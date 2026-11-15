@@ -1,0 +1,33 @@
+ A09. Bloat Score and the morning review
+ Bloat Score = the explicitly confirmed worst bloating for a completed day, 0–10. Today shows
+ "Highest logged so far" instead. The old 0–100 peak × duration score is retired.
+
+ Value                   Meaning                                               Display
+
+ Confirmed daily         DY-01 numeric + DY-02 Yes, by end of next             Chart, averages, comparisons
+ worst                   analysis-zone day
+
+ Late                    Same, entered after the deadline                      History (hollow marker); 7-day
+                                                                               average; not comparisons
+
+ Provisional             Not reviewed, or DY-02 part / not sure, or I can't    "Highest logged N · review to confirm"
+                         remember
+
+ Conflict                Review lower than a logged sample, or zero after      "Check this day"; excluded until fixed
+                         an episode
+
+ Unknown                 Nothing logged and no review                          ?
+
+ Reported duration       Sum of disjoint timed episodes per date               Separate measure; partial if any
+                                                                               END_UNKNOWN
+
+ Review rules
+  • Appears on next open for yesterday only; older dates editable from History as late.
+  • DY-02 is never pre-selected. A skip leaves fields unknown and never erases saved answers.
+  • DY-03 answers: All / Mostly, missed a small snack or drink / Some / None recorded / Not sure / I
+    ate and drank nothing. Mostly can show a food was present, never absent (absence needs All);
+    labelled on results. [FIX 4.3.2]
+  • 7-day average: last 7 completed dates; confirmed and late; at least 4 usable; label "Average of N
+    days (M late)".
+  • Target time 20–30 seconds, measured in beta.
+

@@ -1,0 +1,22 @@
+ B04. Privacy, security and data rights
+  • Ownership enforced in app code and RLS; tested with two users and a staff user. Staff MFA;
+    metadata-only support; temporary user-granted access is scoped and logged.
+  • No advertising or social pixels/SDKs and no session replay anywhere. Analytics: cookieless, event
+    counts only, no food text, symptoms or answers.
+  • Processor register: function, data, regions, retention, training use, deletion for auth, database,
+    storage, AI (Anthropic), email, monitoring, payments, support.
+  • Deletion workflow: verify, suspend access, revoke sessions and shares, cancel jobs, delete
+    records, photos, reports, caches and suggestions, notify processors, record backup expiry,
+    re-apply tombstones on restore.
+  • Export: all owner-visible records with schema versions; JSON and CSV.
+  • Rights requests: logged with jurisdiction and the shortest legal deadline among the three
+    countries; withdrawal of optional consents never deletes the diary.
+  • Breach plan: contain, assess, notify under the FTC Health Breach Notification Rule, state law,
+    PIPEDA/Law 25, DPDP using the shortest deadline; no health detail in notices.
+  • Shared devices: sign-out clears private caches; no sensitive service-worker cache.
+
+  • Emails: neutral subject and body; links only.
+  • No research or other secondary use of any user's data without separate, explicit consent (v4.4).
+  • Age range, ovaries, cycle, menopause, family history and medicines are never sent to AI or
+    analytics (v4.4).
+

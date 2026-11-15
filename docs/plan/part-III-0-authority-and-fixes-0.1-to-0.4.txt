@@ -1,0 +1,443 @@
+ Part III: Full specification
+
+ 0. Authority, labels and how to use this document
+ This is the single build authority for Bloat v4.5. Older documents (v3.x, v4.0, v4.1, the 3 November
+ spec, the v4.2 change record, earlier v4.3 PDFs) are history. Do not load their rules into a coding
+ agent.
+
+ Label                     Meaning
+
+ BUILD DEFAULT             Concrete product or engineering choice to implement and test
+
+ CAUTIOUS DEFAULT          Where an outside review would normally be used, the most cautious behaviour is built
+                           instead
+
+ FIX 4.3.1 to 4.5          Rule changed in v4.3.1 (0.1), v4.3.2 (0.2), v4.4 (0.3) or v4.5 (0.4); where they differ, the
+                           later section wins
+
+ SOURCE                    Content restated from a named public source; the source link is stored in the evidence file
+
+ LATER                     Planned capability with no execution path in this release
+
+ NOT RUN                   Test written; app not built, so not executed
+
+ Reading order
+  • Founder and reviewers: Part 0, A01–A05, A20, D01–D06.
+  • Designers: A06–A07 (every screen), A08–A19.
+  • Engineers and Claude Code: all of Part B and Part C, then A07–A21 for behaviour; B08 is the
+    coding brief.
+  • Anyone checking safety: section 0.1, A15, A17 and D02.
+
+ Version history
+ Version            Date               What it was
+
+ v4.0 / v4.1        1 Nov 2026         Global master with clinician-reviewed safety triage (69 questions, 91 tests)
+
+ 3 Nov spec         3 Nov 2026         33-screen app spec; Free vs Paid; AI ingredient checklist
+
+ v4.2               6 Nov 2026         Wellness-only redesign with no clinician; safety triage removed
+
+ v4.3               6 Nov 2026         Features restored with safeguards; 9 safety layers; locked Free/Pro; USA first
+
+ v4.3.1             6 Nov 2026         Six-month-use fixes; no outside review of any kind; swap-only food
+                                       experiments
+
+ v4.3.2             6 Nov 2026         Five corrections: AI omissions, meal timing, Mostly days, stale tests, kiwi
+                                       allergy
+
+ v4.4               7 Nov 2026         36 fixes from the bloating gap audit: warning signs, free doctor line, age and
+                                       ovaries, periods, menopause, medicines, baseline, doctor PDF
+
+ v4.5               8 Nov 2026         AI spending limit and protections reinstated; Your journey screen; personal
+                                       goal, baseline markers, adaptive logging; no outside review kept (this
+                                       document)
+
+ 0.1 v4.3.1 fixes: what changed and why
+ These fixes came from following one user through six months of the v4.3 rules. Each rule
+ was correct on its own; together they left too few usable days for the foods and habits
+
+ people care about, and nothing to offer once the user had their answer. The founder's
+ decision applies throughout: nothing is reviewed by anyone outside (no clinician,
+ dietitian or lawyer). Where a review would normally be used, the most cautious behaviour is
+ built instead.
+
+ Problem found                        Fix (rule)                                                    Where
+
+ Unticked ingredients were            Every item has Had / Didn't have / Not sure; untouched =      A11, screen 21
+ saved as "didn't have", creating     Not sure; quick buttons Had all of these / None of these
+ false "without" days                 (ML-08)
+
+ Bloating often comes hours           Day D is compared with food eaten on day D plus meals         A10, A14
+ after eating, so the wrong day       from 18:00 on the day before. One fixed window, decided
+ got the credit                       before analysis
+
+ Honest "No, I missed a snack"        Morning review answer "Mostly, missed a small snack or        A09, DY-03
+ lost the whole day                   drink" counts and is labelled
+
+ Restaurant meals removed             Usable days decided separately for each food group; a         A10, A11
+ whole days                           Not sure item removes only its own group. Saved dishes
+                                      can include the place
+
+ Possible triggers sorted by          Three groups: Worth watching (difference 1 point or more      A14, screen 30
+ biggest difference (chance looks     and same direction in both halves), No clear difference,
+ like a trigger)                      Not enough data. Alphabetical inside each; both halves
+                                      shown
+
+ Foods eaten every day (onion,        After 21 days, a group on 80% or more of usable days          A14, A15
+ garlic, wheat) can never be          shows a daily-food message that links to a swap
+ compared                             experiment when one exists and the user is eligible
+
+ Food experiments needed              Replaced by swap experiments: like-for-like swaps for 5       A15
+ professional review                  groups, 2 weeks maximum, 1-week add-back required, at
+                                      most 2 in 180 days. Wheat and multi-group FODMAP
+                                      never offered
+
+ Most habits can never be             Only followed habits get Yes/No each morning; the screen      A13, A14
+ compared                             says so; Personal Focus suggests following a frequently
+                                      logged habit
+
+ Free gives little back               Honest progress counter on Today with real counts only        A04, screen 15
+
+ Upgrading reset the clock            RC-01: right after upgrading, add ingredients to the last 7   A11, screen 38
+                                      days of meals; saved as recalled and labelled
+
+ Cards ran out (20 cards, two a       One card a day, alternating tip and mind-body; when           A16
+ day, 14-day cooldown)                every allowed card was shown recently, use the one
+                                      shown longest ago. Target 40 cards
+
+ Doctor nudge repeated every 30       DN-01: "I've already spoken to a doctor" pauses 90 days;      A14
+ days                                 "Not now" pauses 30 days
+
+ Nothing to offer after month 3       Keep an eye on it mode: daily score, up to 5 watched food     A18
+                                      groups (Yes / No / Not sure), followed habits; meals
+                                      optional; charts, reports and doctor PDF continue
+
+ Monthly subscribers leave after      Pause Pro for 1 to 3 months next to Cancel; cancel screen     A04
+ getting their answer                 offers the doctor PDF first; yearly shown first
+
+ Problem found                        Fix (rule)                                                       Where
+
+ AI accuracy test was too small       300 typed dishes (100 US, 100 Indian, 100 Canadian and           A11
+                                      restaurant) and 100 photos (25 unclear). Measured
+                                      separately: missed 10% or less, wrong 15% or less,
+                                      correct "can't tell" 80% or more
+
+ Wording depended on lawyer           Help page and warning chips quote the NHS word for               A16, A17, D02
+ and clinician checks                 word; cards restate one sourced sentence each; every
+                                      former [Lawyer] item uses its most cautious behaviour
+
+ Pricing was a guess                  During the beta the Upgrade button shows the real price;         D01
+                                      taps are counted and Pro stays free
+ Rows on Mostly days and on groups the AI did not list are tightened by section 0.2.
+ Questions: 78 to 82 (new DN-01, KM-01, KM-02, RC-01; changed ML-03, ML-08, DY-03, DY-04, XP-01). Tests: 117 to
+ 135 (new Q131 to Q148). Screens stay at 39: the new steps live inside existing screens.
+
+ 0.2 v4.3.2 corrections
+ An outside reading of v4.3.1 found five places where the data could say something untrue.
+ All five are fixed here; nothing new was added.
+
+ Problem                                     Correction                                                  Test
+
+ The AI can miss hidden ingredients          Groups the AI didn't list count as not present only for     Q149, Q150
+ (e.g. garlic in a restaurant curry),        meals made at home (ML-06 Home) or confirmed saved
+ and missed groups were treated as           dishes. For restaurant, takeaway, someone else's home
+ not eaten                                   or unknown origin, unlisted groups are unknown
+
+ Food eaten after bloating started           Meals eaten after the start of the day's strongest          Q151
+ was counted for that day                    episode don't count for that day; if eaten from 18:00
+                                             they move into the next day's previous-evening
+                                             window. Exact meal and episode times are kept for this
+
+ A "Mostly" day could wrongly show a         Mostly days can show a group was present, never that        Q152
+ food as not eaten (the missed snack         it was absent. Absence needs All
+ could contain it)
+
+ Six tests still described the v4.3 rules    Q99, Q100, Q116 to Q119, Q126, Q128 and Q29 to Q31          Q154
+ (e.g. Q126 two cards a day),                now match the current rules; the build now refuses old
+ although 0.1 said they were changed         wording, and Q154 checks that no test, question or
+                                             setting contradicts another
+
+ The kiwifruit experiment and card           Both need FX-03 answered No (no food allergy) and say       Q153
+ had no allergy check                        "Don't try this if you're allergic to kiwi"
+ Questions stay at 82. Tests: 135 to 141 (new Q149 to Q154).
+
+ 0.3 v4.4 gap-audit fixes
+ A line-by-line check of the plan against clinical guidance (NHS, NIDDK, AGA 2023, NICE
+ CG122, Mayo Clinic, Cangemi & Lacy 2022) found 36 gaps. The founder accepted all 36 on 7
+ November 2026, with two decisions recorded below. These rules override earlier sections
+ where they differ.
+
+ Founder decisions
+
+ Decision                        Rule
+
+ Doctor line, not a nudge        Free for everyone. One rule: bloating logged on more than 12 of the last 30 days
+                                 (NICE frequency). Never on Today and never a pop-up, so it can't drive users away.
+                                 Shown as a quiet line at the top of History, and in the weekly report, monthly
+                                 summary, Your usual card and doctor PDF. Text: the NHS sentence word for word
+                                 plus a help-page link. A small link "I've spoken to a doctor about this" (DN-01)
+                                 shortens it to one sentence for 90 days. The "after changing your diet" part also
+                                 appears on an experiment result with no change.
+
+ Option A: age range and         Two optional, skippable onboarding questions: ON-14 Age range (18-29 / 30-39 /
+ ovaries                         40-49 / 50-59 / 60+ / Prefer not to say) and ON-15 Do you have ovaries? (Yes / No /
+                                 Prefer not to say). If 50+ and Yes, the doctor line adds the NHS sentence word for
+                                 word: "Sometimes, bloating that does not go away can be a sign of something more
+                                 serious such as ovarian cancer." (nhs.uk/symptoms/bloating, checked 7 November
+                                 2026). Used only for this and the doctor PDF; never sent to AI, analytics, cards or
+                                 comparisons.
+
+ Safety (all free)
+ #      Fix                              Rule
+
+ 1-2    Doctor line                      As above
+
+ 3      Warning chips (EP-08a)           Nine signs from the NHS bloating page, each with its NHS level: emergency
+                                         (sudden, severe stomach ache with a swollen tummy; vomiting blood or
+                                         coffee-ground vomit; severe difficulty breathing) shows the country
+                                         emergency number; urgent (vomiting; fever or shivery; swelling or lump in
+                                         the tummy; can't pee, poo or pass gas) shows "contact a doctor today or go
+                                         to urgent care"; see a doctor (blood in poo; weight loss without trying)
+                                         shows "book an appointment with a doctor". Exact NHS wording; only
+                                         service names and numbers localised. Nothing pauses.
+
+ 4      Common symptoms with             When Abdominal pain, Constipation, Diarrhoea or Heartburn or reflux is
+        NHS advice                       ticked in EP-08, the matching NHS sentence shows inline, at most once per
+                                         sign per day
+
+ 5      Blood in poo                     Shown at the NHS "see a doctor" level
+
+ 6      Option A                         As above
+
+ 7      Learn: warning signs             The NHS list in plain words, linking the help page
+        explained
+
+ Logging
+ #      Fix                              Rule
+
+ 8      Periods (free, opt-in)           CY-01 Period started and CY-02 Period ended replace the single cycle-day
+                                         tap (ACT-16 now opens them). Visible only after ON-10 Cycle context
+
+ 9      Perimenopause or                 New ON-10 option; shaded on charts; listed in the doctor PDF; no cycle
+        menopause (free)                 comparison
+
+ 10     Medicine groups (free)           MD-04 asked when a medicine is added: GLP-1 (weight or diabetes), opioid
+                                         pain medicine, iron, multivitamin, antacid or acid reducer, fibre supplement,
+                                         laxative, antibiotic, hormones (HRT or contraception), anti-diarrhoea
+                                         medicine, other
+
+ 11     Weekly impact (free)             WK-01 once a week in the morning review: How much did bloating get in the
+                                         way this week? Not at all / A little / A lot
+
+ #      Fix                             Rule
+
+ 12     Clothes felt tighter (Pro)      New EP-03 option; Bloat never asks for waist or weight
+
+ 13     Two NICE symptoms (Pro)         Loss of appetite; needing to pee more often or urgently (EP-08 and ON-11)
+
+ 14     Health background (Pro)         HC-01 grows from 14 to 24 options: adds fructose malabsorption, functional
+                                        dyspepsia, functional bloating (diagnosed), non-coeliac gluten or wheat
+                                        sensitivity, SIBO, diverticular disease, pancreatic insufficiency, liver, heart or
+                                        kidney condition, cancer (current or past), anxiety or low mood (doctor PDF
+                                        only)
+
+ 15     Family history (Pro)            FH-01 optional: bowel, stomach or ovarian cancer, coeliac disease, Crohn's
+                                        or colitis. Doctor PDF only
+
+ 16     Tests pick list (Pro)           HC-04: lactose, fructose and SIBO breath tests, coeliac blood test, full blood
+                                        count, anaemia found, CA125, ultrasound, endoscopy, colonoscopy, transit
+                                        study, anorectal manometry, other; result as the doctor wrote it
+
+ Insights (Pro)
+ #      Fix                             Rule
+
+ 17     Your cycle                      After 3 complete cycles, compares the 5 days before a period, period days
+                                        and other days, each needing 7+ usable days; same wording, counts and
+                                        both-halves rules as Possible triggers
+
+ 18     Medicine before/after           For a medicine start, stop or dose change with an MD-04 group: average
+                                        score in the 14 days before vs after, each side needing 7+ usable days.
+                                        "This is a difference in your records, not proof the medicine caused it."
+
+ 19     Large meals                     "Days with a large meal" (ML-04 Large) compared like a habit
+
+ 20     Your usual                      After 14 confirmed days: typical daily score, episodes per week, typical
+                                        episode length, bloating days in the last 30, weekly impact, completeness,
+                                        and the same figures for the first 30 days side by side. No better/worse
+                                        labels
+
+ 21     Confounding note                If 50% or more of a result's "with" days also had poor sleep, stress, illness,
+                                        travel, a period or a medicine change: "On 6 of these 9 days you also logged
+                                        poor sleep."
+
+ 22     Fixed wording                   Under every comparison: "This is a difference in your records, not a medical
+                                        measure."
+
+ 23     Phases                          Small label on Today: Discover (first 28 days of Pro, until the first possible
+                                        trigger), Understand (experiments), Maintain (Keep an eye on it mode).
+                                        Quarterly summary every 90 days (release: later)
+
+ 24     AI source labels                Each AI item is labelled "Seen in photo" or "Usually in this recipe". Typed
+                                        dishes: all items "Usually in this recipe". Guesses never look like facts
+
+ Doctor PDF (Pro)
+
+ #      Fix                             Rule
+
+ 25     Two-minute read                 Page 1 summary: tracking period and completeness; bloating days in the
+                                        last 30; typical strength and episode length; how long it has been happening
+                                        (ON-08); weekly impact; main patterns with counts; medicines and changes;
+                                        period or menopause context; warning signs logged; the doctor line; PD-01
+                                        "Your questions for the appointment". Then fixed sections: symptoms, meals
+                                        and food groups, bowel (incl. straining and incomplete counts), habits,
+                                        medicines, health background, family history, tests, experiments, what's
+                                        missing
+
+ Learn and cards (Pro)
+ #      Fix                             Rule
+
+ 26     New articles                    Medicines and bloating (GLP-1, iron, opioids, fibre supplements, laxatives);
+                                        Bloating, periods and menopause; When normal gas feels like too much;
+                                        Bloating during eating-disorder recovery (never pushed by cards). Plus the
+                                        warning-signs article (fix 7)
+
+ 27     Additions                       Constipation article: some laxatives and insoluble fibre can make bloating
+                                        worse. Supplements article: simeticone. Therapies article: names antibiotics
+                                        such as rifaximin and constipation medicines as options doctors may discuss
+
+ 28     Cards                           Already present: "Smaller, more frequent meals" and "Fibre, gradually" (oats
+                                        or linseed). No change needed
+
+ Engineering and business
+ #      Fix                             Rule
+
+ 29     Monitoring                      Errors, latency, AI failure rate, stuck jobs; alerts to the founder; users always
+                                        see an honest failed state
+
+ 30     AI provider layer               Fixed input/output schema; provider and model set in configuration; tests
+                                        unchanged when switching
+
+ 31     Security tests                  Expired export links, revoked shares, deleted accounts, admin access,
+                                        restored backups (Q184)
+
+ 32     Product events                  Onboarding drop-off, logging time, morning-review completion, weekly
+                                        cohorts, feature use, time to first insight. No health values, food, symptoms
+                                        or free text
+
+ 33     Regional AI test set            Dal makhani, pav bhaji (incl. Jain), chole bhature, dosa, sev usal, thali,
+                                        Indo-Chinese, Gujarati and Hinglish names, with preparation variants;
+                                        reported separately
+
+ 34     Paid test and unit              Gate 2 needs a real paid-conversion test and a one-page model: hosting, AI,
+        economics                       payment and store fees (15-30%), support, refunds, CAC vs lifetime value
+
+ 35     Release labels                  Every feature is launch or later. Later: quarterly summary, voice logging,
+                                        home-screen widget, Apple Health / Health Connect import
+
+ 36     No secondary use                No research or other secondary use of any user's data without separate,
+                                        explicit consent
+ Questions: 82 to 90 (new ON-14, ON-15, CY-01, CY-02, WK-01, MD-04, FH-01, PD-01; changed EP-03, EP-08,
+ EP-08a, ON-10, ON-11, HC-01, HC-04, DN-01). Tests: 141 to 176 (new Q155 to Q189; changed Q21, Q96, Q114,
+ Q116). Screens stay at 39: every new step sits in an existing screen.
+
+ 0.4 v4.5: AI protection, Your journey and personal
+ tracking
+ Founder decisions of 8 November 2026: reinstate an AI spending limit with full protections;
+ add a Your journey screen; make the experience personal in three ways; keep the decision
+ of no outside review. These rules override earlier sections where they differ.
+
+ AI protection (reverses the 7 November removal of the cap)
+ Protection                   Rule
+
+ Monthly spending limit       Configurable by the founder; default $50 during the beta. When reached, AI pauses
+                              for all users until next month or until the limit is raised
+
+ Budget alerts                Email to the founder at 50%, 80% and 100% of the monthly limit; no user data in the
+                              email
+
+ Per-user rate limit          At most 10 AI checks per user per hour
+
+ Daily quota                  At most 40 AI checks per user per day (normal use is 3 to 6), reset at midnight in the
+                              user's time zone
+
+ Maximum request size         Dish text: the first 200 characters go to the AI (the full text is saved). Photos shrunk to
+                              1600px and under 2 MB, otherwise not sent. At most 20 items back; maximum
+                              answer length fixed in configuration
+
+ Retry limit                  One retry after 2 seconds, then ingredients unknown; never automatic loops; the
+                              same meal (same save key) is never sent twice
+
+ Emergency kill switch        Feature flag ai_enabled turns all AI off within 1 minute, without a release
+
+ Keys                         Server-side only; separate test and live keys; written steps to replace a key; the AI
+                              provider's own spending limit as a second safety net
+
+ Model setting                Only approved models; anything else refused at start-up with an alert. Alert when one
+                              request costs 3 times the expected cost or more
+
+ Meals always save            Whenever AI is paused, limited, failing or off: the meal saves with ingredients
+                              unknown and the user can add them by hand. Messages: "The ingredient check is
+                              paused right now. Your meal is saved." or "Your meal is saved. Add ingredients
+                              yourself, or try the check again later."
+
+ Your journey (Pro; replaces the Monthly summary, screen 29)
+  • One screen with the user's whole story, so they never have to visit several screens: Since you
+    started (days tracked, completeness, bloating days in the last 30, typical strength and episode
+    length, a trend line); What your records show (patterns worth watching, Your cycle, medicine
+    before/after); What you have tried (experiments and results); Your phase and what comes next;
+    What is missing; the doctor line when due; a "Make doctor report" button that opens the doctor
+    PDF with the same date range.
+  • The Your usual card and the monthly sections move inside it; History links to it. Screens stay at
+    39.
+  • Sections are ordered by the user's goal (ON-16). Every figure carries its day count and the fixed
+    line "This is a difference in your records, not a medical measure." where it compares.
+  • Free users who tap it see the upgrade screen, with no preview of their findings.
+
+ Personal tracking
+ Change                  Rule                                                                      Tier
+
+ Personal goal           Onboarding asks "What do you most want to find out?" (up to 2):           Asked of
+ (ON-16)                 which foods affect me; whether timing or habits matter; whether my        everyone;
+                         cycle plays a part (with cycle context); how my bloating changes over     ordering of Pro
+                         time; getting ready for a doctor visit; not sure yet. It orders Today's   items is Pro
+                         shortcuts, Personal Focus and Your journey. It never changes any
+                         rule, threshold or result. Changeable in Me
+
+ Days against your       After 14 confirmed days, each finished day shows above, around or         Pro
+ own usual               below your usual. Your usual = median daily score of the last 28
+                         confirmed days; above = 2 or more over, below = 2 or more under.
+                         Never "better" or "worse"
+
+ Logging that adapts     After 14 days of use, habit and symptom options not used in 30 days       Everyone
+                         move under "More" (one tap away, never removed). Add meal shows
+                         saved dishes and the 5 most frequent dishes of the last 30 days first.
+                         The nine warning chips never move or hide
+ Unchanged: no outside review of any kind (founder decision, 8 November 2026, after comparing similar apps:
+ Bellyweather, Gutly, Happy Tummy, Gut Lens and mySymptoms launch without review; Cara Care, Monash
+ FODMAP and Nerva are expert-backed). Bloat never claims "medically validated", "reviewed by clinicians",
+ "recommended by doctors" or "clinically proven".
+
+ Pricing (decided 8 November 2026)
+ Item                    Decision
+
+ USA                     US$5.99 a month, US$14.99 for 3 months, US$39.99 a year (tax added at checkout)
+
+ Canada                  CA$7.99 a month, CA$19.99 for 3 months, CA$54.99 a year (converted from USD at about
+                         1.35-1.40; re-check at Gate 2)
+
+ India                   ₹199 a month, ₹549 for 3 months, ₹1,999 a year (18% GST included)
+
+ 3-month plan            Fits Bloat's natural 2-3 month use. Apple offers 1, 2, 3 and 6 months and 1 year (no 4
+                         months), so 3 months keeps the same price on every platform. Each longer plan is
+                         cheaper per month
+
+ App stores              Same price on the web, iPhone and Android
+
+ Which price a user      Set by where they pay: Razorpay accepts Indian payment methods; the web checkout
+ gets                    charges in the card country's currency; the app stores use the store account's country. A
+                         VPN or picking another country at sign-up does not change it
+
+ Free trial              None. The Free plan never expires and acts as the trial
+ Questions: 90 to 91 (new ON-16). Tests: 176 to 200 (new Q190 to Q213). Screens stay at 39 (screen 29 becomes
+ Your journey).
+

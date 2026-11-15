@@ -1,0 +1,70 @@
+ A17. Safety
+ Bloat gives information about when to get help but never decides who needs help.
+
+ #    Layer                     Specification                                                                Plan
+
+ 1    Help page                 Fixed NHS-based text (below); before sign-up; links on Log bloating,         All
+                                Other symptoms, Me, experiments, footer; works without login
+
+ 2    Warning-sign chips        v4.4: nine NHS signs with NHS levels (section 0.3, fix 3). Exact NHS         All
+                                sentence quoted inline. EP-08a Vomiting → "contact a doctor today"
+                                section; Fever or chills → same; Blood in poo → "contact a doctor" and
+                                "book an appointment" sections; Can't pass gas or poo → "contact a
+                                doctor today"
+
+ 3    Doctor line               Bloating on more than 12 of 30 days; History, reports, Your usual,           All
+                                doctor PDF; never Today; Option A ovarian sentence
+
+ 4    Swap experiment           FX-01 to FX-04, re-asked before each swap                                    Pro
+      check
+
+ #    Layer                   Specification                                                                Plan
+
+ 5    Swap only               Like-for-like swaps for 5 groups; max 2 weeks; add-back mandatory;           Pro
+                              max 2 in 180 days; no wheat or FODMAP programmes; banned words
+                              list
+
+ 6    Wellbeing check         WB-01, WB-02 weekly during swaps; Yes pauses and shows helpline              Pro
+
+ 7    Narrow AI               A11 contract                                                                 Pro
+
+ 8    No ad trackers          No ad or social SDKs or pixels; cookieless analytics without health data;    All
+                              breach plan
+
+ 9    App-store ready         Methodology page; "check with your doctor before diet changes";              All
+                              Google Play health declaration as general wellness
+
+ Help page text
+     When to get medical help
+
+     Bloat is a tracker. It can't tell you what is causing your symptoms or whether they are serious.
+
+     Call 911 (USA and Canada) or 112 (India) now if you have bloating with a swollen stomach and:
+     stomach pain that is severe and came on very suddenly; you are vomiting blood, or your vomit looks
+     like coffee grounds; severe difficulty breathing – you're gasping, choking or unable to get words out.
+
+     Contact a doctor today or go to urgent care if you have bloating and: vomiting, diarrhoea or
+     constipation; stomach pain; a high temperature, or you feel hot, cold or shivery; a swelling or lump
+     in your tummy; you can't pee, poo or pass gas; a burning feeling in your chest from stomach acid
+     (acid reflux).
+
+     Book a regular appointment with a doctor if: you feel bloated regularly; you've tried changing
+     what you eat and still keep feeling bloated; you have bloating and are losing weight without trying;
+     you have bloating and blood in your poo.
+
+     Source: NHS, "Bloating" (quoted word for word; only the emergency number is changed for the
+     user's country). This page is general information, not medical advice. [ I've read this ]
+ The stored source copy and its date checked live in the evidence file; follow the attribution rule in the licence
+ shown at the bottom of the NHS page. A test (Q148) checks the app text matches the stored copy.
+
+ Banned words in the UI and marketing
+ safe food, bad food, trigger confirmed, cause of your bloating, cure, heal, diagnose, abnormal, high
+ risk, all clear, you may have [condition], doctor approved, clinically proven.
+
+ Incident handling
+  • Every Worse card tap, "I felt worse" ending and wellbeing pause appears in a founder review
+    queue; reviewed within 7 days.
+  • A pattern of harm switches off the card, experiment or feature via its flag immediately, and is
+    logged in the evidence file.
+  • A safety-related support message is answered by the founder regardless of plan.
+

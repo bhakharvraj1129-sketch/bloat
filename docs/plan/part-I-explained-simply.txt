@@ -1,0 +1,571 @@
+ Part I: The plan, explained simply
+
+ 1. What Bloat is
+ Bloat is a mobile website (it can sit on the phone's home screen like an app) where adults
+ record their bloating, meals and daily habits, see patterns in their own records, try simple
+ experiments, and take a clear report to their doctor.
+
+ The problem it solves. Most people with regular bloating have a guess about the cause ("it's
+ dairy", "it's stress") but have never checked it. Doctors usually get vague memories instead of real
+ records. Bloat replaces guessing with a simple, honest diary, and then helps people test their
+ guesses safely.
+
+ The promise: Track your bloating. Spot your possible triggers. Try simple experiments. Bring real
+ data to your doctor.
+
+ Bloat does                                              Bloat never does
+
+ Records bloating, meals, habits, bowel movements,       Diagnoses anything, or suggests "you may have IBS"
+ exercise and medicines
+
+ Shows "foods linked to your worse days", with day       Says a food causes bloating, or calls foods "safe" or
+ counts                                                  "bad"
+
+ Runs simple habit experiments and short food swaps      Cuts foods out or puts anyone on a restrictive diet
+
+ Shows advice from public health sources (NHS, NIH,      Recommends probiotics, supplements or medicines
+ Monash, BDA)
+
+ Shows when to get medical help                          Decides how urgent someone's symptoms are, or says
+                                                         "all clear"
+
+ Uses AI to list a dish's bloating-related ingredients   Lets AI give health advice
+
+ Why it's built this way. Nobody outside checks Bloat: no doctor, dietitian or lawyer. So safety is
+ built into the design: the most cautious behaviour wherever a review would normally be used, NHS
+ wording quoted word for word, and food swaps instead of cutting foods out. Bloat also stays a
+ "general wellness" product: it shows information and patterns, but never makes medical decisions.
+ Apps that make medical decisions (like Ada, which sorts symptoms by urgency) or claim to treat a
+ condition (like Parallel or Cara Care for IBS) are regulated medical devices.
+
+ 2. Who it's for
+ The ideal user is an adult who bloats at least once a week, has a guess about why, and wants to
+ check it, or wants something concrete to show a doctor.
+
+ Who                                            How Bloat treats them
+
+ Adults 18+ with regular bloating               Full product
+
+ People going to see a doctor                   Full product; the doctor PDF is made for them
+
+ Pregnant or breastfeeding                      Can track and do habit experiments; no food swaps
+
+ History of an eating disorder, or worried      Can track; no "good / bad food" words anywhere; no food swaps;
+ about food                                     support helpline shown
+
+ Coeliac disease, food allergy, Crohn's or      Can track and do habit experiments; no food swaps
+ colitis
+
+ Under 18                                       Can't create an account
+
+ 3. Where, and in what language
+ The USA is the main market. Canada and India launch at the same time. Everything is in English.
+
+                         USA                                Canada                        India
+
+ Role                    Main market                        Second                        Secondary
+
+ Pro price (no trial;    US$5.99 a month, US$14.99 for      CA$7.99 a month,              ₹199 a month, ₹549 for 3
+ Free never expires)     3 months, US$39.99 a year          CA$19.99 for 3 months,        months, ₹1,999 a year
+                                                            CA$54.99 a year
+
+ Emergency number        911                                911                           112
+
+ Units                   Cups, ounces, °F                   Metric with cups              Metric
+
+ Beta testers            50                                 50                            50
+ People in other countries see "not available yet" and can join an email waitlist. No health questions are asked.
+
+ 4. Free and Pro
+ Free is for recording; Pro is for understanding. Free logging never stops, and safety information is
+ never behind the paywall.
+
+                                                                               Free       Pro
+
+ Log bloating: start, strength 1–10, end                                       Yes        Yes
+
+ Warning signs (vomiting, fever, blood in poo, can't pass gas) with matching   Yes        Yes
+ advice
+
+ What it feels like, other symptoms, "did it ease after passing gas?"          —          Yes
+
+ Meals: name, time, portion                                                    Yes        Yes
+
+ AI ingredient check by typing or photo; saved dishes                          —          Yes
+
+ Everyday habit taps (eating fast, gum, late meals, drinks, sitting, cycle,    Yes        Yes
+ medicines)
+
+ Sleep, stress, illness, travel, eating out                                    —          Yes
+
+ Bowel log and exercise log                                                    —          Yes
+
+ Morning review and daily Bloat Score                                          Yes        Yes
+
+ Progress counter (days logged, days still needed)                             Yes        Yes
+
+ History list                                                                  Yes        Yes
+
+ Charts, weekly Pattern Report, monthly summary                                —          Yes
+
+ Possible triggers and "what to log next" tips                                 —          Yes
+
+ Habit experiments and food swaps                                              —          Yes
+
+ "Keep an eye on it" lighter mode; pause Pro for 1–3 months                    —          Yes
+
+ One daily card and the Learn library                                          —          Yes
+
+ Health background and doctor PDF                                              —          Yes
+
+ Help page, edit, download data, delete account                                Yes        Yes
+
+ Honest selling rules
+  • No fake teasers like "we found 2 triggers" to push upgrades.
+  • The full yearly price is shown. Cancelling takes two taps and never deletes data. "Pause Pro" sits
+    next to Cancel, and the cancel screen offers the doctor PDF first.
+  • Right after upgrading, users can add ingredients to their last 7 days of meals, so their free days
+    aren't wasted.
+  • Beta testers get Pro free; payments switch on after the beta.
+
+ 5. A day with Bloat
+ Users open Bloat when something happens: a meal, a bloating episode, or the next morning to
+ confirm yesterday. There are no reminders or notifications.
+
+ When                 Free user                                         Pro user adds
+
+ Morning              30-second review of yesterday: strongest          Bowel question; experiment check-in;
+                      bloating, whether that covers the whole day,      today's card
+                      whether all food was logged, up to 3 habits
+
+ Breakfast            Taps Add meal, types "oatmeal with milk", picks   Snaps a photo; marks milk as Had from
+                      Medium, saves                                     the AI's short list; saves as a dish
+
+ 11:00, feels         Taps I feel bloated, picks 6                      Adds "visible swelling" and "gas"
+ bloated
+
+ 12:30                Taps Bloating gone: lasted 1.5 hours              Answers "did it ease after passing gas?"
+
+ Lunch                Logs a burrito; taps "ate quickly"                AI lists beans, onion, garlic, sour cream;
+                                                                        marks each Had / Didn't have / Not sure
+
+ After lunch          —                                                 Logs a 15-minute walk; scores bloating
+                                                                        before and after
+
+ Evening              Logs dinner; taps "late meal"                     Logs stress; reads the breathing card
+
+ Any time             History list; help page                           Charts, Pattern Report, possible triggers,
+                                                                        doctor PDF
+ During the day, Today shows "Highest logged so far". The confirmed Bloat Score appears only after the next
+ morning's review.
+
+ 6. Sign-up and setup
+ Sign-up takes 4–5 minutes. Only age and location are required; anything skipped is saved as
+ "unknown".
+
+  1. Where do you live? USA, Canada, India or Other (Other goes to the waitlist).
+  2. When to get medical help. Everyone reads this page and taps "I've read this".
+  3. Sign up with an email code or Google, and confirm you're 18+.
+  4. Three agreements: terms and privacy; storing health information; "Bloat is a wellness tracker,
+    not medical advice, and not for emergencies".
+  5. Location, time zone and units.
+  6. About your bloating: what it feels like, how often, how long, when it's worst, other symptoms
+    you often get.
+  7. Your food: cuisines and preferences (vegetarian, vegan and so on).
+  8. Health context: medicines and supplements with their type; pregnancy, breastfeeding,
+    periods, or perimenopause and menopause (optional); age range and whether you have ovaries
+    (optional, used only for the NHS doctor advice).
+  9. Pick up to 3 habits to be asked about each morning.
+  10. How Bloat works: 4 short cards, including "Bloat doesn't diagnose or treat anything".
+ Optional profile cards appear in the first week (sleep, activity, usual meal times, routine, impact). Pro users add
+ their health background later in Me.
+
+ 7. What users record
+ What                    How                                                                         Plan
+
+ Bloating episodes       Big button; strength 1–10; start and end; never a guessed end time          Free
+
+ Warning signs           Four chips that show the matching help advice                               Free
+
+ Feel and other          Pressure or swelling; gas, burping, pain, nausea, heartburn, early          Pro
+ symptoms                fullness, constipation, diarrhoea
+
+ Meals                   Name, time, portion (small to large, plus slices, cups, bowls)              Free
+
+ Ingredients             AI short list of bloating-related ingredients to tick; "I don't know";      Pro
+                         "assume the usual recipe" (kept as a guess)
+
+ Habits                  24 one-tap habits; untapped means unknown, not "no"                         Most Free; sleep,
+                                                                                                     stress, illness,
+                                                                                                     travel, eating out
+                                                                                                     Pro
+
+ Exercise                Type, length, how hard, before or after a meal                              Pro
+
+ Bowel movements         7 plain descriptions, straining, felt complete; never labelled or alerted   Pro
+
+ Medicines               Name, type (e.g. GLP-1 injection, iron, laxative), start date, changes      Free
+
+ Periods (opt-in)        Period started and ended                                                    Free
+
+ Weekly check            How much bloating got in the way this week                                  Free
+
+ Health background       Conditions with status, lactose details, tests you've had                   Pro
+
+ 8. The morning review and Bloat Score
+ The Bloat Score is the user's own answer to "what was the strongest bloating you felt yesterday?",
+ from 0 to 10. It's simple and honest, not a medical measurement.
+
+ Question                                Answers                                 Why it matters
+
+ Strongest bloating yesterday?           0–10, or I can't remember               This becomes the Bloat Score
+
+ Does that cover the whole day?          Yes / Only part / Not sure (never       Only Yes confirms the score
+                                         pre-ticked)
+
+ Did you log everything you ate and      All / Mostly (missed a small snack) /   All days can show a food was or
+ drank?                                  Some / None / Not sure / Ate nothing    wasn't eaten; Mostly days can
+                                                                                 only show it was eaten
+
+ Did your followed habits happen?        Yes / No / Not sure / Skip              Only followed habits can be
+                                                                                 compared, because only they
+                                                                                 get a clear No
+
+ Rules that keep the numbers honest
+  • A review is "confirmed" if done by the end of the next day; later ones are kept but marked "late"
+    and left out of comparisons.
+  • If the review says 2 but a 6 was logged, the app asks which is right.
+  • The 7-day average needs at least 4 confirmed days and says how many it used.
+  • How long bloating lasted is shown separately and never guessed.
+
+ 9. The meal AI (Pro)
+ The AI does one job: it looks at a dish name or photo and lists only the ingredients that commonly
+ cause gas or bloating. The user marks each one Had, Didn't have or Not sure. Anything left
+ untouched counts as Not sure, never as "didn't have".
+
+ It looks for 12 food groups, each backed by a public source: dairy with lactose; wheat and whole
+ grains; onion and garlic; beans and lentils; fruit sugars; "-ol" sweeteners; cabbage-family
+ vegetables; fried or fatty food; spicy food; fizzy drinks; caffeine; alcohol.
+
+  • Every list says "AI suggestion, may be wrong".
+  • If the user doesn't know, they tap "I don't know what was in it" and nothing is guessed. A single
+    Not sure item (say garlic in a restaurant sauce) only affects garlic; the day still counts for
+    everything else. For meals not made at home, anything the AI didn't list is treated as unknown,
+    because restaurant dishes hide ingredients.
+  • "Assume the usual recipe" saves a guess that's shown in history but not used in comparisons.
+  • Saved dishes make repeat meals one tap, and can include the restaurant name.
+  • Photos have location data removed and are deleted after the check unless the user chooses to
+    keep them.
+  • No calories, ever.
+  • The AI never sees symptoms, health information or who the user is.
+  • Before launch, it must pass a test on 300 dishes (US, Indian, Canadian and restaurant) and 100
+    photos, counting missed ingredients, wrong ones and correct "can't tell" answers separately.
+  • Cost: about 4–5 US cents per Pro user a month.
+
+ 10. How Bloat finds patterns (Pro)
+ Bloat's "brain" is a set of fixed, written rules that run on the user's own records. AI never writes the
+ results.
+
+ Part                       What it does in plain words
+
+ Coverage checker           Picks the days complete enough to use, food group by food group. Food from the
+                            evening before (after 6 pm) counts too, because bloating can come hours later, but food
+                            eaten after the day's worst bloating began doesn't
+
+ Possible triggers          Compares the average Bloat Score on days with a food or habit vs days without, once
+                            there are 7 of each. Never ranks a "top trigger". Results go in three groups: Worth
+                            watching (a difference of 1 point or more that holds in both halves of the period), No
+                            clear difference, Not enough data yet. Never says "causes"
+
+ Everyday foods             Foods eaten almost every day can't be compared from records, so Bloat says so and
+                            offers a short food swap instead
+
+ Time of day                After 10 episodes, shows which hours and weekdays bloating usually starts
+
+ What to log next           Suggests the most useful thing to record, e.g. "Your evening bloating often follows late
+                            dinners. Log dinner times for a week?"
+
+ What helps you             Learns from before/after scores which activities seem to help this person
+
+ Doctor line (free)         If bloating is logged on more than 12 of the last 30 days, a quiet line in History, reports
+                            and the doctor PDF quotes the NHS advice to see a doctor. Never on Today, never a
+                            pop-up. For women 50+ who chose to share age and ovaries, it adds the NHS sentence
+                            about ovarian cancer
+
+ Your usual                 Your typical score, episodes per week and episode length, compared with your first
+                            month
+
+ Your cycle                 For people who log periods: bloating before, during and outside periods, after 3 cycles
+
+ Medicine before and        Bloating in the 2 weeks before vs after starting or changing a medicine
+ after
+
+ Your journey (Pro)         Your whole story on one screen: since you started, what your records show, what you
+                            have tried, your phase, what is missing, and one tap to make a doctor report
+
+ Personal touches           You choose what you most want to find out, and that comes first; days are marked
+                            against your own usual; options you never use step aside (warning signs never move)
+
+ Example result
+    Worth watching · Fizzy drinks: average 5.6 on 9 days with, 4.1 on 12 days without. First half +1.6,
+    second half +1.4.
+
+    Eaten almost every day · Onion and garlic: a 2-week swap can compare it.
+
+    This is a pattern in your own records, not proof of a cause.
+
+ Reports: a weekly Personal Pattern Report, a monthly summary, and a doctor PDF with symptoms,
+ meals, bowel habits, habits, exercise, medicines, health background, experiments and what's
+ missing.
+
+ "Keep an eye on it" mode
+
+ After about two months most people know their patterns, and logging every meal starts to feel like a
+ chore. In this lighter mode the user only logs bloating, answers "had any of these yesterday?" for up
+ to 5 food groups they want to watch, and answers their followed habits. Charts, reports and the
+ doctor PDF keep working. One tap switches back.
+
+ 11. Experiments (Pro)
+ Experiments turn a guess into a personal test. Habit experiments are open to every Pro user; food
+ swaps have extra safety steps.
+
+ Habit experiments (7 days)
+ Eat more slowly · No gum or hard candy · No straws · Fewer fizzy drinks · Walk 10–15 minutes after
+ meals · Slow breathing 3 minutes, 3 times a day · Two kiwifruit a day (for people logging
+ constipation who have no food allergy).
+
+ Food swaps (2 weeks + 1 week adding back)
+ Instead of cutting a food out, the user swaps it for a named equivalent, so nothing is missing from
+ their diet: lactose-free milk and yogurt for regular dairy; garlic-infused oil and chives for onion and
+ garlic; smaller or rinsed portions of beans and lentils; regular sweets instead of sugar-free ones;
+ orange, grapes or kiwi instead of apples, pears and honey. The swap stops automatically at 2 weeks,
+ adding the food back for 1 week is required, and there are at most 2 swaps in 6 months. Wheat and
+ multi-food (FODMAP) programmes are never offered, because they normally need professional
+ supervision.
+
+ Safety steps for food swaps
+  • Before starting, four questions: pregnant or breastfeeding? eating disorder now or before, or
+    worried about food? coeliac disease, food allergy, Crohn's or colitis? losing weight without trying?
+    Any yes means food swaps aren't offered, with a kind explanation.
+  • Every week, two questions: worrying about food more? skipping meals or eating with others
+    because of food? A yes pauses the experiment and shows a helpline (USA: National Alliance for
+    Eating Disorders 1-866-662-1235; Canada: NEDIC 1-866-633-4220; India: Tele-MANAS 14416).
+  • Every screen says "Stop if you feel worse" and links to When to get medical help.
+
+ Results
+    "During the experiment your average Bloat Score was 3.9 (6 days). In the 7 days before it was 5.2 (7
+    days). This is a pattern in your own records, not proof that the change caused it."
+
+ With too few days, the app says so instead of showing numbers.
+
+ 12. Daily cards and Learn library (Pro)
+ Each day a Pro user gets one card, alternating between a tip (for example "eat more slowly", "check
+ sugar-free labels", "no big meal right before bed") and a mind–body activity (walk after a meal,
+ slow breathing, tummy massage from right to left, gentle stretch, wind-down for sleep).
+
+  • Cards are picked from what the user logged, and say why they appeared.
+  • Each card restates one sentence from a public source and links to it; no card adds advice of its
+    own.
+  • If every suitable card has been shown in the last 2 weeks, the one shown longest ago comes
+    back. 20 cards are enough for launch; 40 is the goal.
+  • Cards that don't suit someone are hidden based on published guidance (for example, no tummy
+    massage after recent surgery).
+  • Users can mark a card helpful, no difference or worse. "Worse" hides it and is reviewed by you.
+
+  • The Learn library explains why bloating happens, the gut–brain link, what FODMAPs are, what the
+    evidence says about probiotics (experts don't recommend them for bloating), and how to prepare
+    for a doctor visit.
+
+ 13. Safety
+ Bloat tells people when to get help, but never decides who needs help.
+
+ Layer                         What it means
+
+ Help page                     "When to get medical help", NHS wording quoted word for word, before sign-up and
+                               always one tap away
+
+ Warning-sign chips            Nine warning signs from the NHS bloating page (from sudden severe stomach pain
+                               to weight loss without trying); each shows the exact NHS advice at the right level,
+                               free for everyone
+
+ Doctor line                   Bloating on more than 12 of 30 days shows the NHS advice to see a doctor, quietly,
+                               in History and reports
+
+ Food swap checks              Safety questions before, wellbeing questions every week
+
+ Swap only                     One food group, swapped not cut out, 2 weeks maximum, always add foods back, at
+                               most 2 in 6 months, never "safe" or "bad" foods
+
+ Narrow AI                     AI only lists ingredients; it never gives advice
+
+ No ad trackers                No advertising or social-media tracking anywhere; health data never sold
+
+ App-store-ready               Explains how results are calculated; reminds users to check with a doctor before diet
+                               changes
+
+ Your checks                   You read every "worse" report; any feature can be switched off instantly
+ What Bloat never does: safety questionnaires that sort people by urgency, an "all clear", naming conditions,
+ recommending supplements or medicines, long restrictive diets, calorie or weight tracking, therapy inside the app,
+ or collecting genetic data or ethnicity.
+
+ 14. Privacy
+  • Each user's records are locked to them by the database itself.
+  • No name, phone or photo required (an email still identifies the account, so it's never called
+    anonymous).
+  • Separate agreements for each use; any can be withdrawn.
+  • Download everything any time, free. Delete the account and everything goes, including from
+    backups.
+  • Doctor sharing needs a preview, consent and an expiry date.
+  • Each country's privacy law is covered: US federal and state health-data rules, Canada's PIPEDA
+    and Quebec's Law 25, India's DPDP Act.
+
+ 15. Technology in plain words
+ Part                       Tool                             Job
+
+ Screens                    Next.js with TypeScript          The pages people see; works on any phone browser
+
+ Database and login         Supabase                         Stores records; email-code and Google login; keeps
+                                                             each user's data private
+
+ Hosting                    Vercel                           Puts the website online
+
+ AI                         Claude Haiku 5.5                 Lists dishes and ingredients only
+
+ Checks                     Zod and Playwright               Rejects wrong answers; tests the app automatically
+
+ App stores (later)         Capacitor                        Turns the same website into phone apps
+ Built-in protections: no duplicate saves on a lost connection; edits create versions instead of overwriting; every
+ time is stored with its time zone; Pro features are locked by the server, not just hidden.
+ The plan defines 39 screens, 91 questions and 200 automatic tests.
+
+ 16. Launch stages
+ Stage                 What happens
+
+ S0 Build              Build with fake test accounts and a fake AI. First the basics (sign-up, episode, meal, review,
+                       history, corrections, export), then Pro features
+
+ Gate 1                Before any real user: help page matches the stored NHS text; every card links its source
+                       sentence; AI test passed; all tests pass, including the privacy and deletion tests; terms and
+                       privacy policy published from a template service; helplines re-checked
+
+ S1 Beta               Early access, then 150 people (50 per country) for 8 weeks with Pro free. The app counts
+                       what people do (no ad trackers, no health data); the Upgrade button shows the real price
+                       and counts taps
+
+ S2 Paid launch        Payments switch on in each country
+
+ Later                 Expert consults, a chatbot answering only from approved content, packaged-food label
+                       scanning
+ Beta goals: half still logging in week 1 and a quarter in week 4; most reviews on time and under 30 seconds; at
+ least 30 people with a possible-triggers result and 20 finished experiments by week 8.
+
+ 17. Who does what
+ Who                           Job
+
+ You                           Decisions, budget, company and payments, choosing sources for cards, the AI test
+                               answers, the evidence file, finding beta users, reading every "worse" report. Nobody
+                               outside reviews anything.
+
+ Template service              Terms, privacy policy and country notices for a health and wellness app
+
+ Claude Code                   Builds the app from the Complete Master and runs the tests
+
+ Claude (here)                 Documents, card drafts from sources, checklists, reviewing the build
+
+ 18. What changed from the old plan (v4.1)
+ Topic                 Old plan                                    New plan
+
+ Outside checks        Doctor and dietitian approve everything     None; cautious defaults and NHS wording quoted
+                                                                   word for word
+
+ Safety                19 medical questions sorting people by      Help page, nine NHS warning signs, free doctor
+                       urgency                                     line, eating-disorder safeguards
+
+ Plans                 Not defined                                 Free (logging and score) and Pro (everything else)
+
+ Market                USA, Canada, India equally                  USA first; Canada and India alongside
+
+ Meals                 Typed dish, recipe certainty levels         Free: name only. Pro: AI list by typing or photo,
+                                                                   saved dishes, "I don't know"
+
+ Experiments           Food tests with a clinician, switched off   Habit experiments and 2-week food swaps from
+                                                                   day one, with safety steps
+
+ Tips                  None                                        One daily card that learns what helps
+
+ Insights              Comparisons and summaries                   Plus possible triggers, Pattern Report, what to log
+                                                                   next
+
+ Tracking              Simple activities                           Plus exercise, bowel log, health background
+
+ Calories              Not covered                                 Never shown
+ What stays the same: the Bloat Score, tapping when bloating starts and ends, the morning review, "unknown stays
+ unknown", minimum days before comparisons, "pattern, not cause", free download and deletion, the tech stack
+ and the 150-person beta.
+
+ 19. Words used in the plan
+ Word                                 Meaning
+
+ Episode                              One stretch of bloating, from "I feel bloated" to "Bloating gone"
+
+ Bloat Score                          The confirmed strongest bloating for a finished day, 0–10
+
+ Highest logged so far                The strongest rating entered today, before the day is reviewed
+
+ Confirmed / Late / Conflict /        Review on time / after the deadline / disagrees with a logged rating / not
+ Unknown                              answered
+
+ Possible trigger                     A food or habit linked to worse days in the user's own records; never called a
+                                      cause
+
+ Experiment                           A 7-day habit change, or a 2-week food swap then 1 week adding the food
+                                      back, compared with the week before
+
+ Food group                           One of 12 groups of foods often linked to gas or bloating
+
+ Warning-sign chip                    A tap that records a worrying symptom and shows the matching help advice
+
+ General wellness                     A product that supports healthy habits without diagnosing or treating, and isn't
+                                      a regulated medical device
+
+ Evidence file                        Your record of sources, AI tests, changes and feedback
+
+ Gate                                 A checklist that must be passed before the next stage
+
+ S0, S1, S2                           Build on test data, free beta, paid launch
+
+ 20. What to do next
+ Steps 1 and 2 can run at the same time.
+
+ Step 1: Decide (this week)
+  • Business entity and a payment provider that can bill the USA, Canada and India
+  • Pick a legal template service for health and wellness apps (US, Canada, India)
+  • Decide whether to keep the name Bloat (preliminary check: many apps and supplement brands
+    already use the word)
+
+ Step 2: Start the build
+  • Give Claude Code this PDF (its data files are inside)
+  • Build the basics on test data first, then Pro features
+  • Write the 300-dish and 100-photo AI test answers
+
+ Step 3: Content and evidence (weeks 2–4)
+  • Copy the NHS help text into the evidence file; finalise the 20 launch cards from their source
+    sentences (aim for 40)
+  • Start the evidence file
+  • Run the 25 discovery interviews
+
+ Step 4: Gate 1
+  • Terms and privacy policy published from the template
+  • AI test passed
+  • All 200 tests pass
+  • Helplines re-checked
+  • Support contact and incident plan ready
+
+ Step 5: Beta
+  • Early access with in-app counts
+  • 150-person beta for 8 weeks with Pro free and the price-tap test
+  • Week-8 decision on paid launch
+
+ How to use this PDF: read Part I to understand the plan, Part II to see how each function works,
+ and use Part III as the rulebook for building. Older versions (v4.1 to v4.4) are history only.
+

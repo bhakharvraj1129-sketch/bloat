@@ -1,0 +1,3145 @@
+{
+  "version": "4.3",
+  "date": "2026-11-06",
+  "authority": "Bloat Complete Plan v4.3",
+  "conventions": {
+    "single": "exactly one option value",
+    "multi": "one or more option values; an option with exclusive=true cannot be combined with any other",
+    "integer": "whole number within min..max, or one special_options value",
+    "values": "store option 'value'; show 'label'. Labels are English display text and translation keys.",
+    "unanswered": "absence of an answer is UNKNOWN, never No or zero"
+  },
+  "plans": {
+    "free": "Free and Pro",
+    "pro": "Pro only",
+    "all": "Everyone"
+  },
+  "count": 91,
+  "questions": [
+    {
+      "id": "ON-01",
+      "version": "4.3",
+      "prompt": "Are you 18 or older?",
+      "scope": "onboarding",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          }
+        ]
+      },
+      "behaviour": "No stops account creation; no child-account path.",
+      "plan": "free"
+    },
+    {
+      "id": "ON-02",
+      "version": "4.3",
+      "prompt": "Where do you live?",
+      "scope": "onboarding",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "composite",
+        "fields": [
+          {
+            "name": "residence_country",
+            "type": "string",
+            "format": "ISO 3166-1 alpha-2",
+            "required": true
+          },
+          {
+            "name": "administrative_region",
+            "type": "string",
+            "format": "ISO 3166-2 or free text",
+            "required": false
+          },
+          {
+            "name": "time_zone",
+            "type": "string",
+            "format": "IANA time zone, confirmed by user",
+            "required": true
+          }
+        ]
+      },
+      "behaviour": "Residence country, optional region and confirmed time zone. Billing country and interface language are stored separately.",
+      "plan": "free"
+    },
+    {
+      "id": "ON-03",
+      "version": "4.3",
+      "prompt": "What would you like help recording?",
+      "scope": "optional_profile_after_signup",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "symptoms",
+            "label": "Symptoms"
+          },
+          {
+            "value": "meals",
+            "label": "Meals"
+          },
+          {
+            "value": "both",
+            "label": "Both"
+          }
+        ]
+      },
+      "plan": "free"
+    },
+    {
+      "id": "ON-04",
+      "version": "4.3",
+      "prompt": "What foods do you usually eat?",
+      "scope": "onboarding",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi",
+        "options": [
+          {
+            "value": "south_asian",
+            "label": "South Asian"
+          },
+          {
+            "value": "east_asian",
+            "label": "East Asian"
+          },
+          {
+            "value": "southeast_asian",
+            "label": "Southeast Asian"
+          },
+          {
+            "value": "middle_eastern",
+            "label": "Middle Eastern"
+          },
+          {
+            "value": "african",
+            "label": "African"
+          },
+          {
+            "value": "european",
+            "label": "European"
+          },
+          {
+            "value": "north_american",
+            "label": "North American"
+          },
+          {
+            "value": "latin_american",
+            "label": "Latin American"
+          },
+          {
+            "value": "caribbean",
+            "label": "Caribbean"
+          },
+          {
+            "value": "mixed",
+            "label": "Mixed"
+          },
+          {
+            "value": "other",
+            "label": "Other"
+          }
+        ]
+      },
+      "subcuisines": {
+        "south_asian": [
+          {
+            "value": "north_indian",
+            "label": "North Indian"
+          },
+          {
+            "value": "south_indian",
+            "label": "South Indian"
+          },
+          {
+            "value": "gujarati_rajasthani",
+            "label": "Gujarati/Rajasthani"
+          },
+          {
+            "value": "bengali_east_indian",
+            "label": "Bengali/East Indian"
+          },
+          {
+            "value": "maharashtrian",
+            "label": "Maharashtrian"
+          },
+          {
+            "value": "other_south_asian",
+            "label": "Other South Asian"
+          }
+        ],
+        "_other_cuisines": "Sub-lists defined after discovery interviews; free-text 'Other' always available."
+      },
+      "behaviour": "Options ordered by residence country (North American first for US and CA). Used only to order suggestions; logging unrestricted.",
+      "plan": "free"
+    },
+    {
+      "id": "ON-05",
+      "version": "4.3",
+      "prompt": "Any food preferences?",
+      "scope": "onboarding",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi",
+        "options": [
+          {
+            "value": "vegetarian",
+            "label": "Vegetarian"
+          },
+          {
+            "value": "vegan",
+            "label": "Vegan"
+          },
+          {
+            "value": "eggs_included",
+            "label": "Eggs included"
+          },
+          {
+            "value": "jain",
+            "label": "Jain"
+          },
+          {
+            "value": "other",
+            "label": "Other"
+          },
+          {
+            "value": "none",
+            "label": "None",
+            "exclusive": true
+          }
+        ]
+      },
+      "behaviour": "Never prevents logging an unexpected food.",
+      "plan": "free"
+    },
+    {
+      "id": "ON-06",
+      "version": "4.3",
+      "prompt": "What does bloating feel like for you?",
+      "scope": "onboarding",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "pressure_fullness",
+            "label": "Pressure/fullness"
+          },
+          {
+            "value": "visible_swelling",
+            "label": "Visible swelling"
+          },
+          {
+            "value": "both",
+            "label": "Both"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          }
+        ]
+      },
+      "plan": "free"
+    },
+    {
+      "id": "ON-07",
+      "version": "4.3",
+      "prompt": "How often does it happen?",
+      "scope": "onboarding",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "daily",
+            "label": "Daily"
+          },
+          {
+            "value": "several_days_a_week",
+            "label": "Several days a week"
+          },
+          {
+            "value": "less_often",
+            "label": "Less often"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          }
+        ]
+      },
+      "plan": "free"
+    },
+    {
+      "id": "ON-08",
+      "version": "4.3",
+      "prompt": "How long has this been happening?",
+      "scope": "onboarding",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "under_3_months",
+            "label": "Under 3 months"
+          },
+          {
+            "value": "3_12_months",
+            "label": "3-12 months"
+          },
+          {
+            "value": "longer",
+            "label": "Longer"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          }
+        ]
+      },
+      "plan": "free"
+    },
+    {
+      "id": "ON-09",
+      "version": "4.3",
+      "prompt": "Any medicines or supplements you want in your record?",
+      "scope": "onboarding",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes_add_names",
+            "label": "Yes, add names"
+          },
+          {
+            "value": "none_to_record",
+            "label": "None to record"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "skip",
+            "label": "Skip"
+          }
+        ]
+      },
+      "follow_up": {
+        "yes_add_names": [
+          "MD-01",
+          "free-text condition list"
+        ]
+      },
+      "plan": "free",
+      "behaviour": "Medicines only. Conditions move to HC-01 (Pro)."
+    },
+    {
+      "id": "ON-10",
+      "version": "4.3",
+      "prompt": "Would you like pregnancy, breastfeeding or menstrual-cycle context available?",
+      "scope": "onboarding",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi",
+        "options": [
+          {
+            "value": "pregnancy",
+            "label": "Pregnancy"
+          },
+          {
+            "value": "breastfeeding",
+            "label": "Breastfeeding"
+          },
+          {
+            "value": "cycle_context",
+            "label": "Cycle context"
+          },
+          {
+            "value": "perimenopause_or_menopause",
+            "label": "Perimenopause or menopause"
+          },
+          {
+            "value": "none",
+            "label": "None",
+            "exclusive": true
+          },
+          {
+            "value": "skip",
+            "label": "Skip",
+            "exclusive": true
+          }
+        ]
+      },
+      "behaviour": "Opt-in only. Cycle context enables CY-01/CY-02. Perimenopause or menopause is shaded on charts and listed in the doctor PDF. Never sent to AI or analytics; deletable on its own in Me.",
+      "plan": "free",
+      "changed_in": "4.4"
+    },
+    {
+      "id": "ON-11",
+      "version": "4.3",
+      "prompt": "Which of these do you also often get?",
+      "scope": "onboarding",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi",
+        "options": [
+          {
+            "value": "abdominal_pain",
+            "label": "Abdominal pain"
+          },
+          {
+            "value": "gas",
+            "label": "Gas"
+          },
+          {
+            "value": "burping",
+            "label": "Burping"
+          },
+          {
+            "value": "nausea",
+            "label": "Nausea"
+          },
+          {
+            "value": "heartburn_or_reflux",
+            "label": "Heartburn or reflux"
+          },
+          {
+            "value": "feeling_full_quickly",
+            "label": "Feeling full quickly"
+          },
+          {
+            "value": "loss_of_appetite",
+            "label": "Loss of appetite"
+          },
+          {
+            "value": "needing_to_pee_more_often_or_urgently",
+            "label": "Needing to pee more often or urgently"
+          },
+          {
+            "value": "constipation",
+            "label": "Constipation"
+          },
+          {
+            "value": "diarrhoea",
+            "label": "Diarrhoea"
+          },
+          {
+            "value": "none",
+            "label": "None",
+            "exclusive": true
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure",
+            "exclusive": true
+          }
+        ]
+      },
+      "behaviour": "Context only. No symptom check or pop-up; a When to get medical help link is shown.",
+      "plan": "free",
+      "changed_in": "4.4"
+    },
+    {
+      "id": "ON-12",
+      "version": "4.3",
+      "prompt": "When is your bloating usually worst?",
+      "scope": "onboarding",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi",
+        "options": [
+          {
+            "value": "morning",
+            "label": "Morning"
+          },
+          {
+            "value": "afternoon",
+            "label": "Afternoon"
+          },
+          {
+            "value": "evening",
+            "label": "Evening"
+          },
+          {
+            "value": "night",
+            "label": "Night"
+          },
+          {
+            "value": "after_meals",
+            "label": "After meals"
+          },
+          {
+            "value": "varies",
+            "label": "Varies"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure",
+            "exclusive": true
+          }
+        ]
+      },
+      "plan": "free"
+    },
+    {
+      "id": "EP-01",
+      "version": "4.3",
+      "prompt": "How strong is the bloating right now?",
+      "scope": "episode",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "integer",
+        "min": 1,
+        "max": 10,
+        "anchors": {
+          "1": "Very mild bloating",
+          "10": "Worst bloating imaginable"
+        }
+      },
+      "behaviour": "Subjective symptom record, not a danger scale.",
+      "plan": "free"
+    },
+    {
+      "id": "EP-02",
+      "version": "4.3",
+      "prompt": "When did it start?",
+      "scope": "episode",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "now",
+            "label": "Now"
+          },
+          {
+            "value": "choose_earlier_time",
+            "label": "Choose earlier time"
+          },
+          {
+            "value": "approximate_time",
+            "label": "Approximate time"
+          }
+        ]
+      },
+      "behaviour": "Store UTC instant, IANA zone, offset and precision (EXACT or APPROXIMATE).",
+      "plan": "free"
+    },
+    {
+      "id": "EP-03",
+      "version": "4.3",
+      "prompt": "What does it feel like?",
+      "scope": "episode",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi",
+        "options": [
+          {
+            "value": "pressure_fullness",
+            "label": "Pressure/fullness"
+          },
+          {
+            "value": "visible_swelling",
+            "label": "Visible swelling"
+          },
+          {
+            "value": "clothes_felt_tighter",
+            "label": "Clothes felt tighter"
+          },
+          {
+            "value": "skip",
+            "label": "Skip",
+            "exclusive": true
+          }
+        ]
+      },
+      "plan": "pro",
+      "behaviour": "Pro. 'Clothes felt tighter' is a plain sign of distension; Bloat never asks for waist or weight measurements.",
+      "changed_in": "4.4"
+    },
+    {
+      "id": "EP-04",
+      "version": "4.3",
+      "prompt": "Do you want to note a meal or activity you suspect was related?",
+      "scope": "episode",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "choose_an_entry",
+            "label": "Choose an entry"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "skip",
+            "label": "Skip"
+          }
+        ]
+      },
+      "behaviour": "Pro. Stored as the user's suspicion; never a cause. Feeds Personal Focus P5.",
+      "plan": "pro"
+    },
+    {
+      "id": "EP-05",
+      "version": "4.3",
+      "prompt": "Update this episode?",
+      "scope": "episode",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "action",
+        "options": [
+          {
+            "value": "record_current_severity",
+            "label": "Record current severity"
+          },
+          {
+            "value": "it_ended",
+            "label": "It ended"
+          },
+          {
+            "value": "cancel",
+            "label": "Cancel"
+          }
+        ]
+      },
+      "plan": "free"
+    },
+    {
+      "id": "EP-06",
+      "version": "4.3",
+      "prompt": "When did it end?",
+      "scope": "episode",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "now",
+            "label": "Now"
+          },
+          {
+            "value": "choose_time",
+            "label": "Choose time"
+          },
+          {
+            "value": "approximate_time",
+            "label": "Approximate time"
+          },
+          {
+            "value": "i_do_not_know",
+            "label": "I do not know"
+          }
+        ]
+      },
+      "maps_to_state": {
+        "now": "CLOSED_REPORTED_TIME",
+        "choose_time": "CLOSED_REPORTED_TIME",
+        "approximate_time": "CLOSED_APPROXIMATE",
+        "i_do_not_know": "END_UNKNOWN"
+      },
+      "plan": "free"
+    },
+    {
+      "id": "EP-07",
+      "version": "4.3",
+      "prompt": "Is the episode still happening?",
+      "scope": "missed_close",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          }
+        ]
+      },
+      "maps_to": {
+        "yes": "keep OPEN",
+        "no": "ask EP-06",
+        "not_sure": "keep OPEN, unresolved; no fabricated end"
+      },
+      "plan": "free"
+    },
+    {
+      "id": "EP-08",
+      "version": "4.3",
+      "prompt": "Anything else with it?",
+      "scope": "episode",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi",
+        "options": [
+          {
+            "value": "abdominal_pain",
+            "label": "Abdominal pain"
+          },
+          {
+            "value": "gas",
+            "label": "Gas"
+          },
+          {
+            "value": "burping",
+            "label": "Burping"
+          },
+          {
+            "value": "nausea",
+            "label": "Nausea"
+          },
+          {
+            "value": "heartburn_or_reflux",
+            "label": "Heartburn or reflux"
+          },
+          {
+            "value": "feeling_full_quickly",
+            "label": "Feeling full quickly"
+          },
+          {
+            "value": "loss_of_appetite",
+            "label": "Loss of appetite"
+          },
+          {
+            "value": "needing_to_pee_more_often_or_urgently",
+            "label": "Needing to pee more often or urgently"
+          },
+          {
+            "value": "constipation",
+            "label": "Constipation"
+          },
+          {
+            "value": "diarrhoea",
+            "label": "Diarrhoea"
+          },
+          {
+            "value": "none",
+            "label": "None",
+            "exclusive": true
+          },
+          {
+            "value": "skip",
+            "label": "Skip",
+            "exclusive": true
+          }
+        ]
+      },
+      "behaviour": "Pro. Abdominal pain, Constipation, Diarrhoea and Heartburn or reflux each show the matching NHS sentence inline, at most once per sign per day. No alert, no pause.",
+      "plan": "pro",
+      "changed_in": "4.4"
+    },
+    {
+      "id": "DY-01",
+      "version": "4.3",
+      "prompt": "Thinking about all of [date], what was the strongest bloating you felt?",
+      "scope": "daily_review",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "integer",
+        "min": 0,
+        "max": 10,
+        "anchors": {
+          "0": "No bloating",
+          "1": "Very mild bloating",
+          "10": "Worst bloating imaginable"
+        },
+        "special_options": [
+          {
+            "value": "i_cannot_remember",
+            "label": "I cannot remember"
+          }
+        ]
+      },
+      "behaviour": "Confirmed Bloat Score only with numeric answer AND DY-02 = yes. Below a logged sample = CONFLICT.",
+      "plan": "free"
+    },
+    {
+      "id": "DY-02",
+      "version": "4.3",
+      "prompt": "Does this cover all of [date], including times you did not log?",
+      "scope": "daily_review",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "only_part_of_the_day",
+            "label": "Only part of the day"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          }
+        ]
+      },
+      "behaviour": "Always asked, never pre-filled. Required to submit the review (422 if missing).",
+      "plan": "free"
+    },
+    {
+      "id": "DY-03",
+      "version": "4.3",
+      "prompt": "Did you record everything you ate and drank on [date], including snacks and drinks?",
+      "scope": "daily_review",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "all",
+            "label": "All"
+          },
+          {
+            "value": "mostly",
+            "label": "Mostly, missed a small snack or drink"
+          },
+          {
+            "value": "some",
+            "label": "Some"
+          },
+          {
+            "value": "none_recorded",
+            "label": "None recorded"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "i_ate_and_drank_nothing",
+            "label": "I ate and drank nothing"
+          }
+        ]
+      },
+      "maps_to": {
+        "all": "ALL",
+        "some": "SOME",
+        "none_recorded": "NONE",
+        "not_sure": "UNKNOWN",
+        "i_ate_and_drank_nothing": "NO_INTAKE",
+        "mostly": "MOSTLY"
+      },
+      "plan": "free",
+      "behaviour": "MOSTLY days can show that a food group was present, but cannot show it was absent (a missed snack could contain it). Absence needs ALL. Labelled on results (\"includes N 'mostly' days\").",
+      "changed_in": "4.3.1"
+    },
+    {
+      "id": "DY-04",
+      "version": "4.3",
+      "prompt": "Did [selected activity] happen on [date]?",
+      "scope": "daily_review",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "skip",
+            "label": "Skip"
+          }
+        ]
+      },
+      "behaviour": "Up to 3 followed habits, each answered Yes / No / Not sure. Only followed habits get explicit No answers, so only followed habits can be compared. Morning review also asks BW-01 (Pro), XP-02 (Pro, when an experiment is running) and KM-02 (Keep an eye on it mode).",
+      "plan": "free"
+    },
+    {
+      "id": "DY-05",
+      "version": "4.3",
+      "prompt": "No bloating so far today",
+      "scope": "today",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "action",
+        "options": [
+          {
+            "value": "confirm_provisional_observation",
+            "label": "Confirm provisional observation"
+          },
+          {
+            "value": "cancel",
+            "label": "Cancel"
+          }
+        ]
+      },
+      "behaviour": "Saves PROVISIONAL only; superseded by a later episode.",
+      "plan": "free"
+    },
+    {
+      "id": "ML-01",
+      "version": "4.3",
+      "prompt": "What did you have?",
+      "scope": "meal",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "type_it",
+            "label": "Type it"
+          },
+          {
+            "value": "take_a_photo",
+            "label": "Take a photo"
+          },
+          {
+            "value": "recent",
+            "label": "Recent"
+          },
+          {
+            "value": "saved_dish",
+            "label": "Saved dish"
+          }
+        ]
+      },
+      "plan": "free",
+      "behaviour": "Take a photo and Saved dish are Pro."
+    },
+    {
+      "id": "ML-02",
+      "version": "4.3",
+      "prompt": "When did you have it?",
+      "scope": "meal",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "now",
+            "label": "Now"
+          },
+          {
+            "value": "choose_time",
+            "label": "Choose time"
+          }
+        ]
+      },
+      "plan": "free"
+    },
+    {
+      "id": "ML-03",
+      "version": "4.3",
+      "prompt": "Which of these did you have?",
+      "scope": "meal",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "per_item_state",
+        "options": [
+          {
+            "value": "had",
+            "label": "Had"
+          },
+          {
+            "value": "didn_t_have",
+            "label": "Didn't have"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          }
+        ],
+        "default": "not_sure",
+        "source": "AI suggestion limited to the 12 food groups, max 20 items"
+      },
+      "behaviour": "Fixed text: These are foods often linked to gas or bloating (sources: NIH, NHS). AI suggestion, may be wrong. Mark each one. Every item has three buttons: Had / Didn't have / Not sure. An untouched item is saved as Not sure, never as Didn't have. Food groups the AI did not list count as not present only when the meal was made at home (ML-06 Home) or is a saved dish the user confirmed; for every other meal they are unknown, because the AI can miss hidden ingredients.",
+      "plan": "pro",
+      "answer_mapping": {
+        "Had": "had/ai_confirmed",
+        "Didn't have": "didnt_have/ai_confirmed",
+        "Not sure or untouched": "not_sure (unknown for that item's food group only)",
+        "ML-08 Had all of these": "had/ai_confirmed for every item",
+        "ML-08 None of these": "didnt_have/ai_confirmed for every item",
+        "ML-09": "had/user_added",
+        "ML-10": "unknown/dont_know",
+        "ML-11": "had/guess (excluded from comparisons)",
+        "saved_dish": "as saved/saved_dish",
+        "ai_failed": "unknown/ai_failed"
+      },
+      "changed_in": "4.3.1"
+    },
+    {
+      "id": "ML-04",
+      "version": "4.3",
+      "prompt": "How much did you have?",
+      "scope": "meal",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "small",
+            "label": "Small"
+          },
+          {
+            "value": "medium",
+            "label": "Medium"
+          },
+          {
+            "value": "large",
+            "label": "Large"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          }
+        ],
+        "optional_amount": {
+          "count": "decimal",
+          "units": [
+            "slices",
+            "pieces",
+            "cups",
+            "bowls",
+            "plates",
+            "cans_or_bottles",
+            "fl_oz",
+            "ml"
+          ]
+        }
+      },
+      "optional_quantity": {
+        "amount": "decimal",
+        "unit": "entered unit preserved"
+      },
+      "plan": "free"
+    },
+    {
+      "id": "ML-05",
+      "version": "4.3",
+      "prompt": "How fast did you eat?",
+      "scope": "meal",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "slowly",
+            "label": "Slowly"
+          },
+          {
+            "value": "usual_pace",
+            "label": "Usual pace"
+          },
+          {
+            "value": "quickly",
+            "label": "Quickly"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "skip",
+            "label": "Skip"
+          }
+        ]
+      },
+      "plan": "free"
+    },
+    {
+      "id": "ML-06",
+      "version": "4.3",
+      "prompt": "Where was it made?",
+      "scope": "meal",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "home",
+            "label": "Home"
+          },
+          {
+            "value": "restaurant_or_takeaway",
+            "label": "Restaurant or takeaway"
+          },
+          {
+            "value": "someone_else_s_home",
+            "label": "Someone else's home"
+          },
+          {
+            "value": "other",
+            "label": "Other"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "skip",
+            "label": "Skip"
+          }
+        ]
+      },
+      "behaviour": "Origin never implies ingredients.",
+      "plan": "free"
+    },
+    {
+      "id": "BW-01",
+      "version": "4.3",
+      "prompt": "Did you have a bowel movement on [date]?",
+      "scope": "bowel",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "skip",
+            "label": "Skip"
+          }
+        ]
+      },
+      "behaviour": "Pro. Also asked in the morning review for Pro users.",
+      "plan": "pro"
+    },
+    {
+      "id": "BW-02",
+      "version": "4.3",
+      "prompt": "What did it look like?",
+      "scope": "bowel",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "separate_hard_lumps",
+            "label": "Separate hard lumps"
+          },
+          {
+            "value": "lumpy_and_sausage_shaped",
+            "label": "Lumpy and sausage-shaped"
+          },
+          {
+            "value": "sausage_shaped_with_cracks",
+            "label": "Sausage-shaped with cracks"
+          },
+          {
+            "value": "smooth_and_soft_like_a_sausage",
+            "label": "Smooth and soft, like a sausage"
+          },
+          {
+            "value": "soft_blobs_with_clear_edges",
+            "label": "Soft blobs with clear edges"
+          },
+          {
+            "value": "mushy_with_ragged_edges",
+            "label": "Mushy, with ragged edges"
+          },
+          {
+            "value": "watery_no_solid_pieces",
+            "label": "Watery, no solid pieces"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "skip",
+            "label": "Skip"
+          }
+        ]
+      },
+      "plan": "pro",
+      "behaviour": "Own wording; no licensed chart. Never labelled normal, constipated or diarrhoea; no alerts."
+    },
+    {
+      "id": "BW-03",
+      "version": "4.3",
+      "prompt": "Did you strain?",
+      "scope": "bowel",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "skip",
+            "label": "Skip"
+          }
+        ]
+      },
+      "plan": "pro"
+    },
+    {
+      "id": "BW-04",
+      "version": "4.3",
+      "prompt": "Did it feel complete?",
+      "scope": "bowel",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "skip",
+            "label": "Skip"
+          }
+        ]
+      },
+      "plan": "pro"
+    },
+    {
+      "id": "PF-01",
+      "version": "4.3",
+      "prompt": "How has your sleep been?",
+      "scope": "optional_profile",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "better_than_usual",
+            "label": "Better than usual"
+          },
+          {
+            "value": "usual",
+            "label": "Usual"
+          },
+          {
+            "value": "worse_than_usual",
+            "label": "Worse than usual"
+          },
+          {
+            "value": "skip",
+            "label": "Skip"
+          }
+        ]
+      },
+      "optional_hours": {
+        "type": "decimal",
+        "min": 0,
+        "max": 24
+      },
+      "plan": "free"
+    },
+    {
+      "id": "PF-02",
+      "version": "4.3",
+      "prompt": "How active are you on a usual day?",
+      "scope": "optional_profile",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "mostly_sitting",
+            "label": "Mostly sitting"
+          },
+          {
+            "value": "light",
+            "label": "Light"
+          },
+          {
+            "value": "moderate",
+            "label": "Moderate"
+          },
+          {
+            "value": "very_active",
+            "label": "Very active"
+          },
+          {
+            "value": "varies",
+            "label": "Varies"
+          },
+          {
+            "value": "skip",
+            "label": "Skip"
+          }
+        ]
+      },
+      "plan": "free"
+    },
+    {
+      "id": "PF-03",
+      "version": "4.3",
+      "prompt": "When do you usually eat?",
+      "scope": "optional_profile",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "composite",
+        "fields": [
+          {
+            "name": "meal_times",
+            "type": "list of local times",
+            "required": false
+          },
+          {
+            "name": "varies",
+            "type": "boolean",
+            "required": false
+          }
+        ]
+      },
+      "plan": "free"
+    },
+    {
+      "id": "PF-04",
+      "version": "4.3",
+      "prompt": "Have you had a routine change you want to note?",
+      "scope": "optional_profile",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi",
+        "options": [
+          {
+            "value": "travel",
+            "label": "Travel"
+          },
+          {
+            "value": "work_change",
+            "label": "Work change"
+          },
+          {
+            "value": "diet_change",
+            "label": "Diet change"
+          },
+          {
+            "value": "illness",
+            "label": "Illness"
+          },
+          {
+            "value": "other",
+            "label": "Other"
+          },
+          {
+            "value": "none",
+            "label": "None",
+            "exclusive": true
+          },
+          {
+            "value": "skip",
+            "label": "Skip",
+            "exclusive": true
+          }
+        ]
+      },
+      "plan": "free"
+    },
+    {
+      "id": "PF-05",
+      "version": "4.3",
+      "prompt": "How much is bloating affecting your day?",
+      "scope": "optional_profile",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "not_at_all",
+            "label": "Not at all"
+          },
+          {
+            "value": "a_little",
+            "label": "A little"
+          },
+          {
+            "value": "moderately",
+            "label": "Moderately"
+          },
+          {
+            "value": "a_lot",
+            "label": "A lot"
+          },
+          {
+            "value": "skip",
+            "label": "Skip"
+          }
+        ]
+      },
+      "plan": "free"
+    },
+    {
+      "id": "PF-06",
+      "version": "4.3",
+      "prompt": "Compared with when you started recording, how are your symptoms?",
+      "scope": "monthly_optional",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "much_better",
+            "label": "Much better"
+          },
+          {
+            "value": "better",
+            "label": "Better"
+          },
+          {
+            "value": "same",
+            "label": "Same"
+          },
+          {
+            "value": "worse",
+            "label": "Worse"
+          },
+          {
+            "value": "much_worse",
+            "label": "Much worse"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "skip",
+            "label": "Skip"
+          }
+        ]
+      },
+      "plan": "free"
+    },
+    {
+      "id": "MD-01",
+      "version": "4.3",
+      "prompt": "Add a medicine or supplement",
+      "scope": "medicines",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "composite",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "type",
+            "type": "single",
+            "options": [
+              {
+                "value": "medicine",
+                "label": "Medicine"
+              },
+              {
+                "value": "supplement",
+                "label": "Supplement"
+              }
+            ],
+            "required": true
+          },
+          {
+            "name": "started_on",
+            "type": "date",
+            "required": false
+          },
+          {
+            "name": "started_precision",
+            "type": "single",
+            "options": [
+              {
+                "value": "exact",
+                "label": "Exact"
+              },
+              {
+                "value": "approximate",
+                "label": "Approximate"
+              },
+              {
+                "value": "not_sure",
+                "label": "Not sure"
+              }
+            ],
+            "required": true
+          },
+          {
+            "name": "note",
+            "type": "string",
+            "required": false
+          }
+        ]
+      },
+      "behaviour": "Self-report only; no dosing or interaction advice.",
+      "plan": "free"
+    },
+    {
+      "id": "MD-02",
+      "version": "4.3",
+      "prompt": "Did this change?",
+      "scope": "medicines",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "composite",
+        "fields": [
+          {
+            "name": "change",
+            "type": "single",
+            "options": [
+              {
+                "value": "stopped",
+                "label": "Stopped"
+              },
+              {
+                "value": "dose_changed",
+                "label": "Dose changed"
+              },
+              {
+                "value": "restarted",
+                "label": "Restarted"
+              }
+            ],
+            "required": true
+          },
+          {
+            "name": "date",
+            "type": "date",
+            "required": false
+          },
+          {
+            "name": "precision",
+            "type": "single",
+            "options": [
+              {
+                "value": "exact",
+                "label": "Exact"
+              },
+              {
+                "value": "approximate",
+                "label": "Approximate"
+              },
+              {
+                "value": "not_sure",
+                "label": "Not sure"
+              }
+            ],
+            "required": true
+          }
+        ]
+      },
+      "plan": "free"
+    },
+    {
+      "id": "HP-01",
+      "version": "4.3",
+      "prompt": "When to get medical help",
+      "scope": "help",
+      "plan": "all",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "action",
+        "options": [
+          {
+            "value": "i_ve_read_this",
+            "label": "I've read this"
+          }
+        ]
+      },
+      "behaviour": "Static page before sign-up quoting the NHS Bloating page word for word, with source and link; only the emergency number is changed to the user's country. Never offers an all-clear. Stores viewed_at, page_version, acknowledged."
+    },
+    {
+      "id": "CN-01",
+      "version": "4.3",
+      "prompt": "I agree to the Terms and Privacy Policy.",
+      "scope": "consent",
+      "plan": "all",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "agree",
+            "label": "Agree"
+          }
+        ]
+      }
+    },
+    {
+      "id": "CN-02",
+      "version": "4.3",
+      "prompt": "I consent to Bloat storing my health information to show me my own records.",
+      "scope": "consent",
+      "plan": "all",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "agree",
+            "label": "Agree"
+          }
+        ]
+      }
+    },
+    {
+      "id": "CN-03",
+      "version": "4.3",
+      "prompt": "I understand Bloat is a wellness tracker, not medical advice, and not for emergencies.",
+      "scope": "consent",
+      "plan": "all",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "agree",
+            "label": "Agree"
+          }
+        ]
+      }
+    },
+    {
+      "id": "CN-04",
+      "version": "4.3",
+      "prompt": "I agree that the dish name or meal photo is sent to an AI service to suggest ingredients. Nothing else about me is sent.",
+      "scope": "consent",
+      "plan": "pro",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "agree",
+            "label": "Agree"
+          }
+        ]
+      },
+      "behaviour": "Asked before the first AI ingredient check."
+    },
+    {
+      "id": "ST-01",
+      "version": "4.3",
+      "prompt": "Units and formats",
+      "scope": "settings",
+      "plan": "all",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "us",
+            "label": "US"
+          },
+          {
+            "value": "metric",
+            "label": "Metric"
+          }
+        ]
+      },
+      "behaviour": "Default from residence country; editable in Me."
+    },
+    {
+      "id": "ON-13",
+      "version": "4.3",
+      "prompt": "Which habits do you want to be asked about each morning?",
+      "scope": "onboarding",
+      "plan": "all",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi",
+        "max": 3,
+        "source": "activity registry"
+      }
+    },
+    {
+      "id": "EP-08a",
+      "version": "4.3",
+      "prompt": "Anything worrying with it?",
+      "scope": "episode",
+      "plan": "all",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi",
+        "options": [
+          {
+            "value": "sudden_severe_stomach_ache_with_a_swollen_tummy",
+            "label": "Sudden, severe stomach ache with a swollen tummy"
+          },
+          {
+            "value": "vomiting_blood_or_vomit_that_looks_like_ground_coffee",
+            "label": "Vomiting blood, or vomit that looks like ground coffee"
+          },
+          {
+            "value": "severe_difficulty_breathing",
+            "label": "Severe difficulty breathing"
+          },
+          {
+            "value": "vomiting",
+            "label": "Vomiting"
+          },
+          {
+            "value": "fever_or_feeling_hot_cold_or_shivery",
+            "label": "Fever, or feeling hot, cold or shivery"
+          },
+          {
+            "value": "swelling_or_lump_in_my_tummy",
+            "label": "Swelling or lump in my tummy"
+          },
+          {
+            "value": "can_t_pee_poo_or_pass_gas",
+            "label": "Can't pee, poo or pass gas"
+          },
+          {
+            "value": "blood_in_poo",
+            "label": "Blood in poo"
+          },
+          {
+            "value": "weight_loss_without_trying",
+            "label": "Weight loss without trying"
+          },
+          {
+            "value": "none",
+            "label": "None",
+            "exclusive": true
+          }
+        ]
+      },
+      "behaviour": "Free for everyone. Each selected sign shows the exact NHS sentence for its level inline, with source: emergency = call the country emergency number (911 US/CA, 112 IN); urgent = contact a doctor today or go to urgent care; see_doctor = book an appointment with a doctor. Only service names and the emergency number are localised. Nothing is paused; no all-clear.",
+      "nhs_level": {
+        "sudden_severe_stomach_ache_with_a_swollen_tummy": "emergency",
+        "vomiting_blood_or_vomit_that_looks_like_ground_coffee": "emergency",
+        "severe_difficulty_breathing": "emergency",
+        "vomiting": "urgent",
+        "fever_or_feeling_hot_cold_or_shivery": "urgent",
+        "swelling_or_lump_in_my_tummy": "urgent",
+        "can_t_pee_poo_or_pass_gas": "urgent",
+        "blood_in_poo": "see_doctor",
+        "weight_loss_without_trying": "see_doctor"
+      },
+      "changed_in": "4.4"
+    },
+    {
+      "id": "EP-09",
+      "version": "4.3",
+      "prompt": "Did it ease after passing stool or gas?",
+      "scope": "episode",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          },
+          {
+            "value": "didn_t_pass_any",
+            "label": "Didn't pass any"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ML-07",
+      "version": "4.3",
+      "prompt": "Looks like: [dishes]. Is this right?",
+      "scope": "meal",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "per_item",
+        "options": [
+          {
+            "value": "keep",
+            "label": "Keep"
+          },
+          {
+            "value": "edit",
+            "label": "Edit"
+          },
+          {
+            "value": "remove",
+            "label": "Remove"
+          }
+        ],
+        "add": "Add a dish"
+      },
+      "behaviour": "Photo flow. Photo resized to about 1,000 px; location and device metadata removed before sending."
+    },
+    {
+      "id": "ML-08",
+      "version": "4.3",
+      "prompt": "Quick answer for the whole list",
+      "scope": "meal",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "action",
+        "options": [
+          {
+            "value": "had_all_of_these",
+            "label": "Had all of these"
+          },
+          {
+            "value": "none_of_these",
+            "label": "None of these"
+          }
+        ]
+      },
+      "behaviour": "Sets every item at once; each item can still be changed before saving. Replaces the v4.3 'I'm not sure about some' switch.",
+      "changed_in": "4.3.1"
+    },
+    {
+      "id": "ML-09",
+      "version": "4.3",
+      "prompt": "Add an ingredient not in this list",
+      "scope": "meal",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "text",
+        "max_chars": 60
+      },
+      "behaviour": "Mapped to a food group by a fixed keyword list; otherwise 'other'."
+    },
+    {
+      "id": "ML-10",
+      "version": "4.3",
+      "prompt": "I don't know what was in it",
+      "scope": "meal",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "action"
+      },
+      "behaviour": "All listed items saved as unknown/dont_know."
+    },
+    {
+      "id": "ML-11",
+      "version": "4.3",
+      "prompt": "Assume the usual recipe",
+      "scope": "meal",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "action"
+      },
+      "behaviour": "Listed items saved as had/guess; shown in history; excluded from comparisons."
+    },
+    {
+      "id": "ML-12",
+      "version": "4.3",
+      "prompt": "Save as one of my dishes",
+      "scope": "meal",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "boolean"
+      },
+      "behaviour": "Stores confirmed ingredients for one-tap reuse; changes affect future meals only."
+    },
+    {
+      "id": "EX-01",
+      "version": "4.3",
+      "prompt": "What kind of exercise?",
+      "scope": "exercise",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "walking",
+            "label": "Walking"
+          },
+          {
+            "value": "running",
+            "label": "Running"
+          },
+          {
+            "value": "cycling",
+            "label": "Cycling"
+          },
+          {
+            "value": "gym_or_strength",
+            "label": "Gym or strength"
+          },
+          {
+            "value": "yoga",
+            "label": "Yoga"
+          },
+          {
+            "value": "swimming",
+            "label": "Swimming"
+          },
+          {
+            "value": "sport",
+            "label": "Sport"
+          },
+          {
+            "value": "stretching",
+            "label": "Stretching"
+          },
+          {
+            "value": "other",
+            "label": "Other"
+          }
+        ]
+      }
+    },
+    {
+      "id": "EX-02",
+      "version": "4.3",
+      "prompt": "When did you start?",
+      "scope": "exercise",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "now",
+            "label": "Now"
+          },
+          {
+            "value": "choose_time",
+            "label": "Choose time"
+          },
+          {
+            "value": "roughly",
+            "label": "Roughly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "EX-03",
+      "version": "4.3",
+      "prompt": "How long?",
+      "scope": "exercise",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "10_min",
+            "label": "10 min"
+          },
+          {
+            "value": "20_min",
+            "label": "20 min"
+          },
+          {
+            "value": "30_min",
+            "label": "30 min"
+          },
+          {
+            "value": "45_min",
+            "label": "45 min"
+          },
+          {
+            "value": "60_min",
+            "label": "60+ min"
+          },
+          {
+            "value": "enter_minutes",
+            "label": "Enter minutes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "EX-04",
+      "version": "4.3",
+      "prompt": "How hard was it?",
+      "scope": "exercise",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "light",
+            "label": "Light"
+          },
+          {
+            "value": "moderate",
+            "label": "Moderate"
+          },
+          {
+            "value": "vigorous",
+            "label": "Vigorous"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          }
+        ]
+      }
+    },
+    {
+      "id": "EX-05",
+      "version": "4.3",
+      "prompt": "Was it near a meal?",
+      "scope": "exercise",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "before_a_meal",
+            "label": "Before a meal"
+          },
+          {
+            "value": "after_a_meal",
+            "label": "After a meal"
+          },
+          {
+            "value": "not_near_a_meal",
+            "label": "Not near a meal"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          }
+        ]
+      },
+      "behaviour": "Minutes from the last meal and to the next meal are calculated from logged meals."
+    },
+    {
+      "id": "HC-01",
+      "version": "4.3",
+      "prompt": "Any of these you'd like in your record?",
+      "scope": "health",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi",
+        "options": [
+          {
+            "value": "lactose_intolerance",
+            "label": "Lactose intolerance"
+          },
+          {
+            "value": "fructose_malabsorption",
+            "label": "Fructose malabsorption"
+          },
+          {
+            "value": "ibs",
+            "label": "IBS"
+          },
+          {
+            "value": "functional_dyspepsia",
+            "label": "Functional dyspepsia"
+          },
+          {
+            "value": "functional_bloating_diagnosed",
+            "label": "Functional bloating (diagnosed)"
+          },
+          {
+            "value": "coeliac_disease",
+            "label": "Coeliac disease"
+          },
+          {
+            "value": "non_coeliac_gluten_or_wheat_sensitivity",
+            "label": "Non-coeliac gluten or wheat sensitivity"
+          },
+          {
+            "value": "food_allergy",
+            "label": "Food allergy"
+          },
+          {
+            "value": "sibo",
+            "label": "SIBO"
+          },
+          {
+            "value": "long_term_constipation",
+            "label": "Long-term constipation"
+          },
+          {
+            "value": "crohn_s_or_ulcerative_colitis",
+            "label": "Crohn's or ulcerative colitis"
+          },
+          {
+            "value": "diverticular_disease",
+            "label": "Diverticular disease"
+          },
+          {
+            "value": "reflux",
+            "label": "Reflux"
+          },
+          {
+            "value": "gastroparesis",
+            "label": "Gastroparesis"
+          },
+          {
+            "value": "pancreatic_insufficiency",
+            "label": "Pancreatic insufficiency"
+          },
+          {
+            "value": "thyroid_condition",
+            "label": "Thyroid condition"
+          },
+          {
+            "value": "diabetes",
+            "label": "Diabetes"
+          },
+          {
+            "value": "endometriosis",
+            "label": "Endometriosis"
+          },
+          {
+            "value": "pelvic_floor_problems",
+            "label": "Pelvic-floor problems"
+          },
+          {
+            "value": "previous_tummy_surgery_incl_weight_loss_or_reflux_surgery",
+            "label": "Previous tummy surgery (incl. weight-loss or reflux surgery)"
+          },
+          {
+            "value": "liver_heart_or_kidney_condition",
+            "label": "Liver, heart or kidney condition"
+          },
+          {
+            "value": "cancer_current_or_past",
+            "label": "Cancer, current or past"
+          },
+          {
+            "value": "anxiety_or_low_mood",
+            "label": "Anxiety or low mood"
+          },
+          {
+            "value": "other",
+            "label": "Other"
+          }
+        ]
+      },
+      "behaviour": "Record only (24 options). Used for the swap-experiment check, published exclusions and the doctor PDF. Anxiety or low mood is used only in the doctor PDF. Never used to suggest a condition.",
+      "changed_in": "4.4"
+    },
+    {
+      "id": "HC-02",
+      "version": "4.3",
+      "prompt": "What's the status?",
+      "scope": "health",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "diagnosed_by_a_doctor",
+            "label": "Diagnosed by a doctor"
+          },
+          {
+            "value": "i_suspect_it",
+            "label": "I suspect it"
+          },
+          {
+            "value": "tested_ruled_out",
+            "label": "Tested, ruled out"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "prefer_not_to_say",
+            "label": "Prefer not to say"
+          }
+        ],
+        "optional_year": true
+      }
+    },
+    {
+      "id": "HC-03",
+      "version": "4.3",
+      "prompt": "Lactose details",
+      "scope": "health",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "composite",
+        "fields": {
+          "breath_test": [
+            {
+              "value": "positive",
+              "label": "Positive"
+            },
+            {
+              "value": "negative",
+              "label": "Negative"
+            },
+            {
+              "value": "unclear",
+              "label": "Unclear"
+            },
+            {
+              "value": "not_had",
+              "label": "Not had"
+            }
+          ],
+          "after_dairy": [
+            {
+              "value": "bloating",
+              "label": "Bloating"
+            },
+            {
+              "value": "gas",
+              "label": "Gas"
+            },
+            {
+              "value": "diarrhoea",
+              "label": "Diarrhoea"
+            },
+            {
+              "value": "pain",
+              "label": "Pain"
+            },
+            {
+              "value": "nothing",
+              "label": "Nothing"
+            }
+          ]
+        }
+      },
+      "behaviour": "Shown when Lactose intolerance is selected in HC-01."
+    },
+    {
+      "id": "HC-04",
+      "version": "4.3",
+      "prompt": "Tests you've had",
+      "scope": "health",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "composite",
+        "fields": {
+          "test": [
+            {
+              "value": "lactose_breath_test",
+              "label": "Lactose breath test"
+            },
+            {
+              "value": "fructose_breath_test",
+              "label": "Fructose breath test"
+            },
+            {
+              "value": "sibo_breath_test",
+              "label": "SIBO breath test"
+            },
+            {
+              "value": "coeliac_blood_test",
+              "label": "Coeliac blood test"
+            },
+            {
+              "value": "full_blood_count",
+              "label": "Full blood count"
+            },
+            {
+              "value": "anaemia_found",
+              "label": "Anaemia found"
+            },
+            {
+              "value": "ca125_blood_test",
+              "label": "CA125 blood test"
+            },
+            {
+              "value": "ultrasound",
+              "label": "Ultrasound"
+            },
+            {
+              "value": "endoscopy",
+              "label": "Endoscopy"
+            },
+            {
+              "value": "colonoscopy",
+              "label": "Colonoscopy"
+            },
+            {
+              "value": "transit_study",
+              "label": "Transit study"
+            },
+            {
+              "value": "anorectal_manometry",
+              "label": "Anorectal manometry"
+            },
+            {
+              "value": "other",
+              "label": "Other"
+            }
+          ],
+          "date": "date with precision",
+          "result_text": "as written by the doctor, 200 chars"
+        }
+      },
+      "behaviour": "Pick list plus the result as the doctor wrote it. Shown in the doctor PDF.",
+      "changed_in": "4.4"
+    },
+    {
+      "id": "XP-01",
+      "version": "4.3",
+      "prompt": "Choose an experiment",
+      "scope": "experiment",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "eat_more_slowly",
+            "label": "Eat more slowly"
+          },
+          {
+            "value": "no_gum_or_hard_candy",
+            "label": "No gum or hard candy"
+          },
+          {
+            "value": "no_straws",
+            "label": "No straws"
+          },
+          {
+            "value": "fewer_fizzy_drinks",
+            "label": "Fewer fizzy drinks"
+          },
+          {
+            "value": "walk_after_meals",
+            "label": "Walk after meals"
+          },
+          {
+            "value": "slow_breathing",
+            "label": "Slow breathing"
+          },
+          {
+            "value": "kiwifruit_for_regularity",
+            "label": "Kiwifruit for regularity"
+          },
+          {
+            "value": "swap_lactose_free_dairy",
+            "label": "Swap: lactose-free dairy"
+          },
+          {
+            "value": "swap_onion_and_garlic",
+            "label": "Swap: onion and garlic"
+          },
+          {
+            "value": "swap_beans_and_lentils",
+            "label": "Swap: beans and lentils"
+          },
+          {
+            "value": "swap_sugar_free_sweets_and_gum",
+            "label": "Swap: sugar-free sweets and gum"
+          },
+          {
+            "value": "swap_apples_pears_and_honey",
+            "label": "Swap: apples, pears and honey"
+          }
+        ]
+      },
+      "behaviour": "One at a time. Kiwifruit for regularity requires FX-03 answered No (no food allergy) and shows \"Don't try this if you're allergic to kiwi.\" Swap options require FX-01 to FX-04 all No; at most 2 swap experiments in any 180 days. Wheat, grains and multi-group (FODMAP) experiments are never offered.",
+      "changed_in": "4.3.1"
+    },
+    {
+      "id": "XP-02",
+      "version": "4.3",
+      "prompt": "Did you do [experiment] today?",
+      "scope": "experiment",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "partly",
+            "label": "Partly"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          }
+        ]
+      }
+    },
+    {
+      "id": "XP-03",
+      "version": "4.3",
+      "prompt": "Why are you ending early?",
+      "scope": "experiment",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "i_felt_worse",
+            "label": "I felt worse"
+          },
+          {
+            "value": "too_hard_to_keep_up",
+            "label": "Too hard to keep up"
+          },
+          {
+            "value": "other",
+            "label": "Other"
+          }
+        ]
+      },
+      "behaviour": "'I felt worse' shows no numbers, shows the help link and is logged for founder review."
+    },
+    {
+      "id": "FX-01",
+      "version": "4.3",
+      "prompt": "Are you pregnant or breastfeeding?",
+      "scope": "experiment_check",
+      "plan": "pro",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "prefer_not_to_say",
+            "label": "Prefer not to say"
+          }
+        ]
+      },
+      "behaviour": "Anything other than No: swap experiments not offered."
+    },
+    {
+      "id": "FX-02",
+      "version": "4.3",
+      "prompt": "Have you ever had an eating disorder, or do you often worry about food or your weight?",
+      "scope": "experiment_check",
+      "plan": "pro",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "prefer_not_to_say",
+            "label": "Prefer not to say"
+          }
+        ]
+      },
+      "behaviour": "Anything other than No: swap experiments not offered; country helpline shown."
+    },
+    {
+      "id": "FX-03",
+      "version": "4.3",
+      "prompt": "Do you have coeliac disease, a food allergy, or Crohn's or ulcerative colitis?",
+      "scope": "experiment_check",
+      "plan": "pro",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "prefer_not_to_say",
+            "label": "Prefer not to say"
+          }
+        ]
+      }
+    },
+    {
+      "id": "FX-04",
+      "version": "4.3",
+      "prompt": "Have you lost weight recently without trying?",
+      "scope": "experiment_check",
+      "plan": "pro",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          },
+          {
+            "value": "prefer_not_to_say",
+            "label": "Prefer not to say"
+          }
+        ]
+      },
+      "behaviour": "Yes: not offered; help-page link."
+    },
+    {
+      "id": "WB-01",
+      "version": "4.3",
+      "prompt": "Are you worrying about food more than before?",
+      "scope": "wellbeing",
+      "plan": "pro",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          }
+        ]
+      },
+      "behaviour": "Weekly during swap experiments. Yes pauses the experiment and shows the country helpline (the most cautious default)."
+    },
+    {
+      "id": "WB-02",
+      "version": "4.3",
+      "prompt": "Have you skipped meals or eating with others because of food?",
+      "scope": "wellbeing",
+      "plan": "pro",
+      "required": true,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          }
+        ]
+      }
+    },
+    {
+      "id": "GC-01",
+      "version": "4.3",
+      "prompt": "Card feedback",
+      "scope": "cards",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi_group",
+        "groups": {
+          "tried": [
+            {
+              "value": "tried",
+              "label": "Tried"
+            },
+            {
+              "value": "not_today",
+              "label": "Not today"
+            }
+          ],
+          "result": [
+            {
+              "value": "helpful",
+              "label": "Helpful"
+            },
+            {
+              "value": "no_difference",
+              "label": "No difference"
+            },
+            {
+              "value": "worse",
+              "label": "Worse"
+            }
+          ],
+          "other": [
+            {
+              "value": "not_relevant",
+              "label": "Not relevant"
+            },
+            {
+              "value": "hide_this_card",
+              "label": "Hide this card"
+            }
+          ]
+        }
+      },
+      "behaviour": "Worse hides the card for that user and is logged for founder review."
+    },
+    {
+      "id": "AR-01",
+      "version": "4.3",
+      "prompt": "How bloated do you feel? (before / after)",
+      "scope": "cards",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "integer",
+        "min": 0,
+        "max": 10
+      },
+      "behaviour": "Optional before/after score on mind-body cards and habit experiments; 'What helps you' after 3+ tries."
+    },
+    {
+      "id": "DN-01",
+      "version": "4.3",
+      "prompt": "I've spoken to a doctor about this",
+      "scope": "insights",
+      "plan": "all",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "action",
+        "options": [
+          {
+            "value": "i_ve_spoken_to_a_doctor_about_this",
+            "label": "I've spoken to a doctor about this"
+          }
+        ]
+      },
+      "behaviour": "Small link under the doctor line. Shortens the line to one sentence for 90 days. The doctor line never appears on Today and never as a pop-up.",
+      "changed_in": "4.4"
+    },
+    {
+      "id": "KM-01",
+      "version": "4.3",
+      "prompt": "Which food groups do you want to keep an eye on?",
+      "scope": "keep_an_eye",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi",
+        "max": 5,
+        "source": "the 12 food groups"
+      },
+      "behaviour": "Set when switching on Keep an eye on it mode; editable in Me.",
+      "changed_in": "4.3.1"
+    },
+    {
+      "id": "KM-02",
+      "version": "4.3",
+      "prompt": "Had any of these yesterday?",
+      "scope": "daily_review",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "per_item_state",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure"
+          }
+        ],
+        "source": "KM-01 groups"
+      },
+      "behaviour": "Asked in the morning review in Keep an eye on it mode. Explicit Yes/No sets that group's exposure for the day; Not sure = unknown.",
+      "changed_in": "4.3.1"
+    },
+    {
+      "id": "RC-01",
+      "version": "4.3",
+      "prompt": "Add ingredients to your last 7 days of meals?",
+      "scope": "upgrade",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "action",
+        "options": [
+          {
+            "value": "yes_go_through_them",
+            "label": "Yes, go through them"
+          },
+          {
+            "value": "not_now",
+            "label": "Not now"
+          }
+        ]
+      },
+      "behaviour": "Offered once, right after upgrading. Runs the AI check on free-period meals from the last 7 days; answers saved with source 'recalled' and counted, labelled on results.",
+      "changed_in": "4.3.1"
+    },
+    {
+      "id": "ON-14",
+      "version": "4.3",
+      "prompt": "Your age range (optional)",
+      "scope": "onboarding",
+      "plan": "all",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "18_29",
+            "label": "18-29"
+          },
+          {
+            "value": "30_39",
+            "label": "30-39"
+          },
+          {
+            "value": "40_49",
+            "label": "40-49"
+          },
+          {
+            "value": "50_59",
+            "label": "50-59"
+          },
+          {
+            "value": "60",
+            "label": "60+"
+          },
+          {
+            "value": "prefer_not_to_say",
+            "label": "Prefer not to say"
+          }
+        ]
+      },
+      "behaviour": "Optional, skippable. Used only to add the NHS ovarian-cancer sentence to the doctor line (with ON-15) and in the doctor PDF. Never sent to AI or analytics.",
+      "changed_in": "4.4"
+    },
+    {
+      "id": "ON-15",
+      "version": "4.3",
+      "prompt": "Do you have ovaries? (optional)",
+      "scope": "onboarding",
+      "plan": "all",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          },
+          {
+            "value": "prefer_not_to_say",
+            "label": "Prefer not to say"
+          }
+        ]
+      },
+      "behaviour": "Optional, skippable. Same use and limits as ON-14.",
+      "changed_in": "4.4"
+    },
+    {
+      "id": "CY-01",
+      "version": "4.3",
+      "prompt": "Period started",
+      "scope": "cycle",
+      "plan": "all",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "date",
+        "precision": [
+          "exact",
+          "approximate"
+        ]
+      },
+      "behaviour": "Visible only with ON-10 Cycle context. Replaces the single cycle-day tap.",
+      "changed_in": "4.4"
+    },
+    {
+      "id": "CY-02",
+      "version": "4.3",
+      "prompt": "Period ended",
+      "scope": "cycle",
+      "plan": "all",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "date",
+        "precision": [
+          "exact",
+          "approximate"
+        ]
+      },
+      "changed_in": "4.4"
+    },
+    {
+      "id": "WK-01",
+      "version": "4.3",
+      "prompt": "How much did bloating get in the way this week?",
+      "scope": "weekly",
+      "plan": "all",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "not_at_all",
+            "label": "Not at all"
+          },
+          {
+            "value": "a_little",
+            "label": "A little"
+          },
+          {
+            "value": "a_lot",
+            "label": "A lot"
+          },
+          {
+            "value": "skip",
+            "label": "Skip"
+          }
+        ]
+      },
+      "behaviour": "Once a week in the morning review (Monday by default). Shown in the doctor PDF and on Your usual.",
+      "changed_in": "4.4"
+    },
+    {
+      "id": "MD-04",
+      "version": "4.3",
+      "prompt": "What kind of medicine or supplement is it?",
+      "scope": "medicines",
+      "plan": "all",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "single",
+        "options": [
+          {
+            "value": "glp_1_weight_or_diabetes",
+            "label": "GLP-1 (weight or diabetes)"
+          },
+          {
+            "value": "opioid_pain_medicine",
+            "label": "Opioid pain medicine"
+          },
+          {
+            "value": "iron",
+            "label": "Iron"
+          },
+          {
+            "value": "multivitamin",
+            "label": "Multivitamin"
+          },
+          {
+            "value": "antacid_or_acid_reducer",
+            "label": "Antacid or acid reducer"
+          },
+          {
+            "value": "fibre_supplement",
+            "label": "Fibre supplement"
+          },
+          {
+            "value": "laxative",
+            "label": "Laxative"
+          },
+          {
+            "value": "antibiotic",
+            "label": "Antibiotic"
+          },
+          {
+            "value": "hormones_hrt_or_contraception",
+            "label": "Hormones (HRT or contraception)"
+          },
+          {
+            "value": "anti_diarrhoea_medicine",
+            "label": "Anti-diarrhoea medicine"
+          },
+          {
+            "value": "other",
+            "label": "Other"
+          }
+        ]
+      },
+      "behaviour": "Asked when a medicine is added (MD-01). Enables the before/after view (Pro).",
+      "changed_in": "4.4"
+    },
+    {
+      "id": "FH-01",
+      "version": "4.3",
+      "prompt": "Has a parent, brother or sister had any of these? (optional)",
+      "scope": "health",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi",
+        "options": [
+          {
+            "value": "bowel_cancer",
+            "label": "Bowel cancer"
+          },
+          {
+            "value": "stomach_cancer",
+            "label": "Stomach cancer"
+          },
+          {
+            "value": "ovarian_cancer",
+            "label": "Ovarian cancer"
+          },
+          {
+            "value": "coeliac_disease",
+            "label": "Coeliac disease"
+          },
+          {
+            "value": "crohn_s_or_ulcerative_colitis",
+            "label": "Crohn's or ulcerative colitis"
+          },
+          {
+            "value": "none",
+            "label": "None",
+            "exclusive": true
+          },
+          {
+            "value": "not_sure",
+            "label": "Not sure",
+            "exclusive": true
+          },
+          {
+            "value": "prefer_not_to_say",
+            "label": "Prefer not to say",
+            "exclusive": true
+          }
+        ]
+      },
+      "behaviour": "Doctor PDF only. Never used for cards, nudges, comparisons, AI or analytics.",
+      "changed_in": "4.4"
+    },
+    {
+      "id": "PD-01",
+      "version": "4.3",
+      "prompt": "Questions you want to ask your doctor",
+      "scope": "report",
+      "plan": "pro",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "text",
+        "max_chars": 600
+      },
+      "behaviour": "Printed in its own box on the doctor PDF summary page.",
+      "changed_in": "4.4"
+    },
+    {
+      "id": "ON-16",
+      "version": "4.3",
+      "prompt": "What do you most want to find out? (choose up to 2)",
+      "scope": "onboarding",
+      "plan": "all",
+      "required": false,
+      "status": "IMPLEMENTATION_DEFAULT",
+      "input": {
+        "type": "multi",
+        "max": 2,
+        "options": [
+          {
+            "value": "which_foods_affect_me",
+            "label": "Which foods affect me"
+          },
+          {
+            "value": "whether_timing_or_habits_matter",
+            "label": "Whether timing or habits matter"
+          },
+          {
+            "value": "whether_my_cycle_plays_a_part",
+            "label": "Whether my cycle plays a part"
+          },
+          {
+            "value": "how_my_bloating_changes_over_time",
+            "label": "How my bloating changes over time"
+          },
+          {
+            "value": "getting_ready_for_a_doctor_visit",
+            "label": "Getting ready for a doctor visit"
+          },
+          {
+            "value": "not_sure_yet",
+            "label": "Not sure yet",
+            "exclusive": true
+          }
+        ]
+      },
+      "behaviour": "Personal goal. Orders Today's shortcuts, Personal Focus and the sections of Your journey; changeable in Me. 'Whether my cycle plays a part' shows only with ON-10 Cycle context. Never changes any rule or threshold.",
+      "changed_in": "4.5"
+    }
+  ]
+}

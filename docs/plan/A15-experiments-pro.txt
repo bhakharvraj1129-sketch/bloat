@@ -1,0 +1,75 @@
+ A15. Experiments (Pro)
+ Habit experiments
+ Experiment              Daily instruction                                            Length     Source
+
+ Eat more slowly         Sit down for main meals; fork down between bites;            7 days     NIDDK
+                         about 20 minutes per meal
+
+ No gum or hard          None for the week                                            7 days     NIDDK
+ candy
+
+ No straws               Drink from the glass or cup                                  7 days     NIDDK
+
+ Fewer fizzy drinks      Swap soda, sparkling water and energy drinks for still       7 days     NIDDK, NHS
+                         drinks
+
+ Walk after meals        Gentle 10–15 minutes after main meals, if comfortable        7 days     NHS; 2021 RCT
+
+ Slow breathing          3 minutes diaphragmatic breathing, 3 times a day             7 days     2025 RCT; NHS
+
+ Kiwifruit for           2 whole kiwifruit a day (offered when constipation is        7 days     BDA 2025
+ regularity              logged and FX-03 is No; "Don't try this if you're allergic
+                         to kiwi")
+
+ Swap experiments (after FX check) [FIX 4.3.1]
+ The user swaps one food group for a named equivalent, so nothing is missing from their diet. This
+ replaces cut-back food experiments, lactose trial and gentle FODMAP, which normally need
+ professional supervision.
+
+ Food group                       Swap offered                            Phases and length
+
+ TAG-01 Milk and soft dairy       Lactose-free milk, yogurt, hard         Baseline (prior 7 days) → swap up to 2
+ (lactose)                        cheese                                  weeks (auto-ends) → add back 1 week
+                                                                          (required) → compare
+
+ TAG-03 Onion and garlic          Garlic-infused oil, chives, spring      Same
+                                  onion greens
+
+ TAG-04 Beans and lentils         Smaller portion, or canned and          Same
+                                  rinsed
+
+ TAG-06 Sugar-free sweets         Regular sweets in small amounts,        Same
+ and gum                          or none
+
+ TAG-05 Apples, pears, honey      Orange, grapes, kiwi                    Same
+  • Never offered: wheat or grains (TAG-02), several groups at once (FODMAP programmes), any
+    group without a like-for-like swap. Fizzy drinks are covered by the habit experiment.
+  • At most 2 swap experiments in any 180 days; one experiment of any kind at a time.
+  • FX-01 to FX-04 asked before each swap; anything other than No means swaps are not offered
+    (habit experiments still are).
+  • WB-01 and WB-02 weekly; a Yes pauses the swap and shows the country helpline.
+  • Every swap screen shows "Stop if you feel worse" and a link to When to get medical help.
+
+ State machine
+ PROPOSED → (eligible, prior 4+ confirmed days) → RUNNING → [swap: ADDING_BACK] →
+ COMPLETED. RUNNING → PAUSED (WB Yes) → RUNNING or ENDED_EARLY. Any → ENDED_EARLY
+ (XP-03). One experiment per user at a time.
+
+ Result templates (fixed)
+ Case                    Text
+
+ Habit, enough data      "During the experiment your average Bloat Score was {a} ({n} days). In the 7 days before
+                         it was {b} ({m} days). This is a pattern in your own records, not proof that the change
+                         caused it."
+
+ Food, enough data       "Before: {b} ({m} days). While swapping {group}: {a} ({n} days). After adding it back:
+                         {c} ({k} days). This is a pattern in your own records, not proof that the food caused it.
+                         Keep eating foods that didn't make a difference."
+
+ Not enough              "There aren't enough days to compare yet. You logged a confirmed score on {n} of
+                         {total} days."
+
+ Felt worse              "You ended this experiment because you felt worse. If symptoms are severe or worrying,
+                         see When to get medical help." (no numbers)
+ Enough data = 4+ confirmed days in each period and 4+ "Yes" days.
+

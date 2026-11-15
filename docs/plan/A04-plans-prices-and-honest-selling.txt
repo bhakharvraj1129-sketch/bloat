@@ -1,0 +1,82 @@
+ A04. Plans, prices and honest selling
+ Locked Free / Pro list (6 November 2026)
+ Feature                                                                             Free              Pro
+
+ Help page; warning-sign chips                                                       Yes               Yes
+
+ Episodes: start, strength, end, update                                              Yes               Yes
+
+ Feel (EP-03), other symptoms (EP-08), suspicion (EP-04), eased after passing        —                 Yes
+ gas (EP-09)
+
+ Meals: name, time, portion, pace, where made                                        Yes               Yes
+
+ AI ingredient check (typed or photo), saved dishes                                  —                 Yes
+
+ Habits: eating, drinks, sitting, cycle, water, medicines, alcohol, smoking,         Yes               Yes
+ tea/coffee, walked, exercised
+
+ Habits: poor sleep, stress, constipated, no bowel movement, unwell, travelling,     —                 Yes
+ ate out
+
+ Bowel log; exercise log                                                             —                 Yes
+
+ Morning review, Bloat Score, history list, day detail, edit, delete                 Yes               Yes
+
+ Progress counter (days logged, confirmed days needed)                               Yes               Yes
+
+ Keep an eye on it mode; add ingredients to last 7 days after upgrading; pause       —                 Yes
+ Pro
+
+ Charts, 7-day average, time-of-day pattern                                          —                 Yes
+
+ Feature                                                                             Free           Pro
+
+ Weekly Pattern Report, monthly summary, doctor PDF                                  —              Yes
+
+ Possible triggers, next best log, what helps you                                    —              Yes
+
+ Doctor line (bloating on more than 12 of 30 days), warning signs, period and        Yes            Yes
+ menopause logging, medicine groups, weekly impact
+
+ Your usual, Your cycle, medicine before/after, phases, family history, tests list   —              Yes
+
+ Habit and swap experiments                                                          —              Yes
+
+ Daily cards, Learn library, health background                                       —              Yes
+
+ Download my data, delete account, consents                                          Yes            Yes
+
+ Prices (decided 8 November 2026)
+ Country         Monthly         3 months        Yearly        Tax
+
+ USA             US$5.99         US$14.99        US$39.99      Added at checkout
+
+ Canada          CA$7.99         CA$19.99        CA$54.99      Added at checkout (converted at about 1.35-1.40;
+                                                               re-check at Gate 2)
+
+ India           ₹199            ₹549            ₹1,999        18% GST included
+ Same price on the web, iPhone and Android in each country. No free trial: the Free plan never expires and acts as
+ the trial. The price charged follows the payment method's country (Razorpay for Indian methods, the card's
+ country on the web, the store account's country in the app stores), not the country picked at sign-up. Each longer
+ plan costs less per month than the shorter one (India: ₹199, ₹183, ₹167 a month).
+
+ Selling rules
+  • Free logging never expires. Safety content is never paywalled.
+  • Upgrade prompts state only true facts: "You have 14 scored days. Pro shows your chart and
+    possible triggers." No fake teasers.
+  • Yearly total shown first, then monthly equivalent; currency, tax presentation, renewal date and
+    cancellation route before checkout.
+  • Cancellation in two taps; never deletes data or past reports. Downgrade keeps records; Pro
+    generation stops.
+  • Offer record stores country, currency, amount in minor units, interval, trial terms, provider price
+    ID and version; invoices never re-converted.
+  • Payment provider webhook is authoritative; idempotent, ordered events; explicit states for failed,
+    grace, cancelled, refunded, chargeback.
+  • Free Today shows an honest progress counter: "14 days logged · 9 of 14 confirmed days needed
+    for possible triggers". Real counts only.
+  • Pause Pro for 1, 2 or 3 months sits next to Cancel: no charge, data kept, Pro screens locked until
+    resume. The cancel screen offers "Download your doctor PDF first".
+  • No free trial: the Free plan never expires and acts as the trial (Q210). Plans: monthly, 3 months,
+    yearly; yearly shown first.
+

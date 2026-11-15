@@ -1,0 +1,32 @@
+ B06. Build slices and coding-agent brief
+ Slice        Scope
+
+ A            Onboarding with help page and consents, episodes with warning chips, basic meals, morning review,
+              history, day detail, corrections, export; synthetic US/CA/IN accounts; ownership, revisions, time rules
+              first
+
+ B            Habits, medicines, plan entitlement and Pro locking (403), Pro episode detail, bowel and exercise logs
+
+ C            Meal AI (mock, then real) with photo pipeline, three-state answers, saved dishes with place, recalled
+              check, AI accuracy harness (300 + 100)
+
+ D            Insights: per-group coverage with previous-evening window, possible triggers in three sections with
+              halves, daily-food message, Personal Focus, next best log, charts, Pattern Report, monthly summary,
+              doctor PDF and sharing, Keep an eye on it mode
+
+ E            Habit and swap experiments with FX and WB checks, one card a day and library with admin
+              publishing, what helps you, doctor line, Your usual, Your cycle, medicine before/after
+
+ F            Account deletion and backups, analytics without health data, payments with pause (S2)
+
+ Copyable instruction
+
+    Implement Bloat from Complete Plan v4.5 one slice at a time, starting with Slice A. Load questions,
+    tests and configuration only from the JSON files attached to this PDF (v4.3 file names, v4.5 content);
+    ignore all older documents. Use synthetic US, Canada and India accounts and a labelled mock AI.
+    Keep every production flag false. Implement ownership, transactions, revisions, time handling,
+    unknown-stays-unknown and Pro locking on the server before visual polish. Never add triage, alerts,
+    condition names, calorie numbers or AI-written advice. For each slice report changed files,
+    migrations, the tests run with actual results, and open issues. Do not deploy publicly or take
+    payments.
+

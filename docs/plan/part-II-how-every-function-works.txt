@@ -1,0 +1,1478 @@
+ Part II: How every function works
+
+ This part explains every function in the same format, so anyone (developer, designer,
+ investor or new team member) can understand how it works without you explaining it. Each
+ function lists what it does, who gets it, where it is, how the user uses it, what happens
+ behind the scenes, what is saved, what the user sees, special cases, what it never does, and
+ the tests that prove it.
+
+ Getting started
+ Landing page and country check
+ What it does             Explains Bloat and lets a visitor start; checks whether Bloat is available where they live.
+
+ Who gets it              Everyone
+
+ Where                    Screens 01, 02, 03
+
+ How the user             1. Visitor opens the website and reads the headline, three steps, Free vs Pro and privacy
+ uses it                  promise.
+                          2. Taps Get started.
+                          3. Chooses country: United States, Canada, India or Other.
+
+ Behind the               • US, Canada, India: go to the help page (screen 04).
+ scenes                   • Other: show "Bloat isn't available in your country yet" and an optional waitlist email.
+                          • Prices are shown in the visitor's currency (USD default).
+
+ What is saved            • Nothing for US/CA/IN until sign-up (country held in the open tab).
+                          • Other: waitlist email and country only.
+
+ What the user            "Track your bloating. Spot your possible triggers. Bring real data to your doctor."
+ sees
+
+ Special cases            • Visitor from another country with a VPN: they still choose their country; availability
+                          follows the choice.
+
+ Never                    • Asks health questions before sign-up.
+                          • Uses ad trackers on the page.
+
+ Tests                    Q63, Q91, Q129
+
+ When to get medical help (help page)
+ What it does             Shows everyone, before they start, which symptoms need emergency, same-day or
+                          routine medical help.
+
+ Who gets it              Everyone, free, always
+
+ Where                    Screen 04; links on Log bloating, Other symptoms, Me, experiments, website footer
+
+ How the user             1. New user reads the page during sign-up.
+ uses it                  2. Taps I've read this.
+                          3. Later, anyone can open it from any symptom screen.
+
+ Behind the               • Text quotes the NHS bloating page word for word, with source and link; only the
+ scenes                   emergency number is changed to the user's country: 911 (USA, Canada), 112 (India);
+                          otherwise "your local emergency number".
+                          • A stored copy of the NHS text is kept in the evidence file, and a test checks the app
+                          matches it.
+                          • Works without logging in.
+
+ What is saved            • Date and time viewed, page version, acknowledged yes/no.
+
+ What the user            Three sections: Call 911/112 now · Contact a doctor today or go to urgent care · Book a
+ sees                     regular appointment. Source line: NHS, Bloating.
+
+ Special cases            • User's language not supported: English page with a note; never machine-translated.
+
+ Never                    • Asks questions about symptoms.
+                          • Rewrites or adds to the NHS wording.
+                          • Says "all clear" or "you're fine".
+                          • Pauses or blocks anything.
+
+ Tests                    Q38, Q70, Q92, Q93, Q130, Q148
+
+ Sign up and sign in
+ What it does             Creates the account with Google or an email code.
+
+ Who gets it              Everyone
+
+ Where                    Screens 05, 06
+
+ How the user             1. Taps Continue with Google, or types an email and taps Send code.
+ uses it                  2. Ticks "I am 18 or older".
+                          3. Enters the 6-digit code (email route).
+
+ Behind the               • Under 18 (box not ticked or answered No): account cannot be created.
+ scenes                   • Expired code: a new one can be sent (rate-limited).
+                          • Health questions come after sign-up, so a Google redirect never loses health answers.
+
+ What is saved            • Account, sign-in method, created time.
+
+ What the user            "Check your email for a 6-digit code."
+ sees
+
+ Special cases            • Same email signs up twice: message doesn't reveal whether the account exists.
+
+ Never                    • Requires name, phone or photo.
+                          • Calls the account anonymous.
+
+ Tests                    Q47, Q48
+
+ Consent
+ What it does             Records three separate, provable agreements before any health data is saved.
+
+ Who gets it              Everyone
+
+ Where                    Screen 07
+
+ How the user             1. Reads four short points.
+ uses it                  2. Ticks: Terms and Privacy · Store my health information · Bloat is a wellness tracker, not
+                          medical advice, not for emergencies.
+                          3. Continue unlocks only when all three are ticked.
+
+ Behind the               • A fourth consent (AI meal processing) is asked to Pro users before their first AI check.
+ scenes                   • Each consent can be withdrawn in Me; withdrawing optional ones never deletes the
+                          diary.
+
+ What is saved            • Consent type, version, time granted or withdrawn.
+
+ What the user            Tick text exactly as above.
+ sees
+
+ Special cases            • User withdraws health-data consent: Bloat explains this stops the app and offers
+                          download and delete.
+
+ Never                    • Bundles consents into one tick.
+
+ Tests                    Q74
+
+ Onboarding profile
+ What it does             Collects context that makes history and reports useful.
+
+ Who gets it              Everyone
+
+ Where                    Screens 08–14
+
+ How the user             1. Confirms country, region, time zone and units.
+ uses it                  2. Answers: what bloating feels like, how often, how long, when worst, other symptoms.
+                          3. Picks cuisines and food preferences.
+                          4. Adds medicines; optionally pregnancy, breastfeeding or cycle.
+                          5. Picks up to 3 habits to be asked about each morning.
+                          6. Reads 4 "How Bloat works" cards.
+
+ Behind the               • Only country and time zone are required; anything skipped is unknown, never No.
+ scenes                   • None and Not sure can't be combined with other choices.
+                          • All answers save together in one step; if the reply is lost, the same step can be retried
+                          without duplicates.
+
+ What is saved            • Profile, answers with original answer times, medicines, followed habits.
+
+ What the user            Card 4: "Bloat shows patterns in your own records. It doesn't diagnose or treat anything."
+ sees
+
+ Special cases            • User closes the tab mid-way: unanswered items stay unknown; they can finish later in
+                          Me.
+
+ Never                    • Guesses pregnancy from sex or age.
+                          • Uses cuisine to restrict what can be logged.
+
+ Tests                    Q48, Q69, Q85, Q90
+
+ Daily logging
+
+ Today screen
+ What it does             The home screen for logging fast and seeing today.
+
+ Who gets it              Everyone (extra cards for Pro)
+
+ Where                    Screen 15
+
+ How the user             1. Opens the app.
+ uses it                  2. Sees: Review yesterday (if pending), Highest logged so far, I feel bloated, Add meal,
+                          Add activity, Log bowel movement (Pro), today's timeline.
+                          3. Free also sees a progress counter: "14 days logged · 9 of 14 confirmed days needed for
+                          possible triggers".
+                          4. Pro also sees: today's card, a running experiment, a "what to log next" tip and a small
+                          phase label (Discover, Understand or Maintain).
+
+ Behind the               • Today never shows a confirmed Bloat Score; only "Highest logged so far".
+ scenes                   • If an episode is open, the big button becomes the Bloating ongoing card.
+                          • The progress counter uses real counts only and never hints that something was found.
+                          • In Keep an eye on it mode, watched food groups replace meal prompts.
+                          • Today never shows a doctor card or pop-up; the doctor line lives in History and reports.
+
+ What is saved            • Nothing directly.
+
+ What the user            "Highest logged so far: 6 · 1 episode · 1 h 35 min"
+ sees
+
+ Special cases            • App opened after midnight with yesterday unreviewed: Review yesterday card appears
+                          first.
+
+ Never                    • Shows streak pressure or symptom-free competitions.
+                          • Teases findings ("we found 2 triggers").
+
+ Tests                    Q44, Q139
+
+ Log bloating (start an episode)
+ What it does             Records that bloating has started, in two taps.
+
+ Who gets it              Everyone (feel, symptoms and suspicion are Pro)
+
+ Where                    Screen 16
+
+ How the user             1. Taps I feel bloated.
+ uses it                  2. Picks strength 1–10.
+                          3. Chooses when it started: Now / Earlier time / Roughly.
+                          4. Optional: warning signs (free); feel, other symptoms, something you suspect (Pro).
+                          5. Taps Save.
+
+ Behind the               • Creates an open episode with a first strength reading.
+ scenes                   • Only one episode can be open; if one already is, the app offers to update it instead.
+                          • Start times in the future are rejected.
+                          • Save message appears only after the server confirms.
+
+ What is saved            • Episode (start time, time zone, how exact), strength reading, any warning signs,
+                          symptoms and suspicion.
+
+ What the user            1 = barely noticeable · 10 = worst I can imagine.
+ sees
+
+ Special cases            • Connection lost while saving: "Check save status"; retrying never creates a second
+                          episode.
+
+ Never                    • Treats strength as a danger scale.
+                          • Pops up alerts for high strength.
+
+ Tests                    Q01, Q02, Q03, Q86, Q94
+
+ Warning-sign chips
+ What it does             Lets anyone record a worrying symptom and immediately see the matching NHS advice at
+                          the right level.
+
+ Who gets it              Everyone, free
+
+ Where                    Screen 16 ("Anything worrying with it?")
+
+ How the user             1. While logging bloating, taps any of nine signs, or None.
+ uses it
+
+ Behind the               • Emergency level (call 911 in the US and Canada, 112 in India): sudden, severe stomach
+ scenes                   ache with a swollen tummy · vomiting blood or vomit like ground coffee · severe difficulty
+                          breathing.
+                          • Urgent level (contact a doctor today or go to urgent care): vomiting · fever or feeling
+                          hot, cold or shivery · swelling or lump in the tummy · can't pee, poo or pass gas.
+                          • See a doctor level (book an appointment): blood in poo · weight loss without trying.
+                          • Each shows the exact NHS sentence with its source; only service names and numbers
+                          are changed for the country. Nothing is paused or blocked.
+                          • Pro users who tick abdominal pain, constipation, diarrhoea or reflux in Other symptoms
+                          also see the NHS sentence for it, once a day at most.
+
+ What is saved            • Warning sign linked to the episode.
+
+ What the user            "The NHS advises contacting a doctor today or going to urgent care if you have bloating
+ sees                     with a swelling or lump in your tummy."
+
+ Special cases            • Country without a listed number: "your local emergency number", never a guessed one.
+
+ Never                    • Labels the situation itself.
+                          • Gives an all-clear when no chip is ticked.
+                          • Words the advice in its own way.
+
+ Tests                    Q114, Q115, Q148, Q160, Q161, Q162, Q163
+
+ Update strength and end an episode
+ What it does             Tracks how bloating changes and when it ends.
+
+ Who gets it              Everyone ("eased after passing gas?" is Pro)
+
+ Where                    Screens 17, 18
+
+ How the user             1. On the Bloating ongoing card, taps Update strength to add a new reading.
+ uses it                  2. Taps Bloating gone (or Ended earlier).
+                          3. Chooses when it ended: Now / Choose time / Roughly / I don't know.
+                          4. Pro: answers "Did it ease after passing stool or gas?"
+
+ Behind the               • Each update adds a new reading; earlier readings are never overwritten.
+ scenes                   • End before start is rejected.
+                          • "I don't know" saves the end as unknown; Bloat never invents an end time.
+                          • Episodes crossing midnight are split for duration: 23:00–02:00 counts 1 h and 2 h.
+
+ What is saved            • Strength readings; end time and how exact; episode state.
+
+ What the user            "Lasted 1 h 35 min, strongest 6."
+ sees
+
+ Special cases            • Edit makes two episodes overlap: rejected with a clear message.
+
+ Never                    • Fills in a typical duration.
+                          • Caps duration.
+
+ Tests                    Q03, Q04, Q05, Q07, Q88
+
+ Forgotten episode ("Is it still happening?")
+ What it does             Resolves episodes the user forgot to close.
+
+ Who gets it              Everyone
+
+ Where                    Screen 19
+
+ How the user             1. Opens the app with an episode that has been open for 8 hours or more.
+ uses it                  2. Answers Yes / No / Not sure.
+
+ Behind the               • Yes: stays open. No: asks the end time. Not sure: stays open.
+ scenes                   • The timer is only an open-record timer, not proof of symptoms.
+
+ What is saved            • Answer and, if given, end time.
+
+ What the user            "You started an episode at 2:10 pm yesterday. Is it still happening?"
+ sees
+
+ Special cases            • User ignores the question: episode stays open and the question returns next time.
+
+ Never                    • Auto-closes the episode.
+
+ Tests                    Q07, Q08
+
+ No bloating today
+ What it does             Records a symptom-free day so far.
+
+ Who gets it              Everyone
+
+ Where                    Screen 15
+
+ How the user             1. Taps No bloating so far today.
+ uses it
+
+ Behind the               • Saved as provisional; any later episode replaces it.
+ scenes                   • The day's score is only confirmed in the next morning's review.
+
+ What is saved            • Provisional zero for today.
+
+ What the user            "Noted: no bloating so far today."
+ sees
+
+ Special cases            • Episode logged after tapping it: provisional zero is replaced automatically.
+
+ Never                    • Counts it as a confirmed zero.
+
+ Tests                    Q09, Q10
+
+ Add a meal (Free)
+ What it does             Records what was eaten, when and how much.
+
+ Who gets it              Everyone
+
+ Where                    Screen 20
+
+ How the user             1. Taps Add meal.
+ uses it                  2. Types the dish (or picks a recent one).
+                          3. Chooses time and portion: Small / Medium / Large / Not sure, optional count (slices,
+                          cups, bowls...).
+                          4. Optional: eating pace and where it was made.
+                          5. Saves.
+
+ Behind the               • Free meals store the dish name only; no ingredients.
+ scenes                   • Any text is allowed (non-English dish names too).
+                          • No calories anywhere.
+
+ What is saved            • Meal: dish text, time, time zone, portion, pace, place; ingredient check = free plan.
+
+ What the user            "Meal saved."
+ sees
+
+ Special cases            • Free user upgrades later: earlier free meals have no ingredients, so food comparisons
+                          start from Pro meals.
+
+ Never                    • Shows calories or nutrients.
+                          • Blocks foods based on preferences.
+
+ Tests                    Q67, Q104
+
+ AI ingredient check (typed)
+ What it does             Lists only the ingredients in a dish that are often linked to gas or bloating, for the user to
+                          confirm one by one.
+
+ Who gets it              Pro
+
+ Where                    Screens 20 → 21
+
+ How the user             1. Types a dish, e.g. "chicken burrito with beans".
+ uses it                  2. Sees: "Which of these did you have?" with a short list (e.g. black beans, onion, garlic,
+                          sour cream, flour tortilla).
+                          3. Each item is labelled "Seen in photo" or "Usually in this recipe" (typed dishes: always
+                          "usually"). Marks each item Had / Didn't have / Not sure, or taps Had all of these / None of
+                          these and changes any item.
+                          4. Can add missing ones, or tap I don't know / Assume the usual recipe.
+                          5. Saves.
+
+ Behind the               • First use asks the AI consent tick.
+ scenes                   • AI gets only the dish text and language; returns at most 20 items, each in one of 12 food
+                          groups.
+                          • An item left untouched is saved as Not sure, never as Didn't have. A Not sure item
+                          makes only its own food group unknown for that day; the other groups still count.
+                          • Groups the AI didn't list count as not present only for home-made meals or confirmed
+                          saved dishes; for restaurant and other meals they are unknown, because the AI can miss
+                          hidden ingredients.
+                          • If AI fails twice, the meal saves with ingredients unknown.
+
+ What is saved            • Each ingredient: answer (had / didnt_have / not_sure), where it came from, food group,
+                          AI version.
+
+ What the user            "These are foods often linked to gas or bloating (sources: NIH, NHS). AI suggestion, may
+ sees                     be wrong. Mark each one."
+
+ Special cases            • Restaurant sauce where the user isn't sure about garlic: garlic Not sure, everything else
+                          as marked; the day still counts for the other groups.
+                          • AI returns something odd or unsafe: rejected; manual entry still works.
+
+ Never                    • Sends symptoms, health data or identity to AI.
+                          • Turns an unmarked item into "didn't have".
+                          • Says a food caused bloating.
+
+ Tests                    Q22, Q98, Q99, Q100, Q101, Q103, Q131, Q132, Q133, Q147, Q149, Q150, Q178, Q188
+
+ AI meal photo
+ What it does             Recognises dishes from a photo so logging is faster.
+
+ Who gets it              Pro
+
+ Where                    Screens 20 → 21
+
+ How the user             1. Taps the camera, takes or picks a photo.
+ uses it                  2. Sees "Looks like: pepperoni pizza, side salad, cola"; keeps, edits, removes or adds
+                          dishes.
+                          3. Gets the ingredient checklist for each dish.
+                          4. Sets portion and saves.
+
+ Behind the               • Photo is shrunk and location/device data removed before sending.
+ scenes                   • Photo is deleted after the check unless "Keep my meal photos" is on in Me.
+                          • Nothing saves until the user confirms dishes.
+
+ What is saved            • Confirmed dishes and ingredients; photo only if kept.
+
+ What the user            "Looks like: pepperoni pizza, side salad, cola. Is this right?"
+ sees
+
+ Special cases            • Photo too dark or unclear: AI abstains; user types the dish.
+
+ Never                    • Estimates calories or portion weight.
+                          • Keeps photos by default.
+
+ Tests                    Q102, Q104
+
+ Add ingredients to recent meals after upgrading
+ What it does             Stops the clock from resetting when a free user upgrades, by adding ingredients to the
+                          last 7 days of free meals.
+
+ Who gets it              New Pro users, once
+
+ Where                    Screen 38 (right after upgrading) → 21
+
+ How the user             1. Upgrades to Pro.
+ uses it                  2. Sees: "Add ingredients to your last 7 days of meals?" Yes, go through them / Not now.
+                          3. For each meal, marks the AI list Had / Didn't have / Not sure as usual.
+
+ Behind the               • Offered once only.
+ scenes                   • Answers are saved with the source "recalled" and count in comparisons, labelled on
+                          results.
+                          • About 20 extra AI calls, roughly US$0.006 per upgrade.
+
+ What is saved            • Ingredient answers with source recalled.
+
+ What the user            "Possible triggers · includes 7 recalled days."
+ sees
+
+ Special cases            • User taps Not now: not offered again; normal logging continues.
+
+ Never                    • Fills in ingredients without the user marking them.
+                          • Goes back further than 7 days.
+
+ Tests                    Q140
+
+ Saved dishes, "I don't know" and "Assume the usual recipe"
+ What it does             Handles repeat meals and meals where the user doesn't know the ingredients.
+
+ Who gets it              Pro
+
+ Where                    Screen 21
+
+ How the user             1. Saved dish: tick "Save as one of my dishes", optionally with the place ("Burrito –
+ uses it                  Chipotle"); next time pick it for one-tap logging.
+                          2. I don't know what was in it: one tap, all items unknown.
+                          3. Assume the usual recipe: one tap, items saved as a guess.
+
+ Behind the               • Saved dishes keep confirmed answers and can be edited; changes affect future meals
+ scenes                   only.
+                          • Saving restaurant dishes with the place gives known answers for repeat restaurant
+                          meals.
+                          • Unknown and guessed ingredients are shown in history but never used in comparisons.
+
+ What is saved            • Saved dish versions with optional place; ingredient answers marked saved_dish,
+                          dont_know or guess.
+
+ What the user            "Saved to your dishes."
+ sees
+
+ Special cases            • Restaurant meals eaten once: mark what you know, use Not sure for the rest.
+
+ Never                    • Turns a guess into a confirmed ingredient.
+
+ Tests                    Q14, Q23, Q41, Q121, Q122, Q123
+
+ Habit taps
+ What it does             Records everyday habits that can affect bloating.
+
+ Who gets it              Everyone (sleep, stress, constipated, no bowel movement, unwell, travelling, ate out are
+                          Pro)
+
+ Where                    Screen 22; morning review
+
+ How the user             1. Taps Add activity.
+ uses it                  2. Followed habits are shown first; all 24 are available.
+                          3. Taps what happened, adds detail if asked (e.g. walked 10/20/30+ min, stress
+                          low/medium/high).
+                          4. Saves.
+                          5. Each morning answers Yes / No / Not sure for up to 3 followed habits.
+
+ Behind the               • A habit not tapped is unknown, not No.
+ scenes                   • Only followed habits get an explicit No, so only followed habits can be compared; the
+                          possible-triggers screen says so.
+                          • If an unfollowed habit is logged on 5+ of 14 days, "what to log next" suggests following
+                          it.
+                          • Alcohol and tea/coffee link to the matching food groups without double counting.
+
+ What is saved            • Habit, date, time, detail; morning Yes/No answers.
+
+ What the user            "You can compare the 3 habits you follow. Follow a habit to start comparing it."
+ sees
+
+ Special cases            • User taps the same habit twice in a day: one record with the latest detail.
+
+ Never                    • Treats an untapped habit as "didn't happen".
+
+ Tests                    Q15, Q115, Q146
+
+ Exercise log
+ What it does             Records exercise in enough detail to compare with bloating.
+
+ Who gets it              Pro
+
+ Where                    Screen 23
+
+ How the user             1. Picks Walk or Exercise in Add activity.
+ uses it                  2. Chooses type, start time, duration, intensity, and before / after / not near a meal.
+                          3. Optional: bloating before and after (for walks).
+                          4. Saves.
+
+ Behind the               • Minutes from the last meal and to the next are calculated from logged meals.
+ scenes                   • Symptoms during or after come from episodes, not extra questions.
+
+ What is saved            • Exercise record; optional before/after scores.
+
+ What the user            "Walk, 15 min, light, after lunch."
+ sees
+
+ Special cases            • No meal logged that day: meal timing shown as unknown.
+
+ Never                    • Recommends intense exercise.
+
+ Tests                    Q115
+
+ Bowel log
+ What it does             Records bowel movements, which are closely linked with bloating.
+
+ Who gets it              Pro
+
+ Where                    Screen 24; morning review
+
+ How the user             1. Taps Log bowel movement.
+ uses it                  2. Chooses when, what it looked like (7 plain descriptions), straining, and whether it felt
+                          complete.
+                          3. Saves. The morning review also asks "Bowel movement yesterday?"
+
+ Behind the               • An explicit No is different from no entry.
+ scenes                   • Types are never labelled normal, constipated or diarrhoea, and never trigger alerts.
+
+ What is saved            • Time, type, strain, complete.
+
+ What the user            "Smooth and soft, like a sausage" (type 4 description).
+ sees
+
+ Special cases            • Several in one day: each recorded separately.
+
+ Never                    • Interprets stool type.
+                          • Shows the licensed Bristol chart image.
+
+ Tests                    Q105
+
+ Medicines and supplements
+ What it does             Keeps a record of what the user takes, what kind it is, and when it changed.
+
+ Who gets it              Everyone (before/after view is Pro)
+
+ Where                    Screen 12; Me
+
+ How the user             1. Adds name, type and start date (or Not sure). Type: GLP-1 (weight or diabetes), opioid
+ uses it                  pain medicine, iron, multivitamin, antacid or acid reducer, fibre supplement, laxative,
+                          antibiotic, hormones (HRT or contraception), anti-diarrhoea medicine, other.
+                          2. Records a change: stopped, dose changed, restarted, with date.
+
+ Behind the               • Changes are shaded on charts and listed in the doctor PDF.
+ scenes                   • Pro: before/after view compares the 14 days before and after a change, each side
+                          needing 7+ usable days.
+
+ What is saved            • Medicine, type and change records.
+
+ What the user            "Started iron: 3.8 in the 14 days before, 5.1 in the 14 days after (9 and 8 days). This is a
+ sees                     difference in your records, not proof the medicine caused it."
+
+ Special cases            • Too few days after a change: says how many more are needed.
+
+ Never                    • Comments on, recommends or warns about medicines.
+                          • Sends medicine names to the AI.
+
+ Tests                    Q21, Q168, Q169
+
+ Health background
+ What it does             Records diagnosed or suspected conditions, family history and tests for the user's own
+                          record and the doctor PDF.
+
+ Who gets it              Pro
+
+ Where                    Screen 36
+
+ How the user             1. Picks conditions (24 options, e.g. IBS, functional dyspepsia, SIBO, coeliac disease,
+ uses it                  endometriosis, liver, heart or kidney condition, cancer current or past).
+                          2. Sets status: diagnosed / I suspect it / tested, ruled out / not sure / prefer not to say;
+                          optional year.
+                          3. Lactose intolerance opens breath-test and after-dairy questions.
+                          4. Optionally answers family history (bowel, stomach or ovarian cancer, coeliac disease,
+                          Crohn's or colitis).
+                          5. Adds tests from a list (breath tests, coeliac blood test, blood count, anaemia found,
+                          CA125, ultrasound, endoscopy, colonoscopy and more) with the result as the doctor wrote
+                          it.
+
+ Behind the               • Conditions are used for only three things: swap-experiment eligibility, published
+ scenes                   exclusions (e.g. no swap experiment with coeliac disease), and the doctor PDF.
+                          • Anxiety or low mood and family history are used only in the doctor PDF.
+
+ What is saved            • Conditions, status, lactose details, family history, tests.
+
+ What the user            "Coeliac disease: diagnosed by a doctor, 2022."
+ sees
+
+ Special cases            • User removes a condition: exclusions update immediately.
+
+ Never                    • Suggests a condition the user didn't enter.
+                          • Collects DNA or ethnicity.
+
+ Tests                    Q96, Q128, Q180, Q181
+
+ Review and history
+
+ Morning review
+ What it does             Turns yesterday into a confirmed Bloat Score in about 30 seconds.
+
+ Who gets it              Everyone (bowel, experiment and watched-group questions Pro)
+
+ Where                    Screen 25
+
+ How the user             1. Next app open after midnight shows Review yesterday.
+ uses it                  2. Step 1: strongest bloating 0–10 (or I can't remember) and "does this cover the whole
+                          day?"
+                          3. Step 2: did you record everything you ate and drank? All / Mostly, missed a small snack
+                          or drink / Some / None recorded / Not sure / I ate and drank nothing.
+                          4. Step 3: followed habits (Yes / No / Not sure); Pro also bowel and experiment questions;
+                          in Keep an eye on it mode, "Had any of these yesterday?" for watched groups.
+                          5. Once a week (Monday): "How much did bloating get in the way this week?" Not at all / A
+                          little / A lot.
+
+ Behind the               • "Whole day" is never pre-ticked.
+ scenes                   • "Mostly" days still count to show a food was eaten, so honest users don't lose the day;
+                          only All days can show a food was not eaten.
+                          • If the answer is lower than a logged reading, the day is marked Check this day.
+                          • Answers count on time until the end of the next day; later answers are marked Late.
+
+ What is saved            • Review answers; day status.
+
+ What the user            "You logged up to 5 on Monday."
+ sees
+
+ Special cases            • User skips: day stays provisional; can review later from History (as Late after the
+                          deadline).
+
+ Never                    • Fills answers automatically.
+
+ Tests                    Q09, Q10, Q16, Q42, Q43, Q135, Q152, Q170
+
+ Bloat Score and day statuses
+ What it does             Gives each finished day an honest score and a clear status.
+
+ Who gets it              Everyone
+
+ Where                    Today, History, reports
+
+ How the user             1. Nothing to do: the status follows from logging and the review.
+ uses it
+
+ Behind the               • Confirmed: number + whole day Yes, on time. Late: same, after deadline. Provisional:
+ scenes                   not reviewed or partial. Conflict: review lower than a reading. Unknown: nothing logged.
+                          • Only Confirmed days are used in comparisons; Late days appear in charts and the 7-day
+                          average.
+
+ What is saved            • Day score and status with rule version.
+
+ What the user            Chart: solid = confirmed, hollow = late, dashed = not reviewed, ? = no data.
+ sees
+
+ Special cases            • Travel across time zones: days follow the user's pinned time zone.
+
+ Never                    • Uses the old 0–100 formula.
+                          • Counts a missing day as zero.
+
+ Tests                    Q16, Q43, Q44, Q45, Q65, Q66
+
+ History and day detail
+ What it does             Lets users see and correct any day.
+
+ Who gets it              Everyone (charts Pro)
+
+ Where                    Screens 26, 27
+
+ How the user             1. Opens History and picks a day.
+ uses it                  2. Taps any entry to edit time, strength or details, or delete it.
+
+ Behind the               • Every edit creates a new version; deletes remove the record and its versions.
+ scenes                   • Summaries and reports that used the record are recalculated; shares of stored reports
+                          containing it are revoked.
+
+ What is saved            • New revision or deletion; recalculation job.
+
+ What the user            "Updating your charts…" while recalculating.
+ sees
+
+ Special cases            • Two devices edit at once: the second gets a conflict message and must reload.
+
+ Never                    • Silently overwrites an older change.
+
+ Tests                    Q54, Q56, Q88, Q89
+
+ Insights (Pro)
+
+ Charts and 7-day average
+ What it does             Shows the trend of daily scores.
+
+ Who gets it              Pro
+
+ Where                    Screen 26
+
+ How the user             1. Opens History; switches Week / Month / All.
+ uses it
+
+ Behind the               • 7-day average uses the last 7 finished days, needs at least 4 usable, and states how
+ scenes                   many were late.
+
+ What is saved            • Nothing new.
+
+ What the user            "7-day average 4.2 · from 5 days (1 late)"
+ sees
+
+ Special cases            • Only 3 usable days: no average; message says how many more are needed.
+
+ Never                    • Labels any score high or abnormal.
+
+ Tests                    Q45, Q95
+
+ Possible triggers
+ What it does             Shows which foods and habits are linked to the user's worse days, honestly and without
+                          making chance look like a trigger.
+
+ Who gets it              Pro
+
+ Where                    Screen 30
+
+ How the user             1. Opens Possible triggers; picks a date range.
+ uses it
+
+ Behind the               • Food window: a day's score is compared with food eaten that day plus meals from 6 pm
+ scenes                   the day before, because bloating can come hours later. Meals eaten after the day's worst
+                          bloating started don't count for that day.
+                          • Usable days are decided per food group: a Not sure item removes the day only for its
+                          own group. A food counts as not eaten only on All days with every meal known (for
+                          restaurant meals, only what the user marked). Recalled and mostly days are labelled.
+                          • Needs at least 7 days with and 7 without; otherwise shows how many more days are
+                          needed.
+                          • Never sorted by size. Three sections, alphabetical inside each: Worth watching
+                          (difference 1 point or more and the same direction in both halves of the range), No clear
+                          difference, Not enough data yet.
+                          • Daily food: after 21 days, a group on 80% or more of usable days shows "You eat it
+                          almost every day, so your records can't compare it. A short swap experiment can."
+                          • Only followed habits are compared. Header states how many groups were examined. If
+                          two items usually appear together, says the records can't separate them.
+                          • "Days with a large meal" are compared like a habit.
+                          • Confounding note when half or more of the "with" days also had poor sleep, stress,
+                          illness, travel, a period or a medicine change.
+                          • Every result ends: "This is a difference in your records, not a medical measure."
+
+ What is saved            • Comparison snapshots with section, counts, both halves and versions.
+
+ What the user            "Worth watching · Fizzy drinks: average 5.6 on 9 days with, 4.1 on 12 days without. First
+ sees                     half +1.6 · second half +1.4. This is a pattern in your own records, not proof of a cause."
+
+ Special cases            • Difference 1.4 overall but opposite in the two halves: shown under No clear difference.
+                          • Onion and garlic eaten every day: daily-food message; swap link only if eligible.
+
+ Never                    • Calls anything a cause or a confirmed trigger.
+                          • Ranks items as a "top trigger".
+                          • Tells users to avoid foods.
+
+ Tests                    Q11–Q13, Q17–Q20, Q57, Q124, Q133, Q134, Q136, Q137, Q138, Q149, Q151, Q152,
+                          Q172, Q174, Q175
+
+ Your usual
+ What it does             Shows the user's own normal, so Bloat is useful even when no food or habit stands out.
+
+ Who gets it              Pro
+
+ Where                    History
+
+ How the user             1. Opens History; reads the Your usual card.
+ uses it
+
+ Behind the               • Appears after 14 confirmed days.
+ scenes                   • Shows typical daily score, episodes per week, typical episode length, bloating days in
+                          the last 30, weekly impact and completeness, next to the same figures for the first 30
+                          days.
+                          • Carries the doctor line when its rule is met.
+
+ What is saved            • Nothing new.
+
+ What the user            "Usually: score 4, 3 episodes a week, about 2 hours each. First 30 days: score 5, 4 a
+ sees                     week."
+
+ Special cases            • Fewer than 14 confirmed days: says how many more are needed.
+
+ Never                    • Labels figures better, worse, normal or abnormal.
+
+ Tests                    Q173
+
+ Periods and Your cycle
+ What it does             Lets users who opt in log periods and see whether bloating follows their cycle.
+
+ Who gets it              Logging free (opt-in); comparison Pro
+
+ Where                    Add activity; History; Possible triggers
+
+ How the user             1. Chooses Cycle context during onboarding or in Me.
+ uses it                  2. Taps Period started and Period ended.
+                          3. After 3 cycles, opens Your cycle.
+
+ Behind the               • Compares the 5 days before a period, period days and other days, each needing 7+
+ scenes                   usable days, with the same rules as Possible triggers.
+                          • Perimenopause or menopause can be chosen instead: shaded on charts and listed in the
+                          doctor PDF, with no cycle comparison.
+                          • Never sent to AI or analytics; deletable on its own.
+
+ What is saved            • Period start and end dates; context choice.
+
+ What the user            "5 days before your period: 6.1 (12 days). Period days: 4.9 (14). Other days: 3.8 (40). This
+ sees                     is a difference in your records, not a medical measure."
+
+ Special cases            • Only 2 cycles logged: not enough data yet.
+
+ Never                    • Predicts periods, fertile days or pregnancy.
+                          • Names PMS, endometriosis or any condition.
+
+ Tests                    Q164, Q165, Q166, Q167
+
+ Time-of-day pattern
+ What it does             Shows when bloating usually starts.
+
+ Who gets it              Pro
+
+ Where                    Screen 26 / Pattern Report
+
+ How the user             1. Opens the rhythm chart.
+ uses it
+
+ Behind the               • Appears after 10 ended episodes with known start times; shows hour and weekday
+ scenes                   counts.
+
+ What is saved            • Nothing new.
+
+ What the user            "Most of your episodes start between 6 and 9 pm."
+ sees
+
+ Special cases            • Corrections drop the count below 10: chart disappears until it returns.
+
+ Never                    • Links a time to a specific meal automatically.
+
+ Tests                    Q51
+
+ Personal Focus and "what to log next"
+ What it does             Suggests the most useful thing to track next, based on the user's own records.
+
+ Who gets it              Pro
+
+ Where                    Today, History
+
+ How the user             1. A small card appears with a reason; user taps it or Not useful.
+ uses it
+
+ Behind the               • Fixed rules, e.g. constipation on 3 of 14 days → suggest the bowel log; many unknown
+ scenes                   ingredients → suggest saved dishes; evening episodes with missing dinner times →
+                          suggest logging dinner times; an unfollowed habit on 5+ of 14 days → suggest following
+                          it.
+                          • Not useful hides it for 30 days; it may be offered once more.
+
+ What is saved            • Card shown, reason, dismissal.
+
+ What the user            "You logged fizzy drinks on 5 days. Follow it to compare it with your bloating."
+ sees
+
+ Special cases            • Data corrected so the rule no longer applies: card disappears.
+
+ Never                    • Names a condition or interprets symptoms.
+
+ Tests                    Q51, Q87, Q125, Q146
+
+ Doctor line
+ What it does             Tells anyone who is bloated most days, quietly and in the right places, that the NHS
+                          suggests seeing a doctor.
+
+ Who gets it              Everyone, free
+
+ Where                    Top of History; weekly report; Your journey; Your usual; doctor PDF. Never Today, never a
+                          pop-up
+
+ How the user             1. Nothing to do. The line appears when the rule is met.
+ uses it                  2. Can tap the help-page link, or "I've spoken to a doctor about this" to shorten it for 90
+                          days.
+
+ Behind the               • Rule: bloating logged on more than 12 of the last 30 days (the frequency NICE uses).
+ scenes                   • Text: "The NHS suggests seeing a doctor if you feel bloated regularly or keep feeling
+                          bloated after changing your diet."
+                          • If the user chose age 50-59 or 60+ and said Yes to having ovaries (both optional), the
+                          line adds the NHS sentence: "Sometimes, bloating that does not go away can be a sign of
+                          something more serious such as ovarian cancer."
+                          • The "after changing your diet" part also appears on an experiment result that showed
+                          no change.
+
+ What is saved            • When shown; whether shortened.
+
+ What the user            "Bloating on 15 of the last 30 days. The NHS suggests seeing a doctor if you feel bloated
+ sees                     regularly..."
+
+ Special cases            • Exactly 12 days: no line.
+                          • Age or ovaries skipped: standard line only.
+
+ Never                    • Appears on Today or as a pop-up.
+                          • Names a condition in its own words.
+                          • Uses age or ovaries for anything else.
+
+ Tests                    Q116, Q155, Q156, Q157, Q158, Q159
+
+ Experiments, cards and learning (Pro)
+
+ Habit experiments
+ What it does             Lets users test one habit change for 7 days and see what happened.
+
+ Who gets it              Pro
+
+ Where                    Screens 31, 33
+
+ How the user             1. Chooses: eat more slowly, no gum, no straws, fewer fizzy drinks, walk after meals, slow
+ uses it                  breathing, or kiwifruit (if constipation logged and no food allergy; "Don't try this if you're
+                          allergic to kiwi").
+                          2. Each day answers Did you do it today? Yes / Partly / No.
+                          3. On day 8 sees the result.
+
+ Behind the               • Needs 4 confirmed days in the 7 days before; only one experiment at a time.
+ scenes                   • Result needs 4+ confirmed days in each period and 4+ Yes days.
+
+ What is saved            • Experiment, daily answers, result.
+
+ What the user            "During the experiment your average Bloat Score was 3.9 (6 days). In the 7 days before it
+ sees                     was 5.2 (7 days). This is a pattern in your own records, not proof that the change caused
+                          it."
+
+ Special cases            • Ended early with "I felt worse": no numbers; help link shown; reason logged for you.
+
+ Never                    • Promises the change will help.
+
+ Tests                    Q106–Q110, Q153
+
+ Swap experiments (with safety and wellbeing checks)
+ What it does             Lets eligible users swap one food group for a named equivalent for a short time, add it
+                          back, and compare, so nothing is missing from their diet.
+
+ Who gets it              Pro
+
+ Where                    Screens 31, 32, 33
+
+ How the user             1. Picks one swap: lactose-free dairy · onion and garlic (garlic-infused oil, chives, spring
+ uses it                  onion greens) · beans and lentils (smaller portion, canned and rinsed) · sugar-free sweets
+                          and gum · apples, pears and honey (orange, grapes, kiwi).
+                          2. Answers 4 safety questions (pregnant/breastfeeding; eating disorder or food worry;
+                          coeliac, allergy or IBD; weight loss without trying).
+                          3. Swaps for up to 2 weeks, then adds the food back for 1 week.
+                          4. Answers 2 wellbeing questions each week.
+                          5. Sees the result.
+
+ Behind the               • Any answer other than No to the safety questions: swaps not offered (habit experiments
+ scenes                   still are), with a kind message and helpline where relevant.
+                          • Swap step ends automatically at 2 weeks; adding the food back is required. At most 2
+                          swaps in any 180 days; one experiment of any kind at a time.
+                          • Never offered: wheat or grains, several groups at once (FODMAP programmes), any
+                          group without a like-for-like swap.
+                          • A Yes to a wellbeing question pauses the swap and shows the country helpline.
+                          • Every screen says "Stop if you feel worse" and links When to get medical help.
+
+ What is saved            • Safety answers, phases, daily and weekly answers, result.
+
+ What the user            "Before: 5.0 (7 days). While swapping onion and garlic: 3.6 (14 days). After adding it back:
+ sees                     4.8 (7 days). This is a pattern in your own records, not proof that the food caused it."
+
+ Special cases            • Coeliac disease in health background: swaps not offered.
+                          • Third swap within 180 days: refused with a message.
+
+ Never                    • Uses the words safe food or bad food.
+                          • Cuts a food out without a swap.
+                          • Runs longer than 2 weeks or more than one group.
+
+ Tests                    Q29, Q30, Q31, Q117, Q118, Q119, Q120, Q128, Q143, Q144
+
+ Daily cards
+ What it does             Gives one short, sourced card a day, alternating a habit tip and a mind–body activity.
+
+ Who gets it              Pro
+
+ Where                    Screen 34 (on Today)
+
+ How the user             1. Reads the card; taps the source link if wanted.
+ uses it                  2. Gives feedback: Tried / Not today · Helpful / No difference / Worse · Not relevant · Hide.
+
+ Behind the               • Each card restates one sentence from its source in plain words, with the link
+ scenes                   underneath; no card gives advice its source doesn't.
+                          • Cards are chosen from what the user logged (e.g. gum on 2+ days → "Take a break from
+                          gum"), otherwise rotation.
+                          • Same card all day; a card isn't repeated for 14 days. If every allowed card was shown
+                          recently, the one shown longest ago is used.
+                          • Cards unsuitable by published guidance are hidden (e.g. no tummy massage after
+                          recent surgery; kiwifruit card only when there's no food allergy).
+                          • Worse hides the card and logs it for you.
+
+ What is saved            • Cards shown, reasons, feedback.
+
+ What the user            "Why you're seeing this: you logged chewing gum on 3 days this week."
+ sees
+
+ Special cases            • 20 cards cover one a day; the target is 40 for variety.
+
+ Never                    • Shows a card without a source sentence.
+                          • Recommends supplements or medicines.
+
+ Tests                    Q111, Q112, Q113, Q126, Q142, Q148
+
+ What helps you
+ What it does             Shows which activities seem to help this particular user.
+
+ Who gets it              Pro
+
+ Where                    Cards, experiments, Pattern Report
+
+ How the user             1. Optionally rates bloating before and after a mind–body card or habit.
+ uses it
+
+ Behind the               • Shown after 3+ tries of the same activity.
+ scenes
+
+ What is saved            • Before and after scores.
+
+ What the user            "Walk after meals: bloating went from 5.2 to 3.8 on average across 4 tries."
+ sees
+
+ Special cases            • Fewer than 3 tries: nothing shown yet.
+
+ Never                    • Claims an activity works for everyone.
+
+ Tests                    Q127
+
+ Learn library
+ What it does             Explains bloating in plain words with sources.
+
+ Who gets it              Pro
+
+ Where                    Screen 35
+
+ How the user             1. Opens Learn; reads articles and all cards; can un-hide cards.
+ uses it
+
+ Behind the               • 15 articles at launch: why bloating happens, bloating vs visible swelling, swallowed air,
+ scenes                   foods that make gas, constipation, gut–brain link, FODMAPs, evidence on probiotics and
+                          supplements, tests and therapies doctors may discuss, preparing for a doctor visit,
+                          warning signs explained, medicines and bloating, periods and menopause, when normal
+                          gas feels like too much, bloating during eating-disorder recovery (never pushed by cards).
+
+ What is saved            • Nothing.
+
+ What the user            "Experts don't recommend probiotics for bloating (AGA 2023)."
+ sees
+
+ Special cases            •—
+
+ Never                    • Gives personal medical advice.
+
+ Tests                    Q113, Q189
+
+ Reports, plans and account
+ Weekly Pattern Report
+ What it does             Gives a weekly reason to come back. The monthly view now lives in Your journey.
+
+ Who gets it              Pro
+
+ Where                    Screen 28
+
+ How the user             1. Opens the report from History or the weekly card.
+ uses it
+
+ Behind the               • Weekly: average and chart, episodes and hours, possible triggers that changed,
+ scenes                   experiment, bowel and habit counts, what to log next.
+                          • Reports are snapshots that don't change later.
+
+ What is saved            • Report snapshot with versions.
+
+ What the user            Footer: "These are patterns in your own records, not causes. Bloat doesn't diagnose."
+ sees
+
+ Special cases            • A week with fewer logged days: not called an improvement.
+
+ Never                    • Compares unlike numbers.
+
+ Tests                    Q40
+
+ Doctor PDF and sharing
+ What it does             Prepares a report a doctor can read in two minutes.
+
+ Who gets it              Pro
+
+ Where                    Screen 37
+
+ How the user             1. Picks a date range and types the questions they want to ask.
+ uses it                  2. Previews.
+                          3. Downloads, or shares a link: names recipient and purpose, sets expiry, consents.
+
+ Behind the               • Page 1 summary: tracking period and completeness, bloating days in the last 30, typical
+ scenes                   strength and episode length, how long it has been happening, weekly impact, main
+                          patterns with counts, medicines and changes, period or menopause context, warning
+                          signs logged, the doctor line, and the user's questions.
+                          • Then fixed sections: symptoms, meals and food groups, bowel (with straining and
+                          incomplete counts), habits, medicines, health background, family history, tests,
+                          experiments, what's missing.
+                          • Links can be revoked; a downloaded copy can't be pulled back and the app says so.
+
+ What is saved            • Report snapshot; share with recipient, purpose, expiry.
+
+ What the user            "Self-reported records from Bloat, a wellness tracker. Not a diagnosis."
+ sees
+
+ Special cases            • Record deleted after the report: stored report flagged for regeneration; share revoked.
+
+ Never                    • Sends reports to anyone automatically.
+
+ Tests                    Q34, Q54, Q89, Q179, Q180, Q181
+
+ Free vs Pro, upgrade, pause and subscription
+ What it does             Locks Pro features properly, sells Pro honestly and keeps people who only need a break.
+
+ Who gets it              Free users see Upgrade; Pro manages plan in Me
+
+ Where                    Screens 38, 39
+
+ How the user             1. Free user taps a locked card or Upgrade.
+ uses it                  2. Sees what Pro adds and the price (yearly total first).
+                          3. Upgrades; is offered to add ingredients to the last 7 days.
+                          4. Later can Pause Pro for 1, 2 or 3 months, or cancel in two taps.
+
+ Behind the               • The server refuses Pro requests from free accounts, not just the screens.
+ scenes                   • Payments only after stage S2; webhooks decide the plan.
+                          • Pause: no charge, data kept, Pro screens locked until the chosen date or Resume.
+                          • The cancel screen offers "Download your doctor PDF first". Cancelling never deletes
+                          data or past reports.
+                          • Beta: the Upgrade button shows the real price; a tap shows "Pro is free during the beta"
+                          and is counted.
+
+ What is saved            • Plan, status (incl. paused), dates, billing country, offer version.
+
+ What the user            "You have 14 scored days. Pro shows your chart and possible triggers."
+ sees
+
+ Special cases            • Payment fails: explicit pending or failed state; no Pro until confirmed.
+
+ Never                    • Uses fake teasers like "we found 2 triggers".
+                          • Paywalls safety information.
+
+ Tests                    Q35, Q52, Q53, Q57, Q58, Q71–Q73, Q97, Q140, Q145
+
+ Your journey
+ What it does             Shows the user's whole story on one screen, so they never have to visit several screens to
+                          understand it.
+
+ Who gets it              Pro
+
+ Where                    Screen 29 (replaces the Monthly summary); opened from History, Today or Me
+
+ How the user             1. Opens Your journey.
+ uses it                  2. Reads it top to bottom; sections come in the order of their goal.
+                          3. Taps "Make doctor report" to turn it into a doctor PDF.
+
+ Behind the               • Since you started: days tracked, completeness, bloating days in the last 30, typical
+ scenes                   strength and episode length, a trend line.
+                          • What your records show: patterns worth watching, Your cycle, medicine before/after.
+                          What you have tried: experiments and results.
+                          • Your phase (Discover, Understand, Maintain) and what comes next. What is missing
+                          (e.g. bowel log empty). The doctor line when its rule is met.
+                          • Your usual and the monthly sections live here. Every figure has its day count; every
+                          comparison carries the fixed line.
+
+ What is saved            • A snapshot per month.
+
+ What the user            "Since you started (62 days, 81% complete): bloating on 15 of the last 30 days, usually
+ sees                     strength 4 for about 2 hours."
+
+ Special cases            • Free user taps it: upgrade screen, no preview of findings.
+                          • Too little data for a section: says how many more days are needed.
+
+ Never                    • Ranks a "top trigger".
+                          • Uses better/worse labels.
+                          • Names a condition.
+
+ Tests                    Q202, Q203, Q204, Q205
+
+ Personal goal and logging that adapts
+ What it does             Makes the app feel like the user's own: what they care about comes first, and what they
+                          never use gets out of the way.
+
+ Who gets it              Everyone (ordering of Pro items is Pro)
+
+ Where                    Onboarding; Me; Today; Add activity; Other symptoms; Add meal; History
+
+ How the user             1. Chooses up to 2 goals: which foods affect me; whether timing or habits matter; whether
+ uses it                  my cycle plays a part; how my bloating changes over time; getting ready for a doctor
+                          visit; not sure yet.
+                          2. Uses the app as normal; after 14 days the lists adapt.
+                          3. Pro: sees each finished day marked above, around or below their usual.
+
+ Behind the               • The goal orders Today's shortcuts, Personal Focus and Your journey. It never changes
+ scenes                   any rule, threshold or result.
+                          • Options not used in 30 days move under "More", one tap away. Add meal shows saved
+                          dishes and the 5 most frequent dishes first. The nine warning chips never move or hide.
+                          • Your usual = median daily score of the last 28 confirmed days; above = 2 or more over;
+                          below = 2 or more under; shown after 14 confirmed days.
+
+ What is saved            • Goal; usage counts per option.
+
+ What the user            "Tuesday: 7, above your usual (4)."
+ sees
+
+ Special cases            • User changes the goal: new order immediately; nothing else changes.
+
+ Never                    • Hides any logging option for good.
+                          • Says better or worse.
+
+ Tests                    Q206, Q207, Q208, Q209
+
+ Settings (Me)
+ What it does             Lets users manage profile, units, habits, photos, consents and plan.
+
+ Who gets it              Everyone
+
+ Where                    Screen 39
+
+ How the user             1. Changes country details, time zone (with preview), units, followed habits, medicines,
+ uses it                  Keep my meal photos, consents.
+
+ Behind the               • Time-zone change takes effect at a stated date; past days don't move.
+ scenes
+
+ What is saved            • Updated profile and consents.
+
+ What the user            "From 10 Nov your days will follow America/Toronto."
+ sees
+
+ Special cases            •—
+
+ Never                    • Changes past days silently.
+
+ Tests                    Q06, Q64, Q65
+
+ Keep an eye on it mode
+ What it does             A lighter way to keep tracking once the user knows their patterns, so the app stays useful
+                          after month 3.
+
+ Who gets it              Pro
+
+ Where                    Me (switch on); Today; morning review
+
+ How the user             1. Bloat offers it after 8 weeks of Pro with 30+ confirmed days, or the user switches it on
+ uses it                  in Me.
+                          2. Picks up to 5 food groups to watch.
+                          3. Each day logs bloating as usual; each morning answers "Had any of these yesterday?"
+                          Yes / No / Not sure for the watched groups, plus followed habits.
+                          4. One tap returns to full logging.
+
+ Behind the               • Logging meals becomes optional.
+ scenes                   • Explicit Yes/No answers set exposure for the watched groups, which creates more
+                          usable "without" days than full logging.
+                          • Charts, 7-day average, weekly report, Your journey, doctor PDF and comparisons for
+                          watched groups all continue.
+
+ What is saved            • Logging mode, watched groups, daily answers.
+
+ What the user            "Keeping an eye on: dairy, onion and garlic, fizzy drinks."
+ sees
+
+ Special cases            • User switches back to full logging: nothing is lost.
+
+ Never                    • Compares groups that aren't watched or logged.
+                          • Pushes the user to log more.
+
+ Tests                    Q141
+
+ Download my data
+ What it does             Gives users all their records any time, free.
+
+ Who gets it              Everyone
+
+ Where                    Me
+
+ How the user             1. Taps Download my data; waits for the file; downloads.
+ uses it
+
+ Behind the               • Includes every record and versions; download link lasts 15 minutes.
+ scenes
+
+ What is saved            • Export job.
+
+ What the user            "Your file is ready."
+ sees
+
+ Special cases            • Job fails: clear failed state and retry.
+
+ Never                    • Includes anyone else's data.
+
+ Tests                    Q32, Q55
+
+ Delete account
+ What it does             Removes everything permanently.
+
+ Who gets it              Everyone
+
+ Where                    Me
+
+ How the user             1. Taps Delete account; types DELETE to confirm.
+ uses it
+
+ Behind the               • Access suspended, sessions and shares revoked, jobs cancelled, records, photos,
+ scenes                   reports and AI suggestions deleted, processors notified; restored backups re-apply the
+                          deletion.
+
+ What is saved            • Deletion job and receipt only.
+
+ What the user            "Your account and data are being deleted."
+ sees
+
+ Special cases            • Job running during deletion: it checks the deletion marker and writes nothing.
+
+ Never                    • Keeps health data after deletion (except legally required records).
+
+ Tests                    Q33, Q55, Q75
+
+ Sign out, shared devices and lost connections
+ What it does             Keeps data safe on shared phones and saves reliably on bad networks.
+
+ Who gets it              Everyone
+
+ Where                    All screens
+
+ How the user             1. Signs out from Me.
+ uses it
+
+ Behind the               • Sign-out clears private data from the device.
+ scenes                   • Every save has a unique key, so retries never create duplicates.
+                          • Offline: nothing claims to be saved until the server confirms.
+
+ What is saved            •—
+
+ What the user            "Check save status"
+ sees
+
+ Special cases            • Phone loses signal mid-save: user retries safely.
+
+ Never                    • Keeps health data cached offline.
+
+ Tests                    Q01, Q39
+
+ Behind the scenes (founder tools)
+
+ AI protection
+ What it does             Keeps AI costs and misuse under control, while meals always save.
+
+ Who gets it              Founder (admin); applies to every Pro user
+
+ Where                    Admin settings; server
+
+ How the user             1. Founder sets the monthly AI spending limit (default $50 in the beta) and gets alerts at
+ uses it                  50%, 80% and 100%.
+                          2. Founder can turn all AI off with one switch.
+
+ Behind the               • Per user: at most 10 AI checks an hour and 40 a day.
+ scenes                   • Dish text: first 200 characters sent; photos 1600px and under 2 MB; at most 20 items
+                          back; fixed answer length.
+                          • One retry after 2 seconds, then unknown; the same meal is never sent twice.
+                          • Only approved models; alert if a request costs 3 times the expected cost.
+                          • Keys only on the server; separate test and live keys; written replacement steps; the
+                          provider's own limit as a second net.
+
+ What is saved            • Spend totals, alerts, switch state; no user data in alerts.
+
+ What the user            "The ingredient check is paused right now. Your meal is saved."
+ sees
+
+ Special cases            • Limit reached mid-month: AI pauses for everyone; logging continues.
+
+ Never                    • Loses a meal because AI is unavailable.
+                          • Retries in a loop.
+
+ Tests                    Q190–Q201
+
+ Founder review queue
+ What it does             Makes sure every harm signal is seen and acted on.
+
+ Who gets it              Founder (admin)
+
+ Where                    Admin area
+
+ How the user             1. Opens the queue weekly.
+ uses it                  2. Reviews each "Worse" card tap, "I felt worse" experiment ending and wellbeing pause.
+                          3. Records action: no change, edit, switch off.
+
+ Behind the               • Each item should be reviewed within 7 days.
+ scenes                   • Any feature, card or experiment can be switched off immediately without a new release.
+
+ What is saved            • Feedback log entries and actions.
+
+ What the user            Queue list with counts.
+ sees
+
+ Special cases            • Many Worse taps on one card: switch it off and log why.
+
+ Never                    • Shows staff users' full health records.
+
+ Tests                    Q112
+
+ Publishing cards and articles
+ What it does             Keeps all advice sourced and versioned.
+
+ Who gets it              Founder (admin)
+
+ Where                    Admin area
+
+ How the user             1. Writes or edits a card or article.
+ uses it                  2. Adds source link, evidence label and exclusions.
+                          3. Publishes.
+
+ Behind the               • Publishing is refused without a source link, label and version.
+ scenes                   • Every change is logged in the evidence file.
+
+ What is saved            • Card or article version.
+
+ What the user            —
+ sees
+
+ Special cases            • Source page changes: re-check and update the card.
+
+ Never                    • Uses AI-written advice.
+
+ Tests                    Q113
+

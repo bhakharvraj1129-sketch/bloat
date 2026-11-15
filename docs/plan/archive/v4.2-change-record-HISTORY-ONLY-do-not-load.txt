@@ -1,0 +1,1074 @@
+
+ 1. Summary
+ Version 4.2 turns Bloat into a general wellness tracker that makes no medical judgments, so it
+ can launch without a clinician's review. It also records the founder decisions made between 3 and 6
+ November 2026: two plans (Free and Pro), the USA as the main market, the meal AI and personal
+ experiments in the first release, and no calorie tracking.
+
+ Change count at a glance
+ Area                         v4.1                             v4.2                            Net change
+
+ Screens (app spec)           33 (3 Nov spec) + 4 Pro          37                              3 removed, 3 added
+                              screens added 5 Nov = 37
+
+ Questions in the registry    69                               61                              26 removed, 11
+                                                                                               changed, 18 added
+
+ Acceptance tests             91 (Q01–Q91)                     103 (Q01–Q113, minus 10)        10 removed, 4
+                                                                                               rewritten, 22 added
+
+ Safety questions             19, with routing                 0; one information page         All removed
+
+ Database tables              —                                —                               4 removed, 5
+                                                                                               changed, 9 added
+
+ Guidance cards               None (idea only)                 12 starter cards, each with a   New
+                                                               public source
+
+ Experiments                  Clinician-supervised food        5 habit-only experiments,       Replaced
+                              tests (stage S3, off)            Pro, first release
+
+ Clinician gate (Gate 1)      Clinician approves safety        5 self-checks + lawyer          Replaced
+                                                               review
+
+ How to read the change sections
+ Each change (C1, C2 …) shows three rows: v4.1 (before), v4.2 (after) and Why. The grey tag
+ next to the title names the concern behind it:
+
+ Tag                           Meaning
+
+ No clinician review           The feature needed a doctor, dietitian or physiotherapist to check it. Without one it
+                               must be removed or replaced.
+
+ Medical-device law            The feature could make Bloat a regulated medical device instead of a wellness
+                               product.
+
+ Advertising law               The feature or wording would be a health claim that needs scientific proof.
+
+ Privacy law                   The change is needed to handle health data lawfully.
+
+ Founder decision              The change follows a decision you made, not a legal concern.
+
+ Gap fix                       Something missing or wrong in an earlier version.
+
+ 2. The concerns behind the changes
+ Without a clinician, Bloat cannot make any medical judgment. Three things go wrong if it does:
+
+  • Safety. If the app judges wrongly, a real emergency could be missed or healthy people
+    frightened. With no qualified person checking the logic, the error rests on you.
+  • Medical-device law. In January 2026 the US FDA updated its general wellness guidance. A
+    product stops being wellness if it is meant to diagnose, treat or prevent a condition, prompts or
+    guides specific medical action, names a specific condition when suggesting a doctor, calls
+    outputs abnormal, uses clinical thresholds, or gives ongoing alerts to manage a disease. Showing
+    values, trends and summaries is allowed. Health Canada and India's CDSCO also judge software
+    by its intended use and claims.
+  • Advertising law. The US FTC requires competent and reliable scientific evidence for
+    health-benefit claims. India's Consumer Protection Act covers misleading advertisements.
+ Separately, health data is regulated whether or not a clinician is involved: the FTC Health Breach
+ Notification Rule and state laws such as Washington's My Health My Data Act (first lawsuit filed in
+ February 2025) in the USA, PIPEDA and Quebec Law 25 in Canada, and the DPDP Act in India.
+
+ Every change in this record does one of four things: removes a medical judgment; replaces an
+ expert check with a published source or a test you can run; protects health data; or records a
+ founder decision.
+
+ Founder decisions recorded (3–6 November 2026)
+ Decision                   What it means                                                        Date
+
+ Two plans                  Free: logging and daily Bloat Score only. Pro: everything else.      3 Nov, confirmed
+                                                                                                 5 Nov
+
+ Free meals                 Dish name, time and portion only. No ingredients.                    3 Nov
+
+ Meal AI                    First release, Pro only. Typed dish or meal photo. AI lists only     3 Nov; photo 5
+                            bloating-related ingredients; user ticks what they had and can add   Nov
+                            more.
+
+ Calories                   Not shown. Meal size and fatty food are tracked instead.             5 Nov
+
+ Personal experiments       First release, Pro only.                                             5 Nov
+
+ Guidance cards,            Pro only.                                                            5 Nov
+ exercise detail, health
+ conditions
+
+ Tech stack                 Next.js (TypeScript), Supabase, Vercel, Claude Haiku 5.5, as in      5 Nov
+                            v4.1.
+
+ Audience                   USA first, then Canada. India in the same launch as a secondary      5 Nov
+                            market. English only.
+
+ Clinician review           None. Bloat redesigned as wellness-only. Privacy lawyer still        6 Nov
+                            required.
+
+ Expert consults            Remain a future feature (stage S3).                                  3 Nov
+
+ 3. Plans, audience and business
+ C1. Free and Pro plans · Founder decision
+ v4.1 (before)     One product with paid insights planned for stage S2. No defined split of features between free
+                   and paid.
+
+ v4.2 (after)      Free: sign-up, logging bloating, meals (dish name, time, portion), activities, bowel
+                   movements, morning review, daily Bloat Score as a number, history list, edit and delete,
+                   download my data, delete account. Pro: AI meal check (typed or photo), charts, 7-day
+                   average, weekly and monthly summaries, comparisons, guidance cards, exercise log, health
+                   conditions, experiments, doctor PDF.
+
+ Why               Your decision: the free plan proves the habit; Pro sells the understanding. Download and
+                   deletion stay free because privacy laws give users these rights regardless of plan.
+
+ C2. USA becomes the main market · Founder decision
+ v4.1 (before)     Wave 1 was USA, Canada and India with equal weight; examples, dishes and prices were
+                   India-first.
+
+ v4.2 (after)      USA is the main market, Canada second, India in the same launch as secondary. Country list
+                   order: United States, Canada, India, Other. Examples, AI test dishes and marketing are North
+                   American first.
+
+ Why               Your decision: your main audience is not Indian. India stays because you want it in the first
+                   launch.
+
+ C3. Prices shown in the visitor's currency · Founder decision
+ v4.1 (before)     INR 199 / 1,499 listed first; USD 5.99 / 39.99; Canada not set.
+
+ v4.2 (after)      USD first: US$5.99 a month or US$39.99 a year. India ₹199 / ₹1,499. Canada still to set in CAD
+                   (a USD price is not reused).
+
+ Why               Follows the USA-first decision. Canada needs its own price because currency and buying power
+                   differ.
+
+ C4. Units and formats by country · Founder decision
+ v4.1 (before)     Not specified.
+
+ v4.2 (after)      New setting, chosen from country and editable in Me. USA: 12-hour time, MM/DD dates, °F, lb,
+                   oz, cups, fl oz. Canada: 12-hour, DD/MM, °C, metric with cups. India: 12-hour, DD/MM, °C,
+                   metric.
+
+ Why               US users expect cups and ounces; showing grams and DD/MM would feel foreign and cause
+                   wrong entries.
+
+ C5. Expert consults stay in the future · Founder decision
+ v4.1 (before)     Stage S3: clinician-led consults, separately approved.
+
+ v4.2 (after)      Unchanged: future feature. Test Q78 (clinician licensed for the patient's location) is parked
+                   until consults return.
+
+ Why               Your decision. Consults need licensed clinicians per country, which conflicts with launching
+                   without clinicians.
+
+ C6. Tech stack unchanged · Founder decision
+ v4.1 (before)     Next.js App Router with TypeScript, Supabase (Postgres, Auth, row-level security, private
+                   storage), Vercel, Zod, Playwright, Claude Haiku 5.5.
+
+ v4.2 (after)      Same. Alternatives suggested in other reviews (Replit, Render) are not adopted.
+
+ Why               Your decision: keep the stack in the master plan.
+
+ 4. Safety: from questions to an information page
+ This is the largest group of changes. All of them follow from one rule: the app may give information
+ about when to get help, but it may not decide who needs help.
+
+ C7. 19 safety questions removed · Concern: no clinician review / Concern:
+ medical-device law
+
+ v4.1 (before)     Before sign-up and in onboarding the app asked 19 Yes / No / Not sure questions (SAF-01 to
+                   SAF-19), for example severe sudden pain, vomiting blood, fever, black stool, lump in the
+                   tummy, unable to pee. Each answer set a route: EMERGENCY, URGENT, URGENT_INFO,
+                   ROUTINE_ASSESSMENT or UNRESOLVED.
+
+ v4.2 (after)      No safety questions. Replaced by one fixed page, “When to get medical help” (section 5),
+                   listing the same warning signs as information.
+
+ Why               Asking about symptoms and sorting people by urgency is triage, a clinical function. Deciding
+                   which symptom is “emergency” versus “urgent” is a doctor's job; a wrong route either misses
+                   a real emergency or alarms healthy users. A fixed page gives the same information but the
+                   user reads it and decides. The FDA has long treated information on when to consult a doctor as
+                   low risk. The wording is based on the NHS bloating page, so a health authority wrote it, not
+                   you.
+
+ C8. Safety help pop-up removed · Concern: no clinician review
+ v4.1 (before)     Three pop-up cards: Emergency (dark red, call button, opens instantly on tap), Urgent (“see a
+                   doctor today or soon”), Get advice soon.
+
+ v4.2 (after)      No pop-ups. The help page is always one tap away.
+
+ Why               The pop-ups only existed to show the result of the triage. With no triage there is nothing to
+                   show.
+
+ C9. Routine health check screen removed · Concern: no clinician review
+ v4.1 (before)     Onboarding screen with SAF-11 to SAF-16; a Yes showed “Worth booking a check-up”.
+
+ v4.2 (after)      Removed. A permanent line on the help page and in Me: “If bloating is severe, persistent or
+                   worrying, talk to a doctor.”
+
+ Why               Judging who should book a check-up is the same clinical decision in a milder form.
+
+ C10. No “all clear” anywhere · Concern: no clinician review / Concern: medical-device law
+ v4.1 (before)     Answering No to all questions let the user continue as if cleared; a Not sure answer blocked
+                   any all-clear.
+
+ v4.2 (after)      The only button is “I've read this”. No screen says or implies “all clear” or “no warning signs”.
+                   New test Q93 checks this.
+
+ Why               An all-clear tells the user the app checked them and found them safe. If that user were
+                   seriously ill, the app made a false medical statement.
+
+ C11. Insights never pause · Concern: no clinician review
+ v4.1 (before)     A Yes or Not sure on an urgent sign paused comparisons, summaries and tips (“interpretation
+                   holds”) until a versioned policy released them. SAF-18 had an interim rule that did not pause.
+
+ v4.2 (after)      Nothing pauses. The holds table and the SAF-18 interim rule are removed.
+
+ Why               The pause was triggered by triage. Without triage there is nothing to trigger it, and deciding
+                   when it is safe to resume was itself a clinical rule.
+
+ C12. No symptom check when logging an episode · Concern: no clinician review
+ v4.1 (before)     Picking tummy pain or nausea on “Anything else with it?” (EP-08) offered a reviewed symptom
+                   check. The same applied on the onboarding symptoms screen.
+
+ v4.2 (after)      No check. A small “When to get medical help” link sits under the symptom chips.
+
+ Why               That check was triage at a different moment.
+
+ C13. No thresholds or alerts · Concern: medical-device law / Concern: no clinician review
+ v4.1 (before)     Planned: escalation such as “scores of 8 or more on many days → see a doctor”, still to be set
+                   by a clinician.
+
+ v4.2 (after)      No alerts based on score size or frequency. No “high”, “abnormal” or “concerning” labels.
+                   Scores are shown as numbers and charts only. New test Q95.
+
+ Why               The FDA's 2026 guidance names clinical thresholds and ongoing alerts as features that take a
+                   product out of wellness. Choosing the number and the number of days is a medical decision.
+
+ C14. Bloat never names a condition · Concern: medical-device law / Concern:
+ advertising law
+
+ v4.1 (before)     No explicit rule.
+
+ v4.2 (after)      No screen, card, summary, export or PDF generated by Bloat may suggest a condition (e.g.
+                   “this may be IBS or lactose intolerance”). Condition names appear only where the user entered
+                   them. New test Q96.
+
+ Why               Suggesting a condition is diagnosis. The FDA lists naming a specific condition as a disqualifier
+                   for wellness, and it is the claim most likely to mislead a user.
+
+ C15. Personal Focus P2, P3 and P4 removed · Concern: no clinician review
+ v4.1 (before)     P2: constipation, diarrhoea or no bowel movement on 3+ of 14 days → show the bowel card
+                   first. P3: gas or burping on 3+ days → gum, straw and fizzy-drink tracking. P4: heartburn, or
+                   most episodes after 6 pm → meal-timing tracking. All marked as needing clinical review.
+
+ v4.2 (after)      Removed. P1 (order by cuisine), P5 (user's own suspicion), P6 (time-of-day pattern) and P7
+                   (cycle shading) stay. The useful parts survive: the bowel log is available to all, and guidance
+                   cards trigger from habits the user logged, not from symptoms.
+
+ Why               Each rule turned a symptom pattern into an action, which is interpreting symptoms. v4.1 itself
+                   said they needed a clinician.
+
+ 5. New page: “When to get medical help”
+ This page replaces every safety question. It is identical for all users, asks nothing and stores only
+ that it was viewed. Wording follows the NHS bloating page, adapted for the USA, Canada and India.
+
+ C16. Help page shown before sign-up and always reachable · Concern: no
+ clinician review
+
+ v4.1 (before)      Safety check 1 (4 emergency questions) shown before sign-up.
+
+ v4.2 (after)       The help page is shown before sign-up and requires a tap on “I've read this”. It is linked from
+                    Log bloating, the onboarding symptoms screen, Me, experiment screens and the website
+                    footer. Emergency number follows country: 911 for USA and Canada, 112 for India; “your local
+                    emergency number” anywhere else.
+
+ Why                It replaces the duty of care the safety questions provided: every user is told where to get help
+                    before they start, and can find it from any symptom screen.
+
+ Full page text (draft)
+    When to get medical help
+
+    Bloat is a tracker. It can't tell you what is causing your symptoms or whether they are serious.
+
+    Call 911 (USA and Canada) or 112 (India) now if you have bloating with a swollen stomach and:
+    stomach pain that is severe and came on very suddenly; you are vomiting blood, or your vomit looks
+    like coffee grounds; severe difficulty breathing (gasping, choking or unable to get words out).
+
+    Contact a doctor today or go to urgent care if you have bloating and: vomiting, diarrhoea or
+    constipation; stomach pain; a high temperature, or you feel hot, cold or shivery; a swelling or lump
+    in your tummy; you can't pee, poo or pass gas; a burning feeling in your chest from stomach acid.
+
+    Book a regular appointment with a doctor if: you feel bloated regularly; you've tried changing
+    what you eat and still keep feeling bloated; you have bloating and are losing weight without trying;
+    you have bloating and blood in your poo.
+
+    Source: NHS, “Bloating”. This page is general information, not medical advice. [ I've read this ]
+
+ Stored: date and time viewed, page version, acknowledged yes or no. Sign-up continues normally after the tap;
+ nothing is blocked or paused.
+
+ 6. Personal experiments
+ C17. Experiments become habit-only and move to the first release ·
+ Concern: no clinician review / Founder decision
+
+ v4.1 (before)     Stage S3 “food observation programme”: clinician-supervised food tests with 7 eligibility
+                   questions (FT-01 to FT-07: age, pregnancy, eating disorder, allergy, IBD or coeliac, weight loss,
+                   clinician approval). Off by default.
+
+ v4.2 (after)      Pro, first release. Five habit experiments only: eat more slowly; no chewing gum or hard
+                   candy; no straws; fewer fizzy drinks; a gentle 10-minute walk after lunch and dinner,
+                   only if walking is comfortable. None removes a food, changes how much is eaten, or
+                   involves supplements or fasting. FT-01 to FT-07 removed.
+
+ Why               NIDDK, the AGA and Monash all say cutting foods (dairy, wheat, low-FODMAP) should be done
+                   with a doctor or dietitian; done alone it can cause nutritional gaps and trigger eating disorders.
+                   Even “eat smaller meals” carries that risk, and deciding who to exclude is a clinical call. The
+                   five habits are listed by NIDDK and NHS as general advice for everyone, so nobody needs
+                   screening.
+
+ C18. Experiment rules · Concern: advertising law
+ v4.1 (before)     None (feature was off).
+
+ v4.2 (after)      7 days, compared with the 7 days before. One experiment at a time. Can't start unless 4+ of
+                   the previous 7 days have a confirmed Bloat Score. Daily question “Did you do it today?” Yes /
+                   Partly / No, on Today and in the morning review. Shown before starting: “This is a personal
+                   observation, not a treatment. Stop any time if you feel worse.” and “If you have a diagnosed
+                   condition, follow your doctor's advice first.”
+
+ Why               Comparing against the user's own previous week is the simplest honest comparison. The 4-day
+                   minimum stops results built on too little data.
+
+ C19. Experiment results use fixed wording · Concern: advertising law
+ v4.1 (before)     None.
+
+ v4.2 (after)      With 4+ confirmed days in each period and 4+ “Yes” days: “During the experiment your
+                   average Bloat Score was 3.9 (6 days). In the 7 days before it was 5.2 (7 days). This is a pattern
+                   in your own records, not proof that the change caused it.” Otherwise: “There aren't enough
+                   days to compare yet.” AI never writes or rewrites results.
+
+ Why               With 2–3 days any difference is mostly chance. The fixed sentence stops the app making a
+                   cause-and-effect claim, which the FTC would expect scientific proof for.
+
+ C20. Ending early because “I felt worse” · Concern: no clinician review
+ v4.1 (before)     None.
+
+ v4.2 (after)      “End experiment early” with reasons: I felt worse / Too hard to keep up / Other. “I felt worse”
+                   shows no numbers, shows the help link, and is logged for you.
+
+ Why               A chart could nudge someone who feels worse to keep going. The log is your early-warning
+                   system in place of a clinician.
+
+ 7. Guidance cards
+ C21. Guidance cards added (Pro), sourced from public health bodies
+ · Concern: no clinician review / Concern: advertising law
+
+ v4.1 (before)      Not in v4.1. Proposed on 5 November as a clinician-reviewed library of tips and mind–body
+                    activities.
+
+ v4.2 (after)       12 starter cards, one per day. Each restates a public source in plain words and links to it,
+                    carries an evidence label, and ends with: “General wellness information, not medical advice. If
+                    you have a diagnosed condition, follow your doctor's advice first.”
+
+ Why                With no expert to check your own writing, the safest content is content health authorities
+                    already published. The link proves where it came from; the label prevents overstating it.
+
+ C22. One card a day; no yoga poses or tummy massage · Concern: no
+ clinician review
+
+ v4.1 (before)      Proposal: two cards a day (a digestive tip plus a mind–body activity such as yoga poses,
+                    cat–cow, knee-to-chest, abdominal massage).
+
+ v4.2 (after)       One card a day, the same all day. Movement is limited to walking, general activity and slow
+                    breathing (NHS breathing exercise).
+
+ Why                Poses and abdominal massage can be unsafe after surgery, in pregnancy, or with hernias or
+                    injuries; deciding who can do them needs a physiotherapist. Walking and slow breathing are
+                    low risk and come straight from NHS pages.
+
+ C23. Cards triggered only by habits the user logged · Concern: no clinician
+ review
+
+ v4.1 (before)      Proposal: personalise by symptoms, conditions and observations.
+
+ v4.2 (after)       Triggers use logged habits only (e.g. “chewing gum on 2+ of the last 7 days”), otherwise
+                    general rotation. “Why you're seeing this” states the real reason. Not shown again for 14 days.
+
+ Why                Triggering on symptoms would be interpreting symptoms. Triggering on habits the user
+                    recorded is simply reflecting their own data back.
+
+ C24. Health conditions do not filter cards · Concern: no clinician review
+ v4.1 (before)      Proposal: hide cards unsuitable for a user's condition (e.g. fibre advice with Crohn's).
+
+ v4.2 (after)       Not filtered. The universal “follow your doctor's advice first” line is on every card.
+
+ Why                Deciding which advice suits which disease is clinical judgment; getting it wrong either way
+                    would be your medical error.
+
+ C25. Card publishing and feedback rules · Concern: no clinician review
+ v4.1 (before)     None.
+
+ v4.2 (after)      A card cannot be published without a source link, evidence label and version (test Q113).
+                   Feedback: Tried / Not today; Helpful / No difference / Worse; Not relevant; Hide this card.
+                   “Worse” hides the card for that user and is logged for you.
+
+ Why               The source rule replaces expert sign-off. The “Worse” log lets you spot a problem card without
+                   a clinician monitoring.
+
+ The 12 starter cards
+ #     Card                             Shown when                              Evidence label            Source
+
+ 1     Eat more slowly                  “Ate quickly” 2+ of last 7 days,        Often suggested for gas   NIDDK
+                                        or rotation                             and bloating
+
+ 2     Chew with your mouth             Rotation                                Often suggested for gas   NHS
+       closed                                                                   and bloating
+
+ 3     Take a break from gum and        Gum logged 2+ days                      Often suggested for gas   NIDDK
+       hard candy                                                               and bloating
+
+ 4     Skip the straw                   Straw logged 2+ days                    Often suggested for gas   NIDDK
+                                                                                and bloating
+
+ 5     Notice fizzy drinks              Fizzy drinks group ticked 3+            Often suggested for gas   NIDDK, NHS
+                                        days                                    and bloating
+
+ 6     Check “sugar-free” labels        Sugar alcohols ticked 2+ days           Often suggested for gas   NIDDK
+                                                                                and bloating
+
+ 7     Smaller, more frequent           “Large” portion 3+ times in 7           Often suggested for gas   NIDDK, NHS
+       meals                            days                                    and bloating
+
+ 8     Don't eat a big meal right       “Late meal” 2+ days                     Often suggested for gas   NHS
+       before bed                                                               and bloating
+
+ 9     Move a little every day          “Mostly sitting” 2+ days, or            General health advice     NHS, CDC
+                                        rotation
+
+ 10    A gentle walk after a meal       Bloating within 3 h of meals on         General health advice     NHS
+                                        3+ days
+
+ 11    Drink enough water               Rotation                                Often suggested for gas   NHS
+                                                                                and bloating
+
+ 12    5-minute slow breathing          “Stressed” 2+ days                      General wellbeing         NHS
+
+ 8. Meal logging and the meal AI
+ C26. Free meals: dish name, time and portion only · Founder decision
+ v4.1 (before)     Every meal could carry ingredients with an evidence level.
+
+ v4.2 (after)      Free users record the dish name, time and portion. No ingredients; ai_check_status =
+                   free_plan.
+
+ Why               Your decision: ingredient detail is part of what Pro sells.
+
+ C27. Ingredient question replaced by a bloating-ingredient checklist
+ (Pro) · Founder decision
+ v4.1 (before)     ML-03 “What ingredients do you know were in it?” with 5 evidence levels: known recipe, label,
+                   I know these, accept typical recipe as a guess, unknown. AI suggested a full typical ingredient
+                   list.
+
+ v4.2 (after)      AI lists only the ingredients in the dish that fall in the 12 bloating-related food groups (max 20).
+                   Screen: “Which of these did you have?” checklist, “I'm not sure about some of these” tick box,
+                   and “+ Add an ingredient not in this list” (a fixed word list sorts it into a group, else “other”).
+
+ Why               Your decision on 3 November. It is faster for users and keeps attention on what matters for
+                   bloating.
+
+ C28. How checklist answers are saved · Founder decision
+ v4.1 (before)     Evidence tiers label, known_recipe, user_known (used in comparisons) and accepted_guess,
+                   unknown (excluded).
+
+ v4.2 (after)      Ticked = had it. Not ticked after Save = didn't have it. Not ticked with “I'm not sure” on =
+                   unknown. User-added = had it. AI failure = meal saved with ingredients unknown; check can
+                   be re-run later.
+
+ Why               Keeps the v4.1 principle that unknown stays unknown while matching the simpler checklist.
+
+ C29. Meal photos move to the first release (Pro) · Founder decision
+ v4.1 (before)     Meal photos were stage LATER.
+
+ v4.2 (after)      Pro users can take or choose a photo. The AI lists dishes it can see (“Looks like: pepperoni
+                   pizza, side salad, cola”); the user keeps, edits, removes or adds dishes before the same
+                   checklist appears per dish.
+
+ Why               Your decision: the meal AI should be in the starting phase. Estimated AI cost with photos is
+                   about US$0.04–0.05 per Pro user a month.
+
+ C30. 12 food groups each backed by a public source · Concern: no clinician
+ review
+
+ v4.1 (before)     TAG-01 to TAG-12 defined in v4.1, pending dietitian review.
+
+ v4.2 (after)      Same 12 groups, each with a named source shown in the app under “Why these foods?”: milk
+                   and dairy (NIDDK); wheat, rye and whole grains (NIDDK); onion and garlic (Monash FODMAP);
+                   beans, peas and lentils (NIDDK, NHS); fruit sugars (NIDDK); sugar alcohols (NIDDK);
+                   cabbage-family vegetables (NIDDK, NHS); fried or high-fat (NIDDK, NHS); spicy (NHS); fizzy
+                   drinks (NIDDK, NHS); caffeine (NHS); alcohol (NHS).
+
+ Why               A dietitian would have confirmed the groups. Without one, each needs a published source,
+                   otherwise the answer to “who decided onion is a bloating food?” would be “an AI did”.
+
+ C31. AI accuracy test replaces the dietitian review · Concern: no clinician
+ review
+
+ v4.1 (before)     Dietitian to review tags and AI behaviour before the meal AI went live.
+
+ v4.2 (after)      Before launch: 100 typed dishes (60 USA and Canada, 25 Indian, 15 packaged foods and
+                   drinks) and 50 meal photos, with expected answers written from published recipes and labels.
+                   Proposed pass mark: at least 90% of expected groups found and fewer than 10% wrong
+                   suggestions. Re-run after any prompt or model change.
+
+ Why               Someone has to show the AI is right often enough to rely on. A recorded test is evidence you
+                   checked, and it catches failures like missing onion powder in a burrito or sugar alcohols in
+                   “sugar-free” bars.
+
+ C32. Fixed AI wording and user confirmation · Concern: advertising law
+ v4.1 (before)     AI suggestions marked as suggestions.
+
+ v4.2 (after)      Fixed text: “These are foods often linked to gas or bloating (sources: NIH, NHS). AI suggestion,
+                   may be wrong. Tick the ones you had.” It never says a food causes the user's bloating.
+
+ Why               The user, not the AI, confirms what they ate, so the data stays reliable and no causal claim is
+                   made.
+
+ C33. Portions in everyday units · Founder decision
+ v4.1 (before)     Small / Usual / Large / Not sure.
+
+ v4.2 (after)      Small / Medium / Large / Not sure, plus optional count and unit suited to the dish: slices,
+                   pieces, cups, bowls, plates, cans or bottles, fl oz or ml by units setting.
+
+ Why               US users think in slices and cups; meal size is one of the factors NIDDK and NHS link to
+                   bloating.
+
+ C34. No calories · Founder decision
+ v4.1 (before)     Not tracked (not discussed).
+
+ v4.2 (after)      No calorie number anywhere (test Q104). Meal size is captured by portion; fatty food by the
+                   “fried or high-fat” group.
+
+ Why               Your decision: calories only if they affect bloating, and they are not a bloating factor. AI calorie
+                   estimates from photos are also unreliable.
+
+ C35. AI data limits tightened for photos · Concern: privacy law
+ v4.1 (before)     AI receives only the dish text (max 300 characters); never symptoms, safety answers,
+                   pregnancy, identity or history.
+
+ v4.2 (after)      Same for text. For photos: shrunk to about 1,000 px and location and device data removed
+                   before sending. Never sent: symptoms, scores, conditions, pregnancy, name, email, country,
+                   history (test Q103).
+
+ Why               Data minimisation is required by health-data laws; photos can reveal where someone lives.
+
+ C36. Meal photos deleted by default · Concern: privacy law
+ v4.1 (before)     No photos in the first release.
+
+ v4.2 (after)      Photo deleted right after the check. Setting in Me, “Keep my meal photos”, off by default (test
+                   Q102).
+
+ Why               Fewer stored photos means less sensitive data to protect, leak or explain under state
+                   health-data laws.
+
+ C37. Separate consent before the first AI use · Concern: privacy law
+ v4.1 (before)     General consent at sign-up.
+
+ v4.2 (after)      Pro users tick before the first AI check: “I agree that the dish name or meal photo is sent to an
+                   AI service to suggest ingredients. Nothing else about me is sent.”
+
+ Why               You are sending user content to another company. US regulators have fined health apps that
+                   shared health data without clear consent (GoodRx, BetterHelp).
+
+ 9. Bowel log, exercise, health conditions and
+ other screens
+ C38. Bowel log screen added (Free and Pro) · Gap fix
+ v4.1 (before)     Questions BW-01 to BW-04 existed in v4.1, but the 3 November app spec had no screen for
+                   them.
+
+ v4.2 (after)      New “Log bowel movement” button on Today: when; what it looked like; did you have to
+                   strain; did it feel complete. The morning review asks everyone “Did you have a bowel
+                   movement on [day]?”
+
+ Why               NHS and NIDDK both link constipation and bowel habits with bloating. The missing screen was
+                   my error in the 3 November spec.
+
+ C39. Stool types as plain descriptions, no labels or alerts · Concern:
+ medical-device law / Concern: no clinician review
+
+ v4.1 (before)     BW-02 was a placeholder pending a licensed stool chart.
+
+ v4.2 (after)      Seven descriptions in our own words: separate hard lumps; lumpy and sausage-shaped;
+                   sausage-shaped with cracks; smooth and soft like a sausage; soft blobs with clear edges;
+                   mushy with ragged edges; watery with no solid pieces. Never labelled “normal”, “constipated”
+                   or “diarrhoea”; no alerts (test Q105).
+
+ Why               Labelling a type is interpreting a symptom, and alerting on it is a threshold. Own wording
+                   avoids licensing the standard chart image.
+
+ C40. Exercise log added (Pro) · Founder decision
+ v4.1 (before)     Activities ACT-08 (walk after a meal, 10/20/30+ min) and ACT-09 (exercise,
+                   light/moderate/hard) only.
+
+ v4.2 (after)      Free keeps those two taps. Pro: choosing Walk or Exercise opens type, start, duration, intensity
+                   and “near a meal?” (before / after / not near / not sure). Minutes from the last meal and to the
+                   next are calculated. Symptoms during and after come from the episode log, not extra
+                   questions.
+
+ Why               From the 5 November review: walking after meals is distinct from hard exercise. Kept light so
+                   logging stays quick.
+
+ C41. Health conditions record added (Pro), context only · Founder decision
+ / Concern: no clinician review
+
+ v4.1 (before)     ON-09 free text for conditions and medicines.
+
+ v4.2 (after)      Medicines stay in ON-09. Conditions move to HC-01/HC-02: lactose intolerance, IBS, coeliac
+                   disease, food allergy, long-term constipation, Crohn's or ulcerative colitis, reflux, thyroid
+                   condition, other; each with diagnosed by a doctor / I suspect it / tested, ruled out / not sure /
+                   prefer not to say, optional year. Used only for the user's record and the doctor PDF.
+
+ Why               Structured entries make the doctor PDF clearer. Using them to change advice would be clinical
+                   judgment, so they change nothing. Family history and genetics stay out.
+
+ C42. Consent screen: wellness acknowledgement · Concern: medical-device
+ law
+
+ v4.1 (before)     Two ticks: Terms and Privacy; health-data consent.
+
+ v4.2 (after)      Three required ticks, shown separately, adding: “I understand Bloat is a wellness tracker, not
+                   medical advice, and not for emergencies.”
+
+ Why               Records that the user understood what Bloat is. With the terms, it shows they were told
+                   clearly.
+
+ C43. “How Bloat works” adds a fourth card · Concern: medical-device law
+ v4.1 (before)     Three cards: tap when it starts and ends; add meals; review each morning.
+
+ v4.2 (after)      Adds: “Bloat shows patterns in your own records. It doesn't diagnose or treat anything. For
+                   worrying symptoms, see When to get medical help.”
+
+ Why               Sets expectations at the start, in line with the intended-use statement.
+
+ C44. Today screen additions · Founder decision
+ v4.1 (before)     Today card, I feel bloated, Add meal / Add activity, timeline. Personal Focus symptom tips
+                   planned.
+
+ v4.2 (after)      Adds “Log bowel movement” for everyone; for Pro, the daily card and the running experiment
+                   card. Symptom tips removed.
+
+ Why               Follows the new features and the removal of P2–P4.
+
+ C45. Summaries and comparisons: fixed wording · Concern: advertising law /
+ Concern: medical-device law
+
+ v4.1 (before)     Weekly and monthly summaries and comparisons, with “pattern, not cause” wording pending
+                   clinical review.
+
+ v4.2 (after)      Same maths. Every summary ends: “These are patterns in your own records, not causes. Bloat
+                   doesn't diagnose.” No condition names, no “high” or “abnormal”, no thresholds. Adds
+                   experiment results, exercise comparisons and bowel counts.
+
+ Why               Fixed templates guarantee no causal or diagnostic claim appears, without needing a reviewer
+                   for each sentence.
+
+ C46. Pro locking enforced by the server · Founder decision
+ v4.1 (before)     No plans defined.
+
+ v4.2 (after)      The server refuses every Pro request from a free account with 403 PLAN_REQUIRED (test Q97),
+                   not just hiding screens.
+
+ Why               Otherwise anyone could call the server directly and get Pro features, including AI that costs
+                   you money.
+
+ 10. Question registry: 69 → 61
+ 26 removed, 11 changed, 18 added. Surviving questions keep their IDs.
+
+ Removed (26)
+ IDs               Questions                                                          Why
+
+ SAF-01 to 04      Severe sudden tummy pain; vomiting blood or coffee-ground          Emergency triage → now
+                   material; severe difficulty breathing; swelling of mouth or        help-page text
+                   throat, collapse or hard to wake
+
+ SAF-05 to 10      Repeated vomiting; can't pass stool or gas with pain; fever        Urgent triage → help-page text
+                   or shivering; new or worsening pain; black, tarry stool; new
+                   or worsening swelling
+
+ SAF-11 to 16      Six routine-assessment questions                                   Routine triage → permanent
+                                                                                      “talk to a doctor” line
+
+ SAF-17 to 19      Lump or swelling in tummy; bloating with diarrhoea or              Urgent triage → help-page text
+                   constipation; unable to pee
+
+ FT-01 to 07       Eligibility for clinician-supervised food tests                    Food tests removed
+
+ Changed (11)
+ ID                               v4.1                                    v4.2
+
+ ON-04 foods you usually eat      South Asian first                       Ordered by country (North American first
+                                                                          for USA and Canada); South Asian
+                                                                          sub-regions kept
+
+ ON-09 conditions or              Free-text names                         Medicines only; conditions move to HC-01
+ medicines                                                                (Pro)
+
+ ON-11 other symptoms             Clinical draft                          Same wording; implementation default;
+                                                                          context only
+
+ ON-12 when worst                 Clinical draft                          Same wording; implementation default
+
+ EP-08 anything else with it      Clinical draft; pain or nausea          Same options; no check; help link
+                                  opened a symptom check
+
+ ML-01 what did you have          Type / Recent / Favourite / Manual      Type / Take a photo (Pro) / Recent /
+                                  ingredients                             Favourite
+
+ ML-03 ingredients                5 evidence levels                       “Which of these did you have?” checklist
+                                                                          (Pro)
+
+ ML-04 how much                   Small / Usual / Large / Not sure        Small / Medium / Large / Not sure + count
+                                                                          and unit
+
+ BW-02 stool form                 Placeholder for licensed chart          “What did it look like?” 7 text descriptions
+
+ BW-04 emptying                   “Did you feel you had not fully         “Did it feel complete?” (same data, plain
+                                  emptied?”                               wording)
+
+ DY-04 morning review             Up to 3 followed activities             Also BW-01 for everyone and XP-02 for
+                                                                          running experiments
+
+ Added (18)
+ ID          Question                               Options                                               Plan
+
+ HP-01       When to get medical help (page)        I've read this                                        All
+
+ CN-03       Wellness acknowledgement               Required tick                                         All
+
+ CN-04       AI meal processing consent             Required tick before first AI use                     Pro
+
+ ST-01       Units and formats                      US / Metric                                           All
+
+ ML-07       Looks like: [dishes]. Is this right?   Keep / Edit / Remove; Add a dish                      Pro
+
+ ML-08       I'm not sure about some of these       Tick box                                              Pro
+
+ ML-09       Add an ingredient not in this list     Free text, 60 characters                              Pro
+
+ EX-01       What kind of exercise?                 Walking, running, cycling, gym or strength, yoga,     Pro
+                                                    swimming, sport, stretching, other
+
+ EX-02       When did you start?                    Now / Choose time / Roughly                           Pro
+
+ EX-03       How long?                              10 / 20 / 30 / 45 / 60+ min / enter minutes           Pro
+
+ EX-04       How hard was it?                       Light / Moderate / Vigorous / Not sure                Pro
+
+ EX-05       Was it near a meal?                    Before / After / Not near a meal / Not sure           Pro
+
+ HC-01       Conditions for your record             9 conditions (section 9)                              Pro
+
+ HC-02       Status of each condition               Diagnosed / Suspect / Ruled out / Not sure / Prefer   Pro
+                                                    not to say; year
+
+ XP-01       Choose an experiment                   The 5 experiments                                     Pro
+
+ XP-02       Did you do it today?                   Yes / Partly / No                                     Pro
+
+ XP-03       Why are you ending early?              I felt worse / Too hard / Other                       Pro
+
+ GC-01       Card feedback                          Tried / Not today; Helpful / No difference / Worse;   Pro
+                                                    Not relevant; Hide
+
+ 11. Database changes
+ All new tables follow v4.1 rules: owner-only access, revision numbers, UTC time plus time zone, full
+ deletion with the account.
+
+ Removed (4)
+ Table                                Held                                      Why
+
+ safety_answers                       Each safety answer                        No safety questions
+
+ safety_events                        Route shown, policy version               Replaced by help_page_views
+
+ interpretation_holds                 Insight pauses                            No pauses
+
+ food_observation_eligibility         FT-01 to FT-07 answers                    Food tests removed
+
+ Changed (5)
+ Table                          Change
+
+ profiles                       Add units and time_format
+
+ consents                       Add wellness_acknowledgement and ai_meal_processing, each with version and
+                                time
+
+ meals                          Portion small / medium / large / not_sure; add portion_count, portion_unit, source
+                                (typed / photo / recent / favourite), ai_check_status (not_run / done / failed /
+                                free_plan)
+
+ meal_ingredients               Replace evidence tiers with answer (had / didnt_have / unknown), added_by (ai /
+                                user), food_group, ai_model_version, prompt_version
+
+ entitlements                   plan (free / pro), start, end, billing country, provider reference; checked on every
+                                Pro request
+
+ Added (9)
+ Table                          Fields
+
+ help_page_views                user, page version, viewed at, acknowledged
+
+ meal_photos                    user, meal, storage path, kept, deleted at
+
+ bowel_movements                user, time, time zone, stool type 1–7 / not_sure / skipped, strain, complete, revision
+
+ exercise_records               user, type, start, precision, duration, intensity, meal relation, minutes from last
+                                meal, minutes to next meal, revision
+
+ health_conditions              user, condition, status, year, revision
+
+ experiments                    user, type, start, end, status, end reason, result template, comparison numbers
+
+ experiment_days                experiment, date, done (yes / partly / no / unanswered)
+
+ guidance_cards                 id, version, title, body, evidence label, sources and links, trigger rule, cooldown,
+                                countries, status, published at
+
+ card_events                    user, card and version, date shown, reason, feedback, hidden
+
+ 12. Acceptance tests: 91 → 103
+ Checked against the v4.1 test file. 10 removed, 4 rewritten, 77 unchanged, 22 added.
+
+ Removed (10)
+ Test        v4.1 scenario                                                      Why
+
+ Q25         Any single emergency answer Yes → immediate help                   No safety questions
+
+ Q26         Not sure or unanswered → no all-clear                              No safety questions
+
+ Q46         Emergency during pre-signup                                        No safety questions
+
+ Q49         Retake or doctor visit doesn't lift a hold                         No holds
+
+ Q50         SAF-17–19 missing policy blocks users                              No safety questions
+
+ Q78         Clinician not licensed in patient's location                       Consults are future; parked
+
+ Q81         SAF-17/19 Yes → urgent and pause                                   No safety questions
+
+ Q82         SAF-18 alone → info card                                           No safety questions
+
+ Q83         SAF-18 + SAF-08 → urgent                                           No safety questions
+
+ Q84         Routine item Not sure                                              No safety questions
+
+ Rewritten (4)
+ Test        v4.2 scenario → expected
+
+ Q38         Country without a listed number → help page says “your local emergency number”; never a guessed
+             number
+
+ Q47         Google redirect after the help page → acknowledgement kept or page shown again; no health data
+             stored before sign-up
+
+ Q70         Help page not available in user's language → English page with a note; no machine translation
+
+ Q87         Constipation on 3 of 14 days → saved; no bowel card, alert or condition wording
+
+ Added (22)
+ Test        Scenario → expected
+
+ Q92         New user reaches sign-up → help page first; acknowledgement required and saved
+
+ Q93         Any screen → never says or implies “all clear”
+
+ Q94         Episode with pain and nausea at 10 → saved; help link; no pop-up, alert, pause or condition name
+
+ Q95         14 days of 8–10 → numbers and charts only; no alert or label
+
+ Q96         All outputs searched → no condition names generated by Bloat
+
+ Q97         Free account calls Pro endpoints → 403 PLAN_REQUIRED; nothing saved or sent to AI
+
+ Q98         Typed “chicken burrito with beans” → only 12-group items, max 20, labelled as AI suggestion
+
+ Q99         2 of 5 ticked, not-sure off → 2 had, 3 didn't have
+
+ Test        Scenario → expected
+
+ Q100        Same with not-sure on → 2 had, 3 unknown
+
+ Q101        AI times out twice → meal saved, ingredients unknown, status failed
+
+ Q102        Photo with GPS → location removed; deleted after check when keep is off
+
+ Q103        AI request inspected → only dish or photo and language
+
+ Q104        Any meal screen → no calorie number
+
+ Q105        Type 7 logged 3 times → counted; no label or alert
+
+ Q106        Experiment with 3 confirmed prior days → not started
+
+ Q107        Second experiment while one runs → refused
+
+ Q108        6 + 7 confirmed days, 5 Yes → fixed result template
+
+ Q109        3 Yes days → “not enough days”
+
+ Q110        Ended early, felt worse → no numbers; help link; reason saved
+
+ Q111        Card opened twice same day, then day 5 → same card all day; not again until day 15
+
+ Q112        “Worse” tapped → card hidden; event logged
+
+ Q113        Card without source link → cannot be published
+
+ 13. Countries and release stages
+ Setting                 USA                                  Canada                      India
+
+ Priority                Main market                          Second                      Secondary, same launch
+
+ Pro price               US$5.99 / month, US$39.99 /          Not set (CAD)               ₹199 / month, ₹1,499 /
+                         year                                                             year
+
+ Emergency number        911                                  911                         112
+
+ Units and dates         US units, MM/DD                      Metric with cups, DD/MM     Metric, DD/MM
+
+ Privacy laws            FTC HBNR and FTC Act;                PIPEDA; Quebec Law 25       DPDP Act 2023 and Rules
+                         Washington, Nevada,
+                         Connecticut health-data laws;
+                         California CPRA
+
+ Beta places             50                                   50                          50
+
+ Language                English                              English (French later for   English
+                                                              Quebec)
+
+ C47. Gate 1 replaced by self-checks and lawyer review · Concern: no
+ clinician review
+
+ v4.1 (before)      Before real users: clinician approves safety questions, routes and wording; privacy checks per
+                    country.
+
+ v4.2 (after)       Before real users: (1) help page checked word for word against the NHS source; (2) every card
+                    and food group has a working source link; (3) 100-dish and 50-photo AI test passed and saved;
+                    (4) tests Q92–Q113 pass; (5) lawyer has reviewed privacy policy, terms and consent screens
+                    for all three countries.
+
+ Why                Something must still stand between building and real users. These are the things a clinician
+                    would have caught, replaced with checks you can do.
+
+ C48. Beta testers get Pro free · Founder decision
+ v4.1 (before)      S1 private beta: 150 users, free tracking; paid features at S2.
+
+ v4.2 (after)       S1 beta: 150 users (50 per country) with Pro features free and no payments. Payments open at
+                    S2.
+
+ Why                The meal AI and experiments are in the first release, so they must be tested on real people
+                    before anyone pays.
+
+ 14. Legal documents and marketing
+ C49. Written intended-use statement · Concern: medical-device law
+ v4.1 (before)     Product described as not diagnostic, spread across the master document.
+
+ v4.2 (after)      One fixed statement used in the Terms, website footer, future app-store listings and evidence
+                   file: “Bloat is a general wellness app for adults. It lets people record bloating, meals, bowel
+                   movements, exercise and daily habits, and shows patterns in their own records. Bloat does not
+                   diagnose, treat, cure, mitigate or prevent any disease or condition, does not give medical
+                   advice, and is not for emergencies.”
+
+ Why               Regulators judge a product mainly by its stated intended use and claims. Writing it once and
+                   using it everywhere fixes Bloat as wellness on paper.
+
+ C50. Terms of service contents · Concern: medical-device law
+ v4.1 (before)     Not drafted.
+
+ v4.2 (after)      Must include: the intended-use statement; not medical advice, not for emergencies; 18+ only;
+                   AI suggestions may be wrong; experiments and cards are optional and to stop if feeling worse;
+                   limitation of liability; disclaimer of warranties; US arbitration and class-action waiver (lawyer to
+                   confirm Canada and India); subscription, renewal, cancellation and refunds by country.
+
+ Why               Terms set expectations and limit what a user can claim. They do not remove all liability, which
+                   is why the other changes still matter.
+
+ C51. Privacy policy contents · Concern: privacy law
+ v4.1 (before)     Privacy principles in the master; no policy drafted.
+
+ v4.2 (after)      Must explain: every data type and why; health data used only to show users their own records,
+                   never sold, no advertising use; dish text and photos go to an AI provider (Anthropic) with
+                   nothing else; photos deleted unless kept; storage region, security, retention, deletion; rights
+                   per country; a separate consumer health data notice for Washington and Nevada.
+
+ Why               Required by FTC rules, state health-data laws, PIPEDA, Quebec Law 25 and the DPDP Act. This
+                   is the one review that cannot be skipped.
+
+ C52. Evidence file kept from day one · Concern: no clinician review
+ v4.1 (before)     Not defined.
+
+ v4.2 (after)      Source register (every card, food group and help page with link, date checked and a copy of
+                   the text); AI test results with prompt and model versions; change log; feedback log of every
+                   “Worse” and “I felt worse” and your response.
+
+ Why               If a regulator, lawyer or journalist asks how you made sure Bloat was safe, this file is the
+                   answer. It shows you acted reasonably without a clinician.
+
+ C53. Marketing wording rules · Concern: advertising law
+ v4.1 (before)     Positioning ideas only; earlier ideas included “bloat preventer”.
+
+ v4.2 (after)      Allowed: “track your bloating in seconds”, “see patterns in your own records”, “notice what
+                   tends to happen before you bloat”, “try simple habit experiments and see your results”, “bring
+                   clear notes to your doctor”, “tips based on NIH and NHS guidance”. Not allowed: “cure / reduce
+                   / prevent / stop bloating”, “find your trigger or cause”, “find out if you have IBS”, “proven”,
+                   “doctor approved”, “clinically tested”, “replace your doctor”, “personalised treatment plan”.
+                   Applies to website, ads, creator scripts and social posts.
+
+ Why               Health-benefit claims need scientific proof, usually trials, which you don't have. “Find your
+                   trigger” implies diagnosis; “doctor approved” would be false.
+
+ 15. What did not change
+ These v4.1 rules carry into v4.2 unchanged:
+
+  • Bloat Score = confirmed worst bloating for a completed day, 0–10, only when the review says it
+    covers the whole day; today shows “Highest logged so far”.
+  • Episodes: start, end, strength 1–10 readings; end states reported, approximate or unknown;
+    never a guessed end time.
+  • Day statuses: Confirmed, Provisional, Conflict, Late, Unknown. Review allowed until the end of
+    the next day.
+  • 7-day average needs at least 4 confirmed days.
+  • Comparisons need at least 7 days with and 7 days without, with full meal records.
+  • Unknown stays unknown; a missing tap is never “No”.
+  • Personal Focus P1, P5, P6, P7.
+  • Time stored as UTC with time zone and precision; analysis day by the user's time zone.
+  • Owner-only access, 404 for other users' records, revisions with If-Match, idempotency keys,
+    standard error format.
+  • Edit and delete contracts for episodes and meals (Addendum A6).
+  • The 24 activities and their groups.
+  • Download my data and delete account for everyone.
+  • Slice A order: onboarding → episode → meal → yesterday review → history → correction → export,
+    on synthetic data first.
+  • Private beta of 150 (50 per country) and a usability week of 12.
+
+ 16. Still open
+  • Canada Pro price in CAD.
+  • Business entity and payment provider that can bill the USA, Canada and India.
+  • Choice of privacy lawyer with US health-data experience, covering Canada and India.
+  • Budget cap for build, lawyer and AI.
+  • AI test pass mark (proposed 90% found, under 10% wrong).
+  • Hours before “Is it still happening?” for an episode left open.
+  • Whether new Pro users can run the AI check on meals from their free period.
+
+ Sources
+  • NHS, Bloating: www.nhs.uk/symptoms/bloating/
+  • NHS, Breathing exercises for stress:
+    www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/
+  • NIDDK, Eating, Diet and Nutrition for Gas:
+    www.niddk.nih.gov/health-information/digestive-diseases/gas-digestive-tract/eating-diet-nutrition
+  • Monash University FODMAP: www.monashfodmap.com
+  • CDC, Physical activity guidelines for adults:
+    www.cdc.gov/physical-activity-basics/guidelines/adults.html
+  • Ropes and Gray, FDA updated general wellness guidance (January 2026): www.ropesgray.com/en
+    /insights/alerts/2026/01/fda-adapts-with-the-times-on-digital-health-updated-guidances-on-gener
+
+    al-wellness-products
+  • FDA, Examples of software functions under enforcement discretion (device software functions
+    and mobile medical applications)
+  • Orrick, First lawsuit filed under Washington's My Health My Data Act (February 2025): www.orrick
+    .com/en/Insights/2025/02/First-Lawsuit-Filed-Under-Washingtons-My-Health-My-Data-Act
+  • Bloat Complete Master v4.1, Addendum v4.1, v4.1 question and acceptance files; Bloat App Spec
+    (3 November 2026).
+

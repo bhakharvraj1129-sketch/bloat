@@ -1,0 +1,12 @@
+ D05. Roles
+ Who                           Responsible for
+
+ Founder                       Decisions, budget, entity and payments, sources and content, writing cards from
+                               source sentences, AI test answers, evidence file, review queue, beta, support
+
+ Template service              Terms, privacy policy, consumer health notices per country
+
+ Claude Code                   Building slices from this document; honest test results
+
+ Claude (planning)             Documents, content drafts from sources, checklists, reviewing build results
+

@@ -1,0 +1,1388 @@
+[
+  {
+    "id": "Q01",
+    "scenario": "Start episode, reply lost, retry same action",
+    "expected": "Exactly one episode and original action result",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q02",
+    "scenario": "Second tab starts while episode open",
+    "expected": "Existing episode offered; no second open record",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q03",
+    "scenario": "End before start or future end",
+    "expected": "Reject invalid times without losing prior record",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q04",
+    "scenario": "23:00-02:00 episode",
+    "expected": "One episode; duration split 1h/2h across dates",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q05",
+    "scenario": "DST transition and ambiguous clock time",
+    "expected": "Actual elapsed UTC time; explicit offset choice",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q06",
+    "scenario": "Travel changes device time zone",
+    "expected": "Pinned analysis days do not silently rebucket",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q07",
+    "scenario": "Unknown end after forgotten close",
+    "expected": "No duration imputation or auto-close",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q08",
+    "scenario": "Episode still open for 25 hours but user forgot",
+    "expected": "Ask current status; timer alone is not proof of ongoing symptoms",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q09",
+    "scenario": "No bloating so far, later episode",
+    "expected": "Supersede provisional zero; require final review",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q10",
+    "scenario": "Final daily zero conflicts with a severity sample",
+    "expected": "Mark CONFLICT; ask correction",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q11",
+    "scenario": "No meal records but valid daily symptom answer",
+    "expected": "Retain symptom chart; food comparison unknown",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q12",
+    "scenario": "Full meals with no category and confirmed symptom zero",
+    "expected": "Eligible unexposed day; zero retained",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q13",
+    "scenario": "Confirmed category present but partial food coverage",
+    "expected": "Excluded from standard comparison on both-sided coverage policy",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q14",
+    "scenario": "Accepted typical recipe guess",
+    "expected": "Save labelled guess; exclude from standard category comparison",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q15",
+    "scenario": "Activity not tapped",
+    "expected": "UNKNOWN, never NO",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q16",
+    "scenario": "Late daily recall",
+    "expected": "History retained; standard comparison excluded",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q17",
+    "scenario": "7 with / 7 without and a zero difference",
+    "expected": "Descriptive result; no undefined branch or safe-food claim",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q18",
+    "scenario": "7 with / 7 without and negative difference",
+    "expected": "Same descriptive state; signed difference, no protective claim",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q19",
+    "scenario": "Only exposed days",
+    "expected": "Counts only; no advice to avoid food for data",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q20",
+    "scenario": "Two foods always together",
+    "expected": "Show co-occurrence limitation; no winning cause",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q21",
+    "scenario": "New medicine added with MD-04 group during a comparison window",
+    "expected": "Change shaded on charts; before/after view offered when 7+ usable days exist on each side within 14 days; prespecified sensitivity view records exclusions",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable",
+    "changed_in": "4.4"
+  },
+  {
+    "id": "Q22",
+    "scenario": "AI malformed JSON / prompt injection / timeout",
+    "expected": "Reject or abstain; manual entry remains usable",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q23",
+    "scenario": "User edits private recipe",
+    "expected": "Other users and historical meal snapshots unchanged",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q24",
+    "scenario": "Shared catalogue taxonomy updated",
+    "expected": "New version; historical provenance pinned; recalculation explicit",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q29",
+    "scenario": "Swap experiment requested with FX answers Not sure / Prefer not to say",
+    "expected": "Swap experiments not offered; habit experiments and recording available",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable",
+    "changed_in": "4.3"
+  },
+  {
+    "id": "Q30",
+    "scenario": "FX-03 Yes (coeliac, allergy or IBD) or HC-01 coeliac",
+    "expected": "No swap experiment and no kiwifruit experiment offered; no elimination advice",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable",
+    "changed_in": "4.3"
+  },
+  {
+    "id": "Q31",
+    "scenario": "Direct API request to start a swap experiment by an ineligible Pro user",
+    "expected": "403 NOT_ELIGIBLE server-side; nothing created",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable",
+    "changed_in": "4.3"
+  },
+  {
+    "id": "Q32",
+    "scenario": "Cross-user row ID / report ID / recipe ID",
+    "expected": "Access denied including related resources",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q33",
+    "scenario": "Delete account then restore backup",
+    "expected": "Deletion workflow prevents resurrection and stops jobs/emails",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q34",
+    "scenario": "Signed report link expires or sharing revoked",
+    "expected": "New access denied; downloaded-copy limitation explained",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q35",
+    "scenario": "Duplicate or out-of-order payment webhook",
+    "expected": "Entitlement not duplicated or reverted by stale event",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q37",
+    "scenario": "Country becomes unsupported",
+    "expected": "Affected capability disabled; rights/export workflow preserved",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q38",
+    "scenario": "Country without a listed emergency number",
+    "expected": "Help page says 'your local emergency number'; never a guessed number",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable",
+    "changed_in": "4.3"
+  },
+  {
+    "id": "Q39",
+    "scenario": "User signs out on shared device",
+    "expected": "Private app caches cleared; no sensitive offline service-worker copy",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q40",
+    "scenario": "Rule/formula/model version changes",
+    "expected": "Versioned rollout and regression evidence; no silent history rewrite",
+    "status": "NOT_RUN",
+    "reference_check": "See separate reference report where applicable"
+  },
+  {
+    "id": "Q41",
+    "scenario": "Recipe saved from AI guess",
+    "expected": "Evidence remains uncertain; no automatic tag absence from incomplete recipe",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q42",
+    "scenario": "All episodes closed; review untouched",
+    "expected": "Whole-day answer still required",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q43",
+    "scenario": "Partial or cannot-remember recall",
+    "expected": "UNKNOWN; excluded from confirmed average and comparison",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q44",
+    "scenario": "Today versus completed day",
+    "expected": "Highest logged so far separate from confirmed daily score",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q45",
+    "scenario": "Average with three usable dates",
+    "expected": "No average; four or more shows denominator and late count",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q47",
+    "scenario": "Google redirect after the help page",
+    "expected": "Acknowledgement kept or page shown again; no health data stored before sign-up",
+    "status": "NOT_RUN",
+    "changed_in": "4.3"
+  },
+  {
+    "id": "Q48",
+    "scenario": "Authenticated onboarding commit loses reply",
+    "expected": "Health batch atomic; same-key replay; onboarding_pending recoverable",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q51",
+    "scenario": "Personal Focus dismissal/edit/expiry",
+    "expected": "Deterministic recalculation; no stale false reason; suppression respected",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q52",
+    "scenario": "Upgrade prompt for a free user",
+    "expected": "States only true facts (e.g. scored-day count); no fabricated insight teaser",
+    "status": "NOT_RUN",
+    "changed_in": "4.3"
+  },
+  {
+    "id": "Q53",
+    "scenario": "Downgrade with old PDF and recipes",
+    "expected": "Past owned data accessible; new premium generation disabled",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q54",
+    "scenario": "Delete meal referenced by report",
+    "expected": "Derived views recalculated; dependent stored report/share removed",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q55",
+    "scenario": "Delete while job is running",
+    "expected": "No recreated private records or active links",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q56",
+    "scenario": "Source update races older recompute",
+    "expected": "Older watermark cannot overwrite newest results",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q57",
+    "scenario": "Free account calls insights APIs",
+    "expected": "403 PLAN_REQUIRED; no Pro values in any payload",
+    "status": "NOT_RUN",
+    "changed_in": "4.3"
+  },
+  {
+    "id": "Q58",
+    "scenario": "Founding-member payment before gate",
+    "expected": "Blocked; Gate 2A needed before paid experiment",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q59",
+    "scenario": "Screen-reader/keyboard/mobile flow",
+    "expected": "Core recording, corrections and help operable without colour-only cues",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q60",
+    "scenario": "Client sends invented tag/other-user child ID",
+    "expected": "Server derives tag and rejects unauthorized relationship",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q61",
+    "scenario": "USA, Canada and India synthetic accounts complete Slice A",
+    "expected": "Same core workflow; no hard-coded India gate.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q62",
+    "scenario": "Country ready for tracking but not payments",
+    "expected": "Free features available; Pro checkout hidden; diary unaffected",
+    "status": "NOT_RUN",
+    "changed_in": "4.3"
+  },
+  {
+    "id": "Q63",
+    "scenario": "Unknown country configuration",
+    "expected": "Honest unavailable state; no inferred approval.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q64",
+    "scenario": "Residence differs from current location",
+    "expected": "Help page uses the user's country setting; generic wording if unknown; records not rehomed",
+    "status": "NOT_RUN",
+    "changed_in": "4.3"
+  },
+  {
+    "id": "Q65",
+    "scenario": "Device locale MM/DD differs from DD/MM",
+    "expected": "Display clear; stored date and review window unchanged.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q66",
+    "scenario": "DST, half-hour/quarter-hour zones and travel",
+    "expected": "Correct UTC elapsed duration and pinned day boundaries.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q67",
+    "scenario": "Non-English food name in English interface",
+    "expected": "Text preserved; safe manual fallback and no fabricated ingredient certainty.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q68",
+    "scenario": "Same brand/product name in different markets",
+    "expected": "Variant/market provenance required; no shared false ingredients.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q69",
+    "scenario": "Cuisine preference differs from residence",
+    "expected": "Food ordering follows explicit preference; logging unrestricted.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q70",
+    "scenario": "Help page not available in the user's language",
+    "expected": "English page shown with a note; no machine translation of help text",
+    "status": "NOT_RUN",
+    "changed_in": "4.3"
+  },
+  {
+    "id": "Q71",
+    "scenario": "Foreign currency offer and renewal",
+    "expected": "Exact currency/full charge shown and retained with purchase.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q72",
+    "scenario": "Billing country changes",
+    "expected": "Reviewed next-offer policy; historical invoices unchanged.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q73",
+    "scenario": "Payment provider unavailable in selected market",
+    "expected": "No checkout promise or entitlement; diary availability independent.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q74",
+    "scenario": "Regional consent withdrawn",
+    "expected": "Optional processing stops; appropriate core/rights paths remain.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q75",
+    "scenario": "Deletion spans regional stores/processors",
+    "expected": "All applicable jobs/files handled; no backup resurrection.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q76",
+    "scenario": "Cross-region staff or tenant access attempt",
+    "expected": "Denied unless scoped authorized access exists; audit metadata only.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q77",
+    "scenario": "Notification at recipient local time",
+    "expected": "Correct scheduling and consent recheck, no health content leakage.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q79",
+    "scenario": "Global beta aggregate masks one poor cohort",
+    "expected": "Regional denominators/completeness reported; no unsupported medical comparison.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q80",
+    "scenario": "Policy suspension during job/checkout",
+    "expected": "Recheck availability; no newly delivered disabled interpretation/service.",
+    "status": "NOT_RUN"
+  },
+  {
+    "id": "Q85",
+    "scenario": "Multi-select submits an exclusive option with another option (e.g. none + gas)",
+    "expected": "422 validation error; nothing saved.",
+    "status": "NOT_RUN",
+    "added_in": "4.1"
+  },
+  {
+    "id": "Q86",
+    "scenario": "EP-01 severity 0 or 11, DY-01 value 11 or 3.5",
+    "expected": "422 validation error; DY-01 value 0 accepted as a real zero.",
+    "status": "NOT_RUN",
+    "added_in": "4.1"
+  },
+  {
+    "id": "Q87",
+    "scenario": "EP-08 Constipation on 3 completed dates in 14",
+    "expected": "Saved per episode; P2 offers bowel tracking only; no alert, label or condition wording",
+    "status": "NOT_RUN",
+    "added_in": "4.1",
+    "changed_in": "4.3"
+  },
+  {
+    "id": "Q88",
+    "scenario": "PATCH episode with stale If-Match, or edit that creates an overlap",
+    "expected": "409 REVISION_CONFLICT or 422 OVERLAP; stored record unchanged.",
+    "status": "NOT_RUN",
+    "added_in": "4.1"
+  },
+  {
+    "id": "Q89",
+    "scenario": "DELETE a meal referenced by a stored report",
+    "expected": "204; meal gone from views and recalculations; report flagged for regeneration and its share revoked.",
+    "status": "NOT_RUN",
+    "added_in": "4.1"
+  },
+  {
+    "id": "Q90",
+    "scenario": "Profile with residence IN, locale en-CA, time zone America/Toronto",
+    "expected": "Fields stored separately; current care location not stored on profile.",
+    "status": "NOT_RUN",
+    "added_in": "4.1"
+  },
+  {
+    "id": "Q91",
+    "scenario": "Residence country outside the enabled launch wave",
+    "expected": "Honest unavailable message and optional waitlist before any health answer is collected.",
+    "status": "NOT_RUN",
+    "added_in": "4.1"
+  },
+  {
+    "id": "Q92",
+    "scenario": "New user reaches sign-up",
+    "expected": "Help page shown first; I've read this required; view saved with page version",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q93",
+    "scenario": "Search every screen",
+    "expected": "No screen says or implies all clear or no warning signs",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q94",
+    "scenario": "Episode with tummy pain and nausea at strength 10",
+    "expected": "Saved; help link visible; no pop-up, alert, pause or condition name",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q95",
+    "scenario": "14 days of scores 8-10",
+    "expected": "Numbers and charts only; no high/abnormal label or see-a-doctor alert beyond the Q116 nudge rule",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q96",
+    "scenario": "Search all outputs, cards, summaries and PDFs",
+    "expected": "No condition names generated by Bloat; only user-entered HC-01 values and the NHS sentences quoted word for word (help page, warning chips, ovarian sentence)",
+    "status": "NOT_RUN",
+    "added_in": "4.2",
+    "changed_in": "4.4"
+  },
+  {
+    "id": "Q97",
+    "scenario": "Free account calls each Pro endpoint",
+    "expected": "403 PLAN_REQUIRED; nothing saved or sent to AI",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q98",
+    "scenario": "Pro typed dish 'chicken burrito with beans'",
+    "expected": "Only items in the 12 groups; max 20; labelled AI suggestion, may be wrong",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q99",
+    "scenario": "Save with 2 of 5 items marked Had, 3 marked Didn't have",
+    "expected": "2 had, 3 didnt_have (ai_confirmed)",
+    "status": "NOT_RUN",
+    "added_in": "4.2",
+    "changed_in": "4.3.2"
+  },
+  {
+    "id": "Q100",
+    "scenario": "Save with 2 marked Had and 3 untouched",
+    "expected": "2 had, 3 not_sure; only those 3 items' food groups become unknown for that day",
+    "status": "NOT_RUN",
+    "added_in": "4.2",
+    "changed_in": "4.3.2"
+  },
+  {
+    "id": "Q101",
+    "scenario": "AI times out twice",
+    "expected": "Meal saved, ingredients unknown, ai_check_status failed; re-run later",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q102",
+    "scenario": "Photo with GPS metadata",
+    "expected": "Metadata removed before sending; deleted after the check when keep is off",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q103",
+    "scenario": "Inspect AI request",
+    "expected": "Only dish text or photo and language",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q104",
+    "scenario": "Any meal screen",
+    "expected": "No calorie or nutrient number",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q105",
+    "scenario": "Stool type 7 logged 3 times",
+    "expected": "Counted; no label or alert",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q106",
+    "scenario": "Start experiment with 3 confirmed days in prior 7",
+    "expected": "Not started; 'log normally for a few more days'",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q107",
+    "scenario": "Second experiment while one runs",
+    "expected": "Refused with message",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q108",
+    "scenario": "6 + 7 confirmed days, 5 Yes days",
+    "expected": "Fixed result template with both averages and day counts",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q109",
+    "scenario": "3 Yes days",
+    "expected": "'There aren't enough days to compare yet'",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q110",
+    "scenario": "Ended early: I felt worse",
+    "expected": "No numbers; help link; reason saved",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q111",
+    "scenario": "Card opened twice same day, then day 5",
+    "expected": "Same cards all day; card not shown again until day 15",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q112",
+    "scenario": "Card marked Worse",
+    "expected": "Hidden for that user; event logged for review",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q113",
+    "scenario": "Publish card without source link",
+    "expected": "Refused; stays draft",
+    "status": "NOT_RUN",
+    "added_in": "4.2"
+  },
+  {
+    "id": "Q114",
+    "scenario": "Free user logs Fever or chills (EP-08a)",
+    "expected": "Saved; the exact NHS sentence for the urgent level shown inline with source; nothing paused",
+    "status": "NOT_RUN",
+    "added_in": "4.3",
+    "changed_in": "4.4"
+  },
+  {
+    "id": "Q115",
+    "scenario": "Free user opens Pro logging fields",
+    "expected": "Warning chips available; EP-03, EP-08, EP-09, bowel, sleep/stress, travel/illness/ate-out locked",
+    "status": "NOT_RUN",
+    "added_in": "4.3"
+  },
+  {
+    "id": "Q116",
+    "scenario": "Free user logs bloating on 13 of the last 30 days",
+    "expected": "Doctor line (NHS sentence + help link) shown at the top of History, in the weekly report, monthly summary, Your usual and the doctor PDF; never on Today and never as a pop-up; DN-01 shortens it for 90 days; no condition name",
+    "status": "NOT_RUN",
+    "added_in": "4.3",
+    "changed_in": "4.4"
+  },
+  {
+    "id": "Q117",
+    "scenario": "FX-02 Yes",
+    "expected": "Swap experiments not offered; country helpline shown; habit experiments available",
+    "status": "NOT_RUN",
+    "added_in": "4.3",
+    "changed_in": "4.3.2"
+  },
+  {
+    "id": "Q118",
+    "scenario": "WB-01 Yes during a swap experiment",
+    "expected": "Swap paused; helpline shown; end or resume later",
+    "status": "NOT_RUN",
+    "added_in": "4.3",
+    "changed_in": "4.3.2"
+  },
+  {
+    "id": "Q119",
+    "scenario": "Swap step reaches 2 weeks",
+    "expected": "Ends automatically; 1-week add-back required before the result",
+    "status": "NOT_RUN",
+    "added_in": "4.3",
+    "changed_in": "4.3.2"
+  },
+  {
+    "id": "Q120",
+    "scenario": "Scan UI strings",
+    "expected": "No 'safe food', 'bad food', 'trigger confirmed', 'cure'",
+    "status": "NOT_RUN",
+    "added_in": "4.3"
+  },
+  {
+    "id": "Q121",
+    "scenario": "ML-10 I don't know",
+    "expected": "All listed items unknown/dont_know",
+    "status": "NOT_RUN",
+    "added_in": "4.3"
+  },
+  {
+    "id": "Q122",
+    "scenario": "ML-11 Assume usual recipe",
+    "expected": "Saved as guess; excluded from comparisons; visible in history",
+    "status": "NOT_RUN",
+    "added_in": "4.3"
+  },
+  {
+    "id": "Q123",
+    "scenario": "Saved dish reused",
+    "expected": "Ingredients pre-filled as saved_dish; editable",
+    "status": "NOT_RUN",
+    "added_in": "4.3"
+  },
+  {
+    "id": "Q124",
+    "scenario": "Possible triggers with 6 days with",
+    "expected": "Not shown; '1 more day needed'; at 7+7 counts and fixed wording, number of groups examined shown",
+    "status": "NOT_RUN",
+    "added_in": "4.3"
+  },
+  {
+    "id": "Q125",
+    "scenario": "Next best log suggestion",
+    "expected": "Never names a condition; dismiss hides 30 days",
+    "status": "NOT_RUN",
+    "added_in": "4.3"
+  },
+  {
+    "id": "Q126",
+    "scenario": "Daily cards",
+    "expected": "One card per day, alternating tip and mind-body, stable all day; massage card hidden with HC-01 Previous tummy surgery; kiwifruit card hidden unless FX-03 is No",
+    "status": "NOT_RUN",
+    "added_in": "4.3",
+    "changed_in": "4.3.2"
+  },
+  {
+    "id": "Q127",
+    "scenario": "Before/after scores",
+    "expected": "'What helps you' only after 3+ tries of the same activity",
+    "status": "NOT_RUN",
+    "added_in": "4.3"
+  },
+  {
+    "id": "Q128",
+    "scenario": "HC-01 coeliac",
+    "expected": "No swap experiments offered; habit experiments available",
+    "status": "NOT_RUN",
+    "added_in": "4.3",
+    "changed_in": "4.3.2"
+  },
+  {
+    "id": "Q129",
+    "scenario": "Network inspection on all screens",
+    "expected": "No ad or social tracker requests; analytics contain no health data",
+    "status": "NOT_RUN",
+    "added_in": "4.3"
+  },
+  {
+    "id": "Q130",
+    "scenario": "Helpline and emergency numbers",
+    "expected": "Match user's country (US, CA, IN); generic wording otherwise",
+    "status": "NOT_RUN",
+    "added_in": "4.3"
+  },
+  {
+    "id": "Q131",
+    "scenario": "Ingredient left untouched on the checklist",
+    "expected": "Saved as not_sure; that food group unknown for the day; other groups unaffected",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q132",
+    "scenario": "ML-08 None of these, then one item changed to Had",
+    "expected": "That item had; all others didnt_have",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q133",
+    "scenario": "Restaurant meal: onion Not sure, dairy Didn't have; rest of day fully known",
+    "expected": "Day usable for dairy comparison; unknown for onion only",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q134",
+    "scenario": "Onion eaten at 20:00 on day D-1, none on day D",
+    "expected": "Day D counts as 'with onion' (previous-evening window from 18:00)",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q135",
+    "scenario": "DY-03 Mostly",
+    "expected": "Day counts for comparisons; result shows 'includes N mostly days'",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q136",
+    "scenario": "Possible triggers with 5 groups compared",
+    "expected": "Grouped Worth watching / No clear difference / Not enough data; alphabetical inside groups; never sorted by size",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q137",
+    "scenario": "Difference 1.4 overall but opposite direction in the two halves",
+    "expected": "Shown under No clear difference, with both halves",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q138",
+    "scenario": "Group present on 85% of usable days after 21 days",
+    "expected": "Daily-food message shown; swap link only if FX check passed and a swap exists for that group",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q139",
+    "scenario": "Free user with 14 logged and 9 confirmed days",
+    "expected": "Progress counter shows exactly those counts; no hint of any finding",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q140",
+    "scenario": "User upgrades with 12 free meals in last 7 days",
+    "expected": "RC-01 offered once; answers saved as recalled; results show recalled-day count",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q141",
+    "scenario": "Keep an eye on it mode with KM-02 No for dairy",
+    "expected": "Day counts as without dairy; meals optional; charts, report and doctor PDF still work",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q142",
+    "scenario": "Every allowed card shown within 14 days",
+    "expected": "Card shown longest ago is used; no general filler card while any allowed card exists",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q143",
+    "scenario": "Third swap experiment within 180 days",
+    "expected": "Refused with message; habit experiments available",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q144",
+    "scenario": "API request for wheat or multi-group experiment",
+    "expected": "403 NOT_OFFERED; nothing created",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q145",
+    "scenario": "User pauses Pro for 2 months",
+    "expected": "No charge; data kept; Pro screens locked; resumes on chosen date or by tapping Resume",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q146",
+    "scenario": "User logs an unfollowed habit on 10 days",
+    "expected": "Not compared; screen says only followed habits can be compared; Personal Focus suggests following it",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q147",
+    "scenario": "AI accuracy harness run",
+    "expected": "Reports missed items, wrong items and correct abstentions separately against the set pass marks",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q148",
+    "scenario": "Scan UI, cards and help page",
+    "expected": "Help and warning text matches the stored NHS source copy; every card links its source sentence",
+    "status": "NOT_RUN",
+    "added_in": "4.3.1"
+  },
+  {
+    "id": "Q149",
+    "scenario": "Restaurant paneer curry: AI lists dairy and chilli, misses garlic; user marks both Had",
+    "expected": "Dairy and chilli present; every unlisted group (including onion and garlic) unknown for that meal",
+    "status": "NOT_RUN",
+    "added_in": "4.3.2"
+  },
+  {
+    "id": "Q150",
+    "scenario": "Home-made meal (ML-06 Home): AI lists dairy only; user marks it Had",
+    "expected": "Dairy present; unlisted groups count as not present",
+    "status": "NOT_RUN",
+    "added_in": "4.3.2"
+  },
+  {
+    "id": "Q151",
+    "scenario": "Strongest episode starts 11:00; onion eaten at 20:00 the same day",
+    "expected": "Onion not counted for that day; the 20:00 meal falls into the next day's previous-evening window",
+    "status": "NOT_RUN",
+    "added_in": "4.3.2"
+  },
+  {
+    "id": "Q152",
+    "scenario": "DY-03 Mostly; dairy logged at lunch; no fizzy drinks logged",
+    "expected": "Day counts as with dairy; fizzy drinks unknown (not absent)",
+    "status": "NOT_RUN",
+    "added_in": "4.3.2"
+  },
+  {
+    "id": "Q153",
+    "scenario": "Kiwifruit experiment requested with FX-03 Yes or not answered",
+    "expected": "Not offered; FX-03 asked first; other habit experiments available",
+    "status": "NOT_RUN",
+    "added_in": "4.3.2"
+  },
+  {
+    "id": "Q154",
+    "scenario": "Registry consistency check",
+    "expected": "No test, question or config value contradicts another (cards per day, swap length, experiment names); build fails on a contradiction",
+    "status": "NOT_RUN",
+    "added_in": "4.3.2"
+  },
+  {
+    "id": "Q155",
+    "scenario": "Bloating on exactly 12 of the last 30 days",
+    "expected": "No doctor line (rule is more than 12)",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q156",
+    "scenario": "Bloating on 13 of 30 days; user opens Today",
+    "expected": "Today shows no doctor card, banner or pop-up",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q157",
+    "scenario": "13 of 30 days; ON-14 50-59 and ON-15 Yes",
+    "expected": "Doctor line adds the NHS ovarian-cancer sentence, word for word, with source",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q158",
+    "scenario": "13 of 30 days; ON-14 skipped, or 40-49, or ON-15 No / Prefer not to say",
+    "expected": "No ovarian sentence; standard doctor line only",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q159",
+    "scenario": "AI request, analytics events and cards for a user with ON-14 / ON-15 / FH-01 / ON-10 answers",
+    "expected": "None of these values appear in any AI request, analytics event, card choice or comparison",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q160",
+    "scenario": "Each EP-08a option selected in turn",
+    "expected": "Each shows the NHS sentence for its level: emergency (country emergency number), urgent (doctor today or urgent care), see a doctor; source shown",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q161",
+    "scenario": "User selects 'Sudden, severe stomach ache with a swollen tummy' in a country without a listed number",
+    "expected": "Shows 'your local emergency number'; never a guessed number",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q162",
+    "scenario": "Pro user ticks Abdominal pain in EP-08 twice in one day",
+    "expected": "NHS sentence shown the first time only that day",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q163",
+    "scenario": "Blood in poo selected",
+    "expected": "Shown at the NHS 'see a doctor' level, not as an emergency",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q164",
+    "scenario": "CY-01 visible without ON-10 Cycle context",
+    "expected": "Not visible; appears only after opt-in",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q165",
+    "scenario": "Your cycle with 2 complete cycles logged",
+    "expected": "Not enough data yet (needs 3 cycles); no numbers",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q166",
+    "scenario": "Your cycle with 3+ cycles and 7+ usable days per window",
+    "expected": "Shows averages for 5 days before, period days and other days with counts, both halves and the fixed wording",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q167",
+    "scenario": "ON-10 Perimenopause or menopause selected",
+    "expected": "Shaded on charts; listed in the doctor PDF; no cycle comparison offered",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q168",
+    "scenario": "Medicine with MD-04 'Iron' started; 9 usable days before and 8 after within 14 days",
+    "expected": "Before/after view shows both averages, day counts and the fixed wording; never says the medicine caused it",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q169",
+    "scenario": "Medicine change with only 4 usable days after",
+    "expected": "Before/after view says how many more days are needed; no numbers",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q170",
+    "scenario": "WK-01 answered on Monday",
+    "expected": "Saved for the previous week; shown on Your usual and in the doctor PDF; not asked again that week",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q171",
+    "scenario": "EP-03 Clothes felt tighter",
+    "expected": "Saved as a distension sign; Bloat never asks for waist or weight",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q172",
+    "scenario": "Days with a large meal (ML-04 Large) vs without, 7+ each",
+    "expected": "Compared like a habit in Possible triggers with the same rules",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q173",
+    "scenario": "Your usual with 14+ confirmed days",
+    "expected": "Shows typical daily score, episodes per week, typical episode length, bloating days in 30, completeness, and first-30-days figures for comparison; no labels such as better or worse",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q174",
+    "scenario": "Possible-trigger result where 6 of 9 'with' days also had poor sleep",
+    "expected": "Confounding note: 'On 6 of these 9 days you also logged poor sleep.'",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q175",
+    "scenario": "Any comparison result",
+    "expected": "Fixed line under it: 'This is a difference in your records, not a medical measure.'",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q176",
+    "scenario": "Pro user in week 2, after first possible trigger, and in Keep an eye on it mode",
+    "expected": "Phase label shows Discover, Understand and Maintain respectively; label only, no pressure",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q177",
+    "scenario": "90 days since Pro start",
+    "expected": "Quarterly summary snapshot created; earlier quarters unchanged",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q178",
+    "scenario": "AI result for a photo and for a typed dish",
+    "expected": "Photo items labelled 'Seen in photo' or 'Usually in this recipe'; typed-dish items all 'Usually in this recipe'",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q179",
+    "scenario": "Doctor PDF generated",
+    "expected": "Page 1 summary: tracking period and completeness, bloating days in 30, strength, episode length, impact (WK-01), key patterns, medicines and changes, PD-01 questions box; fixed sections follow",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q180",
+    "scenario": "FH-01 answered",
+    "expected": "Appears only in the doctor PDF",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q181",
+    "scenario": "HC-04 'Anaemia found' recorded",
+    "expected": "Listed in the doctor PDF tests section",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q182",
+    "scenario": "AI provider switched in configuration",
+    "expected": "Same input/output schema; all AI tests pass without app changes",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q183",
+    "scenario": "AI failure rate above threshold, or a background job stuck",
+    "expected": "Monitoring alert raised; user sees an honest failed state, never a silent loss",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q184",
+    "scenario": "Security suite: expired export link, revoked share link, deleted account, admin access, restored backup",
+    "expected": "No health data reachable in any case; deletion re-applied after restore",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q185",
+    "scenario": "Product analytics events",
+    "expected": "Contain no health values, food, symptoms, conditions or free text",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q186",
+    "scenario": "Feature registry",
+    "expected": "Every feature carries a release label: launch or later",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q187",
+    "scenario": "Any research or secondary-use request",
+    "expected": "Refused unless the user gave separate research consent",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q188",
+    "scenario": "AI accuracy harness",
+    "expected": "Includes the regional Indian set (with preparation variants) and reports it separately",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q189",
+    "scenario": "Learn library",
+    "expected": "Contains the 4 new articles (medicines; periods and menopause; when normal gas feels like too much; eating-disorder recovery) and the warning-signs article, each with sources",
+    "status": "NOT_RUN",
+    "added_in": "4.4"
+  },
+  {
+    "id": "Q190",
+    "scenario": "Monthly AI spending limit reached",
+    "expected": "AI paused for all users until the next month or until the founder raises the limit; meals save with ingredients unknown; message: 'The ingredient check is paused right now. Your meal is saved.'",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q191",
+    "scenario": "AI spend reaches 50%, 80% and 100% of the monthly limit",
+    "expected": "One alert email to the founder at each level; no user data in the email",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q192",
+    "scenario": "11th AI check by one user within an hour",
+    "expected": "AI refused for that request; meal saved; message: 'Your meal is saved. Add ingredients yourself, or try the check again later.'",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q193",
+    "scenario": "41st AI check by one user in a day",
+    "expected": "Same as Q192 until midnight in the user's time zone",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q194",
+    "scenario": "Dish text of 250 characters",
+    "expected": "Full text saved on the meal; only the first 200 characters are sent to the AI",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q195",
+    "scenario": "Photo still over 2 MB after shrinking to 1600px",
+    "expected": "Not sent to the AI; user asked to type the dish; meal saveable",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q196",
+    "scenario": "AI provider returns errors",
+    "expected": "One retry after a short wait, then ingredients unknown; no further automatic retries",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q197",
+    "scenario": "Same meal submitted twice with the same save key",
+    "expected": "One AI call only; second request returns the first result",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q198",
+    "scenario": "Founder turns the AI kill switch on",
+    "expected": "No AI calls are made within 1 minute; all meal logging keeps working",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q199",
+    "scenario": "Configuration names a model not on the approved list",
+    "expected": "Server refuses to start AI calls and alerts the founder",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q200",
+    "scenario": "One request's cost is 3 times the expected cost or more",
+    "expected": "Alert to the founder with request size and model; no user data",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q201",
+    "scenario": "Client bundle, logs and error reports scanned",
+    "expected": "No AI key appears anywhere outside the server's secret store; test and live keys differ",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q202",
+    "scenario": "Pro user opens Your journey",
+    "expected": "Shows Since you started, What your records show, What you have tried, Your phase, What is missing, the doctor line when due and a 'Make doctor report' button, each with day counts",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q203",
+    "scenario": "Free user taps Your journey",
+    "expected": "Upgrade screen with truthful wording; no preview of the user's findings",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q204",
+    "scenario": "ON-16 'Getting ready for a doctor visit' chosen",
+    "expected": "Your journey opens with the doctor-report summary; Today shows the doctor-report shortcut first (Pro)",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q205",
+    "scenario": "'Make doctor report' tapped in Your journey",
+    "expected": "Doctor PDF screen opens with the journey's date range filled in",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q206",
+    "scenario": "ON-16 changed in Me",
+    "expected": "New order applies immediately; no rule, threshold or past result changes",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q207",
+    "scenario": "Baseline markers with fewer than 14 confirmed days",
+    "expected": "No markers; after 14, each finished day shows above / around / below your usual (usual = median of the last 28 confirmed days; above = 2 or more over, below = 2 or more under); never 'better' or 'worse'",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q208",
+    "scenario": "User has never used 'Ate out' or 'Constipated' in 30 days (after 14 days of use)",
+    "expected": "Those options move under 'More' in Add activity and Other symptoms, still one tap away; the nine warning chips never move or hide",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q209",
+    "scenario": "Add meal opened by a user with saved dishes and frequent meals",
+    "expected": "Saved dishes and the user's 5 most frequent dishes in the last 30 days shown first",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q210",
+    "scenario": "New user signs up",
+    "expected": "Account is on Free; no trial is offered; Pro starts only after a purchase",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q211",
+    "scenario": "User buys the 3-month plan",
+    "expected": "Pro for 3 months; renews every 3 months until cancelled or paused; renewal date shown before checkout",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q212",
+    "scenario": "User picked India at sign-up but pays with a US card",
+    "expected": "Checkout charges the US price for the card's country; billing country saved on the subscription",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  },
+  {
+    "id": "Q213",
+    "scenario": "Price shown on web, iPhone and Android in each country",
+    "expected": "Same price everywhere: US$5.99 / $14.99 (3 months) / $39.99; CA$7.99 / CA$19.99 / CA$54.99; ₹199 / ₹549 / ₹1,999 (GST included)",
+    "status": "NOT_RUN",
+    "added_in": "4.5"
+  }
+]

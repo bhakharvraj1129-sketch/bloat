@@ -1,0 +1,25 @@
+ B07. Costs
+ Item                       Estimate                  Basis
+
+ AI per call                About US$0.0003           Haiku 5.5 at US$0.10 / US$0.50 per million tokens; ~1,500
+                                                      input incl. image, ~300 output
+
+ AI per Pro user            About US$0.04–0.05 a      ~4 checks a day, saved-dish reuse lowers it
+                            month
+
+ AI for 150 beta users      About US$7 a month        All Pro during beta
+
+ Recalled check after       About US$0.006 once per   ~20 extra AI calls
+ upgrade                    upgrade
+
+ Hosting and database       Free tiers in S0–S1       Quote paid tiers before S2
+
+ Legal documents            Template service          Health and wellness app templates for US, Canada, India
+                            subscription
+
+ Interviews                 25 × voucher              ~US$10 or ₹500 each
+
+ Payments                   Provider fees             Per transaction
+
+ Contingency                20%                       Founder default
+

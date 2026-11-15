@@ -1,0 +1,49 @@
+ Part D: Launch, legal and operations
+
+ D01. Release gates and beta
+ Gate                          Must be true
+
+ Gate 1 (before any real       Help page and warning text match the stored NHS copy (Q148); every card, article
+ user)                         and food group links its source sentence; AI test (300 typed + 100 photos) passed;
+                               all 200 tests pass on synthetic data, including the two-user data-isolation and
+                               deletion tests; terms and privacy policy published from the template service;
+                               helplines re-checked; support contact and incident plan; founder review queue live
+
+ Gate 2 (payments)             Entity and provider ready for US, CA, IN; decided prices loaded (A04); refund,
+                               cancellation and pause terms published; webhooks tested; a real paid-conversion
+                               test run; one-page unit-economics model (hosting, AI, payment and store fees,
+                               support, refunds, CAC vs lifetime value)
+
+ Gate 3 (later features)       Consults, chatbot, label scanning: not in this release. Later-labelled features
+                               (quarterly summary, voice logging, widget, health-app import) after the beta
+
+ Beta plan
+  • 25 discovery interviews (guide already written) across the three countries.
+  • Early access instead of a usability panel: the first real users simply use the app, and in-app
+    counts (no ad trackers, no health data) measure onboarding completion, morning reviews,
+    confirmed days, time to first possible trigger, Upgrade taps and Worse / felt-worse taps.
+  • 150 adults (50 per country) with at-least-weekly bloating, 8 weeks, Pro free; optional in-app
+    2-minute feedback.
+  • Pricing test: the Upgrade button shows the real price; a tap shows "Pro is free during the beta"
+    and is counted.
+ Measure                                      Target                          If missed
+
+ Days 5–7 retention                           ≥50%                            Fix first-session friction
+
+ Days 24–30 retention                         ≥25% and ≥35 people             Review usefulness and burden
+
+ On-time reviews on active days               ≥60%                            Diagnose missingness
+
+ Review time                                  Median ≤30 s                    Simplify
+
+ Possible-triggers result by week 8           ≥30 people                      Check coverage and unknowns
+
+ Completed experiments                        ≥20                             Check experiment burden
+
+ AI checks accepted without edits             ≥70%                            Improve prompt and groups
+
+ Harm signals unresolved                      0; each reviewed in 7 days      Switch off affected content
+
+ Upgrade-button taps at the real price        ≥15% of active users            Revisit price or Pro value
+ Report every measure by country with denominators; no medical comparisons between countries.
+

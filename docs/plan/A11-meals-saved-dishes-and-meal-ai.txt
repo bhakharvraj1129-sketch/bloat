@@ -1,0 +1,75 @@
+ A11. Meals, saved dishes and the meal AI
+ Flow
+  1. Type a dish (300 characters), pick Recent, pick a Saved dish (Pro) or take a photo (Pro).
+  2. Pro: AI lists bloating-related ingredients (photo: dishes first, ML-07).
+  3. User marks each item Had / Didn't have / Not sure (or uses Had all of these / None of these),
+    adds missing ones, or taps I don't know / Assume the usual recipe. Saved dishes can include the
+    place ("Burrito – Chipotle").
+  4. Time and portion (Small / Medium / Large / Not sure; optional count and unit).
+  5. Save. Free saves at step 1 + 4 with ai_check_status = free_plan.
+
+ Answer mapping
+ Action                                  answer             source                        In comparisons
+
+ Had                                     had                ai_confirmed                  Yes
+
+ Didn't have                             didnt_have         ai_confirmed                  Yes
+
+ Not sure, or left untouched             not_sure           ai_confirmed                  No (that group only)
+
+ ML-08 Had all / None of these           had / didnt_have   ai_confirmed                  Yes
+
+ RC-01 recalled after upgrade            as marked          recalled                      Yes, labelled
+
+ Group not listed by the AI              not present /      derived                       Not present only if made
+                                         unknown                                          at home or a confirmed
+                                                                                          saved dish; otherwise
+                                                                                          unknown
+
+ Action                                   answer               source                       In comparisons
+
+ ML-09 added                              had                  user_added                   Yes
+
+ Saved dish                               as saved             saved_dish                   Yes
+
+ ML-11 assume usual recipe                had                  guess                        No (history only)
+
+ ML-10 I don't know                       unknown              dont_know                    No
+
+ AI failed / timed out                    unknown              ai_failed                    No; re-run later
+
+ AI contract
+ Item                    Requirement
+
+ Purposes                DISH_RECOGNITION_FROM_PHOTO and FOOD_GROUP_INGREDIENT_LIST only
+
+ Model                   Claude Haiku 5.5; mock adapter in S0; model and prompt versions stored
+
+ Input                   Dish text (≤300 chars) or photo (longest side ~1,000 px, EXIF and location stripped) +
+                         interface language; treated as untrusted data
+
+ Never sent              Symptoms, scores, conditions, pregnancy, identity, email, country, history
+
+ Output                  Strict JSON: dishes[]; items[] each {name, food_group TAG-01..12, confidence
+                         low/med/high}; abstain flag. Max 20 items. No advice, URLs or calories
+
+ Validation              Reject unknown fields and tags, malformed JSON, oversize arrays; server re-derives groups
+                         from the keyword list
+
+ Failure                 1 retry; then save with unknown ingredients; manual entry always works
+
+ Photos                  Deleted after the check unless Keep my meal photos is on; never used for training by Bloat
+
+ Cost                    About US$0.0003 per call; about US$0.04–0.05 per Pro user a month
+
+ Logging                 Model, purpose, tokens, cost, latency, retry, failure; no prompt text or user content by
+                         default
+
+ Accuracy test
+ Before Gate 1 and after any prompt or model change: 300 typed dishes (100 US, 100 Indian, 100
+ Canadian and restaurant dishes) and 100 photos, 25 of them deliberately unclear. Expected
+ ingredients come from published recipes and labels. Three results are measured separately: missed
+ bloating ingredients (pass: 10% or less), wrong suggestions (15% or less) and correct "can't tell" on
+ unclear photos (80% or more). User confirmation stays mandatory. Results, prompt and model
+ versions go in the evidence file. [FIX 4.3.1]
+

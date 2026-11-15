@@ -1,0 +1,18 @@
+ D06. Open decisions
+
+ Decision                                                                           Needed by
+
+ Business entity and payment provider (US, CA, IN)                                  Gate 2
+
+ Legal template service                                                             Gate 1
+
+ Brand name: keep "Bloat" or choose a more distinctive name (preliminary            Before brand design is final
+ check: crowded, descriptive word)
+ Decided on 7 November 2026: "Is it still happening?" after 8 hours (asked on app open only); no overall budget
+ cap (the AI spending limit was reinstated on 8 November, section 0.4); mobile web first (Next.js, installable), app
+ stores later via Capacitor; next step is brand and key-screen design, then Slice A; NHS ovarian sentence stored
+ word for word: "Sometimes, bloating that does not go away can be a sign of something more serious such as
+ ovarian cancer."
+ Decided in v4.3.1: AI pass marks (missed 10% or less, wrong 15% or less, correct abstain 80% or more); new Pro
+ users can add ingredients to the last 7 days of free meals (RC-01); no outside review of any kind.
+

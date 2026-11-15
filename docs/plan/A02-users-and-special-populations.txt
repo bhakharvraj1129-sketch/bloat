@@ -1,0 +1,25 @@
+ A02. Users and special populations
+ Population                            Recording       Habit experi     Swap experiments             Cards and copy
+                                                       ments
+
+ Adults 18+ (default)                  Yes             Yes (Pro)        Swap experiments             All
+                                                                        (Pro) after FX check
+
+ Under 18                              No account      —                —                            —
+
+ Pregnant or breastfeeding             Yes             Yes              No                           Gentle stretch card
+ (FX-01 or ON-10)                                                                                    hidden
+
+ Eating disorder now or before,        Yes, neutral    Yes              No; helpline shown           No food-restriction tips
+ or food/weight worry (FX-02)          language                                                      pushed; can hide
+                                                                                                     charts
+
+ Coeliac, food allergy, Crohn's or     Yes             Yes              No                           Monash coeliac
+ colitis (FX-03 or HC-01)                                                                            exclusion applied
+
+ Unintended weight loss (FX-04)        Yes             Yes              No; help link                —
+
+ Previous tummy surgery                Yes             Yes              If FX all No                 Massage card hidden
+ (HC-01)
+ Pregnancy, sex and age are never inferred. "Prefer not to say" is never treated as No.
+

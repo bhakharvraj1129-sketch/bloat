@@ -1,0 +1,42 @@
+ A03. Markets, locale, time and units
+ Setting                USA                                  Canada                            India
+
+ Priority               Main market                          Second                            Secondary, same launch
+
+ Emergency              911                                  911                               112
+ number
+
+ Eating-disorder        National Alliance for Eating         NEDIC 1-866-633-4220              Tele-MANAS 14416 (24x7)
+ support                Disorders 1-866-662-1235             (Mon–Thu 9am–9pm, Fri
+                        (Mon–Fri 9am–7pm ET)                 9am–5pm ET)
+
+ Units                  oz, cups, fl oz, °F                  Metric with cups, °C              Metric, °C
+
+ Dates                  MM/DD                                DD/MM                             DD/MM
+
+ Currency               USD                                  CAD                               INR
+
+ Setting               USA                                 Canada                           India
+
+ Privacy laws          FTC Act; FTC Health Breach          PIPEDA; Quebec Law 25            DPDP Act 2023 and Rules
+                       Notification Rule; Washington
+                       My Health My Data Act; Nevada
+                       and Connecticut consumer
+                       health data laws; California
+                       CPRA
+ Other countries: "not available yet" and a waitlist; no health data. English only; French for Quebec is LATER. All
+ strings use stable message IDs for future translation; help text is never machine-translated.
+
+ Time rules
+  • Store every instant in UTC with IANA zone, offset, precision (exact / approximate / unknown),
+    source and entered_at.
+  • Each day uses the pinned analysis time zone. Changing it in Me shows a preview and takes effect
+    at a stated boundary; history does not move.
+  • Episodes crossing midnight keep one identity; duration is split per local date (23:00–02:00 = 1 h
+    + 2 h). Daily worst comes from the review, not the episode peak.
+  • Elapsed time uses UTC. Ambiguous clock times (DST) need an offset choice; non-existent times
+    need correction. Future times and end-before-start are rejected.
+  • Travel is logged as context (ACT-20); it never rewrites the analysis zone. Device clocks are never
+    trusted for authorization.
+  • Dates display in the user's format but are stored unambiguously (03/04 never flips meaning).
+

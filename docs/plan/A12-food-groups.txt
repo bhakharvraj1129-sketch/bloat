@@ -1,0 +1,40 @@
+ A12. Food groups
+ ID           Group                     Examples                                                        Source
+
+ TAG-01       Milk and dairy with       milk, ice cream, yogurt, soft cheese, cream, paneer, lassi,     NIDDK
+              lactose                   milk in coffee drinks
+
+ TAG-02       Wheat, rye and whole      whole-wheat bread, bran cereal, rye, pasta, roti, naan          NIDDK
+              grains
+
+ TAG-03       Onion and garlic          onion, garlic, onion or garlic powder, many sauces and          Monash
+                                        seasonings
+
+ ID         Group                       Examples                                                            Source
+
+ TAG-04     Beans, peas and lentils     black beans, kidney beans (rajma), chickpeas (chole),               NIDDK, NHS
+                                        hummus, lentils, dal, soy
+
+ TAG-05     Fruit sugars                apples, pears, peaches, mango, honey, fruit juice,                  NIDDK
+                                        high-fructose corn syrup
+
+ TAG-06     Sugar alcohols              sorbitol, mannitol, xylitol, erythritol, maltitol in sugar-free     NIDDK
+                                        gum, candy, protein bars
+
+ TAG-07     Fried or high-fat food      fries, fried chicken, pizza, creamy sauces, pastries, samosa,       NIDDK, NHS,
+                                        pakora                                                              BDA
+
+ TAG-08     Spicy food                  hot sauce, chilli, jalapeño, spicy curry, some pickles              NHS
+
+ TAG-09     Fizzy drinks                soda, sparkling water, energy drinks, beer                          NIDDK, NHS
+
+ TAG-10     Cabbage-family              broccoli, cauliflower, cabbage, kale, collard greens, Brussels      NIDDK, NHS
+            vegetables                  sprouts
+
+ TAG-11     Caffeine                    coffee, tea, energy drinks, cola                                    NHS, BDA
+
+ TAG-12     Alcohol                     beer, wine, spirits, cocktails                                      NHS, BDA
+ Groups describe what was eaten, never an intolerance or a measured FODMAP dose. Wheat is not "gluten
+ intolerance"; dairy is not "lactose intolerance". ACT-22 Alcohol and ACT-24 Tea or coffee link to TAG-12 and
+ TAG-11 without double counting.
+

@@ -1,0 +1,62 @@
+ Part A: Product and experience
+
+ A01. Product promise and intended use
+ Bloat is an installable mobile web app for adults 18+ to record bloating, meals, habits, bowel
+ movements and exercise; see patterns in their own records; run simple experiments; and
+ bring a clear report to a doctor.
+
+ Title: Bloat: Bloating and Gut Tracker. Tagline: Track your bloating. Spot your possible
+ triggers. Bring real data to your doctor.
+
+ Intended-use statement (fixed text)
+    Bloat is a general wellness app for adults. It lets people record bloating, meals, bowel movements,
+    exercise and daily habits, and shows patterns in their own records. Bloat does not diagnose, treat,
+    cure, mitigate or prevent any disease or condition, does not give medical advice, and is not for
+    emergencies.
+
+ Does / never does
+ Bloat does                                             Bloat never does
+
+ Records episodes, strength readings, meals, habits,    Diagnoses or suggests a condition
+ bowel movements, exercise, medicines and health
+ background
+
+ Shows the user's own patterns: "foods linked to your   Says a food causes bloating; uses "safe food" or "bad
+ worse days" with day counts                            food"
+
+ Runs habit experiments and 2-week food swap            Prescribes open-ended or restrictive diets, fasting or
+ experiments with safety checks                         calorie targets
+
+ Shows public-health guidance with sources              Recommends probiotics, supplements, medicines or
+                                                        tests
+
+ Shows when to get medical help; nudges toward a        Sorts users by urgency, pauses features, or gives an
+ doctor when bloating is regular                        all-clear
+
+ Uses AI only to list dishes and bloating-related       Lets AI write advice, results or health judgements
+ ingredients
+
+ Why this design
+ With no outside review of any kind, Bloat must stay a general wellness product. The FDA's January
+ 2026 general wellness guidance says a product loses that status if it is meant to diagnose, treat or
+ prevent a condition, guides specific medical action, names a specific condition when suggesting a
+ doctor, calls outputs abnormal, uses clinical thresholds or gives ongoing disease-management
+ alerts. Apps that triage symptoms (Ada Health, a certified medical device) or claim to treat IBS
+ (Parallel, FDA-authorised; Cara Care, certified in Germany) are regulated. Consumer trackers
+ (mySymptoms, GutMap, Gutsy, Debloaty) track and show trigger suspects with disclaimers; none
+ has warning-sign guidance or eating-disorder safeguards. Bloat does all of this.
+
+ Release stages
+
+ Stage                Scope                                                                    Off
+
+ S0 Build             Synthetic US, CA and IN accounts; mock AI; all features built            Real users, payments
+                      behind flags
+
+ S1 Private beta      150 real users, Pro free, all v4.3 features after Gate 1                 Payments
+
+ S2 Paid launch       Payments per country                                                     —
+
+ S3 Later             Consults, approved-content chatbot, label scanning, family               Not in this release
+                      history in doctor PDF
+

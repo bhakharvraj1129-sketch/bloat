@@ -1,0 +1,19 @@
+ D03. Evidence file and content governance
+
+ Record                  Contents                                                                 Owner
+
+ Source register         Every help text, card, article and food group: source, URL, date         Founder
+                         checked, a copy of the text, Bloat wording, version
+
+ AI test record          Dishes, photos, expected and actual answers, pass/fail, prompt and       Founder + Claude
+                         model versions                                                           Code
+
+ Change log              Every change to content, groups, prompts, templates, thresholds,         Founder
+                         experiments
+
+ Feedback log            Worse taps, felt-worse endings, wellbeing pauses, actions taken          Founder
+
+ Decision log            Founder decisions with dates (this document's version history)           Founder
+ Publishing rule: content moves draft → published only with a source, label and version; any published change
+ re-enters the change log.
+

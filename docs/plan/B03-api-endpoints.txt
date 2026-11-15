@@ -1,0 +1,79 @@
+ B03. API endpoints
+ Area             Endpoint                                                  Behaviour
+
+ State            GET /v1/me/state                                          Open episode, pending review, plan, flags,
+                                                                            cards for today
+
+ Help             GET /v1/help?country=; POST /v1/help/ack                  Public page; acknowledgement stored after
+                                                                            sign-up
+
+ Onboarding       POST /v1/onboarding/commit                                Atomic answers + consents;
+                                                                            onboarding_pending on lost reply
+
+ Profile          PATCH /v1/me/profile; PUT                                 Revisions; zone change with preview;
+                  /v1/me/followed-activities; PUT                           keep-an-eye groups
+                  /v1/me/logging-mode
+
+ Nudge            POST /v1/nudges/doctor/response                           DN-01 pause 90 or 30 days
+
+ Consents         POST /v1/consents; DELETE /v1/consents/{type}             Versioned; stops optional processing
+
+ Episodes         POST /v1/episodes; POST /{id}/samples; POST               As A08; 409 existing open; 422 times or
+                  /{id}/end; POST /{id}/still-happening;                    overlap
+                  PATCH/DELETE /{id}
+
+ Episode          POST /v1/episodes/{id}/warning-signs | /symptoms |        Warning signs free; others Pro
+ detail           /suspicions
+
+ Day              POST /v1/days/{date}/no-bloating-so-far; PUT              Status returned
+                  /v1/days/{date}/review
+
+ Meals            POST /v1/meals; PATCH/DELETE /v1/meals/{id}               Free: basic fields only
+
+ Meal AI          POST /v1/food-suggestions (text); POST                    Pro; CN-04 required; abstain on failure
+                  /v1/meal-photos (upload) → /analyze
+
+ Ingredients      PUT /v1/meals/{id}/ingredients; POST                      Answer mapping A11; recalled check once
+                  /v1/meals/recalled-check                                  after upgrade
+
+ Area            Endpoint                                             Behaviour
+
+ Saved           GET/POST /v1/dishes; POST /v1/dishes/{id}/versions   Pro
+ dishes
+
+ Habits          PUT /v1/days/{date}/activities                       Pro habits 403 for Free
+
+ Exercise        POST/PATCH/DELETE /v1/exercise                       Pro
+
+ Bowel           POST/PATCH/DELETE /v1/bowel                          Pro
+
+ Medicines       GET/POST /v1/medicines; POST /{id}/changes           Free
+
+ Health          GET/PUT /v1/health/conditions | /lactose | /tests    Pro
+
+ Insights        GET /v1/insights/summary | /coverage | /triggers |   Pro; 403 for Free
+                 /rhythm | /suggestions
+
+ Experiments     POST /v1/experiments/checks; POST                    Eligibility server-side; 403 NOT_ELIGIBLE;
+                 /v1/experiments; POST /{id}/days; POST               403 NOT_OFFERED for wheat or multi-group
+                 /{id}/wellbeing; POST /{id}/end; GET /{id}/result
+
+ Cards           GET /v1/cards/today; POST /v1/cards/{id}/feedback;   Stable per day
+                 GET /v1/library
+
+ Reports         POST /v1/reports; GET /v1/reports/{id};              Jobs; consent; expiry
+                 POST/DELETE /v1/reports/{id}/shares
+
+ History         GET /v1/history?from&to;&cursor;                     92-day window
+
+ Export          POST /v1/export; GET /v1/export/{job}                15-minute download via gateway
+
+ Account         POST /v1/account/delete; GET /v1/commands/{key}      Suspend, revoke, purge, tombstone
+
+ Billing         POST /v1/billing/webhook; GET                        Signature, ordering, idempotency; pause
+                 /v1/billing/entitlement; POST /v1/billing/pause      1–3 months
+
+ Admin           /admin/*                                             MFA; cards and articles publishing; country
+                                                                      flags; review queues; no health-record
+                                                                      browser
+

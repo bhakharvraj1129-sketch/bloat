@@ -1,0 +1,49 @@
+ E02. Evidence summary
+ Topic            Finding                                             Source                  Use in Bloat
+
+ Causes           Bloating has many mechanisms: swallowed             AGA 2023                Learn; track all
+                  air, fermentation, constipation, sensitivity,
+                  distension reflex
+
+ Eating habits    Eat slowly, sit down, no gum, straws, smoking;      NIDDK, NHS              Cards, habit experiments
+                  smaller meals
+
+ Foods            Beans, cabbage family, fruit sugars, lactose,       NIDDK, NHS              12 food groups
+                  sugar alcohols, fizzy drinks
+
+ IBS-type diet    Regular meals; fruit ≤3 portions; caffeine ≤3       BDA                     Cards
+                  cups; alcohol ≤2 units; fibre gradually; oats,
+                  linseeds
+
+ Low-FODMAP       Effective for functional bloating; short,           European 2025,          Not offered (needs
+                  supervised, reintroduce                             ACG, Monash             supervision); swap
+                                                                                              experiments only; Learn
+                                                                                              article
+
+ Eating           Higher risk in IBS; screen, minimise, watch         Monash                  FX and WB checks
+ disorders        warning signs
+
+ Walking          10–15 min after meals improved symptoms in          2021 RCT                Card, experiment
+                  a small RCT
+
+ Topic              Finding                                          Source                   Use in Bloat
+
+ Breathing          Diaphragmatic breathing improved bloating in     2025 RCT                 Card, experiment
+                    an uncontrolled 2025 trial
+
+ Massage            Helps constipation in small trials               AAFP 2026, NHS           Card
+
+ Constipation       Kiwifruit, psyllium, rye bread, mineral water;   BDA 2025                 Cards; supplements
+ diet               inulin not supported                                                      learn-only
+
+ Probiotics         Not recommended for bloating                     AGA 2023                 Never recommended
+
+ Medicines          Rifaximin, linaclotide, neuromodulators,         AGA, European            Track or doctor PDF only
+ and tests          biofeedback; coeliac and thyroid tests           2025, ACG
+
+ Regulation         Triage and treatment claims make apps            FDA 2026; Ada;           Wellness-only design
+                    devices                                          Parallel; Cara Care
+
+ Privacy            Health apps fined for sharing data with          FTC: Premom,             No ad trackers
+ enforcement        advertisers                                      GoodRx, BetterHelp
+

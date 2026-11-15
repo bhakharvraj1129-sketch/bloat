@@ -1,0 +1,35 @@
+ A08. Episodes
+ Action            Prompt                                          Result
+
+ Start             EP-01 strength 1–10; EP-02 Now / Earlier /      OPEN episode, revision 1; first strength sample
+                   Roughly
+
+ Already open      EP-05 Update / It ended / Cancel                Never a second open episode (409 offers
+                                                                   update)
+
+ Update            New strength reading                            Append sample; never overwrite
+
+ Warning sign      EP-08a chips                                    warning_signs rows; matching help section
+                                                                   shown inline; nothing paused
+
+ Detail (Pro)      EP-03, EP-08, EP-04                             Feel, symptoms, suspicion stored
+
+ End               EP-06 Now / Choose / Roughly / I don't know;    CLOSED_REPORTED_TIME /
+                   Pro EP-09                                       CLOSED_APPROXIMATE / END_UNKNOWN
+
+ Forgotten         EP-07 Still happening? (asked on the next app   Yes stays OPEN; No asks end; Not sure stays
+                   open once an episode has been open 8 hours)     OPEN
+
+ Action            Prompt                                             Result
+
+ No bloating       DY-05 No bloating so far today                     Provisional zero; superseded by any later
+                                                                      episode
+
+ Correct           Edit or delete in Day detail                       New revision; recompute; overlaps rejected
+  • Anchors: 1 = barely noticeable, 10 = worst imaginable. A subjective record, not a danger scale.
+  • No automatic end time, duration cap or median fill. Open-record timer only.
+  • Saved message only after the server confirms; unknown outcome shows Check save status; retry
+    with the same key never duplicates.
+  • Database enforces one OPEN episode per user; closed episodes cannot overlap; adjacent
+    episodes allowed.
+

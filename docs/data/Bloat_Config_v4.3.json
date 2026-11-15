@@ -1,0 +1,1102 @@
+{
+  "version": "4.3",
+  "date": "2026-11-06",
+  "authority": "Bloat Complete Plan v4.3",
+  "launch_decisions": {
+    "strategy": "Global product; wave-based country activation, no India-first dependency.",
+    "wave_1": [
+      "US",
+      "CA",
+      "IN"
+    ],
+    "wave_2_planned": [
+      "EU/EEA",
+      "GB"
+    ],
+    "other_countries": "Honest unavailable message plus optional waitlist (email only, no health answers).",
+    "interface_language_wave_1": "en",
+    "beta_allocation": {
+      "US": 50,
+      "CA": 50,
+      "IN": 50
+    },
+    "usability_week": {
+      "participants": 12,
+      "regions": [
+        "US",
+        "CA",
+        "IN"
+      ]
+    },
+    "primary_market": "US",
+    "outside_review": "none of any kind; safety comes from cautious defaults, word-for-word public sources and swap-only food experiments"
+  },
+  "country_status_values": [
+    "not_reviewed",
+    "review_in_progress",
+    "ready",
+    "suspended",
+    "retired"
+  ],
+  "countries": [
+    {
+      "code": "US",
+      "name": "United States",
+      "wave": 1,
+      "status": "not_reviewed",
+      "features_enabled": {
+        "recording": false,
+        "food_suggestions": false,
+        "weekly_summary": false,
+        "basic_doctor_pdf": false,
+        "personal_focus_display_rules_P1_P5_P6_P7": false,
+        "personal_focus_symptom_rules_P2_P3_P4": false,
+        "descriptive_comparison": false,
+        "full_reports": false,
+        "payments": false,
+        "food_observation_programme": false,
+        "consults": false,
+        "meal_photos": false,
+        "learned_meal_window": false,
+        "automatic_trigger_labels": false,
+        "custom_0_100_score": false
+      },
+      "interface_locales": [
+        "en"
+      ],
+      "emergency_resource": null,
+      "notes": "All production flags false until this country's Gate 1 evidence exists. Test fixtures may simulate 'ready' but must never be promoted.",
+      "emergency_number": "911",
+      "eating_disorder_helpline": "National Alliance for Eating Disorders 1-866-662-1235",
+      "units_default": "us",
+      "date_format": "MM/DD"
+    },
+    {
+      "code": "CA",
+      "name": "Canada",
+      "wave": 1,
+      "status": "not_reviewed",
+      "features_enabled": {
+        "recording": false,
+        "food_suggestions": false,
+        "weekly_summary": false,
+        "basic_doctor_pdf": false,
+        "personal_focus_display_rules_P1_P5_P6_P7": false,
+        "personal_focus_symptom_rules_P2_P3_P4": false,
+        "descriptive_comparison": false,
+        "full_reports": false,
+        "payments": false,
+        "food_observation_programme": false,
+        "consults": false,
+        "meal_photos": false,
+        "learned_meal_window": false,
+        "automatic_trigger_labels": false,
+        "custom_0_100_score": false
+      },
+      "interface_locales": [
+        "en"
+      ],
+      "emergency_resource": null,
+      "notes": "All production flags false until this country's Gate 1 evidence exists. Test fixtures may simulate 'ready' but must never be promoted.",
+      "emergency_number": "911",
+      "eating_disorder_helpline": "NEDIC 1-866-633-4220",
+      "units_default": "metric",
+      "date_format": "DD/MM"
+    },
+    {
+      "code": "IN",
+      "name": "India",
+      "wave": 1,
+      "status": "not_reviewed",
+      "features_enabled": {
+        "recording": false,
+        "food_suggestions": false,
+        "weekly_summary": false,
+        "basic_doctor_pdf": false,
+        "personal_focus_display_rules_P1_P5_P6_P7": false,
+        "personal_focus_symptom_rules_P2_P3_P4": false,
+        "descriptive_comparison": false,
+        "full_reports": false,
+        "payments": false,
+        "food_observation_programme": false,
+        "consults": false,
+        "meal_photos": false,
+        "learned_meal_window": false,
+        "automatic_trigger_labels": false,
+        "custom_0_100_score": false
+      },
+      "interface_locales": [
+        "en"
+      ],
+      "emergency_resource": null,
+      "notes": "All production flags false until this country's Gate 1 evidence exists. Test fixtures may simulate 'ready' but must never be promoted.",
+      "emergency_number": "112",
+      "eating_disorder_helpline": "Tele-MANAS 14416",
+      "units_default": "metric",
+      "date_format": "DD/MM"
+    }
+  ],
+  "features": {
+    "help_page": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "episodes": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "warning_signs": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "meals_basic": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "habit_taps_basic": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "morning_review": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "bloat_score": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "history_list": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "edit_delete": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "export": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "delete_account": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "medicines": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "progress_counter": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "doctor_line": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "cycle_logging": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "weekly_impact": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "medicine_groups": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "age_and_ovaries": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "personal_goal": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "adaptive_logging": {
+      "plan": "free",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "episode_detail": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "ai_ingredient_check": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "meal_photos": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "saved_dishes": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "habit_taps_context": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "bowel_log": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "exercise_log": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "charts": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "seven_day_average": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "pattern_report": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "monthly_summary": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "possible_triggers": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "next_best_log": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "experiments_habit": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "experiments_swap": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "daily_cards": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "learn_library": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "health_background": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "doctor_pdf": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "keep_an_eye_mode": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "recalled_meal_check": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "pause_subscription": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "cycle_comparison": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "medicine_before_after": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "large_meal_comparison": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "your_usual": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "confounding_note": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "phases": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "quarterly_summary": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "later"
+    },
+    "ai_source_labels": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "family_history": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "your_journey": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "baseline_markers": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "launch"
+    },
+    "consults": {
+      "plan": "future",
+      "production_enabled": false,
+      "release": "future"
+    },
+    "chatbot": {
+      "plan": "future",
+      "production_enabled": false,
+      "release": "future"
+    },
+    "label_scanning": {
+      "plan": "future",
+      "production_enabled": false,
+      "release": "future"
+    },
+    "voice_logging": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "later"
+    },
+    "home_screen_widget": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "later"
+    },
+    "health_app_import": {
+      "plan": "pro",
+      "production_enabled": false,
+      "release": "later"
+    }
+  },
+  "feature_precedence": [
+    "help_page",
+    "account_rights_workflows",
+    "country_feature_readiness",
+    "consent",
+    "experiment_eligibility",
+    "data_quality",
+    "plan_entitlement",
+    "display_preference"
+  ],
+  "metrics": {
+    "primary_outcome": "CONFIRMED_DAILY_WORST_0_10",
+    "metric_version": "daily_worst_v1",
+    "bloat_score_label": "Bloat Score = confirmed worst bloating for a completed day, 0-10",
+    "today_label": "Highest logged so far",
+    "duration": "SEPARATE_REPORTED_INTERVALS; no imputation; no cap in source records",
+    "recall_policy": "Timely if entered by end of the following analysis-zone local date; later = LATE (history only).",
+    "seven_day_average": {
+      "window_dates": 7,
+      "min_usable_dates": 4,
+      "includes": [
+        "CONFIRMED",
+        "LATE"
+      ],
+      "excludes": [
+        "UNKNOWN",
+        "PROVISIONAL",
+        "CONFLICT",
+        "partial"
+      ]
+    },
+    "comparison_group_display_minimum": 7,
+    "comparison_states": [
+      "PAUSED",
+      "NEEDS_CORRECTION",
+      "NO_ELIGIBLE_DATA",
+      "ONE_GROUP_ONLY",
+      "SPARSE",
+      "DESCRIPTIVE_COMPARISON"
+    ],
+    "food_coverage_rule": "Full coverage required on both exposed and unexposed days.",
+    "ingredient_evidence_accepted": [
+      "label",
+      "known_recipe",
+      "user_known"
+    ],
+    "ingredient_evidence_excluded": [
+      "accepted_guess",
+      "unknown"
+    ]
+  },
+  "ai": {
+    "input_max_chars": 300,
+    "output_max_ingredients": 20,
+    "max_retries": 1,
+    "timeout_ms": "configurable",
+    "per_user_daily_quota": "configurable",
+    "never_send": [
+      "symptoms",
+      "scores",
+      "conditions",
+      "pregnancy",
+      "identity",
+      "country",
+      "history",
+      "age range",
+      "ovaries",
+      "cycle or menopause",
+      "family history",
+      "medicines"
+    ],
+    "failure": "abstain -> manual entry with unknown ingredients",
+    "slice_a_adapter": "mock (labelled as mock)",
+    "purposes": [
+      "DISH_RECOGNITION_FROM_PHOTO",
+      "FOOD_GROUP_INGREDIENT_LIST"
+    ],
+    "model": "claude-haiku-5-5",
+    "photo": {
+      "max_side_px": 1000,
+      "strip_metadata": true,
+      "delete_after_check_default": true
+    },
+    "no_calories": true,
+    "provider_layer": "fixed input/output schema; provider and model set in configuration",
+    "source_labels": [
+      "seen_in_photo",
+      "usually_in_recipe"
+    ]
+  },
+  "personal_focus": [
+    {
+      "id": "P1",
+      "trigger": "ON-04 / ON-05",
+      "effect": "Order suggestions by cuisine"
+    },
+    {
+      "id": "P2",
+      "trigger": "Constipation, no bowel movement or diarrhoea on >=3 of last 14 completed dates",
+      "effect": "Suggest bowel tracking (Pro bowel log); no alert"
+    },
+    {
+      "id": "P3",
+      "trigger": "Gas or burping on >=3 of last 14 dates",
+      "effect": "Suggest tracking eating speed, straws, gum, fizzy drinks"
+    },
+    {
+      "id": "P4",
+      "trigger": "Heartburn in last 14 dates, or >=5 starts with over half after 18:00",
+      "effect": "Suggest logging meal and sleep times"
+    },
+    {
+      "id": "P5",
+      "trigger": "EP-04 suspicion",
+      "effect": "Offer as a possible-trigger check labelled Your suspicion"
+    },
+    {
+      "id": "P6",
+      "trigger": ">=10 ended episodes with known start",
+      "effect": "Hour-of-day and weekday chart"
+    },
+    {
+      "id": "P7",
+      "trigger": "ON-10 cycle opt-in and CY-01/CY-02 dates, or perimenopause/menopause",
+      "effect": "Shade cycle or menopause context; Your cycle comparison after 3 cycles"
+    }
+  ],
+  "personal_focus_behaviour": {
+    "dismiss_days": 30,
+    "reoffer_times_after_dismiss": 1,
+    "rolling_rules_removed_when_no_longer_met": true,
+    "safety_hold_suppresses": [
+      "P2",
+      "P3",
+      "P4",
+      "comparisons"
+    ]
+  },
+  "activities": [
+    {
+      "id": "ACT-01",
+      "group": "eating_habits",
+      "label": "Ate quickly",
+      "detail": "optional meal"
+    },
+    {
+      "id": "ACT-02",
+      "group": "eating_habits",
+      "label": "Talked a lot while eating"
+    },
+    {
+      "id": "ACT-03",
+      "group": "eating_habits",
+      "label": "Chewing gum or hard sweets"
+    },
+    {
+      "id": "ACT-04",
+      "group": "eating_habits",
+      "label": "Drank through a straw"
+    },
+    {
+      "id": "ACT-05",
+      "group": "eating_habits",
+      "label": "Late meal",
+      "detail": "meal and sleep times"
+    },
+    {
+      "id": "ACT-06",
+      "group": "eating_habits",
+      "label": "Lay down soon after eating"
+    },
+    {
+      "id": "ACT-07",
+      "group": "eating_habits",
+      "label": "Skipped a meal, then ate a larger one"
+    },
+    {
+      "id": "ACT-08",
+      "group": "movement",
+      "label": "Walked after a meal",
+      "detail": "10 / 20 / 30+ minutes"
+    },
+    {
+      "id": "ACT-09",
+      "group": "movement",
+      "label": "Exercised",
+      "detail": "Light / Moderate / Hard"
+    },
+    {
+      "id": "ACT-10",
+      "group": "movement",
+      "label": "Mostly sitting today"
+    },
+    {
+      "id": "ACT-11",
+      "group": "sleep_feelings",
+      "label": "Poor or short sleep",
+      "detail": "hours if known"
+    },
+    {
+      "id": "ACT-12",
+      "group": "sleep_feelings",
+      "label": "Stressed or anxious",
+      "detail": "Low / Medium / High"
+    },
+    {
+      "id": "ACT-13",
+      "group": "sleep_feelings",
+      "label": "Unusually rushed day"
+    },
+    {
+      "id": "ACT-14",
+      "group": "body",
+      "label": "Constipated"
+    },
+    {
+      "id": "ACT-15",
+      "group": "body",
+      "label": "No bowel movement",
+      "links": "BW-01"
+    },
+    {
+      "id": "ACT-16",
+      "group": "body",
+      "label": "Period started or ended",
+      "visible_if": "ON-10 includes cycle_context",
+      "opens": [
+        "CY-01",
+        "CY-02"
+      ]
+    },
+    {
+      "id": "ACT-17",
+      "group": "body",
+      "label": "Drank less water than usual"
+    },
+    {
+      "id": "ACT-18",
+      "group": "body",
+      "label": "Unwell or infection"
+    },
+    {
+      "id": "ACT-19",
+      "group": "body",
+      "label": "New or changed medicine or supplement",
+      "links": "MD-01/MD-02"
+    },
+    {
+      "id": "ACT-20",
+      "group": "routine",
+      "label": "Travelling"
+    },
+    {
+      "id": "ACT-21",
+      "group": "routine",
+      "label": "Ate out"
+    },
+    {
+      "id": "ACT-22",
+      "group": "other",
+      "label": "Alcohol",
+      "links": "TAG-12",
+      "dedupe": true
+    },
+    {
+      "id": "ACT-23",
+      "group": "other",
+      "label": "Smoked"
+    },
+    {
+      "id": "ACT-24",
+      "group": "other",
+      "label": "Tea or coffee",
+      "detail": "cups",
+      "links": "TAG-11",
+      "dedupe": true
+    }
+  ],
+  "activity_rules": {
+    "max_followed": 3,
+    "answers": [
+      "yes",
+      "no",
+      "not_sure",
+      "skip"
+    ],
+    "missing_tap": "UNKNOWN"
+  },
+  "food_tags": [
+    {
+      "id": "TAG-01",
+      "label": "Milk and dairy with lactose",
+      "source": "NIDDK"
+    },
+    {
+      "id": "TAG-02",
+      "label": "Wheat, rye and whole grains",
+      "source": "NIDDK"
+    },
+    {
+      "id": "TAG-03",
+      "label": "Onion and garlic",
+      "source": "Monash"
+    },
+    {
+      "id": "TAG-04",
+      "label": "Beans, peas and lentils",
+      "source": "NIDDK, NHS"
+    },
+    {
+      "id": "TAG-05",
+      "label": "Fruit sugars",
+      "source": "NIDDK"
+    },
+    {
+      "id": "TAG-06",
+      "label": "Sugar alcohols",
+      "source": "NIDDK"
+    },
+    {
+      "id": "TAG-07",
+      "label": "Fried or high-fat food",
+      "source": "NIDDK, NHS, BDA"
+    },
+    {
+      "id": "TAG-08",
+      "label": "Spicy food",
+      "source": "NHS"
+    },
+    {
+      "id": "TAG-09",
+      "label": "Fizzy drinks",
+      "source": "NIDDK, NHS"
+    },
+    {
+      "id": "TAG-10",
+      "label": "Cabbage-family vegetables",
+      "source": "NIDDK, NHS"
+    },
+    {
+      "id": "TAG-11",
+      "label": "Caffeine",
+      "source": "NHS, BDA"
+    },
+    {
+      "id": "TAG-12",
+      "label": "Alcohol",
+      "source": "NHS, BDA"
+    }
+  ],
+  "food_tag_rules": "Descriptive exposure tags, not intolerances or measured doses. Server derives tags from confirmed ingredients; dietitian review pending.",
+  "pricing_hypotheses": {
+    "US": {
+      "currency": "USD",
+      "monthly_minor": 599,
+      "three_month_minor": 1499,
+      "annual_minor": 3999,
+      "tax": "added at checkout"
+    },
+    "CA": {
+      "currency": "CAD",
+      "monthly_minor": 799,
+      "three_month_minor": 1999,
+      "annual_minor": 5499,
+      "tax": "added at checkout",
+      "note": "converted from USD at about 1.35-1.40; re-check at Gate 2"
+    },
+    "IN": {
+      "currency": "INR",
+      "monthly_minor": 19900,
+      "three_month_minor": 54900,
+      "annual_minor": 199900,
+      "tax": "includes 18% GST"
+    },
+    "same_price_on_web_and_app_stores": true,
+    "billing_country": "decided by the payment method (Razorpay for Indian methods; card country on the web; store country in the app stores), not by the country picked at sign-up",
+    "trial": null,
+    "trial_note": "No free trial; the Free plan never expires and acts as the trial",
+    "decided": "2026-11-08",
+    "checkout_enabled": false
+  },
+  "plans": {
+    "free": [
+      "help_page",
+      "episodes",
+      "warning_signs",
+      "meals_basic",
+      "habit_taps_basic",
+      "morning_review",
+      "bloat_score",
+      "history_list",
+      "edit_delete",
+      "export",
+      "delete_account",
+      "medicines",
+      "progress_counter",
+      "doctor_line",
+      "cycle_logging",
+      "weekly_impact",
+      "medicine_groups",
+      "age_and_ovaries",
+      "personal_goal",
+      "adaptive_logging"
+    ],
+    "pro": [
+      "help_page",
+      "episodes",
+      "warning_signs",
+      "meals_basic",
+      "habit_taps_basic",
+      "morning_review",
+      "bloat_score",
+      "history_list",
+      "edit_delete",
+      "export",
+      "delete_account",
+      "medicines",
+      "progress_counter",
+      "doctor_line",
+      "cycle_logging",
+      "weekly_impact",
+      "medicine_groups",
+      "age_and_ovaries",
+      "personal_goal",
+      "adaptive_logging",
+      "episode_detail",
+      "ai_ingredient_check",
+      "meal_photos",
+      "saved_dishes",
+      "habit_taps_context",
+      "bowel_log",
+      "exercise_log",
+      "charts",
+      "seven_day_average",
+      "pattern_report",
+      "monthly_summary",
+      "possible_triggers",
+      "next_best_log",
+      "experiments_habit",
+      "experiments_swap",
+      "daily_cards",
+      "learn_library",
+      "health_background",
+      "doctor_pdf",
+      "keep_an_eye_mode",
+      "recalled_meal_check",
+      "pause_subscription",
+      "cycle_comparison",
+      "medicine_before_after",
+      "large_meal_comparison",
+      "your_usual",
+      "confounding_note",
+      "phases",
+      "quarterly_summary",
+      "ai_source_labels",
+      "family_history",
+      "your_journey",
+      "baseline_markers"
+    ],
+    "habit_taps_pro_only": [
+      "ACT-11",
+      "ACT-12",
+      "ACT-14",
+      "ACT-15",
+      "ACT-18",
+      "ACT-20",
+      "ACT-21"
+    ]
+  },
+  "ai_protection": {
+    "monthly_spend_limit_usd": {
+      "default_beta": 50,
+      "configurable_by": "founder",
+      "on_reach": "pause AI for all users; meals still save"
+    },
+    "budget_alerts_percent": [
+      50,
+      80,
+      100
+    ],
+    "per_user_per_hour": 10,
+    "per_user_per_day": 40,
+    "max_dish_text_chars": 200,
+    "photo_max_px": 1600,
+    "photo_max_mb": 2,
+    "max_items_returned": 20,
+    "max_output_tokens": "fixed in configuration",
+    "retries": 1,
+    "retry_backoff_seconds": 2,
+    "same_meal_dedup": "save key",
+    "kill_switch": "feature flag ai_enabled, effective within 1 minute",
+    "keys": "server-side only; separate test and live keys; rotation steps written in the runbook; provider-side spending limit as a second safety net",
+    "approved_models": "list in configuration; anything else refused",
+    "cost_anomaly_alert": "3x expected cost per request",
+    "when_unavailable": "meal saves with ingredients unknown; user can add ingredients by hand"
+  },
+  "personalisation": {
+    "goal_question": "ON-16",
+    "baseline": {
+      "min_confirmed_days": 14,
+      "window_days": 28,
+      "statistic": "median",
+      "above_if": "+2 or more",
+      "below_if": "-2 or more"
+    },
+    "adaptive_logging": {
+      "after_days": 14,
+      "unused_days": 30,
+      "moves_to": "More",
+      "never_moves": "warning chips EP-08a",
+      "meal_shortcuts": "saved dishes + 5 most frequent dishes in 30 days"
+    }
+  },
+  "medicine_groups": [
+    "GLP-1 (weight or diabetes)",
+    "Opioid pain medicine",
+    "Iron",
+    "Multivitamin",
+    "Antacid or acid reducer",
+    "Fibre supplement",
+    "Laxative",
+    "Antibiotic",
+    "Hormones (HRT or contraception)",
+    "Anti-diarrhoea medicine",
+    "Other"
+  ],
+  "doctor_line": {
+    "rule": "bloating logged on more than 12 of the last 30 days",
+    "days_min": 13,
+    "window_days": 30,
+    "plan": "free",
+    "shown_in": [
+      "History (top)",
+      "weekly report",
+      "monthly summary",
+      "Your usual",
+      "doctor PDF"
+    ],
+    "never_on": [
+      "Today",
+      "pop-up"
+    ],
+    "sentence": "The NHS suggests seeing a doctor if you feel bloated regularly or keep feeling bloated after changing your diet.",
+    "ovarian_sentence_if": {
+      "ON-14": [
+        "50-59",
+        "60+"
+      ],
+      "ON-15": "Yes"
+    },
+    "ovarian_sentence": "Sometimes, bloating that does not go away can be a sign of something more serious such as ovarian cancer.",
+    "ovarian_sentence_source": "https://www.nhs.uk/symptoms/bloating/ (checked 2026-11-07)",
+    "spoken_to_doctor_shortens_days": 90
+  },
+  "warning_sign_levels": {
+    "sudden_severe_stomach_ache_with_a_swollen_tummy": "emergency",
+    "vomiting_blood_or_vomit_that_looks_like_ground_coffee": "emergency",
+    "severe_difficulty_breathing": "emergency",
+    "vomiting": "urgent",
+    "fever_or_feeling_hot_cold_or_shivery": "urgent",
+    "swelling_or_lump_in_my_tummy": "urgent",
+    "can_t_pee_poo_or_pass_gas": "urgent",
+    "blood_in_poo": "see_doctor",
+    "weight_loss_without_trying": "see_doctor"
+  },
+  "phases": {
+    "discover": "first 28 days of Pro, until the first possible trigger",
+    "understand": "after the first possible trigger or day 28; experiments",
+    "maintain": "Keep an eye on it mode"
+  },
+  "thresholds": {
+    "comparison_min_each_group": 7,
+    "seven_day_average_min": 4,
+    "experiment_prior_confirmed_min": 4,
+    "experiment_yes_days_min": 4,
+    "swap_max_weeks": 2,
+    "swap_add_back_weeks": 1,
+    "swap_max_per_180_days": 2,
+    "cards_per_day": 1,
+    "card_cooldown_days": 14,
+    "cards_target_at_launch": 40,
+    "focus_dismiss_days": 30,
+    "what_helps_min_tries": 3,
+    "cycle": {
+      "before_period_days": 5,
+      "min_cycles": 3,
+      "min_usable_days_per_window": 7
+    },
+    "medicine_before_after": {
+      "days_each_side": 14,
+      "min_usable_days_each_side": 7
+    },
+    "your_usual_min_confirmed_days": 14,
+    "confounding_note_share": 0.5,
+    "nhs_sentence_once_per_sign_per_day": true,
+    "quarterly_summary_days": 90,
+    "previous_evening_window_from": "18:00",
+    "exclude_meals_after_peak_episode_start": true,
+    "absence_rules": {
+      "coverage_required": "ALL",
+      "unlisted_groups_absent_only_for": [
+        "ML-06 home",
+        "confirmed saved dish"
+      ]
+    },
+    "worth_watching_min_difference": 1.0,
+    "worth_watching_needs_both_halves": true,
+    "daily_food_notice": {
+      "after_days": 21,
+      "share_of_usable_days": 0.8
+    },
+    "keep_an_eye_offer": {
+      "after_pro_weeks": 8,
+      "confirmed_days_min": 30,
+      "groups_max": 5
+    },
+    "recalled_check_days": 7,
+    "subscription_pause_months": [
+      1,
+      2,
+      3
+    ],
+    "still_happening_after_hours": 8,
+    "ai_test_pass": {
+      "missed_max": 0.1,
+      "wrong_max": 0.15,
+      "correct_abstain_min": 0.8
+    },
+    "ai_test_set": {
+      "typed": {
+        "US": 100,
+        "IN": 100,
+        "CA_and_restaurant": 100
+      },
+      "photos": 100,
+      "unclear_photos": 25,
+      "regional_indian_set": "dal makhani, pav bhaji (incl. Jain), chole bhature, dosa, sev usal, thali, Indo-Chinese, Gujarati and Hinglish dish names, with preparation variants; reported separately"
+    }
+  },
+  "swap_experiments": [
+    {
+      "group": "TAG-01",
+      "swap": "Lactose-free milk, yogurt, hard cheese"
+    },
+    {
+      "group": "TAG-03",
+      "swap": "Garlic-infused oil, chives, spring onion greens"
+    },
+    {
+      "group": "TAG-04",
+      "swap": "Smaller portion, or canned and rinsed"
+    },
+    {
+      "group": "TAG-06",
+      "swap": "Regular sweets in small amounts, or none"
+    },
+    {
+      "group": "TAG-05",
+      "swap": "Orange, grapes, kiwi instead of apples, pears and honey"
+    }
+  ],
+  "swap_never_offered": [
+    "TAG-02 wheat and grains",
+    "multi-group or FODMAP programmes",
+    "any group without a like-for-like swap"
+  ]
+}
