@@ -1,6 +1,6 @@
 # Slice A brief: the core diary
 
-Status: **proposal, waiting for the owner's yes** (written 15 Nov 2026, session 1). No code is written from this brief until it is approved. Open points are in sections 9 and 10.
+Status: **approved by the owner on 15 Nov 2026** (session 1), with every suggestion in sections 9 and 10 accepted. The answers are also in `DECISIONS.md`.
 
 Sources: plan B06 (slices), A05 to A11 and A17 (screens and rules), B01 to B05 (engineering), C01 and C02 (questions and tests), section 0.3 and 0.4 (latest fixes), the Build Guide, and the approved screens in `../design/screens/`.
 
@@ -75,11 +75,11 @@ IDs from `../data/Bloat_Questions_v4.3.json`. Options, labels and rules are load
 - **Meals**: ML-01 (Type it and Recent only), ML-02, ML-04, ML-05, ML-06.
 - **Morning review**: DY-01, DY-02, DY-03, DY-04, WK-01.
 
-That is 39 of the 91 questions (37 if 10.1 is not approved). Not in Slice A: ON-03 and PF-01 to PF-06 (see 10.5); every Pro question (EP-03, EP-04, EP-08, EP-09, ML-03, ML-07 to ML-12, BW, EX, HC, FH, XP, FX, WB, GC, AR, KM, RC, PD); CN-04 (Slice C); CY-01, CY-02 and MD-02 (Slice B); DN-01 (Slice E).
+That is 39 of the 91 questions. Not in Slice A: ON-03 and PF-01 to PF-06 (see 10.5); every Pro question (EP-03, EP-04, EP-08, EP-09, ML-03, ML-07 to ML-12, BW, EX, HC, FH, XP, FX, WB, GC, AR, KM, RC, PD); CN-04 (Slice C); CY-01, CY-02 and MD-02 (Slice B); DN-01 (Slice E).
 
-## 4. Acceptance tests (proposed list: the owner approves)
+## 4. Acceptance tests (approved 15 Nov 2026)
 
-IDs from `../data/Bloat_Acceptance_v4.3.json`. The 200 tests are not tagged by slice, so this list is a proposal. 52 tests belong to Slice A (51 without Q139).
+IDs from `../data/Bloat_Acceptance_v4.3.json`. The 200 tests are not tagged by slice, so this list was proposed in session 1 and approved by the owner. 52 tests belong to Slice A.
 
 | Area | Tests |
 |---|---|
@@ -90,7 +90,7 @@ IDs from `../data/Bloat_Acceptance_v4.3.json`. The 200 tests are not tagged by s
 | Meals | Q67, Q104 |
 | Privacy and server rules | Q32, Q39, Q56, Q60, Q184 |
 | Whole-slice checks | Q59, Q61, Q65, Q93, Q95, Q96, Q120, Q129, Q148, Q154, Q186 |
-| Progress counter | Q139 (only if 10.3 is approved) |
+| Progress counter | Q139 |
 
 Plus the **two-user privacy test** (user A can never read or change user B's rows), which runs in every session from step 3 onward.
 
@@ -131,8 +131,8 @@ Every table gets Row Level Security. Each table change is a new migration file (
 | 08 | `warning_signs` only |
 | 09 | `day_reviews`, `day_scores` |
 | 10 | `meals` |
-| 15 | `activity_definitions`, `followed_activities`, `activity_observations` (only if 10.1 is approved) |
-| 18 | `medicines` (only if 10.1 is approved) |
+| 15 | `activity_definitions`, `followed_activities`, `activity_observations` |
+| 18 | `medicines` |
 | 26 | `country_capabilities`, `content_versions` |
 | 27 | `audit_log`, `command_log`, `recompute_outbox`, `export_jobs`, `waitlist` |
 
@@ -148,7 +148,7 @@ An endpoint is an address on the server that the app calls. All of these run on 
 - `GET /v1/help?country=`, `POST /v1/help/ack`
 - `POST /v1/onboarding/commit`
 - `PATCH /v1/me/profile`
-- `PUT /v1/me/followed-activities` (only if 10.1 is approved)
+- `PUT /v1/me/followed-activities`
 - `POST /v1/consents` (viewing and granting; withdrawal: see 10.6)
 - `POST /v1/episodes`, `POST /v1/episodes/{id}/samples`, `POST /v1/episodes/{id}/end`, `POST /v1/episodes/{id}/still-happening`, `PATCH /v1/episodes/{id}`, `DELETE /v1/episodes/{id}`
 - `POST /v1/episodes/{id}/warning-signs`
@@ -157,8 +157,8 @@ An endpoint is an address on the server that the app calls. All of these run on 
 - `GET /v1/history?from&to&cursor` (also used by Day detail, for one day)
 - `POST /v1/export`, `GET /v1/export/{job}`
 - `GET /v1/commands/{key}` (answers "did my save go through?")
-- `POST /v1/medicines` (only if 10.1 is approved)
-- `POST /v1/waitlist` (**not in plan B03**: see 10.4)
+- `POST /v1/medicines`
+- `POST /v1/waitlist` (not in plan B03; approved by the owner, see 10.4)
 
 Sign-up and sign-in themselves use Supabase Auth (Google and email code), not a `/v1` route.
 
@@ -172,7 +172,7 @@ These wait for a later slice. If one comes up while building Slice A, it is not 
 - **Slice E**: experiments, daily cards, Learn library, the doctor line at the top of History, Your cycle, medicine before and after.
 - **Slice F**: delete account, backups, analytics events, payments and Pause Pro.
 - **Not in this release at all**: streak display (decided 15 Nov 2026), push notifications and reminders (plan A18), real users, a public site, payments.
-- **Not decided yet**: the Day 1, Day 3, Day 7 and Day 14 screens (9.4), optional profile cards (10.5), install to the home screen (plan A07 offers it "after first value"; the app icon needs the logo, which is not designed).
+- **Left out of Slice A, to decide between slices**: the Day 1, Day 3, Day 7 and Day 14 screens (9.4), optional profile cards (10.5), install to the home screen (plan A07 offers it "after first value"; the app icon needs the logo, which is not designed).
 
 ## 7. Parts (one part per session, in build order)
 
@@ -189,7 +189,7 @@ Steps are the step numbers in "00 Start here". Each part starts with its tests, 
 | A6 | 4 | **Episodes on the server.** Start, new strength readings, end, "still happening", warning signs, edit, delete. One open episode per person, no overlaps, midnight handled. No screens yet. | none | Q01, Q02, Q03, Q04, Q05, Q07, Q08, Q66, Q86, Q88 |
 | A7 | 4 | **Today and the episode screens.** Today with the "I feel bloated" button and tabs, the Log bloating sheet with the nine warning chips, Bloating ongoing, Bloating ended, Is it still happening? | 15, 16, 17, 18, 19 | Q44, Q114, Q160, Q161, Q163 |
 | A8 | 4 | **Meals.** Add meal (typed dish, Recent, time, portion, pace, where made), saved on the server, shown in Today's timeline. A meal always saves. | 20 | Q67, Q104 |
-| A9 | 4 | **Morning review and Bloat Score.** The Review yesterday card, the review steps, "No bloating so far today", and the day status (Confirmed, Late, Provisional, Conflict, Unknown). The progress counter if approved. | 25, 15 | Q09, Q10, Q16, Q42, Q43, Q44, Q86, Q170, (Q139) |
+| A9 | 4 | **Morning review and Bloat Score.** The Review yesterday card, the review steps, "No bloating so far today", and the day status (Confirmed, Late, Provisional, Conflict, Unknown). The progress counter. | 25, 15 | Q09, Q10, Q16, Q42, Q43, Q44, Q86, Q170, Q139 |
 | A10 | 4 | **History and day detail.** The free day list, a day's timeline and review answers, edit and delete on each item, recalculation after a correction. | 26, 27 | Q06, Q56, Q65, Q88, Q95 |
 | A11 | 4 | **Me and download my data.** Profile with time-zone preview, units, consents, help page link, sign out, and the data download (JSON and CSV, link lasts 15 minutes). | 39 | Q39, Q90, Q184 |
 | A12 | 5 | **Finish Slice A.** Every test run, the three countries end to end, keyboard and screen-reader pass, wording scans, the owner's phone checks, then the tag `slice-a-done`. | all | Q59, Q61, Q93, Q96, Q120, Q129, Q148, and every test above again |
@@ -209,9 +209,9 @@ Then PROGRESS.md is updated, the commit is tagged `slice-a-done`, and it is push
 
 ## 9. Where the approved screens and the plan disagree
 
-Found on 15 Nov 2026 by reading the 20 Slice A design files next to plan A06. Suggested rule: **the plan wins for every rule, number and wording; the screens win for the look.** Each item still needs the owner's yes, because CLAUDE.md says never to change a rule alone.
+Found on 15 Nov 2026 by reading the 20 Slice A design files next to plan A06. **Decided by the owner on 15 Nov 2026: the plan wins for every rule, number and wording; the screens win for the look.** The owner said yes to every suggestion below, so read each "Suggested" as "Decided".
 
-1. **Tabs.** Plan A06: Today · History · Me. Screens, design README and Build Guide: Today · History · Insights · Me. Slice A has nothing to put in Insights. *Needs a decision before part A7.*
+1. **Tabs.** Plan A06: Today · History · Me. Screens, design README and Build Guide: Today · History · Insights · Me. Slice A has nothing to put in Insights. *Decided: three tabs in Slice A. The Insights tab is added in Slice D, when there is something to show.*
 2. **Setup steps.** The screens show 8 steps (country, help, account, consent, goal, about your bloating, context, habits) and then go straight to Today. The plan has 11. Missing from the screens: 08 location, time and units (the time zone decides where each day starts and ends, so it cannot be skipped); 11 your food (ON-04, ON-05); 14 the four "How Bloat works" cards; question ON-08 "How long has this been happening?"; and a "Continue with Google" button. *Suggested: build all of them as the plan says, in the style of the other setup screens, and show the owner each new screen before it is finished.*
 3. **Morning reminder.** `OnbHabits`, `Me` and the Day 1 screen show "Morning review reminder, every day at 8:00 AM". Plan A18: "No push notifications or WhatsApp reminders in this release." *Suggested: build no reminder.*
 4. **Day 1, Day 3, Day 7 and Day 14 screens.** Four screens under "First two weeks: something to see before day 14". They are not among the plan's 39 screens and no plan section gives their rules. Some of their content needs Pro data. *Suggested: not in Slice A. Decide between slices and update the plan first.* These four files were not copied into the repo.
@@ -224,11 +224,13 @@ Found on 15 Nov 2026 by reading the 20 Slice A design files next to plan A06. Su
 11. **Meal time.** `AddMeal` shows "Now · 1:15 PM today · Yesterday evening". Plan ML-02 is "Now / Choose time". *Suggested: follow the plan.*
 12. **Email code timing.** `SignUp` shows "Code lasts 10 minutes" and a 42-second countdown. Plan screen 06 says "Resend after 30 seconds" and gives no lifetime. *Suggested: 30 seconds; show no lifetime unless the owner adds one.*
 
-## 10. Other open questions
+## 10. Other questions, answered
+
+The owner said yes to every suggestion below on 15 Nov 2026, so read each "Suggested" as "Decided". Only item 8 is still open.
 
 1. **Habits and medicines inside Slice A.** Setup screens 12 and 13 and the morning review step DY-04 use habits and medicines, which B06 lists under Slice B. All setup answers must save together in one go (plan A07), so building setup twice is risky. *Suggested: in Slice A, a person can pick up to 3 free habits, answer them each morning, and add medicine names and types during setup. Slice B adds habit logging (Add activity), changing followed habits and medicines in Me, and medicine changes.* This brings the three habit tables and `medicines` into Slice A.
 2. **Free only.** *Suggested: Slice A shows only free items. "Pro" labels, locked cards and the Upgrade screen arrive together in Slice B.*
-3. **Progress counter on Today.** Free feature (plan A04, test Q139): "14 days logged · 9 of 14 confirmed days needed for possible triggers". *Suggested: build it in part A9, with real counts only. The "14" is two times the plan's setting of 7 days in each group. Confirm.*
+3. **Progress counter on Today.** Free feature (plan A04, test Q139): "14 days logged · 9 of 14 confirmed days needed for possible triggers". *Suggested: build it in part A9, with real counts only. The "14" is two times the plan's setting of 7 days in each group.*
 4. **Waitlist endpoint.** Plan B03 has no endpoint for screen 03's waitlist. *Suggested: `POST /v1/waitlist`, saving email and country only.*
 5. **Optional profile cards.** Plan A07 says PF-01 to PF-06 "appear one per day in the first week". No screen in A05 or A06 shows where, and ON-03 is in the question list but on no screen. *Suggested: not in Slice A.*
 6. **Consents in Me.** Plan screen 07 says consents are "withdrawable in Me", but the plan does not say what happens when a required consent (terms, health data, wellness) is withdrawn. *Suggested: Slice A shows each consent with its version and date, with no withdraw button. Withdrawal arrives with the first optional consent in Slice C.*

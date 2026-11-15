@@ -4,23 +4,29 @@ Every choice made while building goes here with the date. A decision needs the o
 
 ## Open: waiting for the owner's yes
 
-These came up on 15 Nov 2026 while writing the Slice A brief. The full detail is in `docs/slices/slice-a.md`, sections 9 and 10. Until each one is answered, Claude Code follows the plan and asks before building the part it touches.
+1. **Skeleton choices (step 2).** To confirm at the start of step 2: the list of libraries in PROGRESS.md ("Next"), automatic checks on GitHub for every change, and adding `@supabase/ssr` when sign-in is built.
+2. **Small things to ask when their part comes** (`docs/slices/slice-a.md`, 10.8): where "No bloating so far today" (DY-05) sits on Today; the exact words of the "English only" note for test Q70; how old versions of a record are stored (step 3).
+3. **To decide between slices, with a plan update first:** whether to build the Day 1, Day 3, Day 7 and Day 14 screens; where the optional profile cards (PF-01 to PF-06) and question ON-03 appear; what happens when a required consent is withdrawn.
 
-1. **The Slice A brief itself.** `docs/slices/slice-a.md` is a proposal: its screens, its 52 acceptance tests and its 12 parts need the owner's yes.
-2. **Bottom tabs.** Plan A06 says three tabs (Today · History · Me). The approved screens, the design README and the Build Guide show four (Today · History · Insights · Me). Needed before the Today screen is built.
-3. **Onboarding steps.** The approved screens show 8 steps. The plan has 11. Plan screens 08 (location, time and units), 11 (your food) and 14 (how Bloat works) have no design, question ON-08 is missing from the design, and the design's sign-up screen has no Google button. Suggested: build what the plan says, in the style of the approved screens.
-4. **Morning reminder.** Three approved screens show a "Morning review reminder, every day at 8:00 AM". Plan A18 says no push notifications or reminders in this release. Suggested: build no reminder.
-5. **Day 1, Day 3, Day 7 and Day 14 screens.** They are in the approved screens but not in the plan's 39 screens. Suggested: not in Slice A; decide between slices and update the plan first.
-6. **AI consent (CN-04).** The approved Consent screen shows it as an optional fourth tick at sign-up. The plan asks it before the first AI ingredient check (Pro). Suggested: follow the plan; it arrives in Slice C.
-7. **Small rule differences between the approved screens and the plan.** Suggested: the plan wins for every rule, number and wording, and the screens win for the look. The list is in the brief, section 9.
-8. **Habits and medicines inside Slice A.** Onboarding screens 12 and 13 and the morning review (DY-04) touch habits and medicines, which plan B06 puts in Slice B. Suggested: build these onboarding and review steps in Slice A, and leave habit logging and medicine changes for Slice B.
-9. **Slice A is Free only.** Plan locking arrives in Slice B. Suggested: Slice A shows only the free parts, with no "Pro" labels or locks yet.
-10. **Progress counter on Today.** Suggested: build it in Slice A. The "14 confirmed days needed" comes from plan A04 (7 days with and 7 days without). Confirm that number.
-11. **Waitlist address.** Screen 03 saves a waitlist email, but plan B03 lists no endpoint for it. Suggested: add `POST /v1/waitlist`.
-12. **Optional profile cards (PF-01 to PF-06) and question ON-03.** They are in the question list but on no screen. Suggested: not in Slice A.
-13. **Consents in Me.** The plan does not say what happens when a required consent is withdrawn. Suggested: Slice A shows consents (type, version, date) without a withdraw button.
-14. **Landing page links.** Terms, Privacy Policy, Contact and the "How Bloat works" method page do not exist until Gate 1. Suggested: build the landing page in Slice A and add each link when its page exists.
-15. **Skeleton choices (step 2).** The list of libraries, automatic checks on GitHub, and adding `@supabase/ssr` when sign-in is built. See PROGRESS.md, "Next".
+## Decided 15 Nov 2026: the Slice A brief (session 1)
+
+The owner said yes to `docs/slices/slice-a.md` and to every suggestion in it.
+
+1. **The brief.** Slice A's screens, its 52 acceptance tests and its 12 parts are approved.
+2. **Plan against approved screens.** The plan wins for every rule, number and wording. The screens win for the look.
+3. **Bottom tabs.** Three in Slice A (Today · History · Me), as in plan A06. The Insights tab is added in Slice D.
+4. **Setup steps.** Build all of the plan's steps, including the ones with no design: 08 (location, time and units), 11 (your food), 14 (how Bloat works), question ON-08 and the "Continue with Google" button. They follow the style of the approved setup screens, and the owner sees each new screen before it is finished. The goal step (ON-16) sits where the approved screens put it.
+5. **Morning reminder.** None. Plan A18 stands: no push notifications or reminders in this release.
+6. **Day 1, Day 3, Day 7 and Day 14 screens.** Not in Slice A.
+7. **AI consent (CN-04).** Not at sign-up. Asked before the first AI ingredient check, in Slice C.
+8. **Small rule differences**, all following the plan: strength is 1 to 10 when updating an episode; "Not sure" on "Is it still happening?" keeps the episode open; the landing page and the help page use the plan's fixed wording; Pro habits are not selectable on Free; morning habit answers are Yes / No / Not sure; meal time is "Now / Choose time"; a new email code can be asked for after 30 seconds, and no code lifetime is shown.
+9. **Habits and medicines inside Slice A.** In Slice A a person picks up to 3 free habits, answers them each morning, and can add medicine names and types during setup. Habit logging, changing them in Me, and medicine changes are Slice B. The three habit tables and `medicines` are created in Slice A.
+10. **Slice A is Free only.** No "Pro" labels, locked cards or Upgrade screen until Slice B.
+11. **Progress counter on Today.** Built in Slice A (part A9) with real counts only. The "14 confirmed days needed" is two times the plan's setting of 7 days in each group.
+12. **Waitlist endpoint.** `POST /v1/waitlist` is added, saving email and country only. It is not in plan B03.
+13. **Optional profile cards (PF-01 to PF-06) and ON-03.** Not in Slice A.
+14. **Consents in Me.** Slice A shows each consent with its version and date, with no withdraw button. Withdrawal arrives with the first optional consent in Slice C.
+15. **Landing page links.** The landing page is built in Slice A. Terms, Privacy Policy, Contact and the method page are linked when each page exists; tracked as an open issue until Gate 1.
 
 ## Decided 15 Nov 2026: the owner's answers to the seven open questions (session 1)
 
