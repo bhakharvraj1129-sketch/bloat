@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>History</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=DM+Sans:wght@400;600&display=swap">
+<style>
+body{margin:0}
+a{color:#1e5e54}a:hover{color:#17211e}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #f4f6f1; color: #17211e; font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif; font-size: 16px; line-height: 24px; display: flex; flex-direction: column">
+  <div style="flex-grow: 1; padding: 56px 16px 0 16px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', 'Avenir Next', system-ui, sans-serif; font-size: 32px; line-height: 36px; font-weight: 600; letter-spacing: -0.01em">History</h1>
+      <span style="display: flex; background: #ffffff; border: 1px solid #dce3de; border-radius: 999px; padding: 2px">
+        <button style="height: 40px; padding: 0 12px; border-radius: 999px; border: 0; background: none; color: #55625c; font: inherit; font-size: 14px">Week</button>
+        <button style="height: 40px; padding: 0 12px; border-radius: 999px; border: 0; background: #1e5e54; color: #ffffff; font: inherit; font-size: 14px; font-weight: 600">Month</button>
+        <button style="height: 40px; padding: 0 12px; border-radius: 999px; border: 0; background: none; color: #55625c; font: inherit; font-size: 14px">All</button>
+      </span>
+    </div>
+
+    <div style="background: #dcebe5; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 14px; line-height: 20px">Bloating on 15 of the last 30 days. The NHS suggests seeing a doctor if you feel bloated regularly or keep feeling bloated after changing your diet.</span>
+      <span style="display: flex; gap: 16px; font-size: 13px; line-height: 18px">
+        <a href="#help" style="font-weight: 600">When to get medical help</a>
+        <a href="#spoken" style="font-weight: 600">I've spoken to a doctor</a>
+      </span>
+    </div>
+
+    <div style="background: #ffffff; border: 1px solid #dce3de; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <span style="font-family: 'Bricolage Grotesque', 'Avenir Next', system-ui, sans-serif; font-size: 20px; line-height: 26px; font-weight: 600">November</span>
+        <span style="font-size: 13px; color: #55625c">7-day average 4.2 · from 6 days (1 late)</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; text-align: center; font-size: 13px; line-height: 16px; color: #55625c">
+        <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px">
+        <sc-for list="{{cells}}" as="c" hint-placeholder-count="36">
+          <div style="{{ c.style }}">{{ c.text }}</div>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; line-height: 18px; color: #55625c">
+        <span style="display: flex; align-items: center; gap: 4px"><span style="width: 12px; height: 12px; border-radius: 999px; background: #e9d6a7"></span>1–3</span>
+        <span style="display: flex; align-items: center; gap: 4px"><span style="width: 12px; height: 12px; border-radius: 999px; background: #ec9f6a"></span>4–6</span>
+        <span style="display: flex; align-items: center; gap: 4px"><span style="width: 12px; height: 12px; border-radius: 999px; background: #d9714f"></span>7–8</span>
+        <span style="display: flex; align-items: center; gap: 4px"><span style="width: 12px; height: 12px; border-radius: 999px; background: #9c3f2c"></span>9–10</span>
+        <span style="display: flex; align-items: center; gap: 4px"><span style="width: 10px; height: 10px; border-radius: 999px; border: 1px dashed #55625c"></span>not reviewed</span>
+      </div>
+    </div>
+
+    <a href="Journey.dc.html" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; background: #ffffff; border: 1px solid #dce3de; border-radius: 20px; color: #17211e; text-decoration: none">
+      <span style="display: flex; flex-direction: column">
+        <span style="font-weight: 600">Your journey</span>
+        <span style="font-size: 13px; line-height: 18px; color: #55625c">Usually 4, about 3 episodes a week, 2 h each</span>
+      </span>
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1e5e54" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l6 6-6 6"/></svg>
+    </a>
+
+    <div style="background: #ffffff; border: 1px solid #dce3de; border-radius: 20px; padding: 4px 16px; display: flex; flex-direction: column">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #dce3de">
+        <span style="width: 32px; height: 32px; border-radius: 999px; background: #ec9f6a; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px">5</span>
+        <span style="flex-grow: 1">Mon 9 Nov</span>
+        <span style="font-size: 13px; color: #55625c">around your usual</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0">
+        <span style="width: 32px; height: 32px; border-radius: 999px; background: #d9714f; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px">7</span>
+        <span style="flex-grow: 1">Sun 8 Nov</span>
+        <span style="font-size: 13px; color: #55625c">above your usual</span>
+      </div>
+    </div>
+  </div>
+
+  <nav style="background: #ffffff; border-top: 1px solid #dce3de; padding: 8px 16px 24px 16px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0; color: #55625c; font-size: 13px; text-decoration: none">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#55625c" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/></svg>
+      Today
+    </a>
+    <a href="History.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0; color: #1e5e54; font-size: 13px; font-weight: 600; text-decoration: none">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1e5e54" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>
+      History
+    </a>
+    <a href="Triggers.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0; color: #55625c; font-size: 13px; text-decoration: none">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#55625c" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V11M12 19V5M19 19v-6"/></svg>
+      Insights
+    </a>
+    <a href="Upgrade.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0; color: #55625c; font-size: 13px; text-decoration: none">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#55625c" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-5 8-5s6.5 1 8 5"/></svg>
+      Me
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+const scores = [3, 0, 5, 6, null, 2, 4, 7, 5];
+const fill = (n) => n === 0 ? '#ffffff' : n <= 3 ? '#e9d6a7' : n <= 6 ? '#ec9f6a' : n <= 8 ? '#d9714f' : '#9c3f2c';
+const base = { height: '40px', borderRadius: '999px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontVariantNumeric: 'tabular-nums', boxSizing: 'border-box' };
+const cells = [];
+for (let i = 0; i < 6; i++) cells.push({ text: '', style: Object.assign({}, base) });
+for (let d = 1; d <= 30; d++) {
+const s = d <= scores.length ? scores[d - 1] : undefined;
+let style;
+if (s === null) style = Object.assign({}, base, { border: '1px dashed #55625c', color: '#55625c' });
+else if (s === undefined) style = Object.assign({}, base, { color: d === 10 ? '#1e5e54' : '#55625c', fontWeight: d === 10 ? 600 : 400, border: d === 10 ? '2px solid #1e5e54' : '0' });
+else style = Object.assign({}, base, { background: fill(s), border: s === 0 ? '1px solid #dce3de' : '0', fontWeight: 600, color: '#17211e' });
+cells.push({ text: s === null ? '?' : (s === undefined ? String(d) : String(s)), style: style });
+}
+return { cells: cells };
+}
+}
+</script>
+</body>
+</html>

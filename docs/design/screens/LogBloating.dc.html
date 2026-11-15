@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Log bloating</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=DM+Sans:wght@400;600&display=swap">
+<style>
+body{margin:0}
+a{color:#1e5e54}a:hover{color:#17211e}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #55625c; color: #17211e; font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif; font-size: 16px; line-height: 24px; display: flex; flex-direction: column; justify-content: flex-end">
+  <div style="background: #ffffff; border-radius: 20px 20px 0 0; padding: 12px 16px 24px 16px; display: flex; flex-direction: column; gap: 16px">
+    <div style="width: 40px; height: 4px; border-radius: 999px; background: #dce3de; align-self: center"></div>
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', 'Avenir Next', system-ui, sans-serif; font-size: 20px; line-height: 26px; font-weight: 600">How strong is it?</h1>
+      <a href="Main.dc.html" style="font-size: 16px; font-weight: 600; text-decoration: none; padding: 10px 0 10px 16px">Cancel</a>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{levels}}" as="lv" hint-placeholder-count="10">
+          <button onClick="{{ lv.pick }}" aria-label="{{ lv.label }}" style="{{ lv.style }}">{{ lv.n }}</button>
+        </sc-for>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 13px; line-height: 18px; color: #55625c">
+        <span>1 barely noticeable</span>
+        <span>10 worst I can imagine</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 13px; line-height: 16px; font-weight: 600; letter-spacing: 0.04em; color: #55625c">WHEN DID IT START?</span>
+      <div style="display: flex; gap: 8px">
+        <button style="height: 44px; padding: 0 16px; border-radius: 999px; background: #dcebe5; border: 1px solid #1e5e54; color: #17211e; font: inherit; font-weight: 600">Now</button>
+        <button style="height: 44px; padding: 0 16px; border-radius: 999px; background: #ffffff; border: 1px solid #dce3de; color: #17211e; font: inherit">Earlier</button>
+        <button style="height: 44px; padding: 0 16px; border-radius: 999px; background: #ffffff; border: 1px solid #dce3de; color: #17211e; font: inherit">Roughly</button>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 13px; line-height: 16px; font-weight: 600; letter-spacing: 0.04em; color: #55625c">ANYTHING WORRYING WITH IT?</span>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <button style="height: 44px; padding: 0 14px; border-radius: 999px; background: #ffffff; border: 1px solid #dce3de; color: #17211e; font: inherit; font-size: 14px">Vomiting</button>
+        <button style="height: 44px; padding: 0 14px; border-radius: 999px; background: #fbe7e4; border: 1px solid #a52a1f; color: #a52a1f; font: inherit; font-size: 14px; font-weight: 600">Fever or shivery</button>
+        <button style="height: 44px; padding: 0 14px; border-radius: 999px; background: #ffffff; border: 1px solid #dce3de; color: #17211e; font: inherit; font-size: 14px">Blood in poo</button>
+        <button style="height: 44px; padding: 0 14px; border-radius: 999px; background: #ffffff; border: 1px solid #dce3de; color: #17211e; font: inherit; font-size: 14px">Swelling or lump</button>
+        <button style="height: 44px; padding: 0 14px; border-radius: 999px; background: #ffffff; border: 1px solid #dce3de; color: #17211e; font: inherit; font-size: 14px">5 more</button>
+      </div>
+      <div style="background: #fbe7e4; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 4px">
+        <span style="color: #17211e; font-size: 14px; line-height: 20px">[EXACT NHS SENTENCE: bloating with a high temperature, contact a doctor today or go to urgent care]</span>
+        <span style="font-size: 13px; line-height: 18px; color: #a52a1f; font-weight: 600">Source: NHS, Bloating</span>
+      </div>
+    </div>
+
+    <a href="Main.dc.html" style="display: flex; align-items: center; justify-content: center; height: 56px; border-radius: 999px; background: #1e5e54; color: #ffffff; font-size: 18px; font-weight: 600; text-decoration: none">Save</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { picked: 6 }; }
+renderVals() {
+const fill = (n) => n <= 3 ? '#e9d6a7' : n <= 6 ? '#ec9f6a' : n <= 8 ? '#d9714f' : '#9c3f2c';
+const picked = this.state.picked;
+const levels = [1,2,3,4,5,6,7,8,9,10].map((n) => {
+const on = n === picked;
+return { n: n, label: 'Strength ' + n, pick: () => this.setState({ picked: n }),
+style: { height: '48px', borderRadius: '999px', font: 'inherit', fontWeight: 600, fontSize: '18px',
+border: on ? '2px solid #17211e' : '1px solid #dce3de',
+background: on ? fill(n) : '#ffffff', color: on && n >= 9 ? '#ffffff' : '#17211e' } };
+});
+return { levels: levels };
+}
+}
+</script>
+</body>
+</html>
