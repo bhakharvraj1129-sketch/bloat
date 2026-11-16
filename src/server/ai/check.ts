@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import type { Db } from "../supabase";
 import { srv, tx } from "../db";
 import { env } from "../env";
-import { aiOutput, APPROVED_MODELS, costMicros, PROMPT_VERSION, type AiInput, type AiOutput, type AiProvider, type Purpose } from "./types";
+import { aiOutput, configCheck, costMicros, PROMPT_VERSION, type AiInput, type AiOutput, type AiProvider, type Purpose } from "./types";
 import { MockProvider } from "./mock";
 import { AnthropicProvider } from "./anthropic";
 import { aiProtection } from "@/lib/registry";
@@ -21,14 +21,16 @@ let alertedBadModel = false;
 
 /** The provider is chosen in configuration; the rest of the app never knows which one runs. */
 export async function provider(): Promise<AiProvider | null> {
-  const model = env.aiProvider === "mock" ? "mock-ingredients-1" : env.aiModel;
-  if (!APPROVED_MODELS.includes(model) || (env.aiProvider !== "mock" && env.aiProvider !== "anthropic")) {
+  const checked = configCheck(env.aiProvider, env.aiModel);
+  if (!checked.ok) {
+    // Refused before any call, with one alert to the founder (no user data).
     if (!alertedBadModel) {
       alertedBadModel = true;
-      await srv("srv_alert", { p_kind: "ai_model_not_approved", p_detail: { model, provider: env.aiProvider } }).catch(() => {});
+      await srv("srv_alert", { p_kind: "ai_model_not_approved", p_detail: { model: env.aiModel, provider: env.aiProvider } }).catch(() => {});
     }
     return null;
   }
+  const model = checked.model;
   if (env.aiProvider === "mock") return new MockProvider();
   if (!env.anthropicKey) return null;
   return new AnthropicProvider(model, env.anthropicKey);
@@ -66,7 +68,8 @@ export async function runCheck(
   input: { dish_text?: string; image?: { base64: string; media_type: "image/jpeg" } },
 ): Promise<CheckResult> {
   const { data: prior } = await db.from("food_suggestions").select("*").eq("user_id", userId).eq("save_key", saveKey).eq("purpose", purpose).maybeSingle();
-  if (prior) {
+  // A paused or limited result was never sent to the AI, so it may be tried again later.
+  if (prior && prior.status !== "paused" && prior.status !== "limited") {
     const out = (prior.output ?? { dishes: [], items: [] }) as { dishes: string[]; items: CheckItem[]; provider_label?: string };
     return {
       status: prior.status as CheckStatus, dishes: out.dishes ?? [], items: out.items ?? [],
@@ -82,8 +85,17 @@ export async function runCheck(
   } catch {
     return unavailable("paused", AI_PAUSED_MESSAGE);
   }
-  if (!p || !gate.enabled || gate.month_spent_micros >= gate.monthly_limit_micros) return unavailable("paused", AI_PAUSED_MESSAGE, p?.label);
+  // Remember why no check ran, so the meal can be saved with the honest status.
+  const note = (status: "paused" | "limited") => tx(userId, [{
+    op: "upsert", table: "food_suggestions", conflict: ["user_id", "save_key", "purpose"],
+    row: { save_key: saveKey, purpose, input_hash: "not-sent", output: null, model: null, prompt_version: PROMPT_VERSION, latency_ms: null, status },
+  }]).catch(() => {});
+  if (!p || !gate.enabled || gate.month_spent_micros >= gate.monthly_limit_micros) {
+    await note("paused");
+    return unavailable("paused", AI_PAUSED_MESSAGE, p?.label);
+  }
   if (gate.hour_count >= aiProtection.per_user_per_hour || gate.day_count >= aiProtection.per_user_per_day) {
+    await note("limited");
     return unavailable("limited", AI_LIMITED_MESSAGE, p.label);
   }
 

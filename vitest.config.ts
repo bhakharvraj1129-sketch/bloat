@@ -5,6 +5,8 @@ const alias = {
   "@": path.resolve(__dirname, "src"),
   "@data": path.resolve(__dirname, "docs/data"),
   "@content": path.resolve(__dirname, "content"),
+  // "server-only" guards server files from the browser bundle; tests run on the server side.
+  "server-only": path.resolve(__dirname, "tests/support/server-only.ts"),
 };
 
 export default defineConfig({

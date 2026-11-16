@@ -47,3 +47,11 @@ export function costMicros(model: string, inputTokens: number, outputTokens: num
   const p = PRICE_PER_MTOK[model] ?? { input: 0, output: 0 };
   return Math.round(inputTokens * p.input + outputTokens * p.output);
 }
+
+/** Start-up check for the configured provider and model (plan 0.4): only approved models run. */
+export function configCheck(providerName: string, model: string): { ok: true; model: string } | { ok: false; reason: string } {
+  if (providerName !== "mock" && providerName !== "anthropic") return { ok: false, reason: "unknown provider" };
+  const effective = providerName === "mock" ? "mock-ingredients-1" : model;
+  if (!APPROVED_MODELS.includes(effective)) return { ok: false, reason: "model not approved" };
+  return { ok: true, model: effective };
+}

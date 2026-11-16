@@ -126,9 +126,9 @@ returns void language plpgsql security definer set search_path = '' as $$
 begin
   perform private.assert_secret(p_secret);
   if p_what = 'monthly_limit_micros' then
-    update private.ai_settings set monthly_limit_micros = (p_value #>> '{}')::bigint, updated_at = now();
+    update private.ai_settings set monthly_limit_micros = (p_value #>> '{}')::bigint, updated_at = now() where id;
   elsif p_what = 'expected_cost_micros' then
-    update private.ai_settings set expected_cost_micros = (p_value #>> '{}')::bigint, updated_at = now();
+    update private.ai_settings set expected_cost_micros = (p_value #>> '{}')::bigint, updated_at = now() where id;
   elsif p_what = 'flag' then
     insert into public.feature_flags (key, enabled) values (p_value->>'key', (p_value->>'enabled')::boolean)
     on conflict (key) do update set enabled = excluded.enabled, updated_at = now();
