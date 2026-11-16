@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Camera, Lock } from "lucide-react";
 import { Button, Caption, Card, Chip, Field, Label, ProTag, SaveStatus, Segmented, Sheet, inputClass } from "@/components/ui";
 import { QuestionField } from "@/components/question";
@@ -44,15 +44,6 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
   const [notice, setNotice] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const save = useSave<{ meal: { ai_check_status: string } }>();
-
-  useEffect(() => {
-    if (!open) return;
-    saveKey.current = newKey();
-    setStep("details"); setText(""); setWhen({ mode: "now", zone }); setPortion(null); setCount(""); setPace(null); setOrigin(null);
-    setSource("typed"); setDishId(null); setCheck(null); setAnswers({}); setAdded([]); setAddText(""); setAsDish(false); setPlace(""); setNotice(null);
-    save.reset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
 
   const shortcuts = [...new Set([...(state.pro?.frequent_dishes ?? []), ...(state.recent_dishes ?? [])])].slice(0, 6);
 

@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Lock } from "lucide-react";
 import { Advice, Button, Caption, Chip, ChipGroup, Label, ProTag, SaveStatus, Sheet, StrengthScale, ScoreBadge } from "@/components/ui";
 import { QuestionField } from "@/components/question";
 import { AmbiguousChoice, TimePick, type TimeValue } from "@/components/timepick";
-import { useSave } from "@/lib/client/hooks";
+import { useNow, useSave } from "@/lib/client/hooks";
 import { deviceZone } from "@/lib/client/api";
 import { options, question } from "@/lib/registry";
 import { COMMON_SYMPTOM_LEVEL, commonSymptomSentence, levelSentence, NHS_SOURCE_LABEL, type HelpLevel } from "@/lib/wording";
@@ -59,11 +59,6 @@ export function LogBloatingSheet({ open, onOpenChange, state, onSaved }: SheetPr
   const save = useSave<{ advice: AdviceItem[] }>();
   const pro = state.plan === "pro";
   const hidden = state.adaptive?.more_symptoms ?? [];
-
-  useEffect(() => {
-    if (open) { setStrength(null); setWhen({ mode: "now", zone: deviceZone() }); setWarnings([]); setFeel(null); setSymptoms(null); setAdvice(null); setMore(false); save.reset(); }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
 
   async function submit(offset?: number) {
     const started = when.mode === "now" || when.mode === "unknown" ? { mode: "now", zone: deviceZone() } : { ...when, ...(offset !== undefined ? { offset_min: offset } : {}) };
@@ -123,14 +118,9 @@ export function LogBloatingSheet({ open, onOpenChange, state, onSaved }: SheetPr
   );
 }
 
-function useTick(ms: number) {
-  const [, set] = useState(0);
-  useEffect(() => { const t = setInterval(() => set((n) => n + 1), ms); return () => clearInterval(t); }, [ms]);
-}
-
 // Screen 17: an open episode. The timer shows how long the record has been open; it proves nothing.
 export function OngoingSheet({ open, onOpenChange, state, onSaved, onEnd }: SheetProps & { onEnd: (earlier: boolean) => void }) {
-  useTick(30_000);
+  const now = useNow();
   const ep = state.open_episode;
   const [updating, setUpdating] = useState(false);
   const [strength, setStrength] = useState<number | null>(null);
@@ -143,7 +133,7 @@ export function OngoingSheet({ open, onOpenChange, state, onSaved, onEnd }: Shee
         <ScoreBadge value={ep.current_strength} size="lg" label={`Current strength ${ep.current_strength}`} />
         <div>
           <Label>Record open for</Label>
-          <p className="t-title tabular">{formatDuration(Date.now() - startedMs)}</p>
+          <p className="t-title tabular">{formatDuration(Math.max(0, now - startedMs))}</p>
           <Caption>Started {ep.start_precision === "approximate" ? "about " : ""}{formatClock(startedMs, state.profile.time_zone, state.profile.units)}</Caption>
         </div>
       </div>
@@ -181,14 +171,10 @@ export function OngoingSheet({ open, onOpenChange, state, onSaved, onEnd }: Shee
 export function EndSheet({ open, onOpenChange, state, onSaved, earlier }: SheetProps & { earlier: boolean }) {
   const ep = state.open_episode;
   const zone = deviceZone();
-  const [when, setWhen] = useState<TimeValue>({ mode: "now", zone });
+  const [when, setWhen] = useState<TimeValue>(earlier ? { mode: "exact", local: "", zone } : { mode: "now", zone });
   const [eased, setEased] = useState<string | null>(null);
   const [summary, setSummary] = useState<{ lasted: string | null; strongest: number | null } | null>(null);
   const save = useSave<{ summary: { lasted: string | null; strongest: number | null } }>();
-  useEffect(() => {
-    if (open) { setWhen(earlier ? { mode: "exact", local: "", zone } : { mode: "now", zone }); setEased(null); setSummary(null); save.reset(); }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, earlier]);
   if (!ep && !summary) return null;
 
   async function submit(offset?: number) {
@@ -233,16 +219,16 @@ export function EndSheet({ open, onOpenChange, state, onSaved, earlier }: SheetP
 export function StillHappeningSheet({ open, onOpenChange, state, onSaved, onEnd }: SheetProps & { onEnd: () => void }) {
   const ep = state.open_episode;
   const save = useSave();
+  const now = useNow();
   if (!ep) return null;
   const answer = async (a: "yes" | "no" | "not_sure") => {
     const ok = await save.run("POST", `/v1/episodes/${ep.id}/still-happening`, { answer: a });
     if (!ok) return;
-    onOpenChange(false);
-    if (a === "no") onEnd(); else onSaved();
+    if (a === "no") onEnd(); else { onOpenChange(false); onSaved(); }
   };
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title="Is it still happening?">
-      <p>You logged bloating {formatDuration(Date.now() - Date.parse(ep.started_at))} ago and it is still open.</p>
+      <p>You logged bloating {formatDuration(Math.max(0, now - Date.parse(ep.started_at)))} ago and it is still open.</p>
       <div className="flex flex-col gap-2">
         <Button variant="secondary" onClick={() => answer("yes")} disabled={save.saving}>Yes</Button>
         <Button variant="secondary" onClick={() => answer("no")} disabled={save.saving}>No, it ended</Button>

@@ -216,7 +216,8 @@ describe("Slice A: Bloat Score and morning review (plan A09)", () => {
     const now = at("2026-11-03", "09:00", NY);
     for (const path of ["/v1/history", "/v1/me/state", "/v1/days/2026-10-25"]) {
       const text = JSON.stringify((await call(u, "GET", path, undefined, { now })).body).toLowerCase();
-      for (const word of ["abnormal", "high risk", "severe", "alert", "see a doctor", "urgent"]) expect(text).not.toContain(word);
+      for (const word of ["abnormal", "high risk", "severe", "alert", "see a doctor"]) expect(text).not.toContain(word);
+      expect(text).not.toMatch(/\burgent\b/); // the option code "…or_urgently" is not a label
     }
   });
 

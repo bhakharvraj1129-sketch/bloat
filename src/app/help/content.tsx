@@ -1,6 +1,6 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { Button, Card, Screen } from "@/components/ui";
 import { helpPage } from "@/lib/wording";
 import { readPre, writePre } from "@/lib/client/pre";
@@ -9,14 +9,15 @@ import { readPre, writePre } from "@/lib/client/pre";
 export function HelpContent() {
   const router = useRouter();
   const signup = useSearchParams().get("signup") === "1";
-  const [country, setCountry] = useState<string | null>(null);
-  const viewedAt = useRef(new Date().toISOString());
+  const pre = useSyncExternalStore(() => () => {}, () => readPre().country ?? null, () => null);
+  const [fromAccount, setFromAccount] = useState<string | null>(null);
+  const [viewedAt] = useState(() => new Date().toISOString());
   useEffect(() => {
-    const pre = readPre().country;
-    if (pre) return setCountry(pre);
+    if (pre) return;
     // Signed-in users: the country from their settings. Signed out: generic wording.
-    fetch("/v1/me/state", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((s) => setCountry(s?.profile?.country ?? null)).catch(() => {});
-  }, []);
+    fetch("/v1/me/state", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((s) => setFromAccount(s?.profile?.country ?? null)).catch(() => {});
+  }, [pre]);
+  const country = pre ?? fromAccount;
   const page = useMemo(() => helpPage(country), [country]);
   return (
     <Screen title={page.title} back={signup ? "/start" : undefined}>
@@ -31,7 +32,7 @@ export function HelpContent() {
       ))}
       <p className="t-caption">{page.source} <a href={page.sourceUrl} rel="noreferrer" target="_blank">nhs.uk/symptoms/bloating</a></p>
       {signup ? (
-        <Button onClick={() => { writePre({ help_viewed_at: viewedAt.current, help_version: page.version }); router.push("/sign-in?new=1"); }}>
+        <Button onClick={() => { writePre({ help_viewed_at: viewedAt, help_version: page.version }); router.push("/sign-in?new=1"); }}>
           I&apos;ve read this
         </Button>
       ) : (

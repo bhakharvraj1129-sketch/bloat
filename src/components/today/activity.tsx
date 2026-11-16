@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Lock } from "lucide-react";
 import { Button, Caption, Chip, Field, Label, ProTag, SaveStatus, Segmented, Sheet, inputClass } from "@/components/ui";
 import { QuestionField } from "@/components/question";
@@ -29,8 +29,6 @@ export function ActivitySheet({ open, onOpenChange, state, onSaved, onExercise }
   const [cycleDate, setCycleDate] = useState(state.today.date);
   const save = useSave();
   const hidden = new Set(state.adaptive?.more_activities ?? []);
-  useEffect(() => { if (open) { setPicked([]); setDetail({}); setCups(""); setMore(false); setCycle(null); setCycleDate(state.today.date); save.reset(); } // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
 
   const toggle = (id: string) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
   const visible = activities.filter((a) => a.id !== "ACT-16");
@@ -109,8 +107,6 @@ export function ExerciseSheet({ open, onOpenChange, state, onSaved }: Props) {
   const [intensity, setIntensity] = useState<string | null>(null);
   const [near, setNear] = useState<string | null>(null);
   const save = useSave();
-  useEffect(() => { if (open) { setType(null); setWhen({ mode: "now", zone }); setLength(null); setMinutes(""); setIntensity(null); setNear(null); save.reset(); } // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
   const mins = length === "enter_minutes" ? Number(minutes) : length ? Number(length.replace("_min", "")) : 0;
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title="Log exercise">
@@ -139,8 +135,6 @@ export function BowelSheet({ open, onOpenChange, onSaved }: Props) {
   const [strain, setStrain] = useState<string | null>(null);
   const [complete, setComplete] = useState<string | null>(null);
   const save = useSave();
-  useEffect(() => { if (open) { setWhen({ mode: "now", zone }); setLook(null); setStrain(null); setComplete(null); save.reset(); } // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title="Log bowel movement">
       <div className="flex flex-col gap-3"><p className="t-body-strong">When?</p><TimePick name="When?" value={when} onChange={setWhen} /></div>

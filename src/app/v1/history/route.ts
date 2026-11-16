@@ -18,11 +18,12 @@ export const GET = route({ feature: "history_list" }, async (ctx) => {
   const recent = await daysView(ctx.db, ctx.userId, u, addDays(u.today, -29), u.today, ctx.now);
   const line = await doctorLineFor(ctx.db, ctx.userId, u, recent);
   const all = await daysView(ctx.db, ctx.userId, u, historyFrom(u), u.today, ctx.now);
+  const pro = ctx.plan === "pro" ? await historyExtras(ctx, u, all) : null;
   return ok({
     from, to, plan: ctx.plan, today: u.today, date_format: u.profile.date_format,
-    days: dayRows(u, view).reverse(),
+    days: dayRows(u, view).reverse().map((d) => ({ ...d, baseline: pro?.baseline[d.date] ?? null })),
     doctor_line: line.show ? line : null,
     progress: progressCounter(u, all),
-    pro: ctx.plan === "pro" ? await historyExtras(ctx, u, all) : null,
+    pro: pro ? { ...pro, baseline: undefined } : null,
   });
 });

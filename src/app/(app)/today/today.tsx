@@ -20,14 +20,10 @@ export function Today() {
   const router = useRouter();
   const { data: state, error, loading, reload } = useLoad<State>("/v1/me/state");
   const [sheet, setSheet] = useState<SheetName>(null);
-  const [asked, setAsked] = useState(false);
+  const [stillDismissed, setStillDismissed] = useState(false);
   const none = useSave();
 
   useEffect(() => { if (state && !state.onboarded) router.replace("/setup"); }, [state, router]);
-  useEffect(() => {
-    // EP-07: asked once on app open when an episode has been open 8 hours or more.
-    if (state?.open_episode?.ask_still_happening && !asked) { setAsked(true); setSheet("still"); }
-  }, [state, asked]);
 
   if (loading && !state) return <main className="mx-auto max-w-md px-4 pt-8"><h1 className="t-headline mb-6">Today</h1><Loading what="Loading today" /></main>;
   if (error && !state) return <main className="mx-auto max-w-md px-4 pt-8"><h1 className="t-headline mb-6">Today</h1><ErrorState error={error} onRetry={reload} /></main>;
@@ -35,7 +31,9 @@ export function Today() {
 
   const { today, profile, open_episode: ep } = state;
   const sheetProps = { state, onSaved: reload };
-  const close = (o: boolean) => { if (!o) setSheet(null); };
+  // EP-07: asked once on app open when an episode has been open 8 hours or more.
+  const open: SheetName = sheet ?? (ep?.ask_still_happening && !stillDismissed ? "still" : null);
+  const close = (o: boolean) => { if (!o) { if (open === "still") setStillDismissed(true); setSheet(null); } };
   const keepEye = profile.logging_mode === "keep_an_eye";
 
   return (
@@ -124,14 +122,15 @@ export function Today() {
         )}
       </section>
 
-      <LogBloatingSheet open={sheet === "log"} onOpenChange={close} {...sheetProps} />
-      <OngoingSheet open={sheet === "ongoing"} onOpenChange={close} {...sheetProps} onEnd={(earlier) => setSheet(earlier ? "end-earlier" : "end")} />
-      <EndSheet open={sheet === "end" || sheet === "end-earlier"} earlier={sheet === "end-earlier"} onOpenChange={close} {...sheetProps} />
-      <StillHappeningSheet open={sheet === "still"} onOpenChange={close} {...sheetProps} onEnd={() => setSheet("end-earlier")} />
-      <MealSheet open={sheet === "meal"} onOpenChange={close} {...sheetProps} />
-      <ActivitySheet open={sheet === "activity"} onOpenChange={close} {...sheetProps} onExercise={() => setSheet("exercise")} />
-      <ExerciseSheet open={sheet === "exercise"} onOpenChange={close} {...sheetProps} />
-      <BowelSheet open={sheet === "bowel"} onOpenChange={close} {...sheetProps} />
+      {/* Sheets are mounted only while open, so each one starts with a clean form. */}
+      {open === "log" && <LogBloatingSheet open onOpenChange={close} {...sheetProps} />}
+      {open === "ongoing" && <OngoingSheet open onOpenChange={close} {...sheetProps} onEnd={(earlier) => setSheet(earlier ? "end-earlier" : "end")} />}
+      {(open === "end" || open === "end-earlier") && <EndSheet open earlier={open === "end-earlier"} onOpenChange={close} {...sheetProps} />}
+      {open === "still" && <StillHappeningSheet open onOpenChange={close} {...sheetProps} onEnd={() => { setStillDismissed(true); setSheet("end-earlier"); }} />}
+      {open === "meal" && <MealSheet open onOpenChange={close} {...sheetProps} />}
+      {open === "activity" && <ActivitySheet open onOpenChange={close} {...sheetProps} onExercise={() => setSheet("exercise")} />}
+      {open === "exercise" && <ExerciseSheet open onOpenChange={close} {...sheetProps} />}
+      {open === "bowel" && <BowelSheet open onOpenChange={close} {...sheetProps} />}
     </main>
   );
 }
