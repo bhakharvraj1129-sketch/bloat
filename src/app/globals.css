@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+/* Design tokens from docs/design/tokens.json (Bloat Design System). Tokens only: no other colours,
+   fonts, radii or spacing values are used anywhere in the app. */
+:root {
+  --ground: #f4f6f1; --surface: #ffffff; --line: #dce3de; --ink: #17211e; --ink-muted: #55625c;
+  --brand: #1e5e54; --on-brand: #ffffff; --brand-tint: #dcebe5;
+  --score-mild: #e9d6a7; --score-moderate: #ec9f6a; --score-strong: #d9714f; --score-severe: #9c3f2c;
+  --on-score: #17211e; --on-score-severe: #ffffff;
+  --alert: #a52a1f; --alert-tint: #fbe7e4;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #111714; --surface: #1a221f; --line: #2c3632; --ink: #e7eee9; --ink-muted: #a2b0aa;
+    --brand: #7fc6b6; --on-brand: #0d1f1a; --brand-tint: #1f3530;
+    --score-mild: #d8c393; --score-moderate: #e39a6a; --score-strong: #e07a5c; --score-severe: #c46a52;
+    --on-score: #111714; --on-score-severe: #111714;
+    --alert: #ff9a8c; --alert-tint: #3a1f1b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #111714; --surface: #1a221f; --line: #2c3632; --ink: #e7eee9; --ink-muted: #a2b0aa;
+  --brand: #7fc6b6; --on-brand: #0d1f1a; --brand-tint: #1f3530;
+  --score-mild: #d8c393; --score-moderate: #e39a6a; --score-strong: #e07a5c; --score-severe: #c46a52;
+  --on-score: #111714; --on-score-severe: #111714;
+  --alert: #ff9a8c; --alert-tint: #3a1f1b;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-ground: var(--ground); --color-surface: var(--surface); --color-line: var(--line);
+  --color-ink: var(--ink); --color-ink-muted: var(--ink-muted);
+  --color-brand: var(--brand); --color-on-brand: var(--on-brand); --color-brand-tint: var(--brand-tint);
+  --color-score-mild: var(--score-mild); --color-score-moderate: var(--score-moderate);
+  --color-score-strong: var(--score-strong); --color-score-severe: var(--score-severe);
+  --color-on-score: var(--on-score); --color-on-score-severe: var(--on-score-severe);
+  --color-alert: var(--alert); --color-alert-tint: var(--alert-tint);
+  --font-display: var(--font-bricolage), "Avenir Next", system-ui, sans-serif;
+  --font-body: var(--font-dm-sans), "Segoe UI", system-ui, sans-serif;
+  --radius-sm: 10px; --radius-lg: 20px; --radius-pill: 999px;
+}
+
+html { background: var(--ground); }
+body {
+  background: var(--ground); color: var(--ink); font-family: var(--font-body);
+  font-size: 1rem; line-height: 1.5rem; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+}
+
+/* Type styles from the tokens. rem keeps the phone's text-size setting respected. */
+.t-score { font-family: var(--font-display); font-size: 4rem; line-height: 4rem; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.t-headline { font-family: var(--font-display); font-size: 2rem; line-height: 2.25rem; font-weight: 600; letter-spacing: -0.01em; }
+.t-title { font-family: var(--font-display); font-size: 1.25rem; line-height: 1.625rem; font-weight: 600; }
+.t-body-strong { font-weight: 600; }
+.t-label { font-size: 0.8125rem; line-height: 1rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-muted); }
+.t-caption { font-size: 0.8125rem; line-height: 1.125rem; color: var(--ink-muted); }
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* Focus ring: 2px brand with 2px offset on every interactive element, both themes. */
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+a { color: var(--brand); }
+
+@keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.sheet-in { animation: sheet-in 180ms ease-out; }
+.fade-in { animation: fade-in 160ms ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
