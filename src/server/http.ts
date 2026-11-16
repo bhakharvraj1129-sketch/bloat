@@ -164,6 +164,8 @@ export function route<B = undefined>(opts: Options<B>, handler: Handler<B>) {
         return errorResponse(new ApiError(500, "SERVER_ERROR", "Something went wrong. Nothing was saved."), requestId);
       }
       console.error(JSON.stringify({ level: "error", request_id: requestId, kind: e instanceof Error ? e.name : "unknown" }));
+      // Stack traces only in test mode with synthetic accounts; never on a live site.
+      if (process.env.BLOAT_TEST_LOGIN === "1" && e instanceof Error) console.error(e.stack);
       return errorResponse(new ApiError(500, "SERVER_ERROR", "Something went wrong. Nothing was saved."), requestId);
     }
   };

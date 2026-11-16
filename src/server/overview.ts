@@ -29,7 +29,9 @@ export function progressCounter(u: UserCtx, view: DaysView) {
 export function historyFrom(u: UserCtx, days = 92): string {
   const created = analysisDate(Date.parse(u.profile.created_at), u.periods);
   const earliest = addDays(u.today, -(days - 1));
-  return diffDays(created, earliest) > 0 ? created : earliest;
+  // An account never shows days from before it existed (unless the clock is before its creation,
+  // which only happens with the test clock).
+  return diffDays(created, earliest) > 0 && created <= u.today ? created : earliest;
 }
 
 export function dayRows(u: UserCtx, view: DaysView) {
