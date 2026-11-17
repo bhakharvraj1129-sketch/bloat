@@ -1,15 +1,26 @@
 # Deployment
 
-Nothing is live. This file says how a private preview is set up and what is still needed.
+Nothing is public. A private preview exists. This file says how it is set up and what is still needed.
 
 ## State on 17 Nov 2026
 
 | Part | State |
 |---|---|
 | GitHub | Branch `claude/bloat-software-build-uxzoru` on `bhakharvraj1129-sketch/bloat`. No pull request. |
-| Supabase `bloat-test` | Project exists and is healthy but **empty: migrations not applied yet** (see PROGRESS.md). |
-| Vercel | **Blocked.** The Vercel connection needs the owner to approve access to the team `typeshi2`. No project and no preview URL exist. |
-| AI key, Resend, Sentry, Google sign-in, payments | Not connected. |
+| Supabase `bloat-test` (`qntazirusbuwfmnmihzu`) | Three migrations applied through the Supabase connector: `20261117051631 foundation`, `20261117051734 server_functions`, `20261117051738 synthetic_test_users`. The file names in `supabase/migrations/` carry the same versions. Nine schema fingerprints (columns, constraints, indexes, policies, RLS flags, functions, grants) were compared between a local database built from the files and the hosted one: identical. |
+| The one data change outside migrations | One row in `private.server_secrets` named `preview-2026-11-17`, holding only the SHA-256 hash of the preview secret. This is step 2 below. The secret itself is not in the database or the repo. |
+| Vercel | Team `typeshi2`, project `bloat`. Builds every push to the branch as a Preview. Vercel Authentication is on for all preview URLs. Framework Next.js, Node 22. Stable URL: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`. |
+| Vercel variables (Preview only) | Set: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `BLOAT_AI_PROVIDER=mock`, `BLOAT_BILLING_PROVIDER=mock`, `BLOAT_TEST_LOGIN=1`. **Missing: `BLOAT_SERVER_SECRET`.** |
+| Duplicate project | `bloat-zlrr` is a second Vercel project on the same repo. Untouched and unused. Safe for the owner to delete. |
+| AI key, Resend, Sentry, Google sign-in, payments | Not connected. Production has no variables and is not used. |
+
+## The one step left (owner)
+
+1. In Vercel open project **bloat**, then Settings, then Environment Variables.
+2. Add a variable named `BLOAT_SERVER_SECRET`. Paste the preview secret as the value. Tick **Preview** only. Mark it **Sensitive**. Save.
+3. Redeploy the latest preview (Deployments, the three dots, Redeploy), or ask Claude to push a commit.
+
+Variables only reach builds made after they are saved, so step 3 is needed.
 
 ## Environment variables
 
@@ -24,7 +35,7 @@ Names are in `.env.example`. Never commit values.
 | `BLOAT_ADMIN_TOKEN` | server only | Turns on `/admin` (founder tools). Leave empty to switch them off. |
 | `BLOAT_TEST_LOGIN` | server only | `1` on previews with synthetic accounts. Never on a live site: it also enables the mock purchase and the test clock. |
 
-## Set up a preview (once Vercel access is approved)
+## Set up a preview from scratch
 
 1. Apply every file in `supabase/migrations/` to `bloat-test`, in order.
 2. Make a server secret and store only its hash in the database:
@@ -37,6 +48,9 @@ values ('preview', encode(sha256(convert_to('<the secret>', 'utf8')), 'hex'));
 3. In Supabase Auth settings: add the preview URL to the redirect list; put `{{ .Token }}` in the Magic Link and Confirm sign-up email templates (see `supabase/templates/code.html`) so the email shows a 6-digit code; switch on Google if wanted.
 4. Create a Vercel project from this repo, framework Next.js, and add the variables above for Preview. Turn on Vercel's deployment protection so the preview is private.
 5. Open the preview, sign up with the test sign-in, and run through Today, History and Me.
+6. Run the hosted browser tests: `HOSTED_URL=<preview URL> HOSTED_SHARE_URL=<Vercel share link> pnpm test:hosted`. The share link is temporary and is never committed.
+
+Synthetic accounts on a preview are made by `srv_test_user`, which only accepts `@example.com` and `@bloat.test` addresses and needs the server secret. No email is sent.
 
 ## Replace a key
 

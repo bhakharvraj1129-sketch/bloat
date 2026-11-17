@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { report, score, setCounts, type EvalCase, type EvalRow } from "@/lib/ai-eval";
 
 const c = (id: string, set: EvalCase["set"], expected: string[], extra: Partial<EvalCase> = {}): EvalCase => ({ id, set, expected_groups: expected, ...extra });
@@ -36,5 +38,25 @@ describe("Meal AI accuracy harness (plan A11)", () => {
     expect(report([], "m", "p")).toEqual({ ran: false, reason: "No evaluation cases were run." });
     const full: EvalCase[] = [...Array(100).fill(0).map((_, i) => c(`u${i}`, "US", [])), ...Array(100).fill(0).map((_, i) => c(`i${i}`, "IN", [], { regional_indian: i < 30 })), ...Array(100).fill(0).map((_, i) => c(`c${i}`, "CA_and_restaurant", [])), ...Array(100).fill(0).map((_, i) => c(`p${i}`, "photo", [], { unclear: i < 25 }))];
     expect(setCounts(full).complete).toBe(true);
+  });
+});
+
+describe("The harness measures what the app runs (Priority 3)", () => {
+  const root = path.resolve(__dirname, "../..");
+  const script = readFileSync(path.join(root, "scripts/ai-eval.mts"), "utf8");
+  const check = readFileSync(path.join(root, "src/server/ai/check.ts"), "utf8");
+
+  it("harness and app share one call path: provider classes, model check, prompt version, validation and group mapping", () => {
+    for (const shared of ["../src/server/ai/run.ts", "../src/server/ai/anthropic.ts", "../src/server/ai/mock.ts", "../src/server/ai/types.ts"]) expect(script).toContain(shared);
+    for (const name of ["runProvider(", "configCheck(", "PROMPT_VERSION", "AnthropicProvider(", "aiProtection.max_dish_text_chars"]) expect(script, name).toContain(name);
+    expect(check).toContain("runProvider(p, sent)");
+    // The harness has no prompt, schema or client of its own.
+    expect(script).not.toMatch(/system:|zodOutputFormat|new Anthropic\(|messages\.(parse|create)/);
+  });
+
+  it("no paid call is possible without the explicit flag, and mock output is never reported as a pass", () => {
+    expect(script).toContain('args.includes("--confirm-paid-calls")');
+    expect(script.indexOf("if (!confirmed)")).toBeLessThan(script.indexOf("new AnthropicProvider("));
+    expect(script).toContain("It is NOT an AI accuracy result");
   });
 });

@@ -4,9 +4,13 @@ Last updated: 17 Nov 2026. Branch: `claude/bloat-software-build-uxzoru`.
 
 ## Where things stand
 
-The whole app is built end to end against a local database, with synthetic accounts, a labelled mock AI and mock billing. All automated tests pass locally. **It is not deployed anywhere**, and it has never run against the real AI.
+The whole app is built end to end. It runs locally, and a **private preview is deployed on Vercel** against the hosted `bloat-test` database (synthetic accounts, labelled mock AI, mock billing). It has never run against the real AI.
 
-Read next: `TEST_RESULTS.md` (what is proven), `DECISIONS.md` (what needs your yes), `DEPLOYMENT.md` (what is blocked).
+- Preview: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app` (behind Vercel sign-in).
+- Hosted database: the three checked-in migrations are applied to `bloat-test` and match the files.
+- **Blocker right now:** `BLOAT_SERVER_SECRET` is not set in Vercel yet, so the preview opens but cannot save or create accounts. The owner adds it (DEPLOYMENT.md, "The one step left"). Until then only the signed-out protection check has passed on the preview.
+
+Read next: `TEST_RESULTS.md` (what is proven, local and hosted kept apart), `DECISIONS.md` (what needs your yes), `DEPLOYMENT.md`.
 
 ## Built and tested
 
@@ -24,22 +28,22 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 
 ## Not done
 
-1. **Hosted database: not applied.** The two migrations in `supabase/migrations/` run cleanly on the local stack only. `bloat-test` is still empty. This build container cannot reach Supabase directly (its network blocks it), and pasting 50 KB of SQL by hand through the connector risks the hosted database drifting from the files. Apply them with the Supabase CLI (`supabase link` then `supabase db push`) from a machine that can reach Supabase, or allow this environment to reach `qntazirusbuwfmnmihzu.supabase.co` and supply the database password.
-2. **Vercel preview.** Blocked: the owner must approve Vercel access for team `typeshi2`. Then follow DEPLOYMENT.md.
-3. **Real AI.** Needs an Anthropic key in the environment. The provider code is written but has never made a real call.
-4. **AI accuracy test.** Harness ready (`scripts/ai-eval.mts`); needs the 300 dishes and 100 photos.
-5. **Email code and Google sign-in on the hosted project.** Needs the email template and Google provider set in Supabase.
-6. **Founder alert emails** (Resend), **error monitoring** (Sentry), **real payments** (Gate 2).
+1. **Server secret in Vercel** (owner, 2 minutes). Then redeploy and run `pnpm test:hosted`.
+2. **Hosted browser tests.** Written (`tests/hosted/preview.spec.ts`): sign-out protection (passed), save a meal and see it in History after a refresh, diary flow, two-account isolation, doctor-report share link open then revoke. The last four wait on item 1.
+3. **Real AI.** Needs an Anthropic key and the owner's yes on spending limits. The provider code has never made a real call.
+4. **AI accuracy test.** The harness now runs the same code path as the app (see `docs/eval/README.md`). Reference examples available: 0 of 300 dishes, 0 of 100 photos. All still need sourcing and a human check.
+5. **Email code and Google sign-in on the hosted project.** Not exercised. Needs the email template and Google provider set in Supabase, and a test mailbox.
+6. **Founder alert emails** (Resend), **error monitoring** (Sentry), **real payments** (Gate 2), **MFA for founder tools**.
 7. Items marked "Not implemented" or "Partial" in `TEST_RESULTS.md`, and the open questions in `DECISIONS.md`.
-8. Browser tests cover the core diary and one Pro path. The Pro screens for journey, reports, experiments, health background and doctor PDF are tested through the API but not yet clicked through in a browser.
+8. The 19 later screens have not been checked against approved designs.
+9. There is a second, unused Vercel project `bloat-zlrr` linked to the same repo. It has no settings from us. The owner may delete it.
 
 ## Next steps, in order
 
-1. Owner: approve Vercel access; answer the "needs the owner" items in DECISIONS.md.
-2. Apply migrations to `bloat-test`, set the server secret hash, create the Vercel preview with deployment protection on.
-3. Run the API tests against the preview (`BLOAT_BASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, keys) with synthetic accounts.
-4. Add browser tests for each Pro screen; compare the 19 later screens with the approved designs once they are copied into `docs/design/screens/`.
-5. Connect the real AI with a small provider-side spending cap, then run the accuracy test.
+1. Owner: add `BLOAT_SERVER_SECRET` in Vercel (Preview only, Sensitive).
+2. Redeploy, run `pnpm test:hosted`, record results, send the owner the URL and phone steps.
+3. Owner: decide on the AI key and spending limits; supply or approve sources for the accuracy set.
+4. Beta completion: MFA, content and source review, missing acceptance items, design refinements.
 
 ## Later (ideas not in the plan, so not built)
 

@@ -1,4 +1,5 @@
-import "server-only";
+// No "server-only" import: the accuracy harness runs this same class from the command line.
+// The API key is passed in by the caller and never read here.
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { aiOutput, MAX_OUTPUT_TOKENS, type AiInput, type AiProvider, type AiResult } from "./types";
