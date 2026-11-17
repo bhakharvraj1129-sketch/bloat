@@ -9,7 +9,7 @@ import { api, ApiFailure } from "@/lib/client/api";
 import { codeRequestOutcome, type AuthErrorLike } from "@/lib/otp-messages";
 
 // Screens 05: sign up or sign in with Google or an email code. No health question comes before this.
-export function SignIn({ testLogin }: { testLogin: boolean }) {
+export function SignIn({ testLogin, google: googleOn }: { testLogin: boolean; google: boolean }) {
   const router = useRouter();
   const isNew = useSearchParams().get("new") === "1";
   const [email, setEmail] = useState("");
@@ -67,7 +67,8 @@ export function SignIn({ testLogin }: { testLogin: boolean }) {
 
   return (
     <Screen title={isNew ? "Create your account" : "Sign in"} back={isNew ? "/help?signup=1" : "/"}>
-      <Button variant="secondary" onClick={google}>Continue with Google</Button>
+      {/* Shown only when Google sign-in is switched on in Supabase (see server/auth-settings.ts). */}
+      {googleOn && <Button variant="secondary" onClick={google}>Continue with Google</Button>}
       <form onSubmit={sendCode} className="flex flex-col gap-4">
         <Field label="Email"><input className={inputClass} type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
         {isNew && (

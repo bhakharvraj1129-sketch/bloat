@@ -114,3 +114,11 @@ test("an existing account signs in by email code (a sign-in code, not a sign-up 
   await page.reload();
   await expect(page).not.toHaveURL(/sign-in/);
 });
+
+test("Google sign-in is not offered while it is switched off in Supabase, so nobody lands on an error page", async ({ page }) => {
+  const settings = await (await fetch("http://127.0.0.1:54321/auth/v1/settings", { headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0" } })).json();
+  expect(settings.external.google).toBe(false);
+  await page.goto("/sign-in");
+  await expect(page.getByRole("button", { name: "Send code" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Continue with Google" })).toHaveCount(0);
+});
