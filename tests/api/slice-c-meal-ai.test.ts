@@ -283,6 +283,33 @@ describe("Slice C: AI spending protections (plan 0.4)", () => {
     expect(JSON.stringify(alerts[0].detail)).not.toContain(u.id);
   });
 
+  it("Q102 with Keep my meal photos on: only the stripped copy is stored, with no location or camera data, and only its owner can read it", async () => {
+    const jpeg = await sharp({ create: { width: 2400, height: 1800, channels: 3, background: { r: 90, g: 160, b: 60 } } })
+      .withExif({ IFD0: { Make: "TestCam", Copyright: "gps 51.5,-0.12" }, IFD3: { GPSLatitudeRef: "N", GPSLatitude: "51/1 30/1 0/1" } }).jpeg().toBuffer();
+    expect((await sharp(jpeg).metadata()).exif).toBeDefined(); // the original really carries location data
+    const u = await ready();
+    expect((await call(u, "PATCH", "/v1/me/profile", { keep_meal_photos: true })).status).toBe(200);
+    const form = new FormData();
+    form.set("photo", new Blob([new Uint8Array(jpeg)], { type: "image/jpeg" }), "meal.jpg");
+    form.set("save_key", randomUUID());
+    const res = await fetch(`${BASE}/v1/meal-photos`, { method: "POST", headers: { Authorization: `Bearer ${u.token}` }, body: form });
+    const body = await res.json();
+    expect(res.status).toBe(200);
+    expect(body.kept).toBe(true);
+    const { data: rows } = await asUser(u).from("meal_photos").select("path,kept");
+    expect(rows).toHaveLength(1);
+    const { data: file } = await asUser(u).storage.from("meal-photos").download(rows![0]!.path);
+    const stored = Buffer.from(await file!.arrayBuffer());
+    const meta = await sharp(stored).metadata();
+    expect(meta.exif).toBeUndefined();
+    expect(Math.max(meta.width!, meta.height!)).toBeLessThan(2400); // the shrunk copy, not the original
+    expect(stored.includes(Buffer.from("TestCam"))).toBe(false);
+    // Another user cannot read it.
+    const other = await onboarded();
+    const { data: theirs } = await asUser(other).storage.from("meal-photos").download(rows![0]!.path);
+    expect(theirs).toBeNull();
+  });
+
   it("photos: a Free account is refused; for Pro the mock cannot see, so it abstains honestly and nothing is stored (Q102)", async () => {
     const jpeg = await sharp({ create: { width: 2400, height: 1800, channels: 3, background: { r: 200, g: 120, b: 60 } } })
       .withExif({ IFD0: { Make: "TestCam", Copyright: "gps 51.5,-0.12" }, IFD3: { GPSLatitudeRef: "N", GPSLatitude: "51/1 30/1 0/1" } }).jpeg().toBuffer();

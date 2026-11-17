@@ -36,6 +36,7 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
   const [dishId, setDishId] = useState<string | null>(null);
   const [check, setCheck] = useState<Check | null>(null);
   const [checking, setChecking] = useState(false);
+  const pendingPhoto = useRef<File | null>(null); // a photo waiting for the AI consent answer
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
   const [added, setAdded] = useState<string[]>([]);
   const [addText, setAddText] = useState("");
@@ -81,10 +82,10 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
     try {
       const res = await api<Check>("POST", "/v1/meal-photos", undefined, { form });
       if (res.status === "ok") { setSource("photo"); setText((t) => t || res.dishes.join(", ").slice(0, 300)); setCheck(res); setStep("check"); }
-      else setNotice(res.message ?? "The photo didn't show clearly what the dish is. Type the dish instead.");
+      else { setStep("details"); setNotice(res.message ?? "The photo didn't show clearly what the dish is. Type the dish instead."); }
     } catch (e) {
-      if (e instanceof ApiFailure && e.code === "CONSENT_REQUIRED") setStep("consent");
-      else setNotice(e instanceof ApiFailure ? e.message : "The photo could not be checked. Type the dish instead.");
+      if (e instanceof ApiFailure && e.code === "CONSENT_REQUIRED") { pendingPhoto.current = file; setStep("consent"); }
+      else { setStep("details"); setNotice(e instanceof ApiFailure ? e.message : "The photo could not be checked. Type the dish instead."); }
     } finally { setChecking(false); }
   }
 
@@ -158,7 +159,7 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
       {step === "consent" && (
         <>
           <Card><p>{question("CN-04").prompt}</p><Caption className="mt-2">Only the dish name or the photo is sent. Nothing about your symptoms, health or identity ever is. You can withdraw this in Me.</Caption></Card>
-          <Button onClick={async () => { try { await api("POST", "/v1/consents", { type: "ai_meal" }); await runCheck(); } catch { setNotice("That didn't save. Try again."); } }} disabled={checking}>I agree</Button>
+          <Button onClick={async () => { try { await api("POST", "/v1/consents", { type: "ai_meal" }); const photo = pendingPhoto.current; pendingPhoto.current = null; if (photo) await onPhoto(photo); else await runCheck(); } catch { setNotice("That didn't save. Try again."); } }} disabled={checking}>I agree</Button>
           <Button variant="secondary" onClick={() => finish(base())} disabled={save.saving}>No thanks, save the meal</Button>
           {notice && <p role="alert" className="t-caption text-ink">{notice}</p>}
         </>

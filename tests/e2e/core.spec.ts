@@ -257,3 +257,34 @@ test("Q129, Q59: every screen opens for a Pro user with a heading, no errors, no
   expect(failed).toEqual([]);
   expect(errors).toEqual([]);
 });
+
+test("Q102 a photo chosen before the AI consent is checked after 'I agree'; the test AI says it can't tell, and with Keep off nothing is stored", async ({ page }) => {
+  await signUp(page);
+  await setup(page);
+  await page.goto("/upgrade");
+  await page.getByRole("button", { name: "Mock purchase" }).click();
+  await expect(page.getByRole("heading", { name: "You have Pro" })).toBeVisible({ timeout: 15000 });
+  await page.goto("/today");
+  await page.getByRole("button", { name: "Add meal" }).click();
+  const sheet = page.getByRole("dialog");
+  // A real JPEG with camera and location data, made by the test.
+  const sharp = (await import("sharp")).default;
+  const jpeg = await sharp({ create: { width: 1600, height: 1200, channels: 3, background: { r: 200, g: 120, b: 60 } } })
+    .withExif({ IFD0: { Make: "TestCam" }, IFD3: { GPSLatitudeRef: "N", GPSLatitude: "51/1 30/1 0/1" } }).jpeg().toBuffer();
+  const sent: string[] = [];
+  page.on("request", (r) => { if (r.url().includes("/v1/meal-photos")) sent.push(r.method()); });
+  await sheet.locator('input[type="file"]').setInputFiles({ name: "meal.jpg", mimeType: "image/jpeg", buffer: jpeg });
+  await expect(page.getByRole("dialog", { name: "Before the first check" })).toBeVisible();
+  await page.getByRole("button", { name: "I agree" }).click();
+  await expect(page.getByText(/didn't show clearly|Type the dish instead/).first()).toBeVisible({ timeout: 20000 });
+  await expect(page.getByLabel("What did you have?")).toBeVisible(); // back on the meal step, nothing lost
+  expect(sent).toEqual(["POST", "POST"]); // once before consent (refused), once after
+  // Keep my meal photos is off: no photo record and no stored file.
+  const stored = await page.evaluate(async () => (await (await fetch("/v1/export", { method: "POST", headers: { "content-type": "application/json", "idempotency-key": crypto.randomUUID() }, body: JSON.stringify({ format: "json" }) })).json()));
+  const file = await (await page.request.get(stored.download_url)).text();
+  expect(JSON.parse(file).meal_photos ?? []).toEqual([]);
+  // The meal itself still saves by typing.
+  await page.getByLabel("What did you have?").fill("photo test lunch");
+  await page.getByRole("dialog").getByRole("button", { name: "Save without the check" }).click();
+  await expect(page.getByText("photo test lunch")).toBeVisible({ timeout: 15000 });
+});

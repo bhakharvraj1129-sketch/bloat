@@ -88,7 +88,7 @@
 | Q99 | Save with 2 of 5 items marked Had, 3 marked Didn't have | Passed | api/slice-c-meal-ai.test.ts |  |
 | Q100 | Save with 2 marked Had and 3 untouched | Passed | api/slice-c-meal-ai.test.ts, unit/insights.test.ts |  |
 | Q101 | AI times out twice | Passed | api/slice-c-meal-ai.test.ts |  |
-| Q102 | Photo with GPS metadata | Partial | api/slice-c-meal-ai.test.ts, unit/rules.test.ts | Metadata stripping and no-storage are tested. 'Deleted after the check' holds because the photo is never stored unless Keep is on; the Keep path is not browser-tested. |
+| Q102 | Photo with GPS metadata | Passed | api/slice-c-meal-ai.test.ts, e2e/core.spec.ts, unit/rules.test.ts |  |
 | Q103 | Inspect AI request | Passed | api/slice-c-meal-ai.test.ts |  |
 | Q104 | Any meal screen | Passed | api/slice-a-meals.test.ts, unit/rules.test.ts |  |
 | Q105 | Stool type 7 logged 3 times | Passed | api/slice-bd-pro.test.ts |  |

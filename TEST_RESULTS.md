@@ -12,8 +12,8 @@ Run on the local stack: built app on port 3100, local Supabase in Docker.
 | Lint | `pnpm lint` | Passed, 0 errors, 5 warnings |
 | Build | `pnpm build` | Passed |
 | Rule tests (Vitest) | `pnpm test` | 79 passed, 0 failed |
-| API tests (Vitest, real HTTP and database) | `pnpm test:api` | 124 passed, 0 failed |
-| Browser tests (Playwright, phone screen) | `pnpm test:e2e` | 9 passed, 0 failed |
+| API tests (Vitest, real HTTP and database) | `pnpm test:api` | 125 passed, 0 failed |
+| Browser tests (Playwright, phone screen) | `pnpm test:e2e` | 10 passed, 0 failed |
 
 ## Hosted preview
 
@@ -39,8 +39,8 @@ A test is marked Passed only when a test that names its ID ran and passed.
 
 | Status | Count |
 |---|---|
-| Passed with executable evidence | 171 |
-| Partial (the tested part passes; the note says what is missing) | 16 |
+| Passed with executable evidence | 172 |
+| Partial (the tested part passes; the note says what is missing) | 15 |
 | Blocked by something outside the code | 4 |
 | Not implemented | 9 |
 | Failed | 0 |
@@ -147,7 +147,7 @@ Most evidence is at the API and rule level. Only a small part of it is also exer
 | Q99 | Save with 2 of 5 items marked Had, 3 marked Didn't have | Passed | api/slice-c-meal-ai.test.ts |  |
 | Q100 | Save with 2 marked Had and 3 untouched | Passed | api/slice-c-meal-ai.test.ts, unit/insights.test.ts |  |
 | Q101 | AI times out twice | Passed | api/slice-c-meal-ai.test.ts |  |
-| Q102 | Photo with GPS metadata | Partial | api/slice-c-meal-ai.test.ts, unit/rules.test.ts | Metadata stripping and no-storage are tested. 'Deleted after the check' holds because the photo is never stored unless Keep is on; the Keep path is not browser-tested. |
+| Q102 | Photo with GPS metadata | Passed | api/slice-c-meal-ai.test.ts, e2e/core.spec.ts, unit/rules.test.ts |  |
 | Q103 | Inspect AI request | Passed | api/slice-c-meal-ai.test.ts |  |
 | Q104 | Any meal screen | Passed | api/slice-a-meals.test.ts, unit/rules.test.ts |  |
 | Q105 | Stool type 7 logged 3 times | Passed | api/slice-bd-pro.test.ts |  |
