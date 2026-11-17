@@ -14,7 +14,7 @@ export const GET = route({ feature: "recalled_meal_check" }, async (ctx) => {
   return ok({ offered: !!ctx.entitlement?.recalled_check_offered_at, meals: data ?? [] });
 });
 
-export const POST = route({ body: z.strictObject({ answer: z.enum(["yes_go_through_them", "not_now"]) }), mutation: true, feature: "recalled_meal_check" }, async (ctx) => {
+export const POST = route({ capability: "recording", body: z.strictObject({ answer: z.enum(["yes_go_through_them", "not_now"]) }), mutation: true, feature: "recalled_meal_check" }, async (ctx) => {
   if (ctx.entitlement?.recalled_check_offered_at) throw new ApiError(409, "ALREADY_OFFERED", "This was already offered once.");
   // The entitlement row is server-owned; mark the one-time offer as used.
   await tx(ctx.userId, [{ op: "update", table: "entitlements", match: { user_id: ctx.userId }, set: { recalled_check_offered_at: new Date(ctx.now).toISOString() } }]);

@@ -3,7 +3,7 @@ import { loadUser } from "@/server/userdata";
 import { daysView } from "@/server/days";
 
 // DY-05: a provisional zero for today only. Any later episode supersedes it; the review still decides.
-export const POST = route({ mutation: true, feature: "episodes" }, async (ctx) => {
+export const POST = route({ capability: "recording", mutation: true, feature: "episodes" }, async (ctx) => {
   const u = await loadUser(ctx.db, ctx.userId, ctx.now);
   const date = ctx.params.date!;
   if (date !== u.today) throw new ApiError(422, "NOT_TODAY", "This can only be saved for today.");

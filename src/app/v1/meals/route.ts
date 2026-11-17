@@ -21,7 +21,7 @@ const body = z.strictObject({
 
 // Save a meal (plan A11). Meals always save: Free saves the basic fields; Pro adds ingredients.
 // Whatever happened to the AI check, this route never fails because of it.
-export const POST = route({ body, mutation: true, feature: "meals_basic" }, async (ctx) => {
+export const POST = route({ capability: "recording", body, mutation: true, feature: "meals_basic" }, async (ctx) => {
   const u = await loadUser(ctx.db, ctx.userId, ctx.now);
   const b = ctx.body;
   const wantsPro = b.mode !== undefined || b.ingredients !== undefined || b.save_as_dish !== undefined || b.saved_dish_id !== undefined || b.source === "photo" || b.source === "saved_dish";

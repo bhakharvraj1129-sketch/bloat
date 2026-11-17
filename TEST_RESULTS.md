@@ -12,7 +12,7 @@ Run on the local stack: built app on port 3100, local Supabase in Docker.
 | Lint | `pnpm lint` | Passed, 0 errors, 5 warnings |
 | Build | `pnpm build` | Passed |
 | Rule tests (Vitest) | `pnpm test` | 78 passed, 0 failed |
-| API tests (Vitest, real HTTP and database) | `pnpm test:api` | 123 passed, 0 failed |
+| API tests (Vitest, real HTTP and database) | `pnpm test:api` | 124 passed, 0 failed |
 | Browser tests (Playwright, phone screen) | `pnpm test:e2e` | 8 passed, 0 failed |
 
 ## Hosted preview
@@ -39,10 +39,10 @@ A test is marked Passed only when a test that names its ID ran and passed.
 
 | Status | Count |
 |---|---|
-| Passed with executable evidence | 169 |
+| Passed with executable evidence | 171 |
 | Partial (the tested part passes; the note says what is missing) | 16 |
 | Blocked by something outside the code | 4 |
-| Not implemented | 11 |
+| Not implemented | 9 |
 | Failed | 0 |
 
 Most evidence is at the API and rule level. Only a small part of it is also exercised through the screens in a browser.
@@ -90,7 +90,7 @@ Most evidence is at the API and rule level. Only a small part of it is also exer
 | Q33 | Delete account then restore backup | Partial | api/slice-a-account.test.ts | Deletion, token refusal and re-applying tombstones are tested. A real backup restore on Supabase has not been rehearsed. |
 | Q34 | Signed report link expires or sharing revoked | Passed | api/slice-bd-pro.test.ts |  |
 | Q35 | Duplicate or out-of-order payment webhook | Passed | api/slice-ef.test.ts |  |
-| Q37 | Country becomes unsupported | Not implemented | – | Country capability rows exist but switching a country off is not enforced yet. |
+| Q37 | Country becomes unsupported | Passed | api/slice-ef.test.ts |  |
 | Q38 | Country without a listed emergency number | Passed | api/slice-a-account.test.ts, unit/rules.test.ts |  |
 | Q39 | User signs out on shared device | Passed | e2e/core.spec.ts, unit/rules.test.ts |  |
 | Q40 | Rule/formula/model version changes | Partial | api/slice-bd-pro.test.ts | Reports store rule versions and are immutable snapshots (tested). A versioned rollout process for rule changes is not built. |
@@ -129,7 +129,7 @@ Most evidence is at the API and rule level. Only a small part of it is also exer
 | Q76 | Cross-region staff or tenant access attempt | Passed | api/slice-ef.test.ts, e2e/admin.spec.ts |  |
 | Q77 | Notification at recipient local time | Not implemented | – | No notifications or reminders exist in this release (plan A18). |
 | Q79 | Global beta aggregate masks one poor cohort | Not implemented | – | No beta cohort reporting. |
-| Q80 | Policy suspension during job/checkout | Not implemented | – | No re-check of country policy during a running job. |
+| Q80 | Policy suspension during job/checkout | Passed | api/slice-ef.test.ts |  |
 | Q85 | Multi-select submits an exclusive option with another option (e.g. none + gas) | Passed | api/slice-a-episodes.test.ts, unit/rules.test.ts |  |
 | Q86 | EP-01 severity 0 or 11, DY-01 value 11 or 3.5 | Passed | api/slice-a-days.test.ts, api/slice-a-episodes.test.ts, unit/rules.test.ts |  |
 | Q87 | EP-08 Constipation on 3 completed dates in 14 | Passed | api/slice-bd-pro.test.ts |  |
@@ -228,7 +228,7 @@ Most evidence is at the API and rule level. Only a small part of it is also exer
 | Q180 | FH-01 answered | Passed | api/slice-bd-pro.test.ts |  |
 | Q181 | HC-04 'Anaemia found' recorded | Passed | api/slice-bd-pro.test.ts |  |
 | Q182 | AI provider switched in configuration | Partial | unit/rules.test.ts | Both providers share one fixed schema and the mock passes it. Switching to the real provider is untested (no key). |
-| Q183 | AI failure rate above threshold, or a background job stuck | Not implemented | – | AI failure counts show in the founder tools. No automatic alert on failure rate or stuck jobs. |
+| Q183 | AI failure rate above threshold, or a background job stuck | Not implemented | – | AI failure counts show in the founder tools and a failed check is shown plainly to the user (tested under Q130). No automatic alert yet: the plan gives no threshold, so the owner must choose one (DECISIONS.md). |
 | Q184 | Security suite: expired export link, revoked share link, deleted account, admin access, restored backup | Partial | api/slice-a-account.test.ts, api/slice-ef.test.ts | Expired export link, revoked share, deleted account and founder access are tested. Restored backup: see Q33. |
 | Q185 | Product analytics events | Passed | api/slice-ef.test.ts |  |
 | Q186 | Feature registry | Passed | unit/rules.test.ts |  |

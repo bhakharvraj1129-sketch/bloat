@@ -35,7 +35,26 @@ type Options<B> = {
   feature?: FeatureKey;
   /** Mutations must send Idempotency-Key. */
   mutation?: boolean;
+  /** Country capability this route needs. Checked on every request, so a pause takes effect at once. */
+  capability?: Capability;
 };
+
+export type Capability = "recording" | "payments";
+const CAPABILITY_OFF: Record<Capability, string> = {
+  recording: "New entries are paused in your country for now. You can still read, export and delete your records.",
+  payments: "Bloat Pro can't be bought in your country for now. Nothing has been charged.",
+};
+
+/** A capability is off for a country when the founder has suspended or retired it there. */
+async function assertCapability(db: Db, userId: string, capability: Capability): Promise<void> {
+  const { data: profile } = await db.from("profiles").select("residence_country").eq("user_id", userId).maybeSingle();
+  const country = (profile as { residence_country?: string } | null)?.residence_country;
+  if (!country) return; // not set up yet: onboarding decides which countries can start
+  const { data, error } = await db.from("country_capabilities").select("status").eq("country", country).eq("feature", capability).maybeSingle();
+  const status = (data as { status?: string } | null)?.status;
+  // Fail closed: if the status cannot be read, the capability is treated as off.
+  if (error || status === "suspended" || status === "retired") throw new ApiError(403, "CAPABILITY_OFF", CAPABILITY_OFF[capability]);
+}
 
 function json(status: number, data: unknown, requestId: string): Response {
   return Response.json(data, { status, headers: { "x-request-id": requestId, "cache-control": "no-store" } });
@@ -131,6 +150,7 @@ export function route<B = undefined>(opts: Options<B>, handler: Handler<B>) {
         if (opts.feature && isProFeature(opts.feature) && plan !== "pro") {
           throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Pro.");
         }
+        if (opts.capability) await assertCapability(who.db, who.userId, opts.capability);
       }
 
       const commit = async (ops: Op[], status: number, data: unknown): Promise<Result> => {

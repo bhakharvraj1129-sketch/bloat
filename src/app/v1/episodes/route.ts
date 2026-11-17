@@ -12,7 +12,7 @@ import {
 const body = z.strictObject({ strength, started: timeInput, ...detailSchema });
 
 // Start an episode (plan A08). Never a second open episode: 409 offers an update instead.
-export const POST = route({ body, mutation: true, feature: "episodes" }, async (ctx) => {
+export const POST = route({ capability: "recording", body, mutation: true, feature: "episodes" }, async (ctx) => {
   const u = await loadUser(ctx.db, ctx.userId, ctx.now);
   const b = ctx.body;
   if (proDetailRequested(b)) requirePro(ctx.plan);

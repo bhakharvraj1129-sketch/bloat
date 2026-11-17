@@ -30,7 +30,7 @@ export const GET = route({ feature: "experiments_habit" }, async (ctx) => {
 const body = z.strictObject({ key: z.string().min(1).max(80), groups: z.array(z.string()).max(12).optional() });
 
 // Start an experiment. Eligibility is decided here on the server, never only in the app.
-export const POST = route({ body, mutation: true, feature: "experiments_habit" }, async (ctx) => {
+export const POST = route({ capability: "recording", body, mutation: true, feature: "experiments_habit" }, async (ctx) => {
   const u = await loadUser(ctx.db, ctx.userId, ctx.now);
   const def = experimentDef(ctx.body.key);
   // Wheat, grains, FODMAP and anything touching several groups is never offered (403 NOT_OFFERED).

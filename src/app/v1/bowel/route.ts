@@ -9,7 +9,7 @@ const looks = optionValues("BW-02").filter((v) => v !== "skip") as [string, ...s
 const body = z.strictObject({ occurred: timeInput, stool_type: z.enum(looks).optional(), strain: yesNoNotSure.optional(), complete: yesNoNotSure.optional() });
 
 // Bowel log (Pro). Stored exactly as described; never labelled and never alerted on.
-export const POST = route({ body, mutation: true, feature: "bowel_log" }, async (ctx) => {
+export const POST = route({ capability: "recording", body, mutation: true, feature: "bowel_log" }, async (ctx) => {
   const u = await loadUser(ctx.db, ctx.userId, ctx.now);
   const t = resolveTime(ctx.body.occurred, u, ctx.now);
   const id = randomUUID();

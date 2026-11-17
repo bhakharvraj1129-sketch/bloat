@@ -23,7 +23,7 @@ const body = z.strictObject({
 
 // The morning review sets the Bloat Score (plan A09). A skipped field stays unknown and never
 // erases an earlier answer.
-export const PUT = route({ body, mutation: true, feature: "morning_review" }, async (ctx) => {
+export const PUT = route({ capability: "recording", body, mutation: true, feature: "morning_review" }, async (ctx) => {
   const u = await loadUser(ctx.db, ctx.userId, ctx.now);
   const date = ctx.params.date!;
   if (!isDate(date)) throw new ApiError(422, "VALIDATION", "That date is not valid.");

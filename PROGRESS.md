@@ -7,7 +7,7 @@ Last updated: 17 Nov 2026. Branch: `claude/bloat-software-build-uxzoru`.
 The whole app is built end to end. It runs locally, and a **private preview is deployed on Vercel** against the hosted `bloat-test` database (synthetic accounts, labelled mock AI, mock billing). It has never run against the real AI.
 
 - Preview: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app` (behind Vercel sign-in).
-- Hosted database: the three checked-in migrations are applied to `bloat-test` and match the files.
+- Hosted database: the four checked-in migrations are applied to `bloat-test` and match the files.
 - The server secret is set in Vercel. Five hosted browser tests pass (see TEST_RESULTS.md): sign-out protection, meal persistence after refresh, diary flow, two-account isolation, doctor-report share link open then revoke.
 
 Read next: `TEST_RESULTS.md` (what is proven, local and hosted kept apart), `DECISIONS.md` (what needs your yes), `DEPLOYMENT.md`.
@@ -42,7 +42,7 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 
 1. Owner: open the preview on a phone and look around (steps in DEPLOYMENT.md).
 2. Owner: decide on the AI key and spending limits; supply or approve sources for the accuracy set; say whether a test mailbox is available for email sign-in.
-3. Beta completion (Priority 4): MFA for founder tools, content and source review, missing acceptance items, design refinements. MFA for founder tools is done and tested locally (not yet tried on the preview: no staff address is set there). **Exact next unfinished task: Q183, an automatic alert when the AI failure rate is high.**
+3. Beta completion (Priority 4): MFA for founder tools, content and source review, missing acceptance items, design refinements. MFA for founder tools is done and tested locally (not yet tried on the preview: no staff address is set there). Pausing a country (Q37, Q80) is done and tested locally. The AI failure alert (Q183) waits for the owner to choose a threshold (DECISIONS.md item 10). **Exact next unfinished task: browser tests for the remaining Pro screens and the kept-photo path (Q102, Q129).**
 
 ## Later (ideas not in the plan, so not built)
 

@@ -16,7 +16,7 @@ const body = z.strictObject({
 });
 
 // Exercise log (Pro). Minutes from the last meal and to the next are calculated from logged meals.
-export const POST = route({ body, mutation: true, feature: "exercise_log" }, async (ctx) => {
+export const POST = route({ capability: "recording", body, mutation: true, feature: "exercise_log" }, async (ctx) => {
   const u = await loadUser(ctx.db, ctx.userId, ctx.now);
   const b = ctx.body;
   const t = resolveTime(b.started, u, ctx.now);

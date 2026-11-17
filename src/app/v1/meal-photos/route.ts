@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 
 // Pro: photo → dishes and ingredients. The photo is processed in memory and is not stored unless
 // "Keep my meal photos" is on.
-export const POST = route({ feature: "meal_photos" }, async (ctx) => {
+export const POST = route({ capability: "recording", feature: "meal_photos" }, async (ctx) => {
   const u = await loadUser(ctx.db, ctx.userId, ctx.now);
   if (!(await hasAiConsent(ctx.db, ctx.userId))) {
     throw new ApiError(403, "CONSENT_REQUIRED", "Agree to the AI ingredient check first.", { consent: "ai_meal" });

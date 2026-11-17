@@ -40,15 +40,13 @@ BLOCKED = {
 }
 NOT_BUILT = {
  "Q24": "There is no shared food catalogue. Each ingredient row stores the model and prompt version.",
- "Q37": "Country capability rows exist but switching a country off is not enforced yet.",
  "Q56": "Not built as written: results are worked out on read from current records, so there is no stored result for an older job to overwrite.",
  "Q68": "No brand or product catalogue exists.",
  "Q69": "Cuisine preferences are stored; nothing is ordered by them yet (there is no dish suggestion list).",
  "Q70": "The app is English only; the 'English only' note is not shown (wording needs the owner's yes).",
  "Q77": "No notifications or reminders exist in this release (plan A18).",
  "Q79": "No beta cohort reporting.",
- "Q80": "No re-check of country policy during a running job.",
- "Q183": "AI failure counts show in the founder tools. No automatic alert on failure rate or stuck jobs.",
+ "Q183": "AI failure counts show in the founder tools and a failed check is shown plainly to the user (tested under Q130). No automatic alert yet: the plan gives no threshold, so the owner must choose one (DECISIONS.md).",
  "Q187": "No research or secondary use exists anywhere; a refusal path is not built because there is nothing to request.",
 }
 MANUAL_PASS = {

@@ -26,6 +26,7 @@ export async function GET(req: Request) {
 
 const body = z.discriminatedUnion("what", [
   z.strictObject({ what: z.literal("monthly_limit_usd"), value: z.number().min(0).max(10000) }),
+  z.strictObject({ what: z.literal("capability"), country: z.enum(["US", "CA", "IN"]), feature: z.enum(["recording", "payments"]), status: z.enum(["not_reviewed", "review_in_progress", "ready", "suspended", "retired"]) }),
   z.strictObject({ what: z.literal("flag"), key: z.enum(["ai_enabled", "checkout_enabled"]), enabled: z.boolean() }),
 ]);
 
@@ -36,7 +37,10 @@ export async function POST(req: Request) {
   const parsed = body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return errorResponse(new ApiError(422, "VALIDATION", "Not valid."), id);
   const b = parsed.data;
-  if (b.what === "flag") {
+  if (b.what === "capability") {
+    await srv("srv_capability_set", { p_country: b.country, p_feature: b.feature, p_status: b.status });
+    await audit(who, "admin_set_capability", { country: b.country, feature: b.feature, status: b.status });
+  } else if (b.what === "flag") {
     // Real payments stay off until Gate 2 and the owner's explicit yes: this switch cannot turn them on.
     if (b.key === "checkout_enabled" && b.enabled) return errorResponse(new ApiError(403, "CAPABILITY_OFF", "Checkout cannot be switched on before Gate 2."), id);
     await srv("srv_admin_set", { p_what: "flag", p_value: { key: b.key, enabled: b.enabled } });

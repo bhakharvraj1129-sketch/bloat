@@ -354,6 +354,48 @@ describe("Slice F: subscriptions, pause and safe analytics", () => {
     expect(log[1].row.meta).toEqual({ key: "ai_enabled", enabled: true });
   });
 
+  it("Q37, Q80: when a country is paused, new entries and purchases stop with an explanation, and reading, export, corrections and deletion keep working", async () => {
+    const u = await onboarded("CA");
+    const other = await onboarded("US");
+    const meal = await call(u, "POST", "/v1/meals", { save_key: randomUUID(), dish_text: "toast", eaten: { mode: "now" } });
+    expect(meal.status).toBe(201);
+    const open = await call(u, "POST", "/v1/episodes", { strength: 4, started: { mode: "now" } });
+    expect(open.status).toBe(201);
+    const staff = await staffSession();
+    const set = (feature: string, status: string) => fetch(`${BASE}/v1/admin`, { method: "POST", headers: { Authorization: `Bearer ${staff.second}`, "content-type": "application/json" }, body: JSON.stringify({ what: "capability", country: "CA", feature, status }) });
+    expect((await set("recording", "suspended")).status).toBe(200);
+    expect((await set("payments", "suspended")).status).toBe(200);
+    try {
+      // Checked again on each request: the pause applies to the very next save (Q80).
+      const refused = await call(u, "POST", "/v1/meals", { save_key: randomUUID(), dish_text: "soup", eaten: { mode: "now" } });
+      expect(refused.status).toBe(403);
+      expect(refused.body.error.code).toBe("CAPABILITY_OFF");
+      expect(refused.body.error.message).toContain("You can still read, export and delete your records.");
+      expect((await call(u, "POST", "/v1/episodes", { strength: 3, started: { mode: "now" } })).status).toBe(403);
+      expect((await call(u, "POST", "/v1/food-suggestions", { save_key: randomUUID(), dish_text: "soup" })).status).toBe(403);
+      const buy = await call(u, "POST", "/v1/billing/mock-purchase", { interval: "monthly" });
+      expect(buy.status).toBe(403);
+      expect(buy.body.error.code).toBe("CAPABILITY_OFF");
+      expect((await call(u, "GET", "/v1/billing/entitlement")).body.plan).toBe("free");
+      // Rights are kept: read, finish what is open, correct, export, delete.
+      const today = (await call(u, "GET", "/v1/history")).body.today;
+      const day = await call(u, "GET", `/v1/days/${today}`);
+      expect(day.status).toBe(200);
+      expect(day.body.meals.map((m: any) => m.dish_text)).toEqual(["toast"]);
+      expect((await call(u, "POST", `/v1/episodes/${open.body.episode.id}/end`, { ended: { mode: "now" } })).status).toBe(200);
+      expect((await call(u, "PATCH", `/v1/meals/${meal.body.meal.id}`, { dish_text: "toast and jam" }, { ifMatch: 1 })).status).toBe(200);
+      expect((await call(u, "POST", "/v1/export", { format: "json" })).status).toBe(201);
+      // Another country is not affected.
+      expect((await call(other, "POST", "/v1/meals", { save_key: randomUUID(), dish_text: "rice", eaten: { mode: "now" } })).status).toBe(201);
+      expect((await call(u, "POST", "/v1/account/delete", { confirm: "DELETE" })).status).toBe(200);
+    } finally {
+      await set("recording", "not_reviewed");
+      await set("payments", "not_reviewed");
+    }
+    const back = await onboarded("CA");
+    expect((await call(back, "POST", "/v1/meals", { save_key: randomUUID(), dish_text: "toast", eaten: { mode: "now" } })).status).toBe(201);
+  });
+
   it("Q185, Q159: product events carry no health values, food, symptoms, conditions or free text", async () => {
     const u = await proUser("US", { answers: [{ question_id: "ON-14", value: "50_59", answered_at: new Date().toISOString() }, { question_id: "ON-15", value: "yes", answered_at: new Date().toISOString() }, { question_id: "ON-10", value: ["perimenopause_or_menopause"], answered_at: new Date().toISOString() }] });
     await call(u, "POST", "/v1/episodes", { strength: 9, started: { mode: "now" }, warning_signs: ["blood_in_poo"], symptoms: ["diarrhoea"] });

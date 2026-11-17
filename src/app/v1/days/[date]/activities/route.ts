@@ -17,7 +17,7 @@ const body = z.strictObject({
 });
 
 // Habit taps (plan A13). A tap means Yes; anything not tapped stays unknown, never No.
-export const PUT = route({ body, mutation: true, feature: "habit_taps_basic" }, async (ctx) => {
+export const PUT = route({ capability: "recording", body, mutation: true, feature: "habit_taps_basic" }, async (ctx) => {
   const u = await loadUser(ctx.db, ctx.userId, ctx.now);
   const date = ctx.params.date!;
   if (!isDate(date) || date > u.today || diffDays(u.today, date) > 92) throw new ApiError(422, "VALIDATION", "That date is not valid.");

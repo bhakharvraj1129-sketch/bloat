@@ -9,7 +9,7 @@ const body = z.strictObject({ save_key: z.string().min(8).max(128), dish_text: z
 
 // Pro: list bloating-related ingredients for a typed dish. Needs the CN-04 consent first.
 // AI trouble is never an error here: the answer says what happened and the meal can still be saved.
-export const POST = route({ body, feature: "ai_ingredient_check" }, async (ctx) => {
+export const POST = route({ capability: "recording", body, feature: "ai_ingredient_check" }, async (ctx) => {
   const u = await loadUser(ctx.db, ctx.userId, ctx.now);
   if (!(await hasAiConsent(ctx.db, ctx.userId))) {
     throw new ApiError(403, "CONSENT_REQUIRED", "Agree to the AI ingredient check first.", { consent: "ai_meal" });
