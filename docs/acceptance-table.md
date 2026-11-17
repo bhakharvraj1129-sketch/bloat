@@ -184,7 +184,7 @@
 | Q195 | Photo still over 2 MB after shrinking to 1600px | Passed | unit/rules.test.ts |  |
 | Q196 | AI provider returns errors | Passed | api/slice-c-meal-ai.test.ts |  |
 | Q197 | Same meal submitted twice with the same save key | Passed | api/slice-c-meal-ai.test.ts |  |
-| Q198 | Founder turns the AI kill switch on | Partial | api/slice-c-meal-ai.test.ts | The switch takes effect on the next request (tested), well inside 1 minute. |
+| Q198 | Founder turns the AI kill switch on | Passed | api/slice-c-meal-ai.test.ts |  |
 | Q199 | Configuration names a model not on the approved list | Passed | unit/rules.test.ts |  |
 | Q200 | One request's cost is 3 times the expected cost or more | Passed | api/slice-c-meal-ai.test.ts |  |
 | Q201 | Client bundle, logs and error reports scanned | Partial | unit/rules.test.ts | Source scan for keys and client env use passes. Separate test and live keys cannot be checked: no real key exists yet. |

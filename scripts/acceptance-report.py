@@ -24,7 +24,6 @@ PARTIAL = {
  "Q184": "Expired export link, revoked share, deleted account and founder access are tested. Restored backup: see Q33.",
  "Q189": "All 15 articles are listed with sources, as outlines. The full article texts are not written.",
  "Q191": "Alerts are created once per level in the founder outbox with no user data (tested). Sending them by email needs Resend, which is not connected.",
- "Q198": "The switch takes effect on the next request (tested), well inside 1 minute.",
  "Q201": "Source scan for keys and client env use passes. Separate test and live keys cannot be checked: no real key exists yet.",
  "Q59": "Keyboard use, names and focus ring are browser-tested on core recording. No screen-reader session was run.",
  "Q129": "Browser tests visit 22 screens as a Pro user plus the whole sign-up flow: zero third-party requests, no server errors, no page errors (e2e/core.spec.ts). Not visited by that check: experiment detail, morning review, the sign-in code screen and the public share page.",

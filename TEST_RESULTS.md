@@ -39,8 +39,8 @@ A test is marked Passed only when a test that names its ID ran and passed.
 
 | Status | Count |
 |---|---|
-| Passed with executable evidence | 172 |
-| Partial (the tested part passes; the note says what is missing) | 15 |
+| Passed with executable evidence | 173 |
+| Partial (the tested part passes; the note says what is missing) | 14 |
 | Blocked by something outside the code | 4 |
 | Not implemented | 9 |
 | Failed | 0 |
@@ -243,7 +243,7 @@ Most evidence is at the API and rule level. Only a small part of it is also exer
 | Q195 | Photo still over 2 MB after shrinking to 1600px | Passed | unit/rules.test.ts |  |
 | Q196 | AI provider returns errors | Passed | api/slice-c-meal-ai.test.ts |  |
 | Q197 | Same meal submitted twice with the same save key | Passed | api/slice-c-meal-ai.test.ts |  |
-| Q198 | Founder turns the AI kill switch on | Partial | api/slice-c-meal-ai.test.ts | The switch takes effect on the next request (tested), well inside 1 minute. |
+| Q198 | Founder turns the AI kill switch on | Passed | api/slice-c-meal-ai.test.ts |  |
 | Q199 | Configuration names a model not on the approved list | Passed | unit/rules.test.ts |  |
 | Q200 | One request's cost is 3 times the expected cost or more | Passed | api/slice-c-meal-ai.test.ts |  |
 | Q201 | Client bundle, logs and error reports scanned | Partial | unit/rules.test.ts | Source scan for keys and client env use passes. Separate test and live keys cannot be checked: no real key exists yet. |
