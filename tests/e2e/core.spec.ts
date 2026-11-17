@@ -329,3 +329,15 @@ test("doctor report: the in-app preview shows everything the PDF and shared link
     expect(sharedText, heading).toContain(heading.toLowerCase());
   }
 });
+
+test("Me: Download my data saves a complete JSON and CSV file and says so", async ({ page }) => {
+  await signUp(page);
+  await setup(page);
+  await page.goto("/me");
+  for (const [button, check] of [["JSON", (t: string) => JSON.parse(t).row_counts.profiles === 1], ["CSV", (t: string) => t.startsWith("# bloat-export-1") && t.includes("# table: profiles (1 row)")]] as const) {
+    const [file] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: button, exact: true }).click()]);
+    const fs = await import("node:fs/promises");
+    expect(check(await fs.readFile((await file.path())!, "utf8")), button).toBe(true);
+    await expect(page.getByText("Your download is complete.")).toBeVisible();
+  }
+});

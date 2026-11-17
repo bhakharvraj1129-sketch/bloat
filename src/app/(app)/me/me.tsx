@@ -65,9 +65,21 @@ export function Me({ testMode }: { testMode: boolean }) {
     setExportMsg("Preparing your download…");
     try {
       const job = await api<{ download_url: string }>("POST", "/v1/export", { format });
-      location.href = job.download_url;
-      setExportMsg("Your download has started. The link works for 15 minutes.");
-    } catch { setExportMsg("That didn't work. Try again."); }
+      // Fetch the file first, so a failure shows here instead of a broken or partial file.
+      const res = await fetch(job.download_url, { cache: "no-store", credentials: "same-origin" });
+      if (!res.ok) {
+        await res.text().catch(() => "");
+        setExportMsg(res.status === 503 ? "Your download couldn't be finished, so nothing was saved. Try again in a moment." : "That didn't work. Try again.");
+        return;
+      }
+      const blob = await res.blob();
+      const name = /filename="([^"]+)"/.exec(res.headers.get("content-disposition") ?? "")?.[1] ?? `bloat-data.${format}`;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      setExportMsg("Your download is complete.");
+    } catch { setExportMsg("That didn't work. Check your connection and try again."); }
   }
 
   return (
