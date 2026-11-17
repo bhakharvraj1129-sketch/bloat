@@ -30,7 +30,7 @@ PARTIAL = {
  "Q59": "Keyboard use, names and focus ring are browser-tested on core recording. No screen-reader session was run.",
  "Q129": "Browser tests visit 22 screens as a Pro user plus the whole sign-up flow: zero third-party requests, no server errors, no page errors (e2e/core.spec.ts). Not visited by that check: experiment detail, morning review, the sign-in code screen and the public share page.",
  "Q113": "Publishing rule is enforced in the content schema (tested). The founder publishing screen is not built.",
- "Q148": "Help text matches the stored copy (tested) and every published card links a source. The source links themselves have not been checked against the live pages.",
+ "Q148": "Help text matches the stored copy, and every published card links a source (tested). Live source check on 17 Nov 2026 (docs/content/source-check-2026-11-17.md): 6 of 8 source pages load; the kiwi card's source is gone, so it is now a draft; the CDC page blocks automated checks; the help page is adapted, not word for word (owner decision). Not a human review.",
 }
 BLOCKED = {
  "Q47": "Google sign-in needs the Google provider switched on in Supabase (owner). The help acknowledgement is kept in the tab across the redirect by design; untested.",

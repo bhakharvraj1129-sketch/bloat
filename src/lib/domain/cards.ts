@@ -36,17 +36,20 @@ const TRIGGERS: Record<string, { key: string; min: number; why: (n: number) => s
 };
 const ROTATION_WHY = "This is the next card in the regular rotation.";
 
+/** Whether one card may be shown to this person (safety exclusions and hidden cards). */
+export function cardAllowed(c: Card, ctx: CardContext): boolean {
+  if (ctx.hidden.includes(c.id)) return false;
+  if (c.exclusions.includes("previous_tummy_surgery") && ctx.previousTummySurgery) return false;
+  if (c.exclusions.includes("pregnant_or_breastfeeding") && ctx.fx && ctx.fx.fx01 !== "no") return false;
+  // The kiwifruit card is hidden unless FX-03 was answered No.
+  if (c.exclusions.includes("needs_fx03_no") && ctx.fx?.fx03 !== "no") return false;
+  // No food-restriction tips are pushed after an FX-02 answer other than No.
+  if (c.exclusions.includes("food_restriction_tip") && ctx.fx && ctx.fx.fx02 !== "no") return false;
+  return true;
+}
+
 export function allowedCards(ctx: CardContext): Card[] {
-  return publishedCards().filter((c) => {
-    if (ctx.hidden.includes(c.id)) return false;
-    if (c.exclusions.includes("previous_tummy_surgery") && ctx.previousTummySurgery) return false;
-    if (c.exclusions.includes("pregnant_or_breastfeeding") && ctx.fx && ctx.fx.fx01 !== "no") return false;
-    // The kiwifruit card is hidden unless FX-03 was answered No.
-    if (c.exclusions.includes("needs_fx03_no") && ctx.fx?.fx03 !== "no") return false;
-    // No food-restriction tips are pushed after an FX-02 answer other than No.
-    if (c.exclusions.includes("food_restriction_tip") && ctx.fx && ctx.fx.fx02 !== "no") return false;
-    return true;
-  });
+  return publishedCards().filter((c) => cardAllowed(c, ctx));
 }
 
 export function chooseCard(ctx: CardContext): { card: Card; why: string } | null {

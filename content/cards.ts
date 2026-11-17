@@ -43,7 +43,9 @@ export const CARDS: Card[] = [
   tip("water", "Drink enough water", "The BDA suggests about 8 cups of fluid a day, mostly water or non-caffeinated drinks.", "less_water_1", "Often suggested", [SRC.nhs, SRC.bda]),
   tip("caffeine-alcohol", "Caffeine and alcohol", "For IBS-type symptoms the BDA suggests up to 3 cups of caffeinated drinks a day and up to 2 units of alcohol with 2 alcohol-free days a week.", "caffeine_alcohol_4", "Often suggested (IBS-type advice)", [SRC.bda], ["food_restriction_tip"]),
   tip("fibre", "Fibre, gradually", "Raise fibre slowly; a sudden rise can make symptoms worse. Some people find oats or up to a tablespoon of linseeds a day helpful.", null, "Some evidence", [SRC.bda, SRC.niddk]),
-  tip("kiwi", "Kiwifruit and regularity", "Two or three whole kiwifruit a day for 4 weeks may help with constipation.", "constipation_2", "Some evidence", [SRC.bda2025], ["needs_fx03_no"]),
+  // Draft since 17 Nov 2026: its only source page (BDA constipation) now answers 404, and no other
+  // BDA page mentions kiwifruit. A card is never shown without a working source. See DECISIONS.md.
+  { ...tip("kiwi", "Kiwifruit and regularity", "Two or three whole kiwifruit a day for 4 weeks may help with constipation.", "constipation_2", "Some evidence", [SRC.bda2025], ["needs_fx03_no"]), status: "draft" },
   mb("walk", "Gentle walk after a meal", "A gentle 10–15 minute walk after eating is an easy way to move. One small study in people with bloating found it helped some symptoms. Only if walking is comfortable.", "bloating_after_meals_3", [SRC.nhs, SRC.walk]),
   mb("move", "Move a little every day", "Regular activity supports digestion. Adults are advised to aim for about 150 minutes of moderate activity a week.", "sitting_2", [SRC.nhs, SRC.cdc]),
   mb("slow-breathing", "5-minute slow breathing", "Sit or lie comfortably. Breathe in through your nose for a count of 5 and out through your mouth for 5, for 5 minutes. Don't force it.", "stressed_2", [SRC.nhsBreathing]),

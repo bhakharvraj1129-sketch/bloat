@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { randomUUID } from "node:crypto";
+import { publishedCards } from "@content/cards";
 import { addDays, asUser, BASE, staffSession, at, call, logDay, makePro, NY, onboarded, proUser, srvRpc, webhook, type User } from "./helpers";
 
 const START = "2026-08-01";
@@ -227,7 +228,9 @@ describe("Slice E: daily cards and the Learn library", () => {
     const lib = await call(u, "GET", "/v1/library");
     expect(lib.body.articles).toHaveLength(15);
     expect(lib.body.articles.every((a: any) => a.sources.length > 0)).toBe(true);
-    expect(lib.body.cards.length).toBeGreaterThanOrEqual(18);
+    // Exactly the published cards: drafts (no source, or a broken one) are never listed.
+    expect(lib.body.cards.map((c: any) => c.id).sort()).toEqual(publishedCards().map((c) => c.id).sort());
+    expect(lib.body.cards.map((c: any) => c.id)).not.toContain("kiwi");
     expect(lib.body.cards.every((c: any) => c.sources.length > 0)).toBe(true);
     expect(lib.body.what_helps).toEqual([]);
     for (const [i, [b, a]] of [[5, 4], [6, 4], [5, 3]].entries()) {

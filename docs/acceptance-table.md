@@ -134,7 +134,7 @@
 | Q145 | User pauses Pro for 2 months | Passed | api/slice-ef.test.ts |  |
 | Q146 | User logs an unfollowed habit on 10 days | Passed | unit/insights.test.ts |  |
 | Q147 | AI accuracy harness run | Blocked | unit/ai-eval.test.ts | Harness built and unit-tested. The real run needs the 300 dishes, 100 photos and an AI key. No accuracy number is claimed. |
-| Q148 | Scan UI, cards and help page | Partial | unit/cards.test.ts, unit/rules.test.ts | Help text matches the stored copy (tested) and every published card links a source. The source links themselves have not been checked against the live pages. |
+| Q148 | Scan UI, cards and help page | Partial | unit/cards.test.ts, unit/rules.test.ts | Help text matches the stored copy, and every published card links a source (tested). Live source check on 17 Nov 2026 (docs/content/source-check-2026-11-17.md): 6 of 8 source pages load; the kiwi card's source is gone, so it is now a draft; the CDC page blocks automated checks; the help page is adapted, not word for word (owner decision). Not a human review. |
 | Q149 | Restaurant paneer curry: AI lists dairy and chilli, misses garlic; user marks both Had | Passed | unit/insights.test.ts |  |
 | Q150 | Home-made meal (ML-06 Home): AI lists dairy only; user marks it Had | Passed | unit/insights.test.ts |  |
 | Q151 | Strongest episode starts 11:00; onion eaten at 20:00 the same day | Passed | unit/insights.test.ts |  |

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CARDS, cardSchema, publishedCards, CARD_FOOTER } from "@content/cards";
 import { ARTICLES, articleSchema } from "@content/articles";
-import { allowedCards, chooseCard, whatHelps, type CardContext } from "@/lib/domain/cards";
+import { allowedCards, cardAllowed, chooseCard, whatHelps, type CardContext } from "@/lib/domain/cards";
 import { addDays } from "@/lib/time";
 import { thresholds } from "@/lib/registry";
 
@@ -14,7 +14,8 @@ describe("Daily cards (plan A16)", () => {
     const bad = { ...CARDS[0]!, sources: [] };
     expect(cardSchema.safeParse(bad).success).toBe(false);
     expect(cardSchema.safeParse({ ...bad, status: "draft" }).success).toBe(true);
-    expect(CARDS.filter((c) => c.status === "draft").every((c) => c.sources.length === 0)).toBe(true);
+    // Drafts and why: two have no source in the plan; kiwi's only source link is broken (DECISIONS.md).
+    expect(CARDS.filter((c) => c.status === "draft").map((c) => [c.id, c.sources.length])).toEqual([["kiwi", 1], ["stretch", 0], ["wind-down", 0]]);
   });
 
   it("Q148 every published card links its source sentence and carries a label and version", () => {
@@ -79,9 +80,15 @@ describe("Daily cards (plan A16)", () => {
   it("Q126 exclusions: massage hidden after tummy surgery; kiwifruit hidden unless FX-03 is No", () => {
     expect(allowedCards(base({ previousTummySurgery: true })).map((c) => c.id)).not.toContain("massage");
     expect(allowedCards(base()).map((c) => c.id)).toContain("massage");
-    expect(allowedCards(base()).map((c) => c.id)).not.toContain("kiwi"); // FX-03 not answered
-    expect(allowedCards(base({ fx: { fx01: "no", fx02: "no", fx03: "yes" } })).map((c) => c.id)).not.toContain("kiwi");
-    expect(allowedCards(base({ fx: { fx01: "no", fx02: "no", fx03: "no" } })).map((c) => c.id)).toContain("kiwi");
+    const kiwi = CARDS.find((c) => c.id === "kiwi")!;
+    expect(cardAllowed(kiwi, base())).toBe(false); // FX-03 not answered
+    expect(cardAllowed(kiwi, base({ fx: { fx01: "no", fx02: "no", fx03: "yes" } }))).toBe(false);
+    expect(cardAllowed(kiwi, base({ fx: { fx01: "no", fx02: "no", fx03: "no" } }))).toBe(true);
+  });
+
+  it("Q148 the kiwifruit card stays a draft while its source link is broken, so nobody is shown it", () => {
+    expect(CARDS.find((c) => c.id === "kiwi")!.status).toBe("draft");
+    expect(allowedCards(base({ fx: { fx01: "no", fx02: "no", fx03: "no" } })).map((c) => c.id)).not.toContain("kiwi");
   });
 
   it("FX-02 other than No: no food-restriction tips are pushed", () => {
