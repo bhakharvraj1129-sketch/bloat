@@ -29,7 +29,7 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 ## Not done
 
 1. Hosted checks beyond the five browser journeys (the full API suite has only run locally).
-2. Browser tests for the other Pro screens (journey, experiments, health background), local and hosted.
+2. Browser tests that use the Pro screens beyond opening them (journey, experiments, health background).
 3. **Real AI.** Needs an Anthropic key and the owner's yes on spending limits. The provider code has never made a real call.
 4. **AI accuracy test.** The harness now runs the same code path as the app (see `docs/eval/README.md`). Reference examples available: 0 of 300 dishes, 0 of 100 photos. All still need sourcing and a human check.
 5. **Email code and Google sign-in on the hosted project.** Not exercised. Needs the email template and Google provider set in Supabase, and a test mailbox.
@@ -42,7 +42,7 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 
 1. Owner: open the preview on a phone and look around (steps in DEPLOYMENT.md).
 2. Owner: decide on the AI key and spending limits; supply or approve sources for the accuracy set; say whether a test mailbox is available for email sign-in.
-3. Beta completion (Priority 4): MFA for founder tools, content and source review, missing acceptance items, design refinements. MFA for founder tools is done and tested locally (not yet tried on the preview: no staff address is set there). Pausing a country (Q37, Q80) is done and tested locally. The AI failure alert (Q183) waits for the owner to choose a threshold (DECISIONS.md item 10). **Exact next unfinished task: browser tests for the remaining Pro screens and the kept-photo path (Q102, Q129).**
+3. Beta completion (Priority 4): MFA for founder tools, content and source review, missing acceptance items, design refinements. MFA for founder tools is done and tested locally (not yet tried on the preview: no staff address is set there). Pausing a country (Q37, Q80) is done and tested locally. The AI failure alert (Q183) waits for the owner to choose a threshold (DECISIONS.md item 10). A browser test now opens 22 screens as a Pro user and checks for errors and outside requests. **Exact next unfinished task: run the hosted browser tests against the newest preview, then content and source review (Q148, Q189).**
 
 ## Later (ideas not in the plan, so not built)
 

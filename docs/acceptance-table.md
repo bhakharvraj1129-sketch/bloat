@@ -115,7 +115,7 @@
 | Q126 | Daily cards | Passed | api/slice-ef.test.ts, unit/cards.test.ts |  |
 | Q127 | Before/after scores | Passed | api/slice-ef.test.ts, unit/cards.test.ts |  |
 | Q128 | HC-01 coeliac | Passed | api/slice-ef.test.ts |  |
-| Q129 | Network inspection on all screens | Partial | e2e/core.spec.ts, unit/rules.test.ts | Browser test saw zero third-party requests on the main flow, and the source scan is clean. Not every screen was visited in the browser. |
+| Q129 | Network inspection on all screens | Partial | e2e/core.spec.ts, unit/rules.test.ts | Browser tests visit 22 screens as a Pro user plus the whole sign-up flow: zero third-party requests, no server errors, no page errors (e2e/core.spec.ts). Not visited by that check: experiment detail, morning review, the sign-in code screen and the public share page. |
 | Q130 | Helpline and emergency numbers | Passed | api/slice-a-account.test.ts, unit/rules.test.ts |  |
 | Q131 | Ingredient left untouched on the checklist | Passed | api/slice-c-meal-ai.test.ts, unit/insights.test.ts |  |
 | Q132 | ML-08 None of these, then one item changed to Had | Passed | api/slice-c-meal-ai.test.ts |  |

@@ -28,7 +28,7 @@ PARTIAL = {
  "Q198": "The switch takes effect on the next request (tested), well inside 1 minute.",
  "Q201": "Source scan for keys and client env use passes. Separate test and live keys cannot be checked: no real key exists yet.",
  "Q59": "Keyboard use, names and focus ring are browser-tested on core recording. No screen-reader session was run.",
- "Q129": "Browser test saw zero third-party requests on the main flow, and the source scan is clean. Not every screen was visited in the browser.",
+ "Q129": "Browser tests visit 22 screens as a Pro user plus the whole sign-up flow: zero third-party requests, no server errors, no page errors (e2e/core.spec.ts). Not visited by that check: experiment detail, morning review, the sign-in code screen and the public share page.",
  "Q113": "Publishing rule is enforced in the content schema (tested). The founder publishing screen is not built.",
  "Q148": "Help text matches the stored copy (tested) and every published card links a source. The source links themselves have not been checked against the live pages.",
 }

@@ -27,6 +27,7 @@ export function Admin() {
   const load = useCallback(async () => {
     const res = await fetch("/v1/admin", { cache: "no-store" });
     if (res.ok) { setData(await res.json()); setStep("open"); return; }
+    await res.text().catch(() => ""); // always read the answer, so the request is closed
     setData(null);
     if (res.status !== 403) { setStep("signed_out"); return; }
     // Signed in as staff, but this session has not passed the second step yet.
@@ -52,6 +53,7 @@ export function Admin() {
   };
   const post = async (body: unknown) => {
     const res = await fetch("/v1/admin", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+    await res.text().catch(() => "");
     setMsg(res.ok ? "Saved." : "That change was refused.");
     await load();
   };

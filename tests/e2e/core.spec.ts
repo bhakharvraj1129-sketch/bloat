@@ -221,3 +221,39 @@ test("screenshots for a visual check", async ({ page }) => {
   await page.goto("/"); await page.waitForLoadState("networkidle");
   await page.screenshot({ path: "test-results/shots/landing.png", fullPage: true });
 });
+
+test("Q129, Q59: every screen opens for a Pro user with a heading, no errors, no failed requests and nothing sent to a third party", async ({ page }) => {
+  await signUp(page);
+  await setup(page);
+  await page.goto("/upgrade");
+  await page.getByRole("button", { name: "Mock purchase" }).click();
+  await expect(page.getByRole("heading", { name: "You have Pro" })).toBeVisible({ timeout: 15000 });
+
+  const outside: string[] = [];
+  const failed: string[] = [];
+  const errors: string[] = [];
+  page.on("request", (r) => {
+    const host = new URL(r.url()).host;
+    if (!["127.0.0.1:3100", "127.0.0.1:54321"].includes(host) && !/^(data|blob):/.test(r.url())) outside.push(r.url());
+  });
+  page.on("response", (r) => { if (r.status() >= 500) failed.push(`${r.status()} ${new URL(r.url()).pathname}`); });
+  page.on("pageerror", (e) => errors.push(e.message));
+
+  const today = await page.evaluate(async () => (await (await fetch("/v1/history", { cache: "no-store" })).json()).today as string);
+  const screens = [
+    "/today", "/history", `/day/${today}`, "/insights", "/journey", "/report", "/experiments", "/cards", "/learn",
+    "/health", "/doctor", "/me", "/meal/recall", "/upgrade", "/how-bloat-works", "/help", "/terms", "/privacy", "/contact", "/offline", "/admin", "/unavailable",
+  ];
+  for (const path of screens) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { level: 1 }).first(), path).toBeVisible({ timeout: 20000 });
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByText(/something went wrong|application error/i), path).toHaveCount(0);
+    // Keyboard: the first Tab lands on something focusable with a visible name.
+    await page.keyboard.press("Tab");
+    expect(await page.evaluate(() => document.activeElement?.tagName), path).not.toBe("BODY");
+  }
+  expect(outside).toEqual([]);
+  expect(failed).toEqual([]);
+  expect(errors).toEqual([]);
+});
