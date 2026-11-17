@@ -8,7 +8,7 @@ The whole app is built end to end. It runs locally, and a **private preview is d
 
 - Preview: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app` (behind Vercel sign-in).
 - Hosted database: the three checked-in migrations are applied to `bloat-test` and match the files.
-- **Blocker right now:** `BLOAT_SERVER_SECRET` is not set in Vercel yet, so the preview opens but cannot save or create accounts. The owner adds it (DEPLOYMENT.md, "The one step left"). Until then only the signed-out protection check has passed on the preview.
+- The server secret is set in Vercel. Five hosted browser tests pass (see TEST_RESULTS.md): sign-out protection, meal persistence after refresh, diary flow, two-account isolation, doctor-report share link open then revoke.
 
 Read next: `TEST_RESULTS.md` (what is proven, local and hosted kept apart), `DECISIONS.md` (what needs your yes), `DEPLOYMENT.md`.
 
@@ -28,8 +28,8 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 
 ## Not done
 
-1. **Server secret in Vercel** (owner, 2 minutes). Then redeploy and run `pnpm test:hosted`.
-2. **Hosted browser tests.** Written (`tests/hosted/preview.spec.ts`): sign-out protection (passed), save a meal and see it in History after a refresh, diary flow, two-account isolation, doctor-report share link open then revoke. The last four wait on item 1.
+1. Hosted checks beyond the five browser journeys (the full API suite has only run locally).
+2. Browser tests for the other Pro screens (journey, experiments, health background), local and hosted.
 3. **Real AI.** Needs an Anthropic key and the owner's yes on spending limits. The provider code has never made a real call.
 4. **AI accuracy test.** The harness now runs the same code path as the app (see `docs/eval/README.md`). Reference examples available: 0 of 300 dishes, 0 of 100 photos. All still need sourcing and a human check.
 5. **Email code and Google sign-in on the hosted project.** Not exercised. Needs the email template and Google provider set in Supabase, and a test mailbox.
@@ -40,10 +40,9 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 
 ## Next steps, in order
 
-1. Owner: add `BLOAT_SERVER_SECRET` in Vercel (Preview only, Sensitive).
-2. Redeploy, run `pnpm test:hosted`, record results, send the owner the URL and phone steps.
-3. Owner: decide on the AI key and spending limits; supply or approve sources for the accuracy set.
-4. Beta completion: MFA, content and source review, missing acceptance items, design refinements.
+1. Owner: open the preview on a phone and look around (steps in DEPLOYMENT.md).
+2. Owner: decide on the AI key and spending limits; supply or approve sources for the accuracy set; say whether a test mailbox is available for email sign-in.
+3. Beta completion (Priority 4): MFA for founder tools, content and source review, missing acceptance items, design refinements. **Exact next unfinished task: list the "Not implemented" and "Partial" rows of TEST_RESULTS.md and work through them, starting with MFA.**
 
 ## Later (ideas not in the plan, so not built)
 

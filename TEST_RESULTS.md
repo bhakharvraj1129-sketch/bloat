@@ -17,19 +17,21 @@ Run on the local stack: built app on port 3100, local Supabase in Docker.
 
 ## Hosted preview
 
-Run with `pnpm test:hosted` in a real browser (Chromium, phone screen) against `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`, commit `ad42c33`, hosted `bloat-test` database.
+Run with `pnpm test:hosted` in a real browser (Chromium, phone screen) against `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`, app code at commit `c25610a`, hosted `bloat-test` database. 5 passed, 0 failed.
 
 | Check | Result |
 |---|---|
-| Vercel build of commit `ad42c33` | Ready |
+| Vercel build of commit `c25610a` | Ready |
 | Hosted schema equals the migration files (nine fingerprints) | Identical |
-| A signed-out visitor meets Vercel protection, for pages and for the API | **Passed** |
-| An approved tester with a Vercel share link reaches the app | Passed (landing, country, help and sign-in screens loaded) |
-| Synthetic user saves a meal and sees it in History after a refresh | **Not passed yet.** Sign-up returned "Could not sign in." because `BLOAT_SERVER_SECRET` is not set in Vercel. |
-| Diary flow | Not run (same cause) |
-| Two synthetic accounts cannot see or change each other's records | Not run (same cause) |
-| Doctor-report share link opens, then stops after revoke | Not run (same cause) |
-| Email code delivery, Google sign-in | Not exercised. No test mailbox, provider not switched on. |
+| A signed-out visitor meets Vercel protection, for pages and for the API | Passed |
+| A synthetic user signs up, saves a meal, and still sees it in History after a refresh (and in the day after another refresh) | Passed |
+| Diary flow: log bloating with a warning sign, refresh, end it, add a meal, sign out, sign back in, records still there | Passed |
+| Two synthetic accounts: B sees none of A's day, cannot edit or delete A's meal (404), B's export holds nothing of A's, A's meal is unchanged | Passed |
+| Doctor report (mock purchase): share link opens, then shows "This link no longer works" after revoke | Passed |
+| Email code delivery, Google sign-in | **Not exercised.** No test mailbox; Google provider not switched on. Hosted sign-in used the synthetic test password only. |
+| Real AI, real payments | Not exercised (mock, by design) |
+
+The hosted run found one real defect, now fixed and covered by an API test: the doctor report screen could not make a report, because the server wanted every section listed. The full API suite (123 tests) has only been run locally, not against the preview.
 
 ## The 200 acceptance tests
 
@@ -50,7 +52,7 @@ Most evidence is at the API and rule level. Only a small part of it is also exer
 - The real AI provider (no key). All ingredient checks used the labelled mock.
 - The Meal AI accuracy test (300 dishes, 100 photos): harness built, **not run**. No accuracy figure exists.
 - Email code sign-in and Google sign-in on a hosted project. Tests sign in with a test password.
-- On the hosted preview: everything that saves data (waiting for the server secret in Vercel). See "Hosted preview" above.
+- On the hosted preview: only the five browser journeys listed above. Everything else is local only.
 - A real backup restore, real payments, a screen reader session, and most Pro screens in a browser (they are covered through the API).
 
 ## Table

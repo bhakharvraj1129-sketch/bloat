@@ -14,6 +14,15 @@ Nothing is public. A private preview exists. This file says how it is set up and
 | Duplicate project | `bloat-zlrr` is a second Vercel project on the same repo. Untouched and unused. Safe for the owner to delete. |
 | AI key, Resend, Sentry, Google sign-in, payments | Not connected. Production has no variables and is not used. |
 
+## Open it on your phone (owner)
+
+1. On the phone, open a browser and sign in at vercel.com with the same account you use on the computer.
+2. Open `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`.
+3. Tap Get started, choose a country, read the help page, then use an address ending in `@example.com` with any test password of 8 or more characters. No email is sent.
+4. To install it: in Chrome tap the menu then "Add to Home screen"; in Safari tap Share then "Add to Home Screen".
+
+For someone without a Vercel account, ask Claude for a temporary share link. It lasts 23 hours and anyone holding it can open the preview, so treat it like a password. Use made-up data only.
+
 ## Environment variables
 
 Names are in `.env.example`. Never commit values.
