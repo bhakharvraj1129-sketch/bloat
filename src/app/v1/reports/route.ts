@@ -10,7 +10,7 @@ const body = z.discriminatedUnion("kind", [
   z.strictObject({
     kind: z.literal("doctor"), from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     questions: z.string().trim().max(600).optional(), // PD-01
-    sections: z.record(z.enum(DOCTOR_SECTIONS), z.boolean()).optional(),
+    sections: z.partialRecord(z.enum(DOCTOR_SECTIONS), z.boolean()).optional(),
   }),
 ]);
 

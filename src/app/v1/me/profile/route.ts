@@ -18,7 +18,7 @@ const body = z.strictObject({
   keep_meal_photos: z.boolean().optional(),
   hide_charts: z.boolean().optional(),
   // Optional context answers changeable in Me (ON-10, ON-14, ON-15). null deletes the answer.
-  answers: z.record(z.enum(["ON-10", "ON-14", "ON-15"]), z.unknown()).optional(),
+  answers: z.partialRecord(z.enum(["ON-10", "ON-14", "ON-15"]), z.unknown()).optional(),
 });
 
 export const PATCH = route({ body, mutation: true }, async (ctx) => {

@@ -103,8 +103,8 @@ test("Priority 2a: the diary flow on the hosted preview (bloating, warning sign,
   // sign out, then sign back in with the same synthetic account: the records are still there
   await page.goto("/me");
   await page.getByRole("button", { name: "Sign out" }).click();
-  await expect(page).toHaveURL(/\/$/, { timeout: 20000 });
-  await page.goto("/today");
+  await expect(page).toHaveURL(/sign-in/, { timeout: 20000 });
+  await page.goto("/today"); // signed out: the diary is closed
   await expect(page).toHaveURL(/sign-in/);
   await page.getByLabel("Email").fill(who);
   await page.getByLabel("Test password").fill(PASSWORD);

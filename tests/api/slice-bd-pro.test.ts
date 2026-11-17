@@ -246,6 +246,12 @@ describe("Slice D: insights, reports and the doctor PDF, end to end", () => {
     expect(s.sections.family).toEqual(["Coeliac disease"]);
     expect(s.sections.tests[0]).toMatchObject({ result: "Mild, iron started" });
     expect(s.sections.health.conditions[0]).toMatchObject({ label: "Reflux", year: 2020 });
+    // The screen sends only the sections that are switched off (often none). Both shapes must be accepted.
+    expect((await call(u, "POST", "/v1/reports", { kind: "doctor", from: day(0), to: day(13), sections: {} }, { now })).status).toBe(201);
+    const fewer = await call(u, "POST", "/v1/reports", { kind: "doctor", from: day(0), to: day(13), sections: { family: false } }, { now });
+    expect(fewer.status).toBe(201);
+    expect(fewer.body.snapshot.sections.family).toBeNull();
+    expect(fewer.body.snapshot.sections.symptoms).not.toBeNull();
     expect(s.notice).toContain("self-reported");
     expect(s.versions).toMatchObject({ metric: "daily_worst_v1", insights: "insights_v1" });
     // Q180: family history appears nowhere else.
