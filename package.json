@@ -17,7 +17,7 @@
     "test:e2e": "playwright test --trace off",
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
-    "check:registry": "tsx scripts/check-registry.ts"
+    "test:ai-eval": "tsx scripts/ai-eval.mts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.9.0",
