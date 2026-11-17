@@ -29,7 +29,7 @@ Bloat is an installable mobile-web bloating tracker. It is a general wellness tr
 - No health data in logs, analytics events or error reports. Secrets only in environment variables.
 - User-facing text: sentence case, plain "and", no emoji, none of the banned words (`BANNED_PHRASES` in `src/lib/wording.ts`). Medical-help text is the fixed copy adapted from the NHS bloating page, labelled "Adapted from NHS, Bloating"; never rewrite it, never call it word for word.
 - UI uses the design tokens only (`src/app/globals.css`). No shadows, no new colours.
-- Do not deploy a public site, do not take payments, do not use real health data. Supabase: only the `bloat-test` project (`qntazirusbuwfmnmihzu`). Never touch the owner's other projects.
+- No production site, no payments, no real health data. The branch preview is public by the owner's decision (18 Nov 2026) and must keep `BLOAT_TEST_LOGIN=0`. Supabase: only the `bloat-test` project (`qntazirusbuwfmnmihzu`). Never touch the owner's other projects.
 
 ## Commands
 

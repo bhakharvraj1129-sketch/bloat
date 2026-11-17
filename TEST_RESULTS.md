@@ -1,37 +1,45 @@
 # Test results
 
-Last run: 17 Nov 2026. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 18 Nov 2026 (UTC dates in logs read 17 Nov). Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
 
 ## Local suites
 
-Run on the local stack: built app on port 3100, local Supabase in Docker.
+Run on the local stack (built app on port 3100, local Supabase in Docker with all six migrations), 18 Nov 2026, on the code of commit `b70e7ed` plus the test-only fix below.
 
 | Suite | Command | Result |
 |---|---|---|
 | Type check | `pnpm typecheck` | Passed, 0 errors |
 | Lint | `pnpm lint` | Passed, 0 errors, 5 warnings |
 | Build | `pnpm build` | Passed |
-| Rule tests (Vitest) | `pnpm test` | 79 passed, 0 failed |
-| API tests (Vitest, real HTTP and database) | `pnpm test:api` | 125 passed, 0 failed |
-| Browser tests (Playwright, phone screen) | `pnpm test:e2e` | 10 passed, 0 failed |
+| Rule tests (Vitest) | `pnpm test` | 89 passed, 0 failed |
+| API tests (Vitest, real HTTP and database) | `pnpm test:api` | 134 passed, 0 failed |
+| Browser tests (Playwright, phone screen) | `pnpm test:e2e` | 17 tests. Full run: 16 passed, 1 failed (see below). After the fix: the failing file rerun, 5 of 5 passed, and the failing test passed 3 times in a row. |
 
-## Hosted preview
+The one failure was in the test, not the app: the email-code failure test forces a 504 by intercepting the request, and the app's offline service worker sometimes took over the page first, so the interception missed it. The email-code tests now block the service worker. Local email tests use real emails from the local mail catcher.
 
-Run with `pnpm test:hosted` in a real browser (Chromium, phone screen) against `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`, hosted `bloat-test` database. First passing run on commit `c25610a`; rerun on commit `cdc2ebc` (founder sign-in step, country pause, migration `20261117061403` applied) and again on commit `1540294` (photo fix, kiwifruit card draft): 5 passed, 0 failed each time.
+New regression tests this round: report privacy (4 API with PDF text and shared page, 3 unit, 1 browser; all 4 API tests fail on the old code); exports (3 API incl. 1,234 records in JSON and CSV, 2 unit incl. a failure on a later page and a retry, 1 browser); email codes (4 unit, 5 browser); kiwifruit pause (1 API, 1 unit); attribution guard (1 unit); Pro test accounts (1 API); server functions (all 14, in the privacy test).
+
+## Hosted preview (public)
+
+Environment: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`, Vercel project `bloat`, commit `b70e7ed` (deployment `dpl_6W3brAYiyqyDoeyYuCM8yNgyq3Ga`), Vercel protection off, `BLOAT_TEST_LOGIN=0`, Supabase `bloat-test` with migrations up to `20261117182606`. Real Chromium, phone screen, fresh contexts. Command: `pnpm test:hosted` (setup in DEPLOYMENT.md, "Hosted test run"). Result: **8 passed, 0 failed.** The same suite was first rehearsed against a local copy running in public mode (8 of 8).
 
 | Check | Result |
 |---|---|
-| Vercel builds of commits `c25610a`, `cdc2ebc` and `1540294` | Ready |
-| Hosted schema equals the migration files (nine fingerprints) | Identical |
-| A signed-out visitor meets Vercel protection, for pages and for the API | Passed |
-| A synthetic user signs up, saves a meal, and still sees it in History after a refresh (and in the day after another refresh) | Passed |
-| Diary flow: log bloating with a warning sign, refresh, end it, add a meal, sign out, sign back in, records still there | Passed |
-| Two synthetic accounts: B sees none of A's day, cannot edit or delete A's meal (404), B's export holds nothing of A's, A's meal is unchanged | Passed |
-| Doctor report (mock purchase): share link opens, then shows "This link no longer works" after revoke | Passed |
-| Email code delivery, Google sign-in | **Not exercised.** No test mailbox; Google provider not switched on. Hosted sign-in used the synthetic test password only. |
+| A fresh signed-out browser opens the preview: status 200, no redirect to vercel.com, landing page shown; `/today` sends it to the app's own sign-in | Passed |
+| Test switches off: `POST /v1/auth/test-login` 404; no test password form; mock purchase 404; test clock header ignored; no "Mock purchase" on `/me` or `/upgrade`; plan Free; checkout off | Passed |
+| Signed out: `/v1/history`, `/v1/me/state`, a day, reports, an export link all 401; a meal save 401; founder tools 404; direct database reads with the public key return nothing or "permission denied"; a direct insert is refused | Passed |
+| A signed-in synthetic user saves a meal and still sees it in History and the day view after refreshes | Passed |
+| Diary flow: bloating with a warning sign (shows "Adapted from NHS, Bloating"), refresh, end, meal, sign out, sign back in, records still there | Passed |
+| Two accounts: B sees none of A's day, cannot edit or delete A's meal (404), B's export holds nothing of A's, B's own session cannot read or change A's meal directly in the database; A's meal unchanged | Passed |
+| Report privacy on hosted: a designated Pro test account (no purchase) makes a doctor report with Medicines and Health off; the preview, the PDF text and the shared page hold no medicine name, pregnancy or condition; the question still appears; the share link opens in a stranger's browser, then shows "This link no longer works" after revoke | Passed |
+| Exports on hosted: JSON and CSV complete with row counts; the download link gives a stranger 401 | Passed |
+| Server functions on `bloat-test` (direct calls, 17 Nov 18:5x UTC): all 14 refuse a wrong secret (42501 SERVER_SECRET_INVALID); signed-in role can call 0 of 14 (checked in the database catalogue) | Passed |
+| Email code delivery | **Failed on the hosted project, not an app test.** One real request for the test mailbox (18:50 UTC, 17 Nov) timed out in Supabase Auth after 10 s (504 "context deadline exceeded"), with no email sent. Same pattern since the custom SMTP settings were saved at 06:12 UTC. See DEPLOYMENT.md. |
+| Google sign-in | Not exercised: switched off in Supabase. The sign-in page hides the button while it is off (local browser test). |
+| Founder MFA on hosted | Not exercised: no staff address is set on the preview. |
 | Real AI, real payments | Not exercised (mock, by design) |
 
-The hosted run found one real defect, now fixed and covered by an API test: the doctor report screen could not make a report, because the server wanted every section listed. The full API suite (123 tests) has only been run locally, not against the preview.
+Earlier hosted runs (protected preview, 17 Nov, commits `c25610a`, `cdc2ebc`, `1540294`): 5 of 5 each time.
 
 ## The 200 acceptance tests
 
@@ -51,8 +59,8 @@ Most evidence is at the API and rule level. Only a small part of it is also exer
 
 - The real AI provider (no key). All ingredient checks used the labelled mock.
 - The Meal AI accuracy test (300 dishes, 100 photos): harness built, **not run**. No accuracy figure exists.
-- Email code sign-in and Google sign-in on a hosted project. Tests sign in with a test password.
-- On the hosted preview: only the five browser journeys listed above. Everything else is local only.
+- Email code delivery on the hosted project (blocked by its SMTP settings) and Google sign-in (switched off). Locally, email codes are tested end to end with real emails from the local mail catcher.
+- On the hosted preview: only the eight checks listed above. The full API suite runs locally only.
 - A real backup restore, real payments, a screen reader session, and most Pro screens in a browser (they are covered through the API).
 
 ## Table
@@ -193,7 +201,7 @@ Most evidence is at the API and rule level. Only a small part of it is also exer
 | Q145 | User pauses Pro for 2 months | Passed | api/slice-ef.test.ts |  |
 | Q146 | User logs an unfollowed habit on 10 days | Passed | unit/insights.test.ts |  |
 | Q147 | AI accuracy harness run | Blocked | unit/ai-eval.test.ts | Harness built and unit-tested. The real run needs the 300 dishes, 100 photos and an AI key. No accuracy number is claimed. |
-| Q148 | Scan UI, cards and help page | Partial | unit/cards.test.ts, unit/rules.test.ts | Help text matches the stored copy, and every published card links a source (tested). Live source check on 17 Nov 2026 (docs/content/source-check-2026-11-17.md): 6 of 8 source pages load; the kiwi card's source is gone, so it is now a draft; the CDC page blocks automated checks; the help page is adapted, not word for word (owner decision). Not a human review. |
+| Q148 | Scan UI, cards and help page | Partial | unit/cards.test.ts, unit/rules.test.ts | Help text matches the stored copy and is now labelled 'Adapted from NHS, Bloating' (rule test blocks any 'word for word' claim). Every published card links a source. Automated source check 17-18 Nov (docs/content/): kiwifruit card draft (broken source), seven cards have proposed corrections awaiting review, CDC page blocks automated checks. Not a human review. |
 | Q149 | Restaurant paneer curry: AI lists dairy and chilli, misses garlic; user marks both Had | Passed | unit/insights.test.ts |  |
 | Q150 | Home-made meal (ML-06 Home): AI lists dairy only; user marks it Had | Passed | unit/insights.test.ts |  |
 | Q151 | Strongest episode starts 11:00; onion eaten at 20:00 the same day | Passed | unit/insights.test.ts |  |

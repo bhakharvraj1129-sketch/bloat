@@ -1,16 +1,26 @@
 # Progress
 
-Last updated: 17 Nov 2026. Branch: `claude/bloat-software-build-uxzoru`.
+Last updated: 18 Nov 2026. Branch: `claude/bloat-software-build-uxzoru`.
 
 ## Where things stand
 
-The whole app is built end to end. It runs locally, and a **private preview is deployed on Vercel** against the hosted `bloat-test` database (synthetic accounts, labelled mock AI, mock billing). It has never run against the real AI.
+The whole app is built end to end. A **public preview** runs on Vercel against the hosted `bloat-test` database, with synthetic data, a labelled mock AI and mock billing. It has never run against the real AI and takes no payments.
 
-- Preview: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app` (behind Vercel sign-in).
-- Hosted database: the four checked-in migrations are applied to `bloat-test` and match the files.
-- The server secret is set in Vercel. Five hosted browser tests pass (see TEST_RESULTS.md): sign-out protection, meal persistence after refresh, diary flow, two-account isolation, doctor-report share link open then revoke.
+- Public preview: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app` (no Vercel login). Test mode is off there: no password sign-in, no mock purchase, no test clock.
+- Hosted database: six checked-in migrations applied to `bloat-test`, matching the files by version.
+- Hosted browser suite (8 checks) passed on the public preview, commit `b70e7ed`: see TEST_RESULTS.md.
+- **Blocked: email sign-in codes are not delivered on the hosted project.** Supabase cannot finish sending through the custom SMTP server saved on 17 Nov (every request times out after 10 seconds; checked again 18:50 UTC on 17 Nov). The owner must fix the SMTP settings in Supabase. Until then nobody can sign in to the public preview by email. The app now says so plainly instead of waiting silently.
 
 Read next: `TEST_RESULTS.md` (what is proven, local and hosted kept apart), `DECISIONS.md` (what needs your yes), `DEPLOYMENT.md`.
+
+## Done in the 18 Nov round
+
+1. Doctor report privacy: switched-off sections appear nowhere (summary, preview, PDF, shared page, old stored reports).
+2. Exports: never partial, stable paging, clear retry, row counts.
+3. Content: "Adapted from NHS, Bloating" everywhere; kiwifruit experiment paused and card kept as a draft; proposed source-backed corrections written for review.
+4. Email sign-in screens: real failures shown, resend with the right cooldown, no account enumeration; Google button only when Google is on. Hosted delivery still blocked (above).
+5. Public preview: test mode off, designated Pro test accounts, deployment protection removed, verified in a fresh browser.
+6. Signed-in users can no longer call the 14 server functions; duplicate Vercel project's builds skipped; migration history reconciled.
 
 ## Built and tested
 
@@ -28,21 +38,21 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 
 ## Not done
 
-1. Hosted checks beyond the five browser journeys (the full API suite has only run locally).
-2. Browser tests that use the Pro screens beyond opening them (journey, experiments, health background).
-3. **Real AI.** Needs an Anthropic key and the owner's yes on spending limits. The provider code has never made a real call.
-4. **AI accuracy test.** The harness now runs the same code path as the app (see `docs/eval/README.md`). Reference examples available: 0 of 300 dishes, 0 of 100 photos. All still need sourcing and a human check.
-5. **Email code and Google sign-in on the hosted project.** Not exercised. Needs the email template and Google provider set in Supabase, and a test mailbox.
-6. **Founder alert emails** (Resend), **error monitoring** (Sentry), **real payments** (Gate 2).
-7. Items marked "Not implemented" or "Partial" in `TEST_RESULTS.md`, and the open questions in `DECISIONS.md`.
-8. The 19 later screens have not been checked against approved designs.
-9. There is a second, unused Vercel project `bloat-zlrr` linked to the same repo. It has no settings from us. The owner may delete it.
+1. **Email code delivery on the hosted project** (owner: SMTP settings). Then prove it end to end with the test mailbox: a fresh email arrives, its code signs in, the session survives a refresh, a resend works after 60 seconds, a wrong or old code is refused. The local stack proves all of this with real emails from its mail catcher; the hosted proof needs the mailbox (the Gmail connection in this session must be signed in again).
+2. **Google sign-in**: switched off in Supabase, so not exercised. The button is hidden while it is off.
+3. **Founder MFA on the hosted app**: built and tested locally; needs the staff email address to set `BLOAT_STAFF_EMAILS` on the preview.
+4. **Real AI** and the **AI accuracy test**: the harness uses the app's own code path. Reference examples: 0 of 300 dishes, 0 of 100 photos (25 of them meant to be unclear). Paid calls need the owner's yes on the key and spending limit.
+5. Owner decisions in `DECISIONS.md`: kiwifruit correction, seven card wording corrections, AI failure alert threshold, country pause wording, medicine sensitivity view, help page version.
+6. The 19 later screens have not been compared with approved designs (they are not in `docs/design/screens/`).
+7. Founder alert emails (Resend), error monitoring (Sentry), real payments (Gate 2).
 
 ## Next steps, in order
 
-1. Owner: open the preview on a phone and look around (steps in DEPLOYMENT.md).
-2. Owner: decide on the AI key and spending limits; supply or approve sources for the accuracy set; say whether a test mailbox is available for email sign-in.
-3. Beta completion (Priority 4): MFA for founder tools, content and source review, missing acceptance items, design refinements. MFA for founder tools is done and tested locally (not yet tried on the preview: no staff address is set there). Pausing a country (Q37, Q80) is done and tested locally. The AI failure alert (Q183) waits for the owner to choose a threshold (DECISIONS.md item 10). A browser test now opens 22 screens as a Pro user and checks for errors and outside requests. Hosted browser tests pass on the newest build. A live source check of the cards and help page is done (`docs/content/source-check-2026-11-17.md`); it moved the kiwifruit card to draft and raised three owner decisions (DECISIONS.md items 11 to 13). **Exact next unfinished task: design refinements, comparing the 19 later screens with the approved designs once the owner copies them into `docs/design/screens/`.** Q102 is done: a browser test covers the photo path, and it found and fixed a bug where a photo chosen before the AI consent was not checked after "I agree".
+1. Owner: fix the SMTP settings in Supabase (DEPLOYMENT.md, "Email codes"). Owner: sign the Gmail connector in again for the test mailbox, or do the one manual check in the handoff.
+2. Prove hosted email delivery and sign-in (item 1 above). **This is the exact next unfinished task.**
+3. Owner: give the staff email for founder tools; then set `BLOAT_STAFF_EMAILS` and test MFA on the preview.
+4. Owner decisions in DECISIONS.md; then apply the approved content corrections.
+5. Design comparison once the 19 screens are copied in.
 
 ## Later (ideas not in the plan, so not built)
 

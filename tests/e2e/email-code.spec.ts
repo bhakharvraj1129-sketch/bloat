@@ -3,6 +3,9 @@ import { expect, test, type Page } from "@playwright/test";
 // Email sign-in codes against the LOCAL stack. Local Supabase delivers every email to its mail
 // catcher (Mailpit), so the test reads the real email and the real code.
 const MAIL = "http://127.0.0.1:54324";
+// The app's offline service worker can take over the page mid-test; requests it handles are not
+// seen by page.route(), which the failure test below relies on. These tests do not need it.
+test.use({ serviceWorkers: "block" });
 const address = (tag: string) => `otp-${tag}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.com`;
 
 async function codesFor(to: string, atLeast = 1): Promise<string[]> {
