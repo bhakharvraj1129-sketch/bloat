@@ -7,7 +7,7 @@ Nothing is live. This file says how a private preview is set up and what is stil
 | Part | State |
 |---|---|
 | GitHub | Branch `claude/bloat-software-build-uxzoru` on `bhakharvraj1129-sketch/bloat`. No pull request. |
-| Supabase `bloat-test` | Project exists and is healthy. See PROGRESS.md for whether the migrations have been applied. |
+| Supabase `bloat-test` | Project exists and is healthy but **empty: migrations not applied yet** (see PROGRESS.md). |
 | Vercel | **Blocked.** The Vercel connection needs the owner to approve access to the team `typeshi2`. No project and no preview URL exist. |
 | AI key, Resend, Sentry, Google sign-in, payments | Not connected. |
 
