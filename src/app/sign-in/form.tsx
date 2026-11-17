@@ -6,6 +6,7 @@ import { Button, Card, Caption, Field, Screen, inputClass } from "@/components/u
 import { browserSupabase } from "@/lib/client/supabase";
 import { readPre, writePre } from "@/lib/client/pre";
 import { api, ApiFailure } from "@/lib/client/api";
+import { codeRequestOutcome, type AuthErrorLike } from "@/lib/otp-messages";
 
 // Screens 05: sign up or sign in with Google or an email code. No health question comes before this.
 export function SignIn({ testLogin }: { testLogin: boolean }) {
@@ -29,10 +30,18 @@ export function SignIn({ testLogin }: { testLogin: boolean }) {
     if (needAdult) return setMessage("Bloat is for adults. Tick the box to confirm you are 18 or older.");
     setBusy(true); setMessage("");
     writePre({ adult: isNew ? true : undefined });
-    await browserSupabase().auth.signInWithOtp({ email, options: { shouldCreateUser: isNew } });
-    // The same answer whether or not the address has an account: no account-enumerating messages.
+    let error: AuthErrorLike = null;
+    try {
+      ({ error } = await browserSupabase().auth.signInWithOtp({ email: email.trim(), options: { shouldCreateUser: isNew } }));
+    } catch {
+      error = { status: 0 };
+    }
     setBusy(false);
-    router.push(`/sign-in/code?email=${encodeURIComponent(email)}`);
+    // "No account" looks exactly like a sent code (see otp-messages.ts). Real failures are shown
+    // here, so nobody is sent on to wait for an email that is not coming.
+    const out = codeRequestOutcome(error);
+    if (out.kind !== "sent") return setMessage(out.message);
+    router.push(`/sign-in/code?email=${encodeURIComponent(email.trim())}${isNew ? "&new=1" : ""}`);
   }
 
   async function google() {
