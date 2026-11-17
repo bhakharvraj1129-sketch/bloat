@@ -39,6 +39,8 @@ Environment: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.verc
 | Founder MFA on hosted | Not exercised: no staff address is set on the preview. |
 | Real AI, real payments | Not exercised (mock, by design) |
 
+Live spot check on the newest build, commit `3b25b5f` (deployment `dpl_BUXKcfPiby9DtyGNQp58WB5Uv2Cu`; only tests and docs changed after `b70e7ed`, no app code): home 200 with no Vercel redirect; `/today` 307 to `/sign-in`; test-login 404; `/v1/history` 401 signed out; founder tools 404; sign-in page shows "Send code", no test password form, no Google button; help page (rendered in a browser) says "Adapted from NHS, Bloating" with the nhs.uk link, "Call your local emergency number now" with no country and "Call 911 now" for the United States.
+
 Earlier hosted runs (protected preview, 17 Nov, commits `c25610a`, `cdc2ebc`, `1540294`): 5 of 5 each time.
 
 ## The 200 acceptance tests
