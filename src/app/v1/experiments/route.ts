@@ -57,6 +57,7 @@ export const POST = route({ body, mutation: true, feature: "experiments_habit" }
     id, type: def.type, key: def.key, food_group: def.food_group ?? null, phase: "RUNNING", started_on: u.today,
     // The swap step ends by itself after 2 weeks at most.
     swap_ends_on: def.type === "swap" ? addDays(u.today, thresholds.swap_max_weeks * 7 - 1) : null,
+    created_at: new Date(ctx.now).toISOString(),
   };
   return ctx.commit(
     [{ op: "insert", table: "experiments", row }, { op: "insert", table: "product_events", row: { name: "experiment_started", props: { type: def.type } } }],

@@ -16,8 +16,14 @@ export type Bundle = {
 
 /** Everything the insight rules need, loaded once per request for the last 92 days. */
 export async function loadBundle(db: Db, userId: string, u: UserCtx, now: number, plan: "free" | "pro", range?: { from: string; to: string }): Promise<Bundle> {
-  const firstDay = historyFrom(u);
-  const view = await daysView(db, userId, u, firstDay, u.today, now);
+  const windowStart = historyFrom(u);
+  const loaded = await daysView(db, userId, u, windowStart, u.today, now);
+  // The period that counts starts on the first day anything was recorded, so "both halves" and
+  // completeness describe the time the diary was actually in use.
+  const mealDates = loaded.data.meals.map((m) => analysisDate(Date.parse(m.eaten_at), u.periods));
+  const firstTracked = [...loaded.summaries.filter((s) => s.status !== "UNKNOWN").map((s) => s.date), ...mealDates].filter((d) => d >= windowStart).sort()[0];
+  const firstDay = firstTracked ?? windowStart;
+  const view = { data: loaded.data, summaries: loaded.summaries.filter((s) => s.date >= firstDay) };
   const [answers, extras, fol, sus, sym, focusRows, impacts] = await Promise.all([
     loadAnswers(db, userId), loadExtras(db, userId),
     db.from("followed_activities").select("activity_id,position").eq("user_id", userId).order("position"),

@@ -72,9 +72,14 @@ export function warningOps(episodeId: string, codes: string[] | undefined): Op[]
 export async function symptomAdvice(db: Db, userId: string, u: UserCtx, codes: string[]): Promise<Advice[]> {
   const wanted = codes.filter((c) => c in COMMON_SYMPTOM_LEVEL);
   if (!wanted.length) return [];
+  // "Today" means episodes that started on the user's current day (not when the row was written).
   const [start, end] = dayBoundsUtc(u.today, u.zone);
-  const { data } = await db.from("episode_symptoms").select("code,created_at").eq("user_id", userId)
-    .in("code", wanted).gte("created_at", new Date(start).toISOString()).lt("created_at", new Date(end).toISOString());
+  const { data: todays } = await db.from("episodes").select("id").eq("user_id", userId)
+    .gte("started_at", new Date(start).toISOString()).lt("started_at", new Date(end).toISOString());
+  const ids = (todays ?? []).map((e) => e.id as string);
+  const { data } = ids.length
+    ? await db.from("episode_symptoms").select("code").eq("user_id", userId).in("code", wanted).in("episode_id", ids)
+    : { data: [] as Array<{ code: string }> };
   const seen = new Set((data ?? []).map((r) => r.code as string));
   return wanted.filter((c) => !seen.has(c)).map((code) => ({
     code, level: COMMON_SYMPTOM_LEVEL[code]!, sentence: commonSymptomSentence(code)!, source: NHS_SOURCE_LABEL,

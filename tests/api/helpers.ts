@@ -116,6 +116,9 @@ export async function logDay(u: User, date: string, o: {
   for (const m of o.meals ?? []) {
     const save_key = randomUUID();
     if (m.ingredients || m.mode) {
+      // Test setup only: many days are logged in seconds, so earlier synthetic checks are aged to
+      // keep the real per-hour and per-day limits (tested on their own) out of the way.
+      await srvRpc("srv_tx", { p_user: u.id, p_ops: [{ op: "update", table: "ai_usage", match: { purpose: "FOOD_GROUP_INGREDIENT_LIST" }, set: { at: "2026-01-01T00:00:00Z", local_day: "2026-01-01" } }] });
       const s = await call(u, "POST", "/v1/food-suggestions", { save_key, dish_text: m.text }, { now: evening });
       if (s.status !== 200) throw new Error(`suggest: ${JSON.stringify(s.body)}`);
     }
