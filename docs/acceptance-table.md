@@ -67,7 +67,7 @@
 | Q73 | Payment provider unavailable in selected market | Passed | api/slice-ef.test.ts |  |
 | Q74 | Regional consent withdrawn | Passed | api/slice-a-account.test.ts |  |
 | Q75 | Deletion spans regional stores/processors | Blocked | – | Database rows and stored photos are deleted (tested under Q33). Notifying outside processors needs those accounts. |
-| Q76 | Cross-region staff or tenant access attempt | Partial | api/slice-ef.test.ts | Founder tools need a token and expose no health records (tested). Staff accounts with MFA are not built. |
+| Q76 | Cross-region staff or tenant access attempt | Passed | api/slice-ef.test.ts, e2e/admin.spec.ts |  |
 | Q77 | Notification at recipient local time | Not implemented | – | No notifications or reminders exist in this release (plan A18). |
 | Q79 | Global beta aggregate masks one poor cohort | Not implemented | – | No beta cohort reporting. |
 | Q80 | Policy suspension during job/checkout | Not implemented | – | No re-check of country policy during a running job. |

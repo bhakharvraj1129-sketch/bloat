@@ -5,6 +5,6 @@ export const metadata = { title: "Founder tools", robots: { index: false, follow
 export const dynamic = "force-dynamic";
 
 export default function Page() {
-  if (!process.env.BLOAT_ADMIN_TOKEN) notFound();
+  if (!process.env.BLOAT_STAFF_EMAILS) notFound();
   return <Admin />;
 }

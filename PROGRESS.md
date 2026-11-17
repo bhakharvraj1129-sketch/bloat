@@ -33,7 +33,7 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 3. **Real AI.** Needs an Anthropic key and the owner's yes on spending limits. The provider code has never made a real call.
 4. **AI accuracy test.** The harness now runs the same code path as the app (see `docs/eval/README.md`). Reference examples available: 0 of 300 dishes, 0 of 100 photos. All still need sourcing and a human check.
 5. **Email code and Google sign-in on the hosted project.** Not exercised. Needs the email template and Google provider set in Supabase, and a test mailbox.
-6. **Founder alert emails** (Resend), **error monitoring** (Sentry), **real payments** (Gate 2), **MFA for founder tools**.
+6. **Founder alert emails** (Resend), **error monitoring** (Sentry), **real payments** (Gate 2).
 7. Items marked "Not implemented" or "Partial" in `TEST_RESULTS.md`, and the open questions in `DECISIONS.md`.
 8. The 19 later screens have not been checked against approved designs.
 9. There is a second, unused Vercel project `bloat-zlrr` linked to the same repo. It has no settings from us. The owner may delete it.
@@ -42,7 +42,7 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 
 1. Owner: open the preview on a phone and look around (steps in DEPLOYMENT.md).
 2. Owner: decide on the AI key and spending limits; supply or approve sources for the accuracy set; say whether a test mailbox is available for email sign-in.
-3. Beta completion (Priority 4): MFA for founder tools, content and source review, missing acceptance items, design refinements. **Exact next unfinished task: list the "Not implemented" and "Partial" rows of TEST_RESULTS.md and work through them, starting with MFA.**
+3. Beta completion (Priority 4): MFA for founder tools, content and source review, missing acceptance items, design refinements. MFA for founder tools is done and tested locally (not yet tried on the preview: no staff address is set there). **Exact next unfinished task: Q183, an automatic alert when the AI failure rate is high.**
 
 ## Later (ideas not in the plan, so not built)
 

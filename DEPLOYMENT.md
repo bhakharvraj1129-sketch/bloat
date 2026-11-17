@@ -33,7 +33,7 @@ Names are in `.env.example`. Never commit values.
 | `BLOAT_SERVER_SECRET` | server only | A long random value. Its SHA-256 hash must be in `private.server_secrets`. Without it nothing can be saved. |
 | `BLOAT_AI_PROVIDER`, `BLOAT_AI_MODEL`, `ANTHROPIC_API_KEY` | server only | `mock` by default. `anthropic` plus a key for the real check. Only approved models run. |
 | `BLOAT_BILLING_PROVIDER`, `BLOAT_BILLING_WEBHOOK_SECRET` | server only | `mock` only. |
-| `BLOAT_ADMIN_TOKEN` | server only | Turns on `/admin` (founder tools). Leave empty to switch them off. |
+| `BLOAT_STAFF_EMAILS` | server only | Comma-separated email addresses allowed into `/admin` (founder tools). Each also needs an authenticator app code. Leave empty to switch founder tools off. Not set on the preview. |
 | `BLOAT_TEST_LOGIN` | server only | `1` on previews with synthetic accounts. Never on a live site: it also enables the mock purchase and the test clock. |
 
 ## Set up a preview from scratch

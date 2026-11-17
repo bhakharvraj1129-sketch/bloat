@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { randomUUID } from "node:crypto";
-import { addDays, asUser, at, call, logDay, makePro, NY, onboarded, proUser, srvRpc, webhook, type User } from "./helpers";
+import { addDays, asUser, BASE, staffSession, at, call, logDay, makePro, NY, onboarded, proUser, srvRpc, webhook, type User } from "./helpers";
 
 const START = "2026-08-01";
 const day = (i: number) => addDays(START, i);
@@ -318,23 +318,40 @@ describe("Slice F: subscriptions, pause and safe analytics", () => {
     expect(tap.body.checkout).toBe("off");
     expect((await call(u, "GET", "/v1/billing/entitlement")).body.plan).toBe("free");
     expect((await call(u, "POST", "/v1/episodes", { strength: 3, started: { mode: "now" } })).status).toBe(201);
-    const admin = await fetch(`${process.env.BLOAT_BASE_URL ?? "http://127.0.0.1:3100"}/v1/admin`, { method: "POST", headers: { "x-admin-token": "local-admin-token", "content-type": "application/json" }, body: JSON.stringify({ what: "flag", key: "checkout_enabled", enabled: true }) });
+    const staff = await staffSession();
+    const admin = await fetch(`${BASE}/v1/admin`, { method: "POST", headers: { Authorization: `Bearer ${staff.second}`, "content-type": "application/json" }, body: JSON.stringify({ what: "flag", key: "checkout_enabled", enabled: true }) });
     expect(admin.status).toBe(403);
+    expect((await admin.json()).error.code).toBe("CAPABILITY_OFF");
   });
 
-  it("founder tools need the founder token and expose no health records (Q76, Q184)", async () => {
-    const base = process.env.BLOAT_BASE_URL ?? "http://127.0.0.1:3100";
-    expect((await fetch(`${base}/v1/admin`)).status).toBe(404);
-    expect((await fetch(`${base}/v1/admin`, { headers: { "x-admin-token": "guess-guess-guess-guess" } })).status).toBe(404);
+  it("founder tools need a staff account that passed a second sign-in step, expose no health records, and leave an audit trail (Q76, Q184)", async () => {
+    const get = (token?: string) => fetch(`${BASE}/v1/admin`, token ? { headers: { Authorization: `Bearer ${token}` } } : {});
+    expect((await get()).status).toBe(404); // signed out
+    expect((await get("not-a-real-token")).status).toBe(404);
+    expect((await fetch(`${BASE}/v1/admin`, { headers: { "x-admin-token": "local-admin-token" } })).status).toBe(404); // the old shared token is gone
     const u = await onboarded();
     await call(u, "POST", "/v1/meals", { save_key: randomUUID(), dish_text: "secret-dish-name-xyz", eaten: { mode: "now" } });
-    expect((await fetch(`${base}/v1/admin`, { headers: { Authorization: `Bearer ${u.token}` } })).status).toBe(404);
-    const ok = await fetch(`${base}/v1/admin`, { headers: { "x-admin-token": "local-admin-token" } });
+    expect((await get(u.token)).status).toBe(404); // an ordinary account, even signed in
+    const staff = await staffSession();
+    // Staff address and password alone are not enough.
+    const half = await get(staff.first);
+    expect(half.status).toBe(403);
+    expect((await half.json()).error.code).toBe("MFA_REQUIRED");
+    const change = (token: string) => fetch(`${BASE}/v1/admin`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify({ what: "flag", key: "ai_enabled", enabled: true }) });
+    expect((await change(staff.first)).status).toBe(403);
+    expect((await change(u.token)).status).toBe(404);
+    // After the authenticator code: in.
+    const ok = await get(staff.second);
     expect(ok.status).toBe(200);
     const text = await ok.text();
     expect(text).not.toContain("secret-dish-name-xyz");
     expect(text).not.toContain(u.id);
     expect(Object.keys(JSON.parse(text)).sort()).toEqual(["ai_calls_24h", "ai_failures_24h", "ai_settings", "alerts", "events_7d", "flags", "month_spent_micros", "review_queue", "waitlist_count"]);
+    expect((await change(staff.second)).status).toBe(200);
+    // Audit: who did what and when, with no health data.
+    const log = await srvRpc<any[]>("srv_tx", { p_user: staff.id, p_ops: [{ op: "update", table: "audit_log", match: { action: "admin_read" }, set: { action: "admin_read" } }, { op: "update", table: "audit_log", match: { action: "admin_set_flag" }, set: { action: "admin_set_flag" } }] });
+    expect(log[0].n).toBe(1);
+    expect(log[1].row.meta).toEqual({ key: "ai_enabled", enabled: true });
   });
 
   it("Q185, Q159: product events carry no health values, food, symptoms, conditions or free text", async () => {

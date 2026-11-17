@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { browserSupabase } from "@/lib/client/supabase";
 import { Button, Caption, Card, Field, Label, inputClass } from "@/components/ui";
 
 type Data = {
@@ -11,19 +12,46 @@ type Data = {
 const usd = (micros: number) => `$${(micros / 1_000_000).toFixed(2)}`;
 
 // Founder tools: AI spending and kill switch, alerts, the safety review queue and event counts.
-// No health records can be browsed here.
+// No health records can be browsed here. Entry needs a staff account and a second sign-in step.
+type Step = "checking" | "signed_out" | "enrol" | "code" | "open";
+
 export function Admin() {
-  const [token, setToken] = useState("");
+  const [step, setStep] = useState<Step>("checking");
   const [data, setData] = useState<Data | null>(null);
   const [msg, setMsg] = useState("");
   const [limit, setLimit] = useState("");
-  const load = async () => {
-    const res = await fetch("/v1/admin", { headers: { "x-admin-token": token }, cache: "no-store" });
-    if (!res.ok) { setMsg("That token didn't work."); setData(null); return; }
-    setMsg(""); setData(await res.json());
+  const [code, setCode] = useState("");
+  const [factor, setFactor] = useState<{ id: string; qr?: string; secret?: string } | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const load = useCallback(async () => {
+    const res = await fetch("/v1/admin", { cache: "no-store" });
+    if (res.ok) { setData(await res.json()); setStep("open"); return; }
+    setData(null);
+    if (res.status !== 403) { setStep("signed_out"); return; }
+    // Signed in as staff, but this session has not passed the second step yet.
+    const mfa = browserSupabase().auth.mfa;
+    const { data: list } = await mfa.listFactors();
+    const ready = list?.totp?.[0];
+    if (ready) { setFactor({ id: ready.id }); setStep("code"); return; }
+    for (const f of list?.all ?? []) if (f.status !== "verified") await mfa.unenroll({ factorId: f.id });
+    const { data: made, error } = await mfa.enroll({ factorType: "totp", friendlyName: `Founder tools ${Date.now()}` });
+    if (error || !made) { setMsg("The second step could not be set up. Try again."); setStep("signed_out"); return; }
+    setFactor({ id: made.id, qr: made.totp.qr_code, secret: made.totp.secret });
+    setStep("enrol");
+  }, []);
+  useEffect(() => { void Promise.resolve().then(load); }, [load]);
+
+  const verify = async () => {
+    if (!factor) return;
+    setBusy(true); setMsg("");
+    const { error } = await browserSupabase().auth.mfa.challengeAndVerify({ factorId: factor.id, code });
+    setBusy(false); setCode("");
+    if (error) { setMsg("That code didn't work. Check the app and try again."); return; }
+    await load();
   };
   const post = async (body: unknown) => {
-    const res = await fetch("/v1/admin", { method: "POST", headers: { "x-admin-token": token, "content-type": "application/json" }, body: JSON.stringify(body) });
+    const res = await fetch("/v1/admin", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
     setMsg(res.ok ? "Saved." : "That change was refused.");
     await load();
   };
@@ -31,8 +59,28 @@ export function Admin() {
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-8">
       <h1 className="t-headline">Founder tools</h1>
-      <Field label="Founder token"><input className={inputClass} type="password" value={token} onChange={(e) => setToken(e.target.value)} autoComplete="off" /></Field>
-      <Button onClick={load} disabled={!token}>Open</Button>
+      {step === "checking" && <Caption>Checking your sign-in.</Caption>}
+      {step === "signed_out" && (
+        <Card className="flex flex-col gap-3">
+          <p className="t-body">Founder tools need a staff account.</p>
+          <a className="t-body-strong underline" href="/sign-in">Sign in</a>
+        </Card>
+      )}
+      {(step === "enrol" || step === "code") && (
+        <Card className="flex flex-col gap-3">
+          <Label>Second sign-in step</Label>
+          {step === "enrol" && factor?.qr && (
+            <>
+              <Caption>Scan this with an authenticator app on your phone. You only do this once.</Caption>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={factor.qr} alt="Code to scan with your authenticator app" width={176} height={176} />
+              <Caption>Or type this key into the app: <span className="tabular break-all">{factor.secret}</span></Caption>
+            </>
+          )}
+          <Field label="6-digit code from your app"><input className={inputClass} inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} /></Field>
+          <Button onClick={verify} disabled={busy || code.length !== 6}>Continue</Button>
+        </Card>
+      )}
       {msg && <p role="status" className="t-caption text-ink">{msg}</p>}
       {data && (
         <>

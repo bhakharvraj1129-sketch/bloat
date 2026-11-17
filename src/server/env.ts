@@ -15,7 +15,7 @@ export const env = {
   get anthropicKey() { return process.env.ANTHROPIC_API_KEY ?? ""; },
   get billingProvider() { return process.env.BLOAT_BILLING_PROVIDER ?? "mock"; },
   get billingWebhookSecret() { return process.env.BLOAT_BILLING_WEBHOOK_SECRET ?? ""; },
-  get adminToken() { return process.env.BLOAT_ADMIN_TOKEN ?? ""; },
+  get staffEmails() { return process.env.BLOAT_STAFF_EMAILS ?? ""; },
   get testLogin() { return process.env.BLOAT_TEST_LOGIN === "1"; },
   get resendKey() { return process.env.RESEND_API_KEY ?? ""; },
   get founderEmail() { return process.env.BLOAT_FOUNDER_EMAIL ?? ""; },

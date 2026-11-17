@@ -143,3 +143,34 @@ export async function logDay(u: User, date: string, o: {
 export function addDays(date: string, n: number): string {
   return new Date(new Date(`${date}T12:00:00Z`).getTime() + n * 86400000).toISOString().slice(0, 10);
 }
+
+/** RFC 6238 code for an authenticator secret (base32), as a phone app would show it. */
+export function totp(secret: string, at = Date.now()): string {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  let bits = "";
+  for (const c of secret.replace(/=+$/, "").toUpperCase()) bits += alphabet.indexOf(c).toString(2).padStart(5, "0");
+  const key = Buffer.from((bits.match(/.{8}/g) ?? []).map((b) => parseInt(b, 2)));
+  const counter = Buffer.alloc(8);
+  counter.writeBigUInt64BE(BigInt(Math.floor(at / 30000)));
+  const mac = createHmac("sha1", key).update(counter).digest();
+  const o = mac[mac.length - 1]! & 15;
+  return String((mac.readUInt32BE(o) & 0x7fffffff) % 1_000_000).padStart(6, "0");
+}
+
+export const STAFF_EMAIL = "staff@bloat.test"; // must be in BLOAT_STAFF_EMAILS of the app under test
+
+/** A fresh synthetic staff account: one token before the second step, one after it. */
+export async function staffSession(): Promise<{ id: string; first: string; second: string }> {
+  const client = anon();
+  const password = "synthetic-password-1";
+  const old = await client.auth.signInWithPassword({ email: STAFF_EMAIL, password });
+  if (old.data.user) await srvRpc("srv_delete_account", { p_user: old.data.user.id });
+  const made = await client.auth.signUp({ email: STAFF_EMAIL, password });
+  if (made.error || !made.data.session || !made.data.user) throw new Error(`staff signUp failed: ${made.error?.message}`);
+  const first = made.data.session.access_token;
+  const enrol = await client.auth.mfa.enroll({ factorType: "totp" });
+  if (enrol.error) throw new Error(`enrol failed: ${enrol.error.message}`);
+  const done = await client.auth.mfa.challengeAndVerify({ factorId: enrol.data.id, code: totp(enrol.data.totp.secret) });
+  if (done.error) throw new Error(`verify failed: ${done.error.message}`);
+  return { id: made.data.user.id, first, second: done.data.access_token };
+}

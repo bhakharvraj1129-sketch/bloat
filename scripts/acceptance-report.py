@@ -18,7 +18,6 @@ PARTIAL = {
  "Q21": "Medicine changes are shaded on charts and the before/after view is tested (Q168, Q169). The separate 'sensitivity view' that records exclusions is not built.",
  "Q33": "Deletion, token refusal and re-applying tombstones are tested. A real backup restore on Supabase has not been rehearsed.",
  "Q40": "Reports store rule versions and are immutable snapshots (tested). A versioned rollout process for rule changes is not built.",
- "Q76": "Founder tools need a token and expose no health records (tested). Staff accounts with MFA are not built.",
  "Q102": "Metadata stripping and no-storage are tested. 'Deleted after the check' holds because the photo is never stored unless Keep is on; the Keep path is not browser-tested.",
  "Q177": "A quarterly snapshot is created after 90 days (tested once). The quarterly summary screen is labelled 'later' in the plan and is not built.",
  "Q178": "Typed dishes are tested. Photo labels depend on a real AI provider, which is not connected.",

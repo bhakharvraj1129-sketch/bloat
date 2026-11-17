@@ -17,7 +17,7 @@ Choices made while building, with the reason. "Needs the owner" means: please sa
 5. **`@anthropic-ai/sdk`** added for the real ingredient check (the plan names Claude Haiku 5.5). `server-only` added to keep server files out of the browser bundle. `lucide-react` for icons.
 6. **Test-only switches**, all off unless `BLOAT_TEST_LOGIN=1`: password sign-in for `@example.com` accounts, a labelled mock purchase, and a fixed clock header for time tests. Never set on a live site.
 7. **The comparison period starts on the first day anything was recorded** (within the last 92 days), so "both halves" describes time the diary was in use.
-8. **Founder tools (`/admin`) use a single long token**, not staff accounts with MFA. Fine for a private preview. **Must be replaced before any real user** (plan B03).
+8. **Founder tools (`/admin`) need a staff account and a second sign-in step.** The account's email must be in `BLOAT_STAFF_EMAILS`, and the session must have passed an authenticator app code (TOTP). The old shared token is removed. Every founder read and change is written to the audit log as metadata only. Synthetic test addresses only count as staff when `BLOAT_TEST_LOGIN=1`. Founder tools stay off on the preview until the owner names a staff address. Not built: staff roles, forced re-check after a time limit, recovery if the phone is lost (for now: remove the factor in the Supabase dashboard).
 
 ## Where the plan was unclear and what was built (needs the owner)
 
