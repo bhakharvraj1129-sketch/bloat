@@ -12,6 +12,7 @@ import { phase } from "@/lib/domain/focus";
 import { activity, label, METRIC_VERSION, REGISTRY_VERSION, tagLabel } from "@/lib/registry";
 import { addDays, analysisDate, localParts, weekStart, zoneForDate } from "@/lib/time";
 import { COMPARISON_LINE, INTENDED_USE, MEDICINE_LINE, TRIGGERS_FOOTER } from "@/lib/wording";
+import { DOCTOR_SECTIONS, privateDoctorSnapshot, type DoctorSection } from "@/lib/domain/report-privacy";
 
 export const REPORT_VERSIONS = { metric: METRIC_VERSION, insights: INSIGHTS_VERSION, registry: REGISTRY_VERSION, report: "report_v1" };
 
@@ -130,7 +131,7 @@ export async function journeySnapshot(db: Db, userId: string, u: UserCtx, now: n
 }
 
 export type DoctorOptions = { from: string; to: string; questions: string | null; sections: Record<string, boolean> };
-export const DOCTOR_SECTIONS = ["symptoms", "meals", "bowel", "habits", "medicines", "health", "family", "tests", "experiments", "missing"] as const;
+export { DOCTOR_SECTIONS };
 
 /** The doctor report (0.3 fix 25): a one-page summary, then fixed sections. Everything is self-reported. */
 export async function doctorSnapshot(db: Db, userId: string, u: UserCtx, now: number, o: DoctorOptions) {
@@ -183,31 +184,33 @@ export async function doctorSnapshot(db: Db, userId: string, u: UserCtx, now: nu
   if (freeMeals) missing.push(`${freeMeals} of ${meals.length} meals have no confirmed ingredient list.`);
   missing.push("All entries are self-reported and have not been checked by anyone. Possible triggers are patterns in the records, not proof of a cause.");
 
-  return {
+  const snapshot = {
     kind: "doctor" as const, from: o.from, to: o.to, time_zone: u.profile.analysis_time_zone, generated_at: new Date(now).toISOString(),
+    included: DOCTOR_SECTIONS.filter((k) => on(k)) as DoctorSection[],
     notice: "This report was made by the person named on it from their own Bloat diary. Everything in it is self-reported.",
     intended_use: INTENDED_USE,
     summary: {
       tracking_days: days.length, confirmed_days: confirmed.length, completeness: days.length ? Math.round((confirmed.length / days.length) * 100) : null,
-      bloating_days_30: bloatingDates(b.view.summaries, u.today, 30).length,
-      typical_strength: strengths.length ? round1(median(strengths)!) : null,
-      average_daily_score: confirmed.length ? round1(mean(confirmed.map((d) => d.score!))!) : null,
-      typical_episode_minutes: lengths.length ? Math.round(median(lengths)!) : null,
-      how_long: b.answers["ON-08"] ? label("ON-08", b.answers["ON-08"] as string) : null,
-      how_often: b.answers["ON-07"] ? label("ON-07", b.answers["ON-07"] as string) : null,
-      weekly_impact: impact ? label("WK-01", impact) : null,
-      patterns: t.worth_watching.map(slim),
-      medicines: b.extras.medicines.map((m) => ({
+      // Every field below comes from one section, and is left out when that section is off.
+      bloating_days_30: on("symptoms") ? bloatingDates(b.view.summaries, u.today, 30).length : null,
+      typical_strength: on("symptoms") && strengths.length ? round1(median(strengths)!) : null,
+      average_daily_score: on("symptoms") && confirmed.length ? round1(mean(confirmed.map((d) => d.score!))!) : null,
+      typical_episode_minutes: on("symptoms") && lengths.length ? Math.round(median(lengths)!) : null,
+      how_long: on("symptoms") && b.answers["ON-08"] ? label("ON-08", b.answers["ON-08"] as string) : null,
+      how_often: on("symptoms") && b.answers["ON-07"] ? label("ON-07", b.answers["ON-07"] as string) : null,
+      weekly_impact: on("symptoms") && impact ? label("WK-01", impact) : null,
+      patterns: t.worth_watching.map(slim).filter((p) => (p.kind === "habit" ? on("habits") : on("meals"))),
+      medicines: !on("medicines") ? [] : b.extras.medicines.map((m) => ({
         name: m.name, type: m.type, group: m.med_group ? label("MD-04", m.med_group) : null, started_on: m.started_on,
         changes: b.extras.medicineChanges.filter((c) => c.medicine_id === m.id).map((c) => ({ change: c.change.replace(/_/g, " "), date: c.date })),
       })),
-      context: [
+      context: !on("health") ? [] : [
         ...(on10.includes("perimenopause_or_menopause") ? ["Perimenopause or menopause"] : []), ...(on10.includes("pregnancy") ? ["Pregnancy"] : []),
         ...(on10.includes("breastfeeding") ? ["Breastfeeding"] : []), ...(on10.includes("cycle_context") ? [`Periods logged: ${b.extras.cycle.filter((c) => c.kind === "start" && c.date >= o.from && c.date <= o.to).length}`] : []),
         ...(b.answers["ON-14"] && b.answers["ON-14"] !== "prefer_not_to_say" ? [`Age range: ${label("ON-14", b.answers["ON-14"] as string)}`] : []),
       ],
-      warning_signs: tally((warn.data ?? []) as Array<{ code: unknown }>, "EP-08a"),
-      doctor_line: recentLine.show ? { sentence: recentLine.sentence, ovarian: recentLine.ovarianSentence, source: recentLine.source, days: recentLine.days } : null,
+      warning_signs: on("symptoms") ? tally((warn.data ?? []) as Array<{ code: unknown }>, "EP-08a") : [],
+      doctor_line: on("symptoms") && recentLine.show ? { sentence: recentLine.sentence, ovarian: on("health") ? recentLine.ovarianSentence : null, source: recentLine.source, days: recentLine.days } : null,
       questions: o.questions,
     },
     sections: {
@@ -229,7 +232,8 @@ export async function doctorSnapshot(db: Db, userId: string, u: UserCtx, now: nu
       experiments: on("experiments") ? exps : null,
       missing: on("missing") ? missing : null,
     },
-    comparison_line: COMPARISON_LINE, medicine_line: MEDICINE_LINE, footer: TRIGGERS_FOOTER, versions: REPORT_VERSIONS,
+    comparison_line: COMPARISON_LINE, medicine_line: on("medicines") ? MEDICINE_LINE : null, footer: TRIGGERS_FOOTER, versions: REPORT_VERSIONS,
   };
+  return privateDoctorSnapshot(snapshot);
 }
 export type DoctorSnapshot = Awaited<ReturnType<typeof doctorSnapshot>>;

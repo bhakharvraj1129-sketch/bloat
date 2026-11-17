@@ -1,6 +1,7 @@
 import "server-only";
 import { Document, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import type { DoctorSnapshot } from "../reports";
+import { DOCTOR_SECTION_NAMES, includedSections, privateDoctorSnapshot } from "@/lib/domain/report-privacy";
 
 // The doctor PDF, made on the server from an immutable snapshot. Plain black on white so it
 // prints and photocopies well. Page 1 is a two-minute summary (0.3 fix 25).
@@ -24,7 +25,10 @@ const mins = (m: number | null) => (m === null ? null : m >= 60 ? `${Math.floor(
 const pattern = (p: DoctorSnapshot["summary"]["patterns"][number]) =>
   `${p.label}: average ${p.mean_with} on ${p.with_days} days with, ${p.mean_without} on ${p.without_days} days without. First half ${p.first_half ?? "–"}, second half ${p.second_half ?? "–"}.`;
 
-function Report({ d, name }: { d: DoctorSnapshot; name: string }) {
+function Report({ d: raw, name }: { d: DoctorSnapshot; name: string }) {
+  // Switched-off sections are removed everywhere, including page 1 (see report-privacy.ts).
+  const d = privateDoctorSnapshot(raw);
+  const inc = new Set(includedSections(d));
   const sm = d.summary, sec = d.sections;
   const footer = <Text style={s.footer} fixed render={({ pageNumber, totalPages }) => `Bloat doctor report · ${d.from} to ${d.to} · self-reported · page ${pageNumber} of ${totalPages}`} />;
   return (
@@ -33,30 +37,39 @@ function Report({ d, name }: { d: DoctorSnapshot; name: string }) {
         <Text style={s.h1}>Bloating diary summary</Text>
         <Text style={s.muted}>{name ? `${name} · ` : ""}{d.from} to {d.to} · time zone {d.time_zone}</Text>
         <Text style={[s.muted, { marginTop: 4 }]}>{d.notice}</Text>
+        <Text style={s.muted}>Sections included: {[...inc].map((k) => DOCTOR_SECTION_NAMES[k]).join(", ") || "none"}.</Text>
 
         <Text style={s.h2}>At a glance</Text>
         <Row k="Tracking period" v={`${sm.tracking_days} days, ${sm.confirmed_days} with a confirmed daily score (${sm.completeness ?? 0}%)`} />
-        <Row k="Days with bloating, last 30 days" v={sm.bloating_days_30} />
-        <Row k="Typical strength when bloated (1–10)" v={sm.typical_strength} />
-        <Row k="Average confirmed daily score (0–10)" v={sm.average_daily_score} />
-        <Row k="Typical episode length" v={mins(sm.typical_episode_minutes)} />
-        <Row k="How long it has been happening" v={sm.how_long} />
-        <Row k="How often (own description)" v={sm.how_often} />
-        <Row k="How much it got in the way last week" v={sm.weekly_impact} />
+        {inc.has("symptoms") && (<>
+          <Row k="Days with bloating, last 30 days" v={sm.bloating_days_30} />
+          <Row k="Typical strength when bloated (1–10)" v={sm.typical_strength} />
+          <Row k="Average confirmed daily score (0–10)" v={sm.average_daily_score} />
+          <Row k="Typical episode length" v={mins(sm.typical_episode_minutes)} />
+          <Row k="How long it has been happening" v={sm.how_long} />
+          <Row k="How often (own description)" v={sm.how_often} />
+          <Row k="How much it got in the way last week" v={sm.weekly_impact} />
+        </>)}
 
-        <Text style={s.h2}>Main patterns in the records</Text>
-        {sm.patterns.length ? sm.patterns.map((p) => <Text key={p.label} style={s.li}>• {pattern(p)}{p.confounding_note ? ` ${p.confounding_note}` : ""}</Text>) : <Text>No pattern has enough days to report yet.</Text>}
-        <Text style={s.muted}>{d.comparison_line} {d.footer}</Text>
+        {(inc.has("meals") || inc.has("habits")) && (<>
+          <Text style={s.h2}>Main patterns in the records</Text>
+          {sm.patterns.length ? sm.patterns.map((p) => <Text key={p.label} style={s.li}>• {pattern(p)}{p.confounding_note ? ` ${p.confounding_note}` : ""}</Text>) : <Text>No pattern has enough days to report yet.</Text>}
+          <Text style={s.muted}>{d.comparison_line} {d.footer}</Text>
+        </>)}
 
-        <Text style={s.h2}>Medicines and supplements</Text>
-        {sm.medicines.length ? sm.medicines.map((m) => (
-          <Text key={m.name} style={s.li}>• {m.name}{m.group ? ` (${m.group})` : ""}{m.started_on ? `, started ${m.started_on}` : ""}{m.changes.map((c) => `; ${c.change}${c.date ? ` ${c.date}` : ""}`).join("")}</Text>
-        )) : <Text>None recorded.</Text>}
+        {inc.has("medicines") && (<>
+          <Text style={s.h2}>Medicines and supplements</Text>
+          {sm.medicines.length ? sm.medicines.map((m) => (
+            <Text key={m.name} style={s.li}>• {m.name}{m.group ? ` (${m.group})` : ""}{m.started_on ? `, started ${m.started_on}` : ""}{m.changes.map((c) => `; ${c.change}${c.date ? ` ${c.date}` : ""}`).join("")}</Text>
+          )) : <Text>None recorded.</Text>}
+        </>)}
 
-        {sm.context.length > 0 && (<><Text style={s.h2}>Context</Text><Text>{sm.context.join(" · ")}</Text></>)}
+        {inc.has("health") && sm.context.length > 0 && (<><Text style={s.h2}>Context</Text><Text>{sm.context.join(" · ")}</Text></>)}
 
-        <Text style={s.h2}>Warning signs logged</Text>
-        {sm.warning_signs.length ? sm.warning_signs.map((w) => <Text key={w.label} style={s.li}>• {w.label}: {w.times} {w.times === 1 ? "time" : "times"}</Text>) : <Text>None logged.</Text>}
+        {inc.has("symptoms") && (<>
+          <Text style={s.h2}>Warning signs logged</Text>
+          {sm.warning_signs.length ? sm.warning_signs.map((w) => <Text key={w.label} style={s.li}>• {w.label}: {w.times} {w.times === 1 ? "time" : "times"}</Text>) : <Text>None logged.</Text>}
+        </>)}
 
         {sm.doctor_line && (
           <View style={s.note}>
@@ -106,7 +119,7 @@ function Report({ d, name }: { d: DoctorSnapshot; name: string }) {
           {sec.medicines.map((m, i) => (
             <Text key={i} style={s.li}>• {m.medicine}, {m.event.replace(/_/g, " ")} {m.date}: {m.state === "ready" ? `average ${m.before_mean} in the 14 days before (${m.before_days} days), ${m.after_mean} after (${m.after_days} days).` : `not enough scored days yet (${m.before_days} before, ${m.after_days} after).`}</Text>
           ))}
-          <Text style={s.muted}>{d.medicine_line}</Text>
+          {d.medicine_line && <Text style={s.muted}>{d.medicine_line}</Text>}
         </>)}
         {sec.health && (<>
           <Text style={s.h2}>Health background (entered by the person)</Text>

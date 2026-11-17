@@ -7,20 +7,11 @@ import { useLoad, useSave } from "@/lib/client/hooks";
 import { api } from "@/lib/client/api";
 import { question } from "@/lib/registry";
 import type { State } from "@/components/today/types";
+import { DoctorReportView } from "@/components/report/doctor-report";
+import { DOCTOR_SECTIONS, DOCTOR_SECTION_NAMES } from "@/lib/domain/report-privacy";
 
-const SECTIONS: Array<[string, string]> = [
-  ["symptoms", "Symptoms"], ["meals", "Meals and food groups"], ["bowel", "Bowel record"], ["habits", "Habits and exercise"], ["medicines", "Medicines"],
-  ["health", "Health background"], ["family", "Family history"], ["tests", "Tests"], ["experiments", "Experiments"], ["missing", "What is missing"],
-];
-type Pattern = { label: string; with_days: number; without_days: number; mean_with: number | null; mean_without: number | null };
-type Snapshot = {
-  from: string; to: string; summary: {
-    tracking_days: number; confirmed_days: number; completeness: number | null; bloating_days_30: number; typical_strength: number | null; typical_episode_minutes: number | null;
-    how_long: string | null; weekly_impact: string | null; patterns: Pattern[]; medicines: Array<{ name: string }>; warning_signs: Array<{ label: string; times: number }>;
-    doctor_line: { sentence: string; ovarian: string | null; source: string } | null; questions: string | null;
-  };
-};
-type Made = { id: string; snapshot: Snapshot; pdf_url: string };
+const SECTIONS: Array<[string, string]> = DOCTOR_SECTIONS.map((k) => [k, DOCTOR_SECTION_NAMES[k]]);
+type Made = { id: string; snapshot: Parameters<typeof DoctorReportView>[0]["snapshot"]; pdf_url: string };
 type Share = { url: string; expires_at: string; share_id: string; note: string };
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
@@ -41,7 +32,6 @@ export function Doctor() {
   const [revoked, setRevoked] = useState(false);
   const make = useSave<Made>();
   const shareSave = useSave<Share>();
-  const s = made?.snapshot.summary;
 
   return (
     <ProScreen title="Doctor report" back="/me" load={st}>
@@ -71,23 +61,12 @@ export function Doctor() {
             }}>{make.saving ? "Preparing…" : "Preview report"}</Button>
           )}
 
-          {made && s && (
+          {made && (
             <>
               <section className="flex flex-col gap-2" aria-labelledby="preview">
-                <Label id="preview">Preview: page 1 summary</Label>
-                <Card className="flex flex-col gap-2">
-                  <p className="t-title">Bloating diary summary</p>
-                  <Caption>{made.snapshot.from} to {made.snapshot.to}</Caption>
-                  <p>Tracking: {s.tracking_days} days, {s.confirmed_days} with a confirmed daily score ({s.completeness ?? 0}%).</p>
-                  <p>Days with bloating in the last 30: {s.bloating_days_30}.</p>
-                  <p>Typical strength: {s.typical_strength ?? "not recorded"}. Typical episode: {s.typical_episode_minutes === null ? "not recorded" : `${s.typical_episode_minutes} min`}.</p>
-                  <p>How long it has been happening: {s.how_long ?? "not recorded"}. Got in the way last week: {s.weekly_impact ?? "not recorded"}.</p>
-                  <p>Main patterns: {s.patterns.length ? s.patterns.map((p) => `${p.label} (${p.mean_with} on ${p.with_days} days with, ${p.mean_without} on ${p.without_days} without)`).join("; ") : "none with enough days yet"}.</p>
-                  <p>Medicines: {s.medicines.length ? s.medicines.map((m) => m.name).join(", ") : "none recorded"}.</p>
-                  <p>Warning signs logged: {s.warning_signs.length ? s.warning_signs.map((w) => `${w.label} (${w.times})`).join(", ") : "none"}.</p>
-                  {s.doctor_line && <p className="rounded-sm bg-brand-tint p-3">{s.doctor_line.sentence}{s.doctor_line.ovarian ? ` ${s.doctor_line.ovarian}` : ""} <span className="t-caption">{s.doctor_line.source}</span></p>}
-                  <div className="rounded-sm border border-ink p-3"><p className="t-body-strong">Your questions for the appointment</p><p className="whitespace-pre-wrap">{s.questions ?? " "}</p></div>
-                </Card>
+                <Label id="preview">Preview: everything the PDF and the shared link will contain</Label>
+                <Caption>Sections you switched off are left out of every part of the report, including the summary.</Caption>
+                <Card className="flex flex-col gap-2"><DoctorReportView snapshot={made.snapshot} /></Card>
               </section>
               <a href={made.pdf_url} className="inline-flex min-h-12 items-center justify-center rounded-pill bg-brand px-5 font-semibold text-on-brand no-underline" download>Download PDF</a>
               <Caption>Downloaded copies can&apos;t be recalled. Once you save or send the file, Bloat can no longer remove it.</Caption>

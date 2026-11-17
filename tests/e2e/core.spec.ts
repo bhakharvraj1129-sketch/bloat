@@ -288,3 +288,44 @@ test("Q102 a photo chosen before the AI consent is checked after 'I agree'; the 
   await page.getByRole("dialog").getByRole("button", { name: "Save without the check" }).click();
   await expect(page.getByText("photo test lunch")).toBeVisible({ timeout: 15000 });
 });
+
+test("doctor report: the in-app preview shows everything the PDF and shared link contain, and switched-off Medicines and Health appear in none of them", async ({ page }) => {
+  await signUp(page);
+  await setup(page);
+  await page.goto("/upgrade");
+  await page.getByRole("button", { name: "Mock purchase" }).click();
+  await expect(page.getByRole("heading", { name: "You have Pro" })).toBeVisible({ timeout: 15000 });
+  const MED = "Zorvatrin-7Q";
+  const send = (method: string, url: string, body: unknown) => page.evaluate(async ({ method, url, body }) => (await fetch(url, { method, headers: { "content-type": "application/json", "idempotency-key": crypto.randomUUID() }, body: JSON.stringify(body) })).status, { method, url, body });
+  expect(await send("POST", "/v1/medicines", { name: MED, type: "supplement", started_precision: "not_sure" })).toBe(201);
+  expect(await send("PATCH", "/v1/me/profile", { answers: { "ON-10": ["pregnancy"] } })).toBe(200);
+  expect(await send("PUT", "/v1/health/conditions", { conditions: [{ condition: "reflux", status: "diagnosed_by_a_doctor", year: 2019 }] })).toBe(200);
+
+  await page.goto("/doctor");
+  await page.getByLabel("Questions you want to ask your doctor").fill("Synthetic question QZ-88");
+  await page.getByRole("checkbox", { name: "Medicines", exact: true }).click();
+  await page.getByRole("checkbox", { name: "Health background" }).click();
+  await expect(page.getByRole("checkbox", { name: "Medicines", exact: true })).not.toBeChecked();
+  await page.getByRole("button", { name: "Preview report" }).click();
+  const preview = page.getByRole("region", { name: /Preview: everything/ });
+  await expect(preview.getByText("QZ-88")).toBeVisible({ timeout: 30000 });
+  await expect(preview.getByText(/Sections included:/)).not.toContainText("Medicines");
+  const previewText = (await preview.innerText()).toLowerCase();
+  for (const leak of [MED, "Pregnancy", "Reflux"]) expect(previewText, leak).not.toContain(leak.toLowerCase());
+
+  // The shared page shows the same content as the preview.
+  await page.getByLabel("Who is it for?").fill("Test GP");
+  await page.getByLabel("What is it for?").fill("Privacy check");
+  await page.getByRole("checkbox").last().check();
+  await page.getByRole("button", { name: "Create share link" }).click();
+  const link = (await page.locator("p.break-all").innerText()).trim();
+  const reader = await page.context().newPage();
+  await reader.goto(link);
+  await expect(reader.getByText("QZ-88")).toBeVisible({ timeout: 30000 });
+  const sharedText = (await reader.locator("main").innerText()).toLowerCase();
+  for (const leak of [MED, "Pregnancy", "Reflux"]) expect(sharedText, leak).not.toContain(leak.toLowerCase());
+  for (const heading of ["At a glance", "Questions for the appointment", "Symptoms", "What is missing, and limits"]) {
+    expect(previewText, heading).toContain(heading.toLowerCase());
+    expect(sharedText, heading).toContain(heading.toLowerCase());
+  }
+});
