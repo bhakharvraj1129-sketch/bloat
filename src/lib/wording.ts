@@ -1,11 +1,13 @@
 // Fixed wording. These sentences come from the plan (A01, A14, A15, A17, 0.3, 0.4) and are never
-// rewritten by code or AI. The NHS text is quoted word for word; only the emergency number changes.
+// rewritten by code or AI. The medical-help text is adapted from the NHS "Bloating" page for the US,
+// Canada and India (for example "pass gas", "urgent care", the local emergency number), so it is
+// labelled "Adapted from NHS, Bloating" and never claimed to be an exact quote. Every NHS warning sign is kept.
 import { emergencyNumber } from "./registry";
 
 export const CONSENT_VERSION = "2026-11-16";
 export const HELP_PAGE_VERSION = "nhs-bloating-2026-11-07";
 export const NHS_SOURCE_URL = "https://www.nhs.uk/symptoms/bloating/";
-export const NHS_SOURCE_LABEL = "Source: NHS, Bloating";
+export const NHS_SOURCE_LABEL = "Adapted from NHS, Bloating";
 
 export const INTENDED_USE =
   "Bloat is a general wellness app for adults. It lets people record bloating, meals, bowel movements, exercise and daily habits, and shows patterns in their own records. Bloat does not diagnose, treat, cure, mitigate or prevent any disease or condition, does not give medical advice, and is not for emergencies.";
@@ -38,7 +40,7 @@ export function emergencyPhrase(countryCode: string | null | undefined): string 
   return n ? `Call ${n} now` : "Call your local emergency number now";
 }
 
-/** The help page (plan A17). Section text is the stored NHS copy. */
+/** The help page (plan A17). Section text is the stored copy adapted from the NHS page. */
 export function helpPage(countryCode: string | null | undefined) {
   return {
     version: HELP_PAGE_VERSION,
@@ -78,7 +80,7 @@ export function helpPage(countryCode: string | null | undefined) {
       },
     ],
     source:
-      "Source: NHS, \"Bloating\" (quoted word for word; only the emergency number is changed for the user's country). This page is general information, not medical advice.",
+      "Adapted from NHS, Bloating. Contact routes and the emergency number are changed for your country. This page is general information, not medical advice.",
     sourceUrl: NHS_SOURCE_URL,
   };
 }

@@ -178,7 +178,7 @@ describe("Slice A: episodes (plan A08)", () => {
     expect(a.body.advice).toHaveLength(9);
     for (const adv of a.body.advice) {
       expect(adv.sentence).toMatch(signs[adv.code]!);
-      expect(adv.source).toBe("Source: NHS, Bloating");
+      expect(adv.source).toBe("Adapted from NHS, Bloating");
     }
     // Q163: blood in poo is at the "see a doctor" level, not an emergency.
     expect(a.body.advice.find((x: any) => x.code === "blood_in_poo").level).toBe("see_doctor");

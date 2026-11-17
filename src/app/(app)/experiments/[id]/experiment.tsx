@@ -75,7 +75,7 @@ export function Experiment({ id }: { id: string }) {
                 <Label>Result</Label>
                 <p>{d.result.text}</p>
                 {d.result.help_link && <Link href="/help" className="font-semibold">When to get medical help</Link>}
-                {d.doctor_note && <Caption>{d.doctor_note} Source: NHS, Bloating.</Caption>}
+                {d.doctor_note && <Caption>{d.doctor_note} Adapted from NHS, Bloating.</Caption>}
               </Card>
             )}
 

@@ -60,6 +60,8 @@ export function offerFor(def: ExperimentDef, e: Eligibility): Offer {
     else if (!e.fx03No) reason = "Answer the safety question about allergies first.";
     else if (!e.constipationLogged) reason = "Offered once constipation has been logged.";
   }
+  // A paused experiment is never offered, whatever the person's answers.
+  if (def.paused) reason = def.paused;
   return { key: def.key, name: def.name, type: def.type, offered: reason === null, reason };
 }
 

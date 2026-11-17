@@ -5,7 +5,7 @@ import { useSave } from "@/lib/client/hooks";
 
 export type DoctorLineData = { show: boolean; days: number; window: number; sentence: string; ovarianSentence: string | null; shortened: boolean; source: string; sourceUrl: string };
 
-/** The doctor line: a quiet line quoting the NHS word for word. Never a pop-up, never on Today. */
+/** The doctor line: a quiet line based on the NHS bloating page, labelled "Adapted from NHS, Bloating". Never a pop-up, never on Today. */
 export function DoctorLineBox({ line, onChanged }: { line: DoctorLineData; onChanged?: () => void }) {
   const save = useSave();
   return (

@@ -55,7 +55,7 @@ test("log bloating with a warning sign, update it, end it, add a meal, and see i
   await sheet.getByRole("radio", { name: "6", exact: true }).click();
   await sheet.getByRole("checkbox", { name: "Fever, or feeling hot, cold or shivery" }).click();
   await expect(sheet.getByText("Contact a doctor today or go to urgent care.")).toBeVisible();
-  await expect(sheet.getByText("Source: NHS, Bloating")).toBeVisible();
+  await expect(sheet.getByText("Adapted from NHS, Bloating")).toBeVisible();
   // Pro fields are locked for Free, with a truthful label
   await expect(sheet.getByText("How it feels, other symptoms")).toBeVisible();
   await sheet.getByRole("button", { name: "Save" }).click();

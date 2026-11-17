@@ -7,7 +7,7 @@ Bloat is a calm personal diary for bloating: log in two taps, see your own patte
 - Write plainly, in the second person ("you", "your records"). Short sentences. No emoji, no exclamation marks.
 - Say what the records show, never what they mean: "Fizzy drinks: 5.6 on 9 days with, 4.1 on 12 days without." Never "trigger found", "bad food", "safe food", "cause", "diagnosis", "abnormal".
 - Every comparison ends with the fixed caption: "This is a difference in your records, not a medical measure."
-- Quote the NHS word for word for medical advice, with "Source: NHS, Bloating" in `caption`. Never write medical advice in Bloat's own words.
+- For medical advice use only the fixed copy adapted from the NHS bloating page, with "Adapted from NHS, Bloating" in `caption` (changed 18 Nov 2026 at the owner's request: the copy is adapted for the US, Canada and India, not word for word). Never write medical advice in Bloat's own words.
 - Honest states: say "Saving…" until the server confirms, then "Saved". Unknown stays "Not sure", never filled in.
 - No streaks, guilt or pressure. "Mostly" is a fine answer.
 

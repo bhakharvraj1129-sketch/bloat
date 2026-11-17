@@ -134,11 +134,22 @@ describe("Slice E: experiments (plan A15)", () => {
     // Kiwifruit with FX-03 not answered: not offered, and the list says to answer the question first.
     const v = await withDays(5);
     const kiwi = (await call(v, "GET", "/v1/experiments", undefined, { now: clock(5) })).body.habit.find((h: any) => h.key === "kiwifruit_for_regularity");
-    expect(kiwi).toMatchObject({ offered: false, reason: "Answer the safety question about allergies first.", warning: "Don't try this if you're allergic to kiwi" });
+    expect(kiwi).toMatchObject({ offered: false, reason: "Paused for now while its instructions are reviewed.", warning: "Don't try this if you're allergic to kiwi" });
     expect((await call(v, "POST", "/v1/experiments", { key: "kiwifruit_for_regularity" }, { now: clock(5) })).status).toBe(403);
     await call(v, "POST", "/v1/experiments/checks", { ...NO, fx03: "yes" }, { now: clock(5) });
     expect((await call(v, "POST", "/v1/experiments", { key: "kiwifruit_for_regularity" }, { now: clock(5) })).status).toBe(403);
     expect((await call(v, "POST", "/v1/experiments", { key: "slow_breathing" }, { now: clock(5) })).status).toBe(201);
+  });
+
+  it("the kiwifruit experiment is paused for review: refused on the server even when every safety answer allows it", async () => {
+    const u = await withDays(5);
+    await call(u, "POST", "/v1/experiments/checks", NO, { now: clock(5) }); // FX-03 No
+    const r = await call(u, "POST", "/v1/experiments", { key: "kiwifruit_for_regularity" }, { now: clock(5) });
+    expect(r.status).toBe(403);
+    expect(r.body.error).toMatchObject({ code: "NOT_ELIGIBLE", message: "Paused for now while its instructions are reviewed." });
+    const list = await call(u, "GET", "/v1/experiments", undefined, { now: clock(5) });
+    expect(list.body.habit.find((h: any) => h.key === "kiwifruit_for_regularity")).toMatchObject({ offered: false });
+    expect((await call(u, "GET", "/v1/experiments", undefined, { now: clock(5) })).body.habit.filter((h: any) => h.offered).length).toBeGreaterThan(0);
   });
 
   it("Q118, Q119: a wellbeing Yes pauses the swap and shows the helpline; the swap step ends itself after 2 weeks and the add-back week comes before any result", async () => {

@@ -7,7 +7,11 @@ import { mean, round1, type DaySummary } from "./day";
 export type ExperimentDef = {
   key: string; type: "habit" | "swap"; name: string; instruction: string; source: string; days: number;
   food_group?: string; swap?: string; target?: { kind: "food" | "habit"; id: string }; needs_no_allergy?: boolean; warning?: string;
+  /** Set while an experiment is under review: it is shown as not offered and the server refuses to start it. */
+  paused?: string;
 };
+
+export const PAUSED_FOR_REVIEW = "Paused for now while its instructions are reviewed.";
 
 const swapText = (group: string) => config.swap_experiments.find((s) => s.group === group)!.swap;
 
@@ -18,7 +22,10 @@ export const EXPERIMENTS: ExperimentDef[] = [
   { key: "fewer_fizzy_drinks", type: "habit", name: "Fewer fizzy drinks", instruction: "Swap soda, sparkling water and energy drinks for still drinks.", source: "NIDDK, NHS", days: 7, target: { kind: "food", id: "TAG-09" } },
   { key: "walk_after_meals", type: "habit", name: "Walk after meals", instruction: "Gentle 10–15 minutes after main meals, if comfortable.", source: "NHS; 2021 RCT", days: 7, target: { kind: "habit", id: "ACT-08" } },
   { key: "slow_breathing", type: "habit", name: "Slow breathing", instruction: "3 minutes diaphragmatic breathing, 3 times a day.", source: "2025 RCT; NHS", days: 7 },
-  { key: "kiwifruit_for_regularity", type: "habit", name: "Kiwifruit for regularity", instruction: "2 whole kiwifruit a day.", source: "BDA 2025", days: 7, needs_no_allergy: true, warning: "Don't try this if you're allergic to kiwi" },
+  // Paused 18 Nov 2026 at the owner's request: its source link was broken, and the BDA guideline
+  // (PMC12623288) describes 2-3 kiwifruit a day for at least 4 weeks, not 7 days. Proposed
+  // correction in docs/content/proposed-corrections-2026-11-18.md. Not offered until approved.
+  { key: "kiwifruit_for_regularity", type: "habit", name: "Kiwifruit for regularity", instruction: "2 whole kiwifruit a day.", source: "BDA 2025", days: 7, needs_no_allergy: true, warning: "Don't try this if you're allergic to kiwi", paused: PAUSED_FOR_REVIEW },
   { key: "swap_lactose_free_dairy", type: "swap", name: "Swap: lactose-free dairy", instruction: `Swap milk and soft dairy for: ${swapText("TAG-01")}.`, source: "NIDDK", days: 14, food_group: "TAG-01", swap: swapText("TAG-01"), target: { kind: "food", id: "TAG-01" } },
   { key: "swap_onion_and_garlic", type: "swap", name: "Swap: onion and garlic", instruction: `Swap onion and garlic for: ${swapText("TAG-03")}.`, source: "Monash", days: 14, food_group: "TAG-03", swap: swapText("TAG-03"), target: { kind: "food", id: "TAG-03" } },
   { key: "swap_beans_and_lentils", type: "swap", name: "Swap: beans and lentils", instruction: `Swap beans and lentils for: ${swapText("TAG-04")}.`, source: "NIDDK, NHS", days: 14, food_group: "TAG-04", swap: swapText("TAG-04"), target: { kind: "food", id: "TAG-04" } },

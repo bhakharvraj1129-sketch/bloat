@@ -3,7 +3,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import acceptance from "@data/Bloat_Acceptance_v4.3.json";
 import { config, questions, checkAnswer, emergencyNumber, helpline, prices, formatMoney, thresholds, aiProtection } from "@/lib/registry";
-import { BANNED_PHRASES, helpPage, HELP_PAGE_VERSION, levelSentence, INTENDED_USE, COMPARISON_LINE, TRIGGERS_FOOTER } from "@/lib/wording";
+import { BANNED_PHRASES, helpPage, HELP_PAGE_VERSION, levelSentence, INTENDED_USE, COMPARISON_LINE, TRIGGERS_FOOTER, NHS_SOURCE_LABEL } from "@/lib/wording";
 import { analysisDate, formatDate, offsetMinutes, splitByDate, zonedToUtc, localDate } from "@/lib/time";
 import { effectivePlan } from "@/lib/domain/plan";
 import { buildDoctorLine } from "@/lib/domain/doctorline";
@@ -76,7 +76,7 @@ describe("Data files from the plan PDF", () => {
 });
 
 describe("Wording and safety (plan A17)", () => {
-  it("Q148 the help page matches the stored NHS copy word for word", () => {
+  it("Q148 the help page matches the stored copy adapted from the NHS, and says it is adapted (never \"word for word\")", () => {
     const p = helpPage("US");
     expect(p.version).toBe(HELP_PAGE_VERSION);
     expect(p.title).toBe("When to get medical help");
@@ -90,6 +90,11 @@ describe("Wording and safety (plan A17)", () => {
     expect(p.sections[2]!.heading).toBe("Book a regular appointment with a doctor if:");
     expect(p.sections[2]!.items).toEqual(["you feel bloated regularly", "you've tried changing what you eat and still keep feeling bloated", "you have bloating and are losing weight without trying", "you have bloating and blood in your poo"]);
     expect(config.doctor_line.sentence).toBe("The NHS suggests seeing a doctor if you feel bloated regularly or keep feeling bloated after changing your diet.");
+    expect(p.source).toBe("Adapted from NHS, Bloating. Contact routes and the emergency number are changed for your country. This page is general information, not medical advice.");
+    expect(p.sourceUrl).toBe("https://www.nhs.uk/symptoms/bloating/");
+    expect(NHS_SOURCE_LABEL).toBe("Adapted from NHS, Bloating");
+    // No user-facing text or label may claim the adapted text is quoted word for word.
+    for (const f of SOURCE.filter((x) => /\.(tsx?|json)$/.test(x))) expect(read(f), f).not.toMatch(/quoted word for word|Source: NHS, Bloating/);
   });
 
   it("Q38, Q130, Q161: emergency numbers and helplines match the country; unknown countries get generic wording", () => {
@@ -283,5 +288,20 @@ describe("AI layer (plan A11, 0.4)", () => {
     const result = await preparePhoto(big);
     if (result) expect(result.length).toBeLessThanOrEqual(2 * 1024 * 1024); // either refused or within the limit
     expect(aiProtection.photo_max_mb).toBe(2);
+  });
+});
+
+describe("Kiwifruit experiment pause", () => {
+  it("only the kiwifruit experiment is paused; its safety rules still hold underneath the pause", async () => {
+    const { EXPERIMENTS: list, PAUSED_FOR_REVIEW } = await import("@/lib/domain/experiments");
+    const { offerFor } = await import("@/server/experiments");
+    expect(list.filter((e) => e.paused).map((e) => e.key)).toEqual(["kiwifruit_for_regularity"]);
+    const kiwi = list.find((e) => e.key === "kiwifruit_for_regularity")!;
+    const ok = { blockedByCondition: false, checkedRecently: true, fxPassed: true, fx03No: true, constipationLogged: true, swapsIn180: 0, active: null, priorConfirmed: 7 };
+    expect(offerFor(kiwi, ok as never)).toMatchObject({ offered: false, reason: PAUSED_FOR_REVIEW });
+    const unpaused = { ...kiwi, paused: undefined };
+    expect(offerFor(unpaused, ok as never).offered).toBe(true);
+    expect(offerFor(unpaused, { ...ok, fx03No: false } as never).reason).toBe("Answer the safety question about allergies first.");
+    expect(offerFor(unpaused, { ...ok, blockedByCondition: true } as never).offered).toBe(false);
   });
 });
