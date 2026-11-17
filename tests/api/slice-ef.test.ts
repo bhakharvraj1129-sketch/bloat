@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { randomUUID } from "node:crypto";
 import { publishedCards } from "@content/cards";
-import { addDays, asUser, BASE, staffSession, at, call, logDay, makePro, NY, onboarded, proUser, srvRpc, webhook, type User } from "./helpers";
+import { addDays, anon, asUser, BASE, onboardingBody, staffSession, at, call, logDay, makePro, NY, onboarded, proUser, srvRpc, webhook, type User } from "./helpers";
 
 const START = "2026-08-01";
 const day = (i: number) => addDays(START, i);
@@ -422,5 +422,23 @@ describe("Slice F: subscriptions, pause and safe analytics", () => {
     for (const leak of ["garlic", "naan", "blood", "diarrh", "50_59", "ovar", "menopause", "\"strength\"", "\"worst\"", "\"score\""]) expect(text, leak).not.toContain(leak);
     const allowed = new Set(["plan", "with_ingredients", "late", "count", "type", "interval", "accepted"]);
     for (const e of data!) for (const k of Object.keys(e.props as object)) expect(allowed.has(k), `${e.name}.${k}`).toBe(true);
+  });
+});
+
+describe("Designated Pro test accounts (BLOAT_PRO_TEST_EMAILS)", () => {
+  it("a listed, confirmed address gets Pro screens without any purchase; an unlisted one stays Free; nothing is written to billing", async () => {
+    const email = "pro-tester@bloat.test"; // listed in .env.local for the local server
+    const old = await anon().auth.signInWithPassword({ email, password: "synthetic-password-1" });
+    if (old.data.user) await srvRpc("srv_delete_account", { p_user: old.data.user.id });
+    const made = await anon().auth.signUp({ email, password: "synthetic-password-1" });
+    const u = { id: made.data.user!.id, email, token: made.data.session!.access_token };
+    expect((await call(u, "POST", "/v1/onboarding/commit", onboardingBody("US"))).status).toBe(201);
+    expect((await call(u, "GET", "/v1/journey")).status).toBe(200);
+    const ent = await call(u, "GET", "/v1/billing/entitlement");
+    expect(ent.body).toMatchObject({ plan: "pro", status: "none" });
+    const { data: rows } = await asUser(u).from("entitlements").select("plan,status");
+    expect((rows ?? []).filter((r) => r.plan === "pro")).toEqual([]); // Pro comes from the server list, not a purchase
+    const other = await onboarded();
+    expect((await call(other, "GET", "/v1/journey")).status).toBe(403);
   });
 });

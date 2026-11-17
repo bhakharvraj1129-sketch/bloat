@@ -17,6 +17,8 @@ export const env = {
   get billingWebhookSecret() { return process.env.BLOAT_BILLING_WEBHOOK_SECRET ?? ""; },
   get staffEmails() { return process.env.BLOAT_STAFF_EMAILS ?? ""; },
   get testLogin() { return process.env.BLOAT_TEST_LOGIN === "1"; },
+  /** Comma-separated confirmed email addresses that get Pro without a purchase (test accounts only). */
+  get proTestEmails() { return process.env.BLOAT_PRO_TEST_EMAILS ?? ""; },
   get resendKey() { return process.env.RESEND_API_KEY ?? ""; },
   get founderEmail() { return process.env.BLOAT_FOUNDER_EMAIL ?? ""; },
 };

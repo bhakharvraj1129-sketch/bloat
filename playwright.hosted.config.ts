@@ -13,6 +13,6 @@ export default defineConfig({
   workers: 1,
   retries: 0,
   reporter: [["list"]],
-  use: { baseURL: process.env.HOSTED_URL, trace: "off", ...(proxy ? { proxy: { server: proxy } } : {}) },
+  use: { baseURL: process.env.HOSTED_URL, trace: "off", ...(proxy ? { proxy: { server: proxy, bypass: "localhost,127.0.0.1" } } : {}) },
   projects: [{ name: "phone", use: { ...devices["Pixel 7"] } }],
 });

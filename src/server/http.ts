@@ -5,6 +5,7 @@ import { bearerClient, cookieClient, type Db } from "./supabase";
 import { DbError, tx, type Op } from "./db";
 import { isProFeature, type FeatureKey } from "@/lib/registry";
 import { effectivePlan, type Entitlement } from "@/lib/domain/plan";
+import { env } from "./env";
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string, message: string, public details?: unknown) {
@@ -66,19 +67,32 @@ export function errorResponse(e: ApiError, requestId: string): Response {
 
 const hash = (s: string) => createHash("sha256").update(s).digest("hex");
 
-async function authenticate(req: Request): Promise<{ userId: string; db: Db } | null> {
+type Who = { userId: string; db: Db; email: string | null };
+const confirmedEmail = (u: { email?: string | null; email_confirmed_at?: string | null }) => (u.email && u.email_confirmed_at ? u.email.toLowerCase() : null);
+
+async function authenticate(req: Request): Promise<Who | null> {
   const header = req.headers.get("authorization");
   if (header?.toLowerCase().startsWith("bearer ")) {
     const token = header.slice(7).trim();
     const db = bearerClient(token);
     const { data, error } = await db.auth.getUser(token);
     if (error || !data.user) return null;
-    return { userId: data.user.id, db };
+    return { userId: data.user.id, db, email: confirmedEmail(data.user) };
   }
   const db = await cookieClient();
   const { data, error } = await db.auth.getUser();
   if (error || !data.user) return null;
-  return { userId: data.user.id, db };
+  return { userId: data.user.id, db, email: confirmedEmail(data.user) };
+}
+
+/**
+ * Designated test accounts (BLOAT_PRO_TEST_EMAILS) get Pro without any purchase, so Pro screens
+ * can be tested while payments and the mock purchase are off. Decided on the server only, and
+ * only for a confirmed email address (the person proved they read that mailbox).
+ */
+export function isProTestAccount(email: string | null): boolean {
+  if (!email) return false;
+  return env.proTestEmails.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean).includes(email);
 }
 
 async function loadEntitlement(db: Db, userId: string): Promise<Entitlement | null> {
@@ -147,6 +161,7 @@ export function route<B = undefined>(opts: Options<B>, handler: Handler<B>) {
       if (who) {
         entitlement = await loadEntitlement(who.db, who.userId);
         plan = effectivePlan(entitlement, now);
+        if (plan !== "pro" && isProTestAccount(who.email)) plan = "pro";
         if (opts.feature && isProFeature(opts.feature) && plan !== "pro") {
           throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Pro.");
         }

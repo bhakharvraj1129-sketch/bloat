@@ -78,18 +78,28 @@ describe("Privacy: the two-user test (plan B04)", () => {
     }
   });
 
-  it("server functions refuse a missing or wrong secret", async () => {
+  it("all 14 server functions refuse a missing or wrong secret, and signed-in users cannot call them at all (even with the right secret)", async () => {
     const a = await seed();
-    for (const secret of ["", "wrong", null]) {
-      const { error } = await asUser(a.u).rpc("srv_tx", { p_secret: secret, p_user: a.u.id, p_ops: [{ op: "update", table: "entitlements", match: { user_id: a.u.id }, set: { plan: "pro" } }] });
-      expect(error).not.toBeNull();
-      const del = await asUser(a.u).rpc("srv_delete_account", { p_secret: secret, p_user: a.u.id });
-      expect(del.error).not.toBeNull();
-      const adm = await asUser(a.u).rpc("srv_admin_read", { p_secret: secret });
-      expect(adm.error).not.toBeNull();
+    const uid = a.u.id;
+    const calls: Array<[string, Record<string, unknown>]> = [
+      ["srv_tx", { p_user: uid, p_ops: [{ op: "update", table: "entitlements", match: { user_id: uid }, set: { plan: "pro" } }] }],
+      ["srv_ai_gate", { p_user: uid, p_local_day: "2026-11-01" }], ["srv_ai_record", { p_user: uid, p_row: {} }],
+      ["srv_alert", { p_kind: "x", p_detail: {} }], ["srv_admin_set", { p_what: "monthly_limit_micros", p_value: 1 }], ["srv_admin_read", {}],
+      ["srv_billing_event", { p_event: {} }], ["srv_delete_account", { p_user: uid }], ["srv_reapply_tombstones", {}],
+      ["srv_share_lookup", { p_token_hash: "x" }], ["srv_export_lookup", { p_token_hash: "x" }], ["srv_waitlist_add", { p_email: "x@example.com", p_country: "GB" }],
+      ["srv_test_user", { p_email: "intruder@example.com", p_password: "intruder-password" }], ["srv_capability_set", { p_country: "US", p_feature: "recording", p_status: "suspended" }],
+    ];
+    for (const [fn, args] of calls) {
+      for (const secret of ["", "wrong", null]) {
+        expect((await anon().rpc(fn, { p_secret: secret, ...args })).error, `${fn} anon ${secret}`).not.toBeNull();
+        expect((await asUser(a.u).rpc(fn, { p_secret: secret, ...args })).error, `${fn} user ${secret}`).not.toBeNull();
+      }
+      const withSecret = await asUser(a.u).rpc(fn, { p_secret: SERVER_SECRET, ...args });
+      expect(withSecret.error?.code, `${fn} signed-in with the right secret`).toBe("42501"); // permission denied
     }
     const { data } = await asUser(a.u).from("entitlements").select("plan").single();
     expect(data!.plan).toBe("free");
+    expect((await anon().from("country_capabilities").select("status").eq("country", "US").eq("feature", "recording").single()).data!.status).not.toBe("suspended");
     expect(SERVER_SECRET.length).toBeGreaterThan(20);
   });
 
