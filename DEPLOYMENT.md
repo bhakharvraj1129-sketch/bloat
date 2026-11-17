@@ -10,17 +10,9 @@ Nothing is public. A private preview exists. This file says how it is set up and
 | Supabase `bloat-test` (`qntazirusbuwfmnmihzu`) | Three migrations applied through the Supabase connector: `20261117051631 foundation`, `20261117051734 server_functions`, `20261117051738 synthetic_test_users`. The file names in `supabase/migrations/` carry the same versions. Nine schema fingerprints (columns, constraints, indexes, policies, RLS flags, functions, grants) were compared between a local database built from the files and the hosted one: identical. |
 | The one data change outside migrations | One row in `private.server_secrets` named `preview-2026-11-17`, holding only the SHA-256 hash of the preview secret. This is step 2 below. The secret itself is not in the database or the repo. |
 | Vercel | Team `typeshi2`, project `bloat`. Builds every push to the branch as a Preview. Vercel Authentication is on for all preview URLs. Framework Next.js, Node 22. Stable URL: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`. |
-| Vercel variables (Preview only) | Set: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `BLOAT_AI_PROVIDER=mock`, `BLOAT_BILLING_PROVIDER=mock`, `BLOAT_TEST_LOGIN=1`. **Missing: `BLOAT_SERVER_SECRET`.** |
+| Vercel variables (Preview only) | Set: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `BLOAT_AI_PROVIDER=mock`, `BLOAT_BILLING_PROVIDER=mock`, `BLOAT_TEST_LOGIN=1`, and `BLOAT_SERVER_SECRET` (added by the owner, Sensitive). |
 | Duplicate project | `bloat-zlrr` is a second Vercel project on the same repo. Untouched and unused. Safe for the owner to delete. |
 | AI key, Resend, Sentry, Google sign-in, payments | Not connected. Production has no variables and is not used. |
-
-## The one step left (owner)
-
-1. In Vercel open project **bloat**, then Settings, then Environment Variables.
-2. Add a variable named `BLOAT_SERVER_SECRET`. Paste the preview secret as the value. Tick **Preview** only. Mark it **Sensitive**. Save.
-3. Redeploy the latest preview (Deployments, the three dots, Redeploy), or ask Claude to push a commit.
-
-Variables only reach builds made after they are saved, so step 3 is needed.
 
 ## Environment variables
 
