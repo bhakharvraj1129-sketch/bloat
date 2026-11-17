@@ -17,11 +17,11 @@ Run on the local stack: built app on port 3100, local Supabase in Docker.
 
 ## Hosted preview
 
-Run with `pnpm test:hosted` in a real browser (Chromium, phone screen) against `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`, hosted `bloat-test` database. First passing run on commit `c25610a`; rerun on commit `cdc2ebc` (with the founder sign-in step and country pause code, and migration `20261117061403` applied): 5 passed, 0 failed.
+Run with `pnpm test:hosted` in a real browser (Chromium, phone screen) against `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`, hosted `bloat-test` database. First passing run on commit `c25610a`; rerun on commit `cdc2ebc` (founder sign-in step, country pause, migration `20261117061403` applied) and again on commit `1540294` (photo fix, kiwifruit card draft): 5 passed, 0 failed each time.
 
 | Check | Result |
 |---|---|
-| Vercel builds of commits `c25610a` and `cdc2ebc` | Ready |
+| Vercel builds of commits `c25610a`, `cdc2ebc` and `1540294` | Ready |
 | Hosted schema equals the migration files (nine fingerprints) | Identical |
 | A signed-out visitor meets Vercel protection, for pages and for the API | Passed |
 | A synthetic user signs up, saves a meal, and still sees it in History after a refresh (and in the day after another refresh) | Passed |
