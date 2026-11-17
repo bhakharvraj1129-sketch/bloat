@@ -34,7 +34,8 @@ Names are in `.env.example`. Never commit values.
 | `BLOAT_AI_PROVIDER`, `BLOAT_AI_MODEL`, `ANTHROPIC_API_KEY` | server only | `mock` by default. `anthropic` plus a key for the real check. Only approved models run. |
 | `BLOAT_BILLING_PROVIDER`, `BLOAT_BILLING_WEBHOOK_SECRET` | server only | `mock` only. |
 | `BLOAT_STAFF_EMAILS` | server only | Comma-separated email addresses allowed into `/admin` (founder tools). Each also needs an authenticator app code. Leave empty to switch founder tools off. Not set on the preview. |
-| `BLOAT_TEST_LOGIN` | server only | `1` on previews with synthetic accounts. Never on a live site: it also enables the mock purchase and the test clock. |
+| `BLOAT_TEST_LOGIN` | server only | Exactly `1` turns on password sign-in for synthetic accounts, the mock purchase and the test clock. **`0` on the public preview since 18 Nov 2026.** Never `1` on a public or live site. |
+| `BLOAT_PRO_TEST_EMAILS` | server only | Comma-separated confirmed addresses that get Pro without a purchase, for testing Pro screens while payments and the mock purchase are off. Preview: `pro-tester@bloat.test` (synthetic, for the hosted test run) and the owner's test mailbox. Empty on a live site. |
 
 ## Set up a preview from scratch
 
