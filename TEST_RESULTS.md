@@ -1,6 +1,33 @@
 # Test results
 
-Last run: 18 Nov 2026 (UTC dates in logs read 17 Nov). Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 18 Nov 2026. The newest results (email-and-password sign-in) are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+
+## Email-and-password sign-in (18 Nov 2026)
+
+### Local (local Supabase in Docker; nothing hosted)
+
+| Check | Result |
+|---|---|
+| Rule tests `pnpm test` (adds 3 sign-in message and validation tests) | 92 passed, 0 failed |
+| API tests `pnpm test:api` (default email-code mode) | 134 passed, 0 failed |
+| Browser tests `pnpm test:e2e` (default email-code mode, incl. 5 email-code tests with real local emails) | 17 passed, 0 failed |
+| Type check, lint | 0 errors (5 old warnings) |
+| Rehearsal: the hosted suite against a local copy in password mode (`BLOAT_SIGN_IN_METHOD=password`, `BLOAT_TEST_LOGIN=0`) with 7 synthetic local accounts | **9 passed, 1 failed by design.** Passed: public visit and password-only sign-in screen; test switches off; signed-out API and database access refused; meal saved and still there after refresh; diary flow incl. sign out and sign back in through the form; two-account isolation; report privacy and share-link revoke; exports; and the sign-in check (empty-form field errors, wrong password and unknown address get the same message, password cleared, no input names, no password in any URL, correct sign-in, refresh keeps the session, sign-out ends screens and APIs, and a second session's token stops working). Failed by design: "nobody can create an account", because local sign-ups stay on for the API tests; the test stopped before sending any sign-up request. |
+
+### Hosted preview
+
+Environment: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`, commit `940a00d` (deployment `dpl_92qDryyhPyPmfHvD7zVQbQLT6sXR`), `BLOAT_SIGN_IN_METHOD=password`, `BLOAT_TEST_LOGIN=0`, Supabase `bloat-test`. Run 18 Nov 08:30–08:45 UTC.
+
+| Check | Result |
+|---|---|
+| A fresh signed-out browser opens the preview (200, no Vercel login); `/today` goes to the app's sign-in; the sign-in shows email and password only, says new accounts can't be created; no "Send code", no sign-up links, no Google button; `/sign-in/code` sends you back to `/sign-in` | Passed (browser) |
+| Signed out: history, state, a day, reports and an export link 401; a meal save 401; founder tools 404; direct database reads with the public key return nothing or "permission denied"; a direct insert refused | Passed (browser and API) |
+| Empty form: field error shown and the field marked invalid; unknown email and wrong password: only "Email or password is incorrect."; password field cleared; 0 inputs with a `name`; the password appeared in no requested URL; the page stayed on `/sign-in` with no query | Passed (browser) |
+| Old test-login route | 404, passed |
+| Supabase logs since 08:00 UTC: the 2 wrong-password attempts show as `invalid_credentials`; 0 log lines contain password text (auth, edge and database logs) | Passed |
+| **Direct requests cannot create accounts** | **Not passed.** Supabase still has sign-ups on (`disable_signup` false). The test checks this first and sends no sign-up request while it is on. Owner action: DEPLOYMENT.md, "Sign-in method", step 1. |
+| Correct credentials sign in; refresh keeps the session; sign-out ends screens, APIs and the old token; two-account isolation, on hosted | **Not run on hosted.** The temporary verification accounts could not be created: the Supabase connector asked the owner to confirm the SQL and got no answer, so nothing was created (checked: a sign-in for one of them answered `invalid_credentials`). The same checks passed in the local rehearsal above. |
+| Owner's own test account `bloat-tester@bloat.test` | Not created yet (owner action). |
 
 ## Local suites
 

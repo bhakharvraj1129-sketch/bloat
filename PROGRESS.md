@@ -1,17 +1,26 @@
 # Progress
 
-Last updated: 18 Nov 2026. Branch: `claude/bloat-software-build-uxzoru`.
+Last updated: 18 Nov 2026 (afternoon). Branch: `claude/bloat-software-build-uxzoru`.
 
 ## Where things stand
 
-The whole app is built end to end. A **public preview** runs on Vercel against the hosted `bloat-test` database, with synthetic data, a labelled mock AI and mock billing. It has never run against the real AI and takes no payments.
+The whole app is built end to end. A **public preview** runs on Vercel against the hosted `bloat-test` database, with synthetic data, a labelled mock AI and mock billing. No real payments, no real AI calls.
 
-- Public preview: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app` (no Vercel login). Test mode is off there: no password sign-in, no mock purchase, no test clock.
-- Hosted database: six checked-in migrations applied to `bloat-test`, matching the files by version.
-- Hosted browser suite (8 checks) passed on the public preview, commit `b70e7ed`: see TEST_RESULTS.md.
-- **Blocked: email sign-in codes are not delivered on the hosted project.** Supabase cannot finish sending through the custom SMTP server saved on 17 Nov (every request times out after 10 seconds; checked again 18:50 UTC on 17 Nov). The owner must fix the SMTP settings in Supabase. Until then nobody can sign in to the public preview by email. The app now says so plainly instead of waiting silently.
+- Public preview: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app` (no Vercel login).
+- **Sign-in is now email and password, temporarily, for owner-provisioned test accounts only** (commit `940a00d`). Email codes stay in the code for later. See DEPLOYMENT.md, "Sign-in method".
+- Test mode stays off on the preview (`BLOAT_TEST_LOGIN=0`): no old test login, no shared password, no mock purchase.
+- **Waiting on the owner (two Supabase dashboard steps):** switch off "Allow new users to sign up", and create `bloat-tester@bloat.test` with a strong password. Until sign-ups are off, someone could still create an account by calling Supabase directly.
+- The hosted checks that need a signed-in account (correct sign-in, refresh, sign-out, isolation) did not run on the hosted preview this time: the Supabase connector asked the owner to confirm creating the temporary test accounts and got no answer. They pass locally.
 
-Read next: `TEST_RESULTS.md` (what is proven, local and hosted kept apart), `DECISIONS.md` (what needs your yes), `DEPLOYMENT.md`.
+Read next: `TEST_RESULTS.md` (newest first, local and hosted kept apart), `DEPLOYMENT.md` (owner steps and how to restore email sign-in), `DECISIONS.md`.
+
+## Done on 18 Nov (afternoon): email-and-password sign-in
+
+1. `BLOAT_SIGN_IN_METHOD` switch: `password` on the preview, `email_code` (default) everywhere else. Only one sign-in is ever shown.
+2. New sign-in form: email and password, accessible field errors, one generic "Email or password is incorrect." message, loading state, password cleared after each try, no way for the password to land in a URL.
+3. No sign-up in the app; signed-in visitors are sent on; the 18+ confirmation is kept before setup.
+4. Hosted test suite now signs in through the real form and checks wrong details, refresh, sign-out (including that an older session's token stops working) and that nobody can create an account.
+5. Checked hosted Supabase settings: Site URL and redirect are the preview's `/auth/callback`; custom SMTP is off; sign-ups are still on.
 
 ## Done in the 18 Nov round
 
@@ -38,7 +47,8 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 
 ## Not done
 
-1. **Email code delivery on the hosted project** (owner: SMTP settings). Then prove it end to end with the test mailbox: a fresh email arrives, its code signs in, the session survives a refresh, a resend works after 60 seconds, a wrong or old code is refused. The local stack proves all of this with real emails from its mail catcher; the hosted proof needs the mailbox (the Gmail connection in this session must be signed in again).
+0. **Hosted proof of the password sign-in with a signed-in account** (correct sign-in, refresh, sign-out, isolation) and "nobody can create an account": waiting on the two owner steps and the connector confirmation (see Next steps).
+1. **Email sign-in for real users** (replaced by password sign-in for testing on 18 Nov). Custom SMTP was switched off; the built-in mailer only reaches project-team addresses, 2 an hour. Must be restored and proven end to end before anyone outside is invited (DEPLOYMENT.md, "Before inviting anyone outside").
 2. **Google sign-in**: switched off in Supabase, so not exercised. The button is hidden while it is off.
 3. **Founder MFA on the hosted app**: built and tested locally; needs the staff email address to set `BLOAT_STAFF_EMAILS` on the preview.
 4. **Real AI** and the **AI accuracy test**: the harness uses the app's own code path. Reference examples: 0 of 300 dishes, 0 of 100 photos (25 of them meant to be unclear). Paid calls need the owner's yes on the key and spending limit.
@@ -48,11 +58,10 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 
 ## Next steps, in order
 
-1. Owner: fix the SMTP settings in Supabase (DEPLOYMENT.md, "Email codes"). Owner: sign the Gmail connector in again for the test mailbox, or do the one manual check in the handoff.
-2. Prove hosted email delivery and sign-in (item 1 above). **This is the exact next unfinished task.**
-3. Owner: give the staff email for founder tools; then set `BLOAT_STAFF_EMAILS` and test MFA on the preview.
-4. Owner decisions in DECISIONS.md; then apply the approved content corrections.
-5. Design comparison once the 19 screens are copied in.
+1. Owner: in Supabase (bloat-test), switch off "Allow new users to sign up", then create `bloat-tester@bloat.test` with Auto Confirm and a strong password (DEPLOYMENT.md, "Sign-in method").
+2. Owner: answer the Supabase connector's confirmation when asked, so the temporary verification accounts can be created; then run the full hosted suite (10 checks) and delete those accounts. **This is the exact next unfinished task.**
+3. Before inviting anyone outside: restore email sign-in (DEPLOYMENT.md, "Before inviting anyone outside").
+4. Owner: staff email for founder tools; open decisions in DECISIONS.md; AI key and spending limit when ready.
 
 ## Later (ideas not in the plan, so not built)
 
