@@ -3,7 +3,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { SUPABASE_KEY, SUPABASE_URL, sessionFor, signInBrowser } from "./session";
+import { account, PASSWORD, SUPABASE_KEY, SUPABASE_URL, sessionFor } from "./session";
 
 // Browser and API checks against the PUBLIC preview and its database, with synthetic accounts
 // made for this run (see DEPLOYMENT.md, "Hosted test run"). Kept apart from the local suites.
@@ -18,20 +18,31 @@ test.beforeAll(() => {
   for (const k of ["HOSTED_URL", "HOSTED_SUPABASE_URL", "HOSTED_SUPABASE_KEY", "HOSTED_ACCOUNTS", "HOSTED_PASSWORD"]) if (!process.env[k]) throw new Error(`Set ${k}`);
 });
 
-/** A brand-new account: help page first (as the app requires), then the session, then setup. */
+/** Signs in through the app's own email-and-password form, the way a tester does. */
+async function signInForm(page: Page, role: string, opts: { adult?: boolean } = {}) {
+  await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible({ timeout: 30000 });
+  await page.getByLabel("Email").fill(account(role));
+  await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
+  if (opts.adult) await page.getByLabel("I am 18 or older").check();
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).not.toHaveURL(/\/sign-in/, { timeout: 30000 });
+}
+
+/** A brand-new account: country and help page first (as the app requires), then sign in, then setup. */
 async function onboard(context: BrowserContext, role: string): Promise<Page> {
   const page = await context.newPage();
   await page.goto("/start");
   await page.getByRole("radio", { name: "United States" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "I've read this" }).click();
-  await expect(page.getByRole("heading", { name: "Create your account" })).toBeVisible();
-  await signInBrowser(context, BASE, role);
-  await page.goto("/setup");
+  await signInForm(page, role, { adult: true });
+  await page.waitForLoadState("domcontentloaded");
+  await page.goto("/setup"); // setup sends an account that is already set up on to Today
   const consent = page.getByRole("heading", { name: "Consent" });
   const today = page.getByRole("heading", { name: "Today" });
   await expect(consent.or(today)).toBeVisible({ timeout: 30000 });
   if (await today.isVisible()) return page; // already set up in an earlier run
+  await page.getByRole("checkbox").first().waitFor();
   for (const box of await page.getByRole("checkbox").all()) await box.check();
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("checkbox", { name: "This is right" }).click();
@@ -65,7 +76,14 @@ test("public: a fresh signed-out browser opens the preview with no Vercel login,
   await expect(page.getByRole("link", { name: "Get started" }).first()).toBeVisible();
   await page.goto("/today");
   await expect(page).toHaveURL(/\/sign-in/);
-  await expect(page.getByRole("button", { name: "Send code" })).toBeVisible();
+  // The testing sign-in: email and password only. No sign-up, no email-code flow, no Google.
+  await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
+  await expect(page.getByText("New accounts can't be created here.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Send code" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /new here|already have an account|create/i })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Continue with Google" })).toHaveCount(0);
+  await page.goto("/sign-in/code?email=someone%40example.com");
+  await expect(page).toHaveURL(/\/sign-in$/); // the code screen is not offered
   await context.close();
 });
 
@@ -75,7 +93,7 @@ test("public: test-only switches are off (no password sign-in, no mock purchase,
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto("/sign-in");
-  await expect(page.getByRole("button", { name: "Send code" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
   await expect(page.getByText(/Test password|Test sign-in/)).toHaveCount(0);
   const p = await onboard(context, "public");
   for (const screen of ["/me", "/upgrade"]) {
@@ -155,7 +173,7 @@ test("Priority 2a: the diary flow (bloating with a warning sign, refresh, end, m
   await expect(page).not.toHaveURL(/\/me/, { timeout: 20000 });
   await page.goto("/today");
   await expect(page).toHaveURL(/sign-in/);
-  await signInBrowser(context, BASE, "diary");
+  await signInForm(page, "diary");
   await page.goto("/today");
   await expect(page.getByRole("heading", { name: "Today" })).toBeVisible({ timeout: 30000 });
   await expect(page.getByText(`Diary lunch ${stamp}`)).toBeVisible({ timeout: 20000 });
@@ -268,4 +286,67 @@ test("exports on the hosted preview: JSON and CSV downloads are complete for a s
   expect((await stranger.request.get(`${BASE}${out.json.url}`)).status()).toBe(401);
   await stranger.close();
   await context.close();
+});
+
+test("password sign-in: wrong details get one generic message, correct details sign in, a refresh keeps the session, and sign-out ends access to screens, APIs and the old token", async ({ browser }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  const seen: string[] = [];
+  page.on("request", (r) => seen.push(r.url()));
+  await page.goto("/sign-in");
+  // Empty form: accessible field errors, nothing sent.
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByText("Enter your email address.")).toBeVisible();
+  await expect(page.getByLabel("Email")).toHaveAttribute("aria-invalid", "true");
+  // A wrong password and an address with no account get exactly the same message.
+  const tries: Array<[string, string]> = [[account("p1"), `wrong-${stamp}`], [`nobody-${stamp}@example.com`, `wrong-${stamp}`]];
+  for (const [email, pw] of tries) {
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Password", { exact: true }).fill(pw);
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+    await expect(page.getByRole("alert").filter({ hasText: "Email or password is incorrect." })).toBeVisible({ timeout: 20000 });
+    await expect(page.getByLabel("Password", { exact: true })).toHaveValue(""); // cleared after each try
+    await expect(page).toHaveURL(/\/sign-in$/);
+  }
+  // The inputs have no "name", so even a form sent before the page is ready carries nothing.
+  expect(await page.locator("form input[name]").count()).toBe(0);
+  await signInForm(page, "p1");
+  await page.reload();
+  await expect(page).not.toHaveURL(/sign-in/);
+  const status = () => page.evaluate(async () => (await fetch("/v1/me/state", { cache: "no-store" })).status);
+  expect(await status()).toBe(200);
+  // Credentials never appear in any address the browser asked for.
+  for (const u of seen) {
+    expect(u, u).not.toContain(encodeURIComponent(PASSWORD));
+    expect(u, u).not.toContain(PASSWORD);
+    expect(u.toLowerCase(), u).not.toContain("password=");
+  }
+  const tokenCookie = (await context.cookies()).filter((c) => c.name.includes("auth-token"));
+  expect(tokenCookie.length).toBeGreaterThan(0);
+  const { token: oldToken } = await sessionFor("p1"); // a second session, to prove sign-out revokes it too
+  await page.goto("/me");
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await expect(page).not.toHaveURL(/\/me/, { timeout: 20000 });
+  expect((await context.cookies()).filter((c) => c.name.includes("auth-token") && c.value)).toEqual([]);
+  await page.goto("/today");
+  await expect(page).toHaveURL(/\/sign-in/);
+  expect(await status()).toBe(401);
+  // Supabase signs out every session of the account ("global"), so even a token taken earlier stops working.
+  const reused = await fetch(`${BASE}/v1/me/state`, { headers: { Authorization: `Bearer ${oldToken}` } });
+  expect(reused.status).toBe(401);
+  await context.close();
+});
+
+test("nobody can create an account: sign-ups are off in Supabase itself, the email-code route creates nothing, and the old test login is gone", async ({ request }) => {
+  const settings = await (await fetch(`${SUPABASE_URL}/auth/v1/settings`, { headers: { apikey: SUPABASE_KEY } })).json();
+  // Checked first, so no sign-up request (and no email) is ever sent while sign-ups are still on.
+  expect(settings.disable_signup, "Supabase still allows new sign-ups (Authentication, Sign In / Providers, 'Allow new users to sign up')").toBe(true);
+  const fresh = `nobody-${stamp}@example.com`;
+  const signup = await fetch(`${SUPABASE_URL}/auth/v1/signup`, { method: "POST", headers: { apikey: SUPABASE_KEY, "content-type": "application/json" }, body: JSON.stringify({ email: fresh, password: `Pw-${stamp}-x9!` }) });
+  expect(signup.status).toBe(422);
+  expect((await signup.json()).error_code).toBe("signup_disabled");
+  const otp = await fetch(`${SUPABASE_URL}/auth/v1/otp`, { method: "POST", headers: { apikey: SUPABASE_KEY, "content-type": "application/json" }, body: JSON.stringify({ email: fresh, create_user: true }) });
+  expect(otp.status).toBe(422);
+  const legacy = await request.post(`${BASE}/v1/auth/test-login`, { data: { email: fresh, password: "synthetic-password-1", create: true } });
+  expect(legacy.status()).toBe(404);
 });

@@ -47,7 +47,9 @@ export function Setup() {
     fetch("/v1/me/state", { cache: "no-store" }).then((r) => r.json()).then((s) => {
       if (s?.onboarded) return router.replace("/today");
       const pre = readPre();
+      // Country, the help page and the 18+ confirmation all come before any health question.
       if (!pre.country || !pre.help_viewed_at) return router.replace("/start");
+      if (!pre.adult) return router.replace("/sign-in?new=1");
       help.current = { viewed_at: pre.help_viewed_at, page_version: pre.help_version ?? HELP_PAGE_VERSION };
       setCountry(pre.country);
       setUnits((countryCfg(pre.country)?.units_default as "us" | "metric") ?? "metric");

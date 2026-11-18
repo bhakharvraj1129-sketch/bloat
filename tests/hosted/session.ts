@@ -1,10 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
-import type { BrowserContext } from "@playwright/test";
 
-// Signs a pre-made synthetic test account in through Supabase directly (not through the app,
-// which has no password sign-in when test mode is off) and gives the browser the same session
-// cookie the app would set. Accounts and their one-off password are made by the test operator
-// for each run and deleted afterwards; nothing here is a real person's account.
+// Accounts for one hosted test run. The browser tests sign in through the app's own email-and-
+// password form; sessionFor() signs in through Supabase directly only to check the database from
+// the outside (isolation) and that sign-out revokes other sessions. Accounts and their one-off
+// password are made by the test operator for each run and deleted afterwards (DEPLOYMENT.md,
+// "Hosted test run"); nothing here is a real person's account.
 export const SUPABASE_URL = process.env.HOSTED_SUPABASE_URL!;
 export const SUPABASE_KEY = process.env.HOSTED_SUPABASE_KEY!;
 export const PASSWORD = process.env.HOSTED_PASSWORD!;
@@ -25,10 +25,4 @@ export async function sessionFor(role: string): Promise<{ cookies: Array<{ name:
   if (error || !data.session) throw new Error(`sign-in for ${role} failed: ${error?.message}`);
   await new Promise((r) => setTimeout(r, 50));
   return { cookies: [...jar].filter(([, v]) => v).map(([name, value]) => ({ name, value })), token: data.session.access_token };
-}
-
-export async function signInBrowser(context: BrowserContext, base: string, role: string) {
-  const { cookies } = await sessionFor(role);
-  const url = new URL(base);
-  await context.addCookies(cookies.map((c) => ({ ...c, domain: url.hostname, path: "/", secure: url.protocol === "https:", sameSite: "Lax" as const, httpOnly: false })));
 }
