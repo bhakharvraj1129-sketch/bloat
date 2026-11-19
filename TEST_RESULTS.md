@@ -37,8 +37,30 @@ Environment: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.verc
 | Empty waitlist and empty sign-in: an inline message in the app's own wording | Passed |
 | Earlier public checks: fresh browser, no Vercel login, password-only sign-in, no sign-up, no code screen | Passed |
 | Earlier public checks: signed-out API and direct database calls read and change nothing | Passed |
-| Test switches off: old test login 404, no test password on the sign-in screen | Passed; the rest of that test (mock purchase and test clock refused for a signed-in account) **blocked**: needs a hosted test account |
-| Anything signed in on the hosted preview (sheets, saves, Back inside the app, unsaved-change questions) | **Not run.** No hosted test account exists: Supabase sign-ups are still on and `bloat-tester@bloat.test` was not created (checked 19 Nov). These behaviours are proven locally only. |
+| Test switches off: old test login 404, no test password on the sign-in screen | Passed |
+
+Then, the same day, with 7 synthetic accounts made for this run through the Supabase connector (one-off
+password kept in a local file, only its hash sent; `pro-tester@bloat.test` is the designated Pro address),
+the full hosted suite plus the new signed-in navigation checks, on the same deployment:
+
+| Check | Result |
+|---|---|
+| Test switches off for a signed-in account: mock purchase and test clock refused, plan stays Free, checkout off | Passed |
+| Priority 1: a meal saves and is still in History after a refresh | Passed |
+| Priority 2a: diary flow with a warning sign, refresh, end, meal, sign out, sign back in | Passed |
+| Priority 2b: two accounts cannot see or change each other's records (app and database) | Passed |
+| Priority 2c: Pro doctor report with Medicines and Health off; preview, PDF and shared page leave them out; share link stops after revoke | Passed |
+| Exports: complete JSON and CSV for the owner, refused to anyone else | Passed |
+| Password sign-in: generic message for wrong details, refresh keeps the session, sign-out ends screens, APIs and the old token | Passed |
+| Signed in: Back from a day returns to Today; the phone's Back closes a sheet and stays; focus returns to the opener; "Close without saving?" keeps typed text | Passed |
+| Signed in: "Leave without saving?" from Health background by tab bar and Back | Passed |
+| **Nobody can create an account** | **Failed.** Supabase still allows new sign-ups. The connector has no tool for this setting; the owner must switch it off in the dashboard. |
+
+Totals on the hosted preview: 17 passed, 1 failed (the sign-up switch).
+
+Clean-up: the one-off password file was destroyed after the run, so nobody can sign in to the 7 accounts.
+Deleting the accounts themselves needs the owner's yes in the Supabase connector; the question timed out
+unanswered, so they still exist (marked `synthetic_test_run = 2026-11-19`; deleting them removes all their rows).
 
 ## Email-and-password sign-in (18 Nov 2026)
 
