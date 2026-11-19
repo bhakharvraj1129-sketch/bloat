@@ -26,7 +26,19 @@ by blocking requests in the browser); screen readers other than the accessibilit
 
 ### Hosted preview
 
-See the section below this one once the deploy of this round is checked.
+Environment: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`, commit `e029f9d`
+(deployment `dpl_D3QpxCgr3cZXJR7UesavJbGVhWF6`, READY, alias confirmed on this deployment), `BLOAT_SIGN_IN_METHOD=password`,
+`BLOAT_TEST_LOGIN=0`, Supabase `bloat-test`. Run 19 Nov 2026, signed out only.
+
+| Check | Result |
+|---|---|
+| `/me` signed out goes to `/sign-in?next=%2Fme`; an outside address in `next` is ignored | Passed |
+| Contact, then its help link, then Back returns to Contact; Privacy, Terms and How Bloat works opened directly: Back goes to the start page; Help opened directly: its Back button goes to the start page | Passed |
+| Empty waitlist and empty sign-in: an inline message in the app's own wording | Passed |
+| Earlier public checks: fresh browser, no Vercel login, password-only sign-in, no sign-up, no code screen | Passed |
+| Earlier public checks: signed-out API and direct database calls read and change nothing | Passed |
+| Test switches off: old test login 404, no test password on the sign-in screen | Passed; the rest of that test (mock purchase and test clock refused for a signed-in account) **blocked**: needs a hosted test account |
+| Anything signed in on the hosted preview (sheets, saves, Back inside the app, unsaved-change questions) | **Not run.** No hosted test account exists: Supabase sign-ups are still on and `bloat-tester@bloat.test` was not created (checked 19 Nov). These behaviours are proven locally only. |
 
 ## Email-and-password sign-in (18 Nov 2026)
 
