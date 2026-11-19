@@ -96,13 +96,21 @@ values ('preview', encode(sha256(convert_to('<the secret>', 'utf8')), 'hex'));
 4. Create a Vercel project from this repo, framework Next.js, and add the variables above for Preview, with `BLOAT_TEST_LOGIN=0`.
 5. Before removing deployment protection, check on the new build that `POST /v1/auth/test-login` answers 404 and the sign-in page has no test password form.
 
+## Addresses
+
+- Testing preview, dedicated address: `https://bloat-preview.vercel.app`. It is a Vercel project domain tied to the
+  branch `claude/bloat-software-build-uxzoru`, so it always shows that branch's newest build (added 19 Nov 2026).
+- The same build: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`.
+- `bloat-olive.vercel.app` is the project's production address. There is no production deployment, on purpose.
+- If email sign-in is restored, add `https://bloat-preview.vercel.app/auth/callback` to Supabase's redirect URLs.
+
 ## Hosted test run
 
 The hosted browser suite (`tests/hosted/preview.spec.ts`) signs in through the app's own email-and-password form. For each run:
 
 1. Make a one-off random password in a local file (never printed or committed) and its bcrypt hash.
 2. Create the run's synthetic accounts in `bloat-test` with that hash (roles: public, p1, diary, iso_a, iso_b, export, and `pro-tester@bloat.test` for Pro). This is done through the Supabase connector and needs the owner's confirmation there.
-3. Run: `NODE_USE_ENV_PROXY=1 HOSTED_URL=<preview> HOSTED_SUPABASE_URL=<project URL> HOSTED_SUPABASE_KEY=<publishable key> HOSTED_ACCOUNTS=<role=email,...> HOSTED_PASSWORD=<from the file> pnpm test:hosted`.
+3. Run: `NODE_USE_ENV_PROXY=1 HOSTED_URL=<preview> HOSTED_SUPABASE_URL=<project URL> HOSTED_SUPABASE_KEY=<publishable key> HOSTED_ACCOUNTS=<role=email,...> HOSTED_PASSWORD=<from the file> pnpm test:hosted`. Use fresh accounts for every run (the checks count entries), except `pro-tester@bloat.test`, whose hash can be replaced. Files run in name order: `signed-in-navigation.spec.ts` relies on accounts set up by `preview.spec.ts`.
 4. Delete the accounts and the password file after the run.
 
 ## Replace a key

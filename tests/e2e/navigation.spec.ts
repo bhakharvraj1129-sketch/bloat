@@ -54,7 +54,7 @@ test("the phone's Back button closes an open sheet and stays on the screen; focu
   const page = await account(context);
   await page.goto("/me");
   await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Today" }).click();
-  await expect(page.getByRole("heading", { name: "Today" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Today", exact: true })).toBeVisible();
 
   const opener = page.getByRole("button", { name: "I feel bloated" });
   await opener.click();

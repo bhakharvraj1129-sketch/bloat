@@ -29,7 +29,7 @@ async function setup(page: Page) {
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByRole("heading", { name: "How Bloat works" })).toBeVisible();
   await page.getByRole("button", { name: "Go to Today" }).click();
-  await expect(page.getByRole("heading", { name: "Today" })).toBeVisible({ timeout: 20000 });
+  await expect(page.getByRole("heading", { name: "Today", exact: true })).toBeVisible({ timeout: 20000 });
 }
 
 test("Q92, Q61: sign-up shows the help page first, then setup, then Today. Q129: no third-party requests at all", async ({ page }) => {

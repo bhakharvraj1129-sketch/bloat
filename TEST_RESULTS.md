@@ -18,6 +18,28 @@ Last run: 19 Nov 2026. The newest results (Silver design) are first; older secti
 
 Not tested: real phones, 200% browser zoom (only the phone's text-size path via rem), screen readers.
 
+### Hosted preview
+
+Environment: commit `10cd14e`, deployment `dpl_Gga7Z3gVatwKDMxTbtFrp1D65o3Y` (READY), served at both
+`https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app` and the new dedicated address
+`https://bloat-preview.vercel.app` (both aliases confirmed on this deployment; the new address answered 200 with the
+new About page). `BLOAT_SIGN_IN_METHOD=password`, `BLOAT_TEST_LOGIN=0`, Supabase `bloat-test`. Synthetic accounts made
+for the run (one-off password, only its hash sent; destroyed after the run).
+
+| Check | Result |
+|---|---|
+| Signed out: return path after sign-in, contextual Back on public pages, empty-form messages | Passed (3) |
+| Public visit with no Vercel login; homepage offers Sign in (not Get started) while sign-ups are closed; password-only sign-in | Passed |
+| Test switches off; signed-out API and database calls refused | Passed (2) |
+| Priority 1, 2a, 2b, 2c (meal persists, diary flow, two-account isolation, Pro doctor report privacy) | Passed (4) |
+| Exports; password sign-in, refresh and sign-out | Passed (2) |
+| Signed in: Back from a day, phone Back closes a sheet, focus return, close-without-saving, leave-without-saving | Passed (2) |
+| **Nobody can create an account** | **Failed: Supabase sign-ups still on (owner's dashboard switch).** |
+
+Totals: 14 passed, 1 failed. A first attempt on reused accounts failed 4 more checks only because those accounts
+already held the earlier run's entries (the suite expects fresh accounts), and one setup lookup matched the new
+"Add to today" and "Today so far" headings; the lookup is now exact and the run above used fresh accounts.
+
 ## Navigation and action repairs (19 Nov 2026)
 
 ### Local (local Supabase in Docker; nothing hosted)

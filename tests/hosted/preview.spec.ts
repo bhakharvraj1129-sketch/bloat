@@ -39,7 +39,7 @@ async function onboard(context: BrowserContext, role: string): Promise<Page> {
   await page.waitForLoadState("domcontentloaded");
   await page.goto("/setup"); // setup sends an account that is already set up on to Today
   const consent = page.getByRole("heading", { name: "Consent" });
-  const today = page.getByRole("heading", { name: "Today" });
+  const today = page.getByRole("heading", { name: "Today", exact: true });
   await expect(consent.or(today)).toBeVisible({ timeout: 30000 });
   if (await today.isVisible()) return page; // already set up in an earlier run
   await page.getByRole("checkbox").first().waitFor();
@@ -48,7 +48,7 @@ async function onboard(context: BrowserContext, role: string): Promise<Page> {
   await page.getByRole("checkbox", { name: "This is right" }).click();
   for (let i = 0; i < 7; i++) await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "Go to Today" }).click();
-  await expect(page.getByRole("heading", { name: "Today" })).toBeVisible({ timeout: 30000 });
+  await expect(page.getByRole("heading", { name: "Today", exact: true })).toBeVisible({ timeout: 30000 });
   return page;
 }
 
@@ -73,7 +73,9 @@ test("public: a fresh signed-out browser opens the preview with no Vercel login,
   const res = await page.goto(BASE);
   expect(res!.status()).toBe(200);
   expect(new URL(page.url()).host).toBe(new URL(BASE).host); // no redirect to vercel.com
-  await expect(page.getByRole("link", { name: "Get started" }).first()).toBeVisible();
+  // Sign-ups are closed while testing, so the homepage offers Sign in, never Get started.
+  await expect(page.getByRole("main").getByRole("link", { name: "Sign in" }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Get started" })).toHaveCount(0);
   await page.goto("/today");
   await expect(page).toHaveURL(/\/sign-in/);
   // The testing sign-in: email and password only. No sign-up, no email-code flow, no Google.
@@ -175,7 +177,7 @@ test("Priority 2a: the diary flow (bloating with a warning sign, refresh, end, m
   await expect(page).toHaveURL(/sign-in/);
   await signInForm(page, "diary");
   await page.goto("/today");
-  await expect(page.getByRole("heading", { name: "Today" })).toBeVisible({ timeout: 30000 });
+  await expect(page.getByRole("heading", { name: "Today", exact: true })).toBeVisible({ timeout: 30000 });
   await expect(page.getByText(`Diary lunch ${stamp}`)).toBeVisible({ timeout: 20000 });
   await expect(page.getByText(/1 episode/)).toBeVisible();
   await context.close();
