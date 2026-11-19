@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
-import { Button, Caption, Card, ErrorState, Label, Loading, SaveStatus, ScoreBadge } from "@/components/ui";
+import { Button, Caption, Card, ErrorState, Label, Loading, SaveStatus, ScoreBadge, Screen } from "@/components/ui";
 import { useLoad, useSave } from "@/lib/client/hooks";
 import { formatClock, formatDate, formatDuration } from "@/lib/time";
 import type { State } from "@/components/today/types";
@@ -25,8 +25,8 @@ export function Today() {
 
   useEffect(() => { if (state && !state.onboarded) router.replace("/setup"); }, [state, router]);
 
-  if (loading && !state) return <main className="mx-auto max-w-md px-4 pt-8"><h1 className="t-headline mb-6">Today</h1><Loading what="Loading today" /></main>;
-  if (error && !state) return <main className="mx-auto max-w-md px-4 pt-8"><h1 className="t-headline mb-6">Today</h1><ErrorState error={error} onRetry={reload} /></main>;
+  if (loading && !state) return <Screen title="Today" width="wide"><Loading what="Loading today" /></Screen>;
+  if (error && !state) return <Screen title="Today" width="wide"><ErrorState error={error} onRetry={reload} /></Screen>;
   if (!state || !state.onboarded) return null;
 
   const { today, profile, open_episode: ep } = state;
@@ -36,78 +36,80 @@ export function Today() {
   const close = (o: boolean) => { if (!o) { if (open === "still") setStillDismissed(true); setSheet(null); } };
   const keepEye = profile.logging_mode === "keep_an_eye";
 
+  const highest = today.highest_logged ?? (today.provisional_zero ? 0 : null);
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 px-4 pb-32 pt-8">
-      <header className="flex items-baseline justify-between">
-        <h1 className="t-headline">Today</h1>
-        <span className="t-caption">{formatDate(today.date, profile.date_format)}{state.pro?.phase ? ` · ${state.pro.phase.label}` : ""}</span>
-      </header>
-
+    <Screen title="Today" width="wide" eyebrow={`${formatDate(today.date, profile.date_format)}${state.pro?.phase ? ` · ${state.pro.phase.label}` : ""}`}>
       {state.paused && <Card><p className="t-body-strong">Pro is paused</p><Caption>Your records are kept and free logging keeps working. <Link href="/me">Resume in Me</Link></Caption></Card>}
 
       {state.pending_review && (
-        <Link href={`/review/${state.pending_review.date}`} className="flex items-center justify-between gap-3 rounded-lg bg-brand-tint px-4 py-3 text-ink no-underline">
+        <Link href={`/review/${state.pending_review.date}`} className="flex min-h-16 items-center justify-between gap-3 rounded-lg border border-line bg-subtle px-5 py-4 text-ink no-underline hover:bg-line md:px-6">
           <span className="flex flex-col"><span className="font-semibold">Review yesterday</span><span className="t-caption">A few quick questions set your Bloat Score</span></span>
-          <ChevronRight size={20} strokeWidth={1.75} className="text-brand" aria-hidden />
+          <ChevronRight size={20} strokeWidth={1.75} aria-hidden />
         </Link>
       )}
 
-      <Card className="flex items-center gap-4">
-        <ScoreBadge size="lg" value={today.highest_logged ?? (today.provisional_zero ? 0 : null)} unknown={today.highest_logged === null && !today.provisional_zero} label={today.highest_logged !== null ? `Highest logged so far: ${today.highest_logged}` : "Nothing logged yet"} />
-        <div className="flex flex-col gap-0.5">
-          <Label>Highest logged so far</Label>
-          <span className="font-semibold">
-            {today.episodes === 0 ? (today.provisional_zero ? "No bloating so far" : "Nothing logged yet") : `${today.episodes} ${today.episodes === 1 ? "episode" : "episodes"} · ${formatDuration(today.duration_ms)}${today.duration_partial ? " so far" : ""}`}
-          </span>
-          <Caption>Your score is set in tomorrow&apos;s review</Caption>
-        </div>
-      </Card>
-
-      {ep ? (
-        <button type="button" onClick={() => setSheet("ongoing")} className="flex min-h-16 items-center justify-between gap-3 rounded-pill bg-brand px-6 text-left text-on-brand">
-          <span className="flex flex-col"><span className="text-lg font-semibold">Bloating ongoing</span><span className="text-[0.8125rem]">Since {formatClock(Date.parse(ep.started_at), profile.time_zone, profile.units)} · strength {ep.current_strength}</span></span>
-          <ChevronRight size={20} strokeWidth={1.75} aria-hidden />
-        </button>
-      ) : (
-        <Button size="lg" onClick={() => setSheet("log")}>I feel bloated</Button>
-      )}
-
-      {!ep && today.episodes === 0 && !today.provisional_zero && (
-        <>
-          <Button variant="quiet" disabled={none.saving} onClick={async () => { const ok = await none.run("POST", `/v1/days/${today.date}/no-bloating-so-far`); if (ok) reload(); }}>No bloating so far today</Button>
-          <SaveStatus state={none.state === "saved" ? "idle" : none.state} error={none.error} onCheck={async () => { if ((await none.check()).ok) reload(); }} />
-        </>
-      )}
-
-      <div className="grid grid-cols-2 gap-2">
-        <Button variant="secondary" onClick={() => setSheet("meal")}>{keepEye ? "Add meal (optional)" : "Add meal"}</Button>
-        <Button variant="secondary" onClick={() => setSheet("activity")}>Add activity</Button>
-        {state.plan === "pro" && <Button variant="secondary" className="col-span-2" onClick={() => setSheet("bowel")}>Log bowel movement</Button>}
-      </div>
-
-      {keepEye && (
-        <Card>
-          <Label>Keeping an eye on</Label>
-          <p className="mt-1">{profile.watched_groups.map(tagLabel).join(" · ")}</p>
-          <Caption>Tomorrow&apos;s review asks whether you had each of these. Meals are optional.</Caption>
+      <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr]">
+        <Card as="section" className="flex flex-col gap-6">
+          <div className="flex flex-col gap-1">
+            <Label>Highest logged so far</Label>
+            <p className="t-score" aria-label={today.highest_logged !== null ? `Highest logged so far: ${today.highest_logged}` : "Nothing logged yet"}>
+              {highest ?? "?"}{highest !== null && <span className="ml-2 align-baseline text-xl font-medium tracking-normal text-ink-muted">/ 10</span>}
+            </p>
+            <p className="font-semibold">
+              {today.episodes === 0 ? (today.provisional_zero ? "No bloating so far" : "Nothing logged yet") : `${today.episodes} ${today.episodes === 1 ? "episode" : "episodes"} · ${formatDuration(today.duration_ms)}${today.duration_partial ? " so far" : ""}`}
+            </p>
+            <Caption>Your score is set in tomorrow&apos;s review</Caption>
+          </div>
+          <div className="flex flex-col gap-3 border-t border-line pt-6">
+            {ep ? (
+              <button type="button" onClick={() => setSheet("ongoing")} className="flex min-h-16 items-center justify-between gap-3 rounded-sm bg-brand px-5 text-left text-on-brand hover:opacity-90">
+                <span className="flex flex-col"><span className="text-lg font-semibold">Bloating ongoing</span><span className="text-[0.8125rem]">Since {formatClock(Date.parse(ep.started_at), profile.time_zone, profile.units)} · strength {ep.current_strength}</span></span>
+                <ChevronRight size={20} strokeWidth={1.75} aria-hidden />
+              </button>
+            ) : (
+              <Button size="lg" onClick={() => setSheet("log")}>I feel bloated</Button>
+            )}
+            {!ep && today.episodes === 0 && !today.provisional_zero && (
+              <>
+                <Button variant="quiet" disabled={none.saving} onClick={async () => { const ok = await none.run("POST", `/v1/days/${today.date}/no-bloating-so-far`); if (ok) reload(); }}>No bloating so far today</Button>
+                <SaveStatus state={none.state === "saved" ? "idle" : none.state} error={none.error} onCheck={async () => { if ((await none.check()).ok) reload(); }} />
+              </>
+            )}
+          </div>
         </Card>
-      )}
+
+        <Card as="section" className="flex flex-col gap-4">
+          <h2 className="t-title">Add to today</h2>
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant="secondary" onClick={() => setSheet("meal")}>{keepEye ? "Add meal (optional)" : "Add meal"}</Button>
+            <Button variant="secondary" onClick={() => setSheet("activity")}>Add activity</Button>
+            {state.plan === "pro" && <Button variant="secondary" className="col-span-2" onClick={() => setSheet("bowel")}>Log bowel movement</Button>}
+          </div>
+          {keepEye && (
+            <div className="flex flex-col gap-1 border-t border-line pt-4">
+              <Label>Keeping an eye on</Label>
+              <p>{profile.watched_groups.map(tagLabel).join(" · ")}</p>
+              <Caption>Tomorrow&apos;s review asks whether you had each of these. Meals are optional.</Caption>
+            </div>
+          )}
+        </Card>
+      </div>
 
       {state.plan === "pro" ? (
         <ProToday state={state} onChanged={reload} />
       ) : (
-        <Card className="bg-brand-tint">
+        <Card className="bg-subtle">
           <p className="t-body-strong tabular">{state.progress.days_logged} {state.progress.days_logged === 1 ? "day" : "days"} logged · {Math.min(state.progress.confirmed_days, state.progress.confirmed_needed)} of {state.progress.confirmed_needed} confirmed days needed for possible triggers</p>
           <Caption>A confirmed day is one where your morning review covers the whole day. <Link href="/upgrade">What Pro adds</Link></Caption>
         </Card>
       )}
 
-      <section aria-labelledby="so-far" className="flex flex-col gap-2">
-        <Label id="so-far">Today so far</Label>
+      <section aria-labelledby="so-far" className="flex flex-col gap-3">
+        <h2 id="so-far" className="t-title">Today so far</h2>
         {state.timeline.length === 0 ? (
           <Card><Caption>Nothing logged yet today. Entries appear here as you add them.</Caption></Card>
         ) : (
-          <Card className="px-4 py-1">
+          <Card className="py-2 md:py-3">
             <ul>
               {state.timeline.map((t) => (
                 <li key={`${t.kind}-${t.id}`} className="flex items-center gap-3 border-b border-line py-3 last:border-0">
@@ -131,6 +133,6 @@ export function Today() {
       {open === "activity" && <ActivitySheet open onOpenChange={close} {...sheetProps} onExercise={() => setSheet("exercise")} />}
       {open === "exercise" && <ExerciseSheet open onOpenChange={close} {...sheetProps} />}
       {open === "bowel" && <BowelSheet open onOpenChange={close} {...sheetProps} />}
-    </main>
+    </Screen>
   );
 }

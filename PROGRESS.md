@@ -14,7 +14,25 @@ The whole app is built end to end. A **public preview** runs on Vercel against t
 
 Read next: `TEST_RESULTS.md` (newest first, local and hosted kept apart), `DEPLOYMENT.md` (owner steps and how to restore email sign-in), `DECISIONS.md`.
 
-## Done on 19 Nov: navigation and action repairs (design package still blocked)
+## Done on 19 Nov (afternoon): Bloat / Silver design applied
+
+The owner attached the design package; it is now in `docs/design/silver/`. Applied to the whole app:
+1. Tokens: white, silver grey and black (`src/app/globals.css`, `docs/design/tokens.json` v2), system fonts,
+   12px controls, 20px cards, 3px ink focus ring, light theme only (DECISIONS.md, Engineering choice 21).
+2. Shared parts restyled once: buttons, options (selected = black with a tick), strength scale, score marks,
+   cards, inputs, warning-sign advice (red kept, with an icon), sheets (bottom sheet on phones, centred dialog
+   from tablet width).
+3. New frames: signed-in sidebar from 768px and four bottom tabs on phones (Today, History, Patterns, You), with
+   one ownership rule for the active tab; public header with a phone menu listing every public page; footer.
+4. Screens: homepage (real Today screenshot with sample entries; "Sign in" while sign-ups are closed), new About
+   page, Privacy, Terms, Contact and How Bloat works as reading pages, sign-in and country screens as a centred
+   card, setup, Today as a two-column dashboard on desktop, page labels on History, Patterns and You screens.
+5. Defect found and fixed: filled link buttons had text in the same colour as their fill on the live site
+   ("Get started" measured rgb(30, 94, 84) on rgb(30, 94, 84)). A browser test now checks every filled control.
+6. A dedicated address for the testing preview: `https://bloat-preview.vercel.app` (always the latest build of
+   this branch). The production address `bloat-olive.vercel.app` stays unused: no production site.
+
+## Done on 19 Nov: navigation and action repairs
 
 The request had two parts: (1) apply the "Bloat / Silver" design package, (2) repair navigation and actions.
 
@@ -83,7 +101,7 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 
 ## Next steps, in order
 
-1. Owner: add the "Bloat / Silver" design files to `docs/design/silver/` (Preview.html, Design-and-UX-Spec.md, tokens.css, source-control-inventory.csv). Then: replace the tokens in `src/app/globals.css` from tokens.css, restyle the shared components and shells, then the screens in the order homepage, sign-in, setup, Today, History, Patterns, reports, You, the rest; rerun the ledger (`docs/control-ledger.md`) and the five-width check.
+1. Owner: company name and a monitored support address for About and Contact; yes or no on a dark theme before launch (DECISIONS.md 21).
 2. Owner: in Supabase (bloat-test), switch off "Allow new users to sign up", then create `bloat-tester@bloat.test` with Auto Confirm and a strong password (DEPLOYMENT.md, "Sign-in method"). Checked 19 Nov: sign-ups still on, account not created.
 3. Owner: answer the Supabase connector's confirmation when asked, so the temporary verification accounts can be created; then run the full hosted suite (10 checks) and delete those accounts. **This is the exact next unfinished task.**
 4. Before inviting anyone outside: restore email sign-in (DEPLOYMENT.md, "Before inviting anyone outside").

@@ -33,7 +33,7 @@ function Fig({ label, value, note }: { label: string; value: string; note: strin
 export function Journey() {
   const load = useLoad<Data>("/v1/journey");
   return (
-    <ProScreen title="Your journey" back="/history" load={load}>
+    <ProScreen title="Your journey" eyebrow="Patterns" back="/insights" load={load}>
       {(d) => {
         const doctorButton = <LinkButton href={`/doctor?from=${d.doctor_report.from}&to=${d.doctor_report.to}`}>Make doctor report</LinkButton>;
         const sections: Record<string, ReactNode> = {

@@ -3,7 +3,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { safeNext } from "@/lib/next-path";
 import { useEffect, useRef, useState } from "react";
-import { Button, Card, Caption, Field, Screen, inputClass } from "@/components/ui";
+import { Button, Card, Caption, Field, inputClass } from "@/components/ui";
+import { AuthPage } from "@/components/public";
 import { browserSupabase } from "@/lib/client/supabase";
 import { readPre, writePre } from "@/lib/client/pre";
 import { api, ApiFailure } from "@/lib/client/api";
@@ -75,7 +76,7 @@ export function SignIn({ testLogin, google: googleOn }: { testLogin: boolean; go
   }
 
   return (
-    <Screen title={isNew ? "Create your account" : "Sign in"} back={isNew ? "/help?signup=1" : "/"}>
+    <AuthPage title={isNew ? "Create your account" : "Sign in"} back={isNew ? "/help?signup=1" : "/"}>
       {/* Shown only when Google sign-in is switched on in Supabase (see server/auth-settings.ts). */}
       {googleOn && <Button variant="secondary" onClick={google}>Continue with Google</Button>}
       <form onSubmit={sendCode} noValidate className="flex flex-col gap-4">
@@ -98,6 +99,6 @@ export function SignIn({ testLogin, google: googleOn }: { testLogin: boolean; go
           <Button variant="secondary" onClick={testSignIn} disabled={busy || !email || password.length < 8}>Sign in with test password</Button>
         </Card>
       )}
-    </Screen>
+    </AuthPage>
   );
 }

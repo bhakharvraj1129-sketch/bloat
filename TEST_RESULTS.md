@@ -1,6 +1,22 @@
 # Test results
 
-Last run: 19 Nov 2026. The newest results (navigation and action repairs) are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 19 Nov 2026. The newest results (Silver design) are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+
+## Bloat / Silver design (19 Nov 2026, afternoon)
+
+### Local (local Supabase in Docker; nothing hosted)
+
+| Check | Result |
+|---|---|
+| Rule tests `pnpm test` (adds 2 tab-ownership tests) | 96 passed, 0 failed |
+| API tests `pnpm test:api` (backend unchanged) | 134 passed, 0 failed |
+| Browser tests `pnpm test:e2e` (tab labels, 3px focus ring, light theme and a new check that every filled button and link has readable text) | 31 passed, 0 failed |
+| Control ledger crawler on the new design, signed-out, Free and Pro, 31 screens incl. the new About page | 1,292 rows: 840 pass, 0 fail, 49 checked by named tests, 403 listed (fields, disabled, inside sheets, and the sidebar that is hidden on a phone) |
+| Five widths (320, 390, 768, 1024, 1440) on 24 screens: sideways scrolling | 0 of 185 |
+| Live site before this round: text colour of the "Get started" button | rgb(30, 94, 84) on rgb(30, 94, 84): invisible. Fixed; covered by the readable-text check |
+| Type check, lint | 0 errors (5 old warnings) |
+
+Not tested: real phones, 200% browser zoom (only the phone's text-size path via rem), screen readers.
 
 ## Navigation and action repairs (19 Nov 2026)
 

@@ -48,7 +48,7 @@ function Result({ i, line }: { i: Item; line: string }) {
 export function Triggers() {
   const load = useLoad<Data>("/v1/insights/triggers");
   return (
-    <ProScreen title="Possible triggers" load={load}>
+    <ProScreen title="Possible triggers" eyebrow="Patterns" load={load}>
       {(d) => (
         <>
           <Caption>{d.header} {formatDate(d.from, d.date_format, false)} to {formatDate(d.to, d.date_format, false)}.{d.recalled_days ? ` Includes ${d.recalled_days} days with ingredients added afterwards.` : ""}{d.mostly_days ? ` Includes ${d.mostly_days} "mostly" days.` : ""}</Caption>
@@ -107,8 +107,8 @@ export function Triggers() {
           <Caption>{d.followed_note} <Link href="/me">Change habits in Me</Link></Caption>
           <p className="t-caption text-ink">{d.footer}</p>
           <nav aria-label="More" className="grid grid-cols-2 gap-2">
-            <Link href="/experiments" className="flex min-h-12 items-center justify-center rounded-pill border border-line bg-surface px-3 font-semibold text-ink no-underline">Experiments</Link>
-            <Link href="/journey" className="flex min-h-12 items-center justify-center rounded-pill border border-line bg-surface px-3 font-semibold text-ink no-underline">Your journey</Link>
+            <Link href="/experiments" className="flex min-h-12 items-center justify-center rounded-sm border border-line bg-surface px-3 font-semibold text-ink no-underline">Experiments</Link>
+            <Link href="/journey" className="flex min-h-12 items-center justify-center rounded-sm border border-line bg-surface px-3 font-semibold text-ink no-underline">Your journey</Link>
           </nav>
         </>
       )}

@@ -1,70 +1,76 @@
 @import "tailwindcss";
 
-/* Design tokens from docs/design/tokens.json (Bloat Design System). Tokens only: no other colours,
-   fonts, radii or spacing values are used anywhere in the app. */
+/* Design tokens: Bloat / Silver (docs/design/silver/tokens.css, approved by the owner on 19 Nov 2026),
+   mirrored in docs/design/tokens.json. Tokens only: no other colours, fonts, radii or spacing values
+   are used anywhere in the app. Light theme only for now (DECISIONS.md, Engineering choice 21). */
 :root {
-  --ground: #f4f6f1; --surface: #ffffff; --line: #dce3de; --ink: #17211e; --ink-muted: #55625c;
-  --brand: #1e5e54; --on-brand: #ffffff; --brand-tint: #dcebe5;
-  --score-mild: #e9d6a7; --score-moderate: #ec9f6a; --score-strong: #d9714f; --score-severe: #9c3f2c;
-  --on-score: #17211e; --on-score-severe: #ffffff;
+  --ground: #f5f5f6; --surface: #ffffff; --line: #dedee2; --ink: #171719; --ink-muted: #626269;
+  --subtle: #eeeef0; --control: #85858e;
+  --brand: #171719; --on-brand: #ffffff; --brand-tint: #eeeef0;
+  /* Strength and Bloat Score marks, light to dark. The number is always printed beside them. */
+  --score-mild: #eeeef0; --score-moderate: #b8b8bf; --score-strong: #626269; --score-severe: #171719;
+  --on-score: #171719; --on-score-strong: #ffffff; --on-score-severe: #ffffff;
+  /* The one semantic colour: the NHS warning signs and their advice, and destructive actions. */
   --alert: #a52a1f; --alert-tint: #fbe7e4;
   color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --ground: #111714; --surface: #1a221f; --line: #2c3632; --ink: #e7eee9; --ink-muted: #a2b0aa;
-    --brand: #7fc6b6; --on-brand: #0d1f1a; --brand-tint: #1f3530;
-    --score-mild: #d8c393; --score-moderate: #e39a6a; --score-strong: #e07a5c; --score-severe: #c46a52;
-    --on-score: #111714; --on-score-severe: #111714;
-    --alert: #ff9a8c; --alert-tint: #3a1f1b;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --ground: #111714; --surface: #1a221f; --line: #2c3632; --ink: #e7eee9; --ink-muted: #a2b0aa;
-  --brand: #7fc6b6; --on-brand: #0d1f1a; --brand-tint: #1f3530;
-  --score-mild: #d8c393; --score-moderate: #e39a6a; --score-strong: #e07a5c; --score-severe: #c46a52;
-  --on-score: #111714; --on-score-severe: #111714;
-  --alert: #ff9a8c; --alert-tint: #3a1f1b;
-  color-scheme: dark;
 }
 
 @theme inline {
   --color-ground: var(--ground); --color-surface: var(--surface); --color-line: var(--line);
   --color-ink: var(--ink); --color-ink-muted: var(--ink-muted);
+  --color-subtle: var(--subtle); --color-control: var(--control);
   --color-brand: var(--brand); --color-on-brand: var(--on-brand); --color-brand-tint: var(--brand-tint);
   --color-score-mild: var(--score-mild); --color-score-moderate: var(--score-moderate);
   --color-score-strong: var(--score-strong); --color-score-severe: var(--score-severe);
-  --color-on-score: var(--on-score); --color-on-score-severe: var(--on-score-severe);
+  --color-on-score: var(--on-score); --color-on-score-strong: var(--on-score-strong); --color-on-score-severe: var(--on-score-severe);
   --color-alert: var(--alert); --color-alert-tint: var(--alert-tint);
-  --font-display: var(--font-bricolage), "Avenir Next", system-ui, sans-serif;
-  --font-body: var(--font-dm-sans), "Segoe UI", system-ui, sans-serif;
-  --radius-sm: 10px; --radius-lg: 20px; --radius-pill: 999px;
+  /* System fonts: nothing to download, no layout shift. */
+  --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  /* Controls 12px, cards and sheets 20px, badges pill. */
+  --radius-sm: 12px; --radius-lg: 20px; --radius-pill: 999px;
 }
 
 html { background: var(--ground); }
 body {
   background: var(--ground); color: var(--ink); font-family: var(--font-body);
-  font-size: 1rem; line-height: 1.5rem; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+  font-size: 1rem; line-height: 1.5rem; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; -webkit-tap-highlight-color: transparent;
 }
 
-/* Type styles from the tokens. rem keeps the phone's text-size setting respected. */
-.t-score { font-family: var(--font-display); font-size: 4rem; line-height: 4rem; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-.t-headline { font-family: var(--font-display); font-size: 2rem; line-height: 2.25rem; font-weight: 600; letter-spacing: -0.01em; }
-.t-title { font-family: var(--font-display); font-size: 1.25rem; line-height: 1.625rem; font-weight: 600; }
+/* Type styles. rem keeps the phone's text-size setting respected. Nothing below 13px. */
+.t-hero { font-family: var(--font-display); font-size: 2.75rem; line-height: 1.04; font-weight: 600; letter-spacing: -0.045em; }
+.t-score { font-family: var(--font-display); font-size: 3.5rem; line-height: 1.1; font-weight: 600; letter-spacing: -0.045em; font-variant-numeric: tabular-nums; }
+.t-headline { font-family: var(--font-display); font-size: 2.125rem; line-height: 1.12; font-weight: 600; letter-spacing: -0.035em; }
+.t-title { font-family: var(--font-display); font-size: 1.1875rem; line-height: 1.5rem; font-weight: 600; letter-spacing: -0.01em; }
 .t-body-strong { font-weight: 600; }
-.t-label { font-size: 0.8125rem; line-height: 1rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-muted); }
-.t-caption { font-size: 0.8125rem; line-height: 1.125rem; color: var(--ink-muted); }
+.t-label { font-size: 0.8125rem; line-height: 1rem; font-weight: 650; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); }
+.t-caption { font-size: 0.8125rem; line-height: 1.1875rem; color: var(--ink-muted); }
 .tabular { font-variant-numeric: tabular-nums; }
+@media (min-width: 768px) {
+  .t-hero { font-size: 3.5rem; }
+  .t-score { font-size: 4rem; }
+  .t-headline { font-size: 2.75rem; letter-spacing: -0.04em; }
+}
+@media (min-width: 1024px) {
+  .t-hero { font-size: 3.75rem; letter-spacing: -0.05em; }
+}
 
-/* Focus ring: 2px brand with 2px offset on every interactive element, both themes. */
-:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+/* Focus ring: 3px ink with an offset, on every interactive element. */
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 
-a { color: var(--brand); }
+/* Element defaults live in the base layer, so a utility class on a link (a button's text colour,
+   no-underline) always wins. Unlayered, this rule once made filled link buttons' text the same
+   colour as their background. Links in running text are underlined: they share the text colour. */
+@layer base {
+  a { color: var(--ink); text-decoration-line: underline; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+  a:hover { text-decoration-thickness: 2px; }
+}
 
 @keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes menu-in { from { transform: translateY(-6px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.menu-in { animation: menu-in 140ms ease-out; }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-.sheet-in { animation: sheet-in 180ms ease-out; }
+.sheet-in { animation: sheet-in 170ms ease-out; }
 .fade-in { animation: fade-in 160ms ease-out; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

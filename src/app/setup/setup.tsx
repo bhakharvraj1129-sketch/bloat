@@ -111,10 +111,11 @@ export function Setup() {
     if (out) { clearPre(); router.replace("/today"); }
   }
 
-  if (!ready) return <main className="mx-auto max-w-md px-4 pt-8"><p role="status">Loading…</p></main>;
+  if (!ready) return <main className="mx-auto max-w-[38rem] px-5 pt-10"><p role="status">Loading…</p></main>;
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-6 px-4 pb-12 pt-8">
+    <main className="mx-auto flex min-h-dvh max-w-[38rem] flex-col gap-6 px-5 pb-12 pt-8 md:pt-14">
+      <p className="font-display text-[1.6875rem] font-semibold leading-none tracking-[-0.05em]">bloat.</p>
       <div>
         <p className="t-caption">Step {step + 1} of {STEPS.length}</p>
         <div className="mt-2 h-1.5 overflow-hidden rounded-pill bg-line" aria-hidden><div className="h-full rounded-pill bg-brand transition-all duration-200" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} /></div>
@@ -231,7 +232,7 @@ export function Setup() {
                   const pro = PRO_ACTIVITY_IDS.has(a.id);
                   const on = followed.includes(a.id);
                   return pro ? (
-                    <span key={a.id} className="inline-flex min-h-11 items-center gap-1.5 rounded-pill border border-line bg-surface px-4 text-ink-muted">
+                    <span key={a.id} className="inline-flex min-h-11 items-center gap-1.5 rounded-sm border border-line bg-surface px-4 text-ink-muted">
                       <Lock size={16} strokeWidth={1.75} aria-hidden />{a.label}<ProTag />
                     </span>
                   ) : (

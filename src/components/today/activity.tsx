@@ -36,7 +36,7 @@ export function ActivitySheet({ open, onOpenChange, state, onSaved, onExercise }
 
   function chip(a: (typeof activities)[number]) {
     if (PRO_ACTIVITY_IDS.has(a.id) && !pro) {
-      return <span key={a.id} className="inline-flex min-h-11 items-center gap-1.5 rounded-pill border border-line bg-surface px-4 text-ink-muted"><Lock size={16} strokeWidth={1.75} aria-hidden />{a.label}<ProTag /></span>;
+      return <span key={a.id} className="inline-flex min-h-11 items-center gap-1.5 rounded-sm border border-line bg-surface px-4 text-ink-muted"><Lock size={16} strokeWidth={1.75} aria-hidden />{a.label}<ProTag /></span>;
     }
     return <Chip key={a.id} selected={picked.includes(a.id)} onClick={() => toggle(a.id)}>{a.label}</Chip>;
   }

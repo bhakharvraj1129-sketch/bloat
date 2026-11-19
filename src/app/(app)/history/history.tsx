@@ -33,12 +33,12 @@ const LOCKED = [
 // Screen 26. Free: the day list. Pro: chart, average and links to reports.
 export function History() {
   const { data, error, loading, reload } = useLoad<Data>("/v1/history");
-  if (loading && !data) return <Screen title="History"><Loading what="Loading history" /></Screen>;
-  if (error && !data) return <Screen title="History"><ErrorState error={error} onRetry={reload} /></Screen>;
+  if (loading && !data) return <Screen title="History" eyebrow="Every entry, in context"><Loading what="Loading history" /></Screen>;
+  if (error && !data) return <Screen title="History" eyebrow="Every entry, in context"><ErrorState error={error} onRetry={reload} /></Screen>;
   if (!data) return null;
   const anything = data.days.some((d) => d.status !== "UNKNOWN" || d.meals > 0);
   return (
-    <Screen title="History">
+    <Screen title="History" eyebrow="Every entry, in context">
       {data.doctor_line && <DoctorLineBox line={data.doctor_line} onChanged={reload} />}
       {data.pro && <ProHistory data={data.pro} days={data.days} dateFormat={data.date_format} />}
       <section aria-labelledby="days" className="flex flex-col gap-2">

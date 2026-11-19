@@ -2,7 +2,8 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { safeNext } from "@/lib/next-path";
 import { useEffect, useState } from "react";
-import { Button, Caption, Field, Screen, inputClass } from "@/components/ui";
+import { Button, Caption, Field, inputClass } from "@/components/ui";
+import { AuthPage } from "@/components/public";
 import { browserSupabase } from "@/lib/client/supabase";
 import { CODE_COOLDOWN_SECONDS, codeRequestOutcome, verifyMessage, type AuthErrorLike } from "@/lib/otp-messages";
 
@@ -56,7 +57,7 @@ export function CodeForm() {
   }
 
   return (
-    <Screen title="Enter your code" back={isNew ? "/sign-in?new=1" : "/sign-in"}>
+    <AuthPage title="Enter your code" back={isNew ? "/sign-in?new=1" : "/sign-in"}>
       <p className="text-ink-muted">If {email || "that address"} can sign in, we sent it a 6-digit code. It can take a minute to arrive. Check your spam folder too.</p>
       <form onSubmit={verify} className="flex flex-col gap-4">
         <Field label="6-digit code">
@@ -67,6 +68,6 @@ export function CodeForm() {
       {message && <p role="status" className="t-caption text-ink">{message}</p>}
       <Button variant="quiet" onClick={resend} disabled={wait > 0 || busy || sending}>{sending ? "Sending…" : wait > 0 ? `Send a new code in ${wait} s` : "Send a new code"}</Button>
       <Caption>The email only contains your code. It never includes anything from your diary.</Caption>
-    </Screen>
+    </AuthPage>
   );
 }

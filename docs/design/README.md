@@ -1,3 +1,9 @@
+> **19 Nov 2026: the visual system is now Bloat / Silver** (`docs/design/silver/`, values in `tokens.json` version 2).
+> White, silver grey and black; system fonts; 12px controls and 20px cards; a sidebar from tablet width and four
+> bottom tabs on phones (Today, History, Patterns, You); light theme only for now. The colour, type and shape rules
+> below are kept for history and are superseded where they differ. The voice, wording, safety and honesty rules are
+> unchanged. The 20 approved Slice A screens in `screens/` show the old look; their content and order still apply.
+
 Bloat is a calm personal diary for bloating: log in two taps, see your own patterns, bring real records to your doctor. Everything here should feel like a steady, kind notebook, never a hospital and never a diet app.
 
 "Bloat" is the working name; the logo is not designed yet, so set the name in `headline` type in `brand`.

@@ -87,7 +87,7 @@ test("hosted, signed in: Back, sheets and the phone's Back button, focus return,
 test("hosted, signed in: leaving a screen with unsaved changes asks first", async ({ page }) => {
   test.skip(!process.env.HOSTED_PASSWORD, "needs the run's synthetic accounts");
   await signIn(page, "pro");
-  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Me" }).click();
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "You" }).click();
   await page.getByRole("link", { name: /Health background/ }).click();
   await expect(page.getByRole("heading", { name: "Health background" })).toBeVisible();
   await page.getByRole("checkbox", { name: "IBS", exact: true }).click();

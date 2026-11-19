@@ -58,7 +58,7 @@ export function Upgrade({ testMode }: { testMode: boolean }) {
           </Card>
         )}
         <Link href="/health" className="font-semibold">Add your health background (optional)</Link>
-        <Link href="/today" className="inline-flex min-h-12 items-center justify-center rounded-pill bg-brand px-5 font-semibold text-on-brand no-underline">Go to Today</Link>
+        <Link href="/today" className="inline-flex min-h-12 items-center justify-center rounded-sm bg-brand px-5 font-semibold text-on-brand no-underline">Go to Today</Link>
       </Screen>
     );
   }

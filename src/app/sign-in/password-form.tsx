@@ -1,7 +1,8 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { Button, Caption, Screen, inputClass } from "@/components/ui";
+import { Button, Caption, inputClass } from "@/components/ui";
+import { AuthPage } from "@/components/public";
 import { browserSupabase } from "@/lib/client/supabase";
 import { readPre, writePre } from "@/lib/client/pre";
 import { passwordSignInMessage, validateSignIn, type FieldErrors } from "@/lib/sign-in-messages";
@@ -67,7 +68,7 @@ export function PasswordSignIn() {
   const describe = (field: keyof FieldErrors, hint?: string) => [errors[field] ? `${field}-error` : null, hint ?? null].filter(Boolean).join(" ") || undefined;
 
   return (
-    <Screen title="Sign in" back={fromHelp ? "/help?signup=1" : "/"}>
+    <AuthPage title="Sign in" eyebrow="Welcome back" back={fromHelp ? "/help?signup=1" : "/"}>
       <Caption>This preview uses test accounts set up by the owner. New accounts can&apos;t be created here.</Caption>
       <form onSubmit={submit} method="post" noValidate className="flex flex-col gap-4" aria-describedby={message ? "signin-error" : undefined}>
         <div className="flex flex-col gap-2">
@@ -110,7 +111,7 @@ export function PasswordSignIn() {
         <Button type="submit" disabled={!ready || busy} aria-busy={busy || undefined}>{busy ? "Signing in…" : "Sign in"}</Button>
       </form>
       {message && <p id="signin-error" role="alert" className="t-caption text-ink">{message}</p>}
-    </Screen>
+    </AuthPage>
   );
 }
 
@@ -124,7 +125,7 @@ export function AdultConfirm() {
   const [adult, setAdult] = useState(false);
   const [error, setError] = useState("");
   return (
-    <Screen title="You're signed in" back="/">
+    <AuthPage title="You're signed in" back="/">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -143,6 +144,6 @@ export function AdultConfirm() {
         </div>
         <Button type="submit">Continue</Button>
       </form>
-    </Screen>
+    </AuthPage>
   );
 }

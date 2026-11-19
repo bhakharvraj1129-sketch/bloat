@@ -182,6 +182,7 @@ test("a double tap on Download sends one request", async ({ context }) => {
 test("when a session runs out, signing in again returns to the same screen", async ({ context }) => {
   const page = await account(context);
   await page.goto("/history");
+  await page.waitForLoadState("networkidle"); // History has finished loading before the session ends
   await context.clearCookies();
   await page.goto("/me");
   await expect(page).toHaveURL(/\/sign-in\?next=%2Fme$/);

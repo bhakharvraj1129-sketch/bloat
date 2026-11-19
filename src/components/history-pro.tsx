@@ -25,7 +25,7 @@ export function ProHistory({ data, days, dateFormat }: { data: ProHistoryData; d
       {!data.hide_charts && <DayChart days={[...days].reverse()} dateFormat={dateFormat} context={data.context ?? []} />}
       <nav aria-label="Reports" className="grid grid-cols-2 gap-2">
         {[["/insights", "Possible triggers"], ["/journey", "Your journey"], ["/report", "Weekly report"], ["/experiments", "Experiments"]].map(([href, label]) => (
-          <Link key={href} href={href!} className="flex min-h-12 items-center justify-center rounded-pill border border-line bg-surface px-3 text-center font-semibold text-ink no-underline">{label}</Link>
+          <Link key={href} href={href!} className="flex min-h-12 items-center justify-center rounded-sm border border-line bg-surface px-3 text-center font-semibold text-ink no-underline">{label}</Link>
         ))}
       </nav>
     </>

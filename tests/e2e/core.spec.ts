@@ -42,7 +42,7 @@ test("Q92, Q61: sign-up shows the help page first, then setup, then Today. Q129:
   await setup(page);
   await expect(page.getByText("Highest logged so far")).toBeVisible();
   await expect(page.getByText(/0 days logged · 0 of 14 confirmed days needed/)).toBeVisible();
-  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link")).toHaveText(["Today", "History", "Insights", "Me"]);
+  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link")).toHaveText(["Today", "History", "Patterns", "You"]);
   expect(outside).toEqual([]);
 });
 
@@ -108,7 +108,7 @@ test("Q59 core recording works with the keyboard alone, and controls have names 
   const main = page.getByRole("button", { name: "I feel bloated" });
   await page.keyboard.press("Tab"); // keyboard focus shows the ring
   const ring = await page.evaluate(() => { const el = document.activeElement!; const c = getComputedStyle(el); return { style: c.outlineStyle, width: c.outlineWidth }; });
-  expect(ring).toEqual({ style: "solid", width: "2px" });
+  expect(ring).toEqual({ style: "solid", width: "3px" }); // Silver: 3px ink ring
   await main.focus();
   await page.keyboard.press("Enter");
   const sheet = page.getByRole("dialog", { name: "Log bloating" });
@@ -125,7 +125,7 @@ test("Q59 core recording works with the keyboard alone, and controls have names 
   await expect(page.getByText("Call 911 now if you have bloating with a swollen stomach and:")).toBeVisible();
 });
 
-test("phone layout: no sideways scrolling, 44px touch targets, and dark mode uses the dark tokens", async ({ page }) => {
+test("phone layout: no sideways scrolling, readable text on every filled button and link, 44px touch targets, and the Silver light theme", async ({ page }) => {
   await signUp(page);
   await setup(page);
   for (const path of ["/today", "/history", "/me", "/upgrade", "/help", "/"]) {
@@ -133,16 +133,31 @@ test("phone layout: no sideways scrolling, 44px touch targets, and dark mode use
     await page.waitForLoadState("networkidle");
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow, path).toBeLessThanOrEqual(0);
+    // A filled control's text must stand out from its own fill (it once matched it: invisible text).
+    const unreadable = await page.evaluate(() => {
+      const lum = (c: string) => { const [r, g, b] = (c.match(/[\d.]+/g) ?? []).map(Number).slice(0, 3).map((v) => { const x = v / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!; };
+      const out: string[] = [];
+      for (const el of document.querySelectorAll<HTMLElement>("a, button")) {
+        const st = getComputedStyle(el);
+        if ((el as HTMLButtonElement).disabled || !el.textContent?.trim() || st.backgroundColor === "rgba(0, 0, 0, 0)") continue;
+        const a = lum(st.color), b = lum(st.backgroundColor);
+        const ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+        if (ratio < 4.5) out.push(`${el.textContent.trim().slice(0, 40)} (${ratio.toFixed(2)})`);
+      }
+      return out;
+    });
+    expect(unreadable, path).toEqual([]);
   }
   await page.goto("/today");
   for (const b of await page.getByRole("button").all()) {
     const box = await b.boundingBox();
     if (box) expect(box.height, await b.textContent() ?? "").toBeGreaterThanOrEqual(44);
   }
+  // Silver is light only for now (DECISIONS.md): a phone set to dark mode still gets the light tokens.
   await page.emulateMedia({ colorScheme: "dark" });
-  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(17, 23, 20)");
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(245, 245, 246)");
   await page.emulateMedia({ colorScheme: "light" });
-  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(244, 246, 241)");
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(245, 245, 246)");
 });
 
 test("Q91 another country gets the honest waitlist; Q203 a Free user who opens Your journey lands on Upgrade with no preview; Q39 sign-out; delete account", async ({ page }) => {
@@ -194,7 +209,7 @@ test("a Pro user (mock purchase) sees the ingredient check, marks items, and Pos
   await check.getByRole("radiogroup", { name: "Did you have cheese?" }).getByRole("radio", { name: "Had", exact: true }).click();
   await check.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.getByText("chicken burrito with beans")).toBeVisible();
-  await page.getByRole("link", { name: "Insights" }).click();
+  await page.getByRole("link", { name: "Patterns" }).click();
   await expect(page.getByRole("heading", { name: "Possible triggers" })).toBeVisible();
   await expect(page.getByText("These are patterns in your own records, not proof of a cause.")).toBeVisible();
   await expect(page.getByText("Not enough data yet")).toBeVisible();
@@ -213,9 +228,6 @@ test("screenshots for a visual check", async ({ page }) => {
   await page.getByRole("dialog").getByRole("button", { name: "Save" }).click();
   await page.getByRole("button", { name: "Done" }).click();
   await page.screenshot({ path: "test-results/shots/today.png", fullPage: true });
-  await page.emulateMedia({ colorScheme: "dark" });
-  await page.screenshot({ path: "test-results/shots/today-dark.png", fullPage: true });
-  await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/history"); await page.waitForLoadState("networkidle");
   await page.screenshot({ path: "test-results/shots/history.png", fullPage: true });
   await page.goto("/"); await page.waitForLoadState("networkidle");

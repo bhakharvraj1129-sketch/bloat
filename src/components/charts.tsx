@@ -53,7 +53,7 @@ export function DayChart({ days, dateFormat, context }: { days: DayRow[]; dateFo
           return (
             <g key={d.date} {...common}>
               <rect x={x} y={y(0) - h} width={bar} height={h} rx={Math.min(bar / 2, 6)}
-                fill={solid ? TONE(value) : "var(--surface)"} stroke={solid ? (value === 0 ? "var(--line)" : "none") : TONE(Math.max(value, 1))}
+                fill={solid ? TONE(value) : "var(--surface)"} stroke={value <= 3 ? "var(--control)" : solid ? "none" : TONE(value)}
                 strokeWidth={solid ? 1 : 2} strokeDasharray={d.status === "PROVISIONAL" || d.status === "CONFLICT" ? "3 3" : undefined} />
               {label}
             </g>

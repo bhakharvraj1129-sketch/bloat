@@ -33,11 +33,11 @@ export function Report() {
     return () => { alive = false; };
   }, [tick, router]);
 
-  if (error) return <Screen title="Weekly report" back="/history"><ErrorState error={error} onRetry={() => { setError(null); setTick((t) => t + 1); }} /></Screen>;
-  if (!snap) return <Screen title="Weekly report" back="/history"><Loading /></Screen>;
+  if (error) return <Screen title="Weekly report" eyebrow="Patterns" back="/insights"><ErrorState error={error} onRetry={() => { setError(null); setTick((t) => t + 1); }} /></Screen>;
+  if (!snap) return <Screen title="Weekly report" eyebrow="Patterns" back="/insights"><Loading /></Screen>;
   const fmt = (d: string) => formatDate(d, "DD/MM", false);
   return (
-    <Screen title="Weekly report" back="/history">
+    <Screen title="Weekly report" eyebrow="Patterns" back="/insights">
       <Caption>{fmt(snap.from)} to {fmt(snap.to)} · {snap.counts.confirmed} confirmed, {snap.counts.late} late, {snap.counts.missing} without a score</Caption>
       {snap.doctor_line && <DoctorLineBox line={snap.doctor_line} />}
       <Card className="flex flex-col gap-3">

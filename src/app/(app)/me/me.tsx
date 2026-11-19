@@ -62,8 +62,8 @@ export function Me({ testMode }: { testMode: boolean }) {
   // A profile change being saved, and the data it was made against: once fresh data arrives, the saved value shows.
   const [pending, setPending] = useState<{ body: Record<string, unknown>; base: State | null }>({ body: {}, base: null });
 
-  if (st.loading && !st.data) return <Screen title="Me"><Loading /></Screen>;
-  if (st.error && !st.data) return <Screen title="Me"><ErrorState error={st.error} onRetry={st.reload} /></Screen>;
+  if (st.loading && !st.data) return <Screen title="You" eyebrow="Settings and your data"><Loading /></Screen>;
+  if (st.error && !st.data) return <Screen title="You" eyebrow="Settings and your data"><ErrorState error={st.error} onRetry={st.reload} /></Screen>;
   const s = st.data;
   if (!s || !s.onboarded) return null;
   const pro = s.plan === "pro";
@@ -107,7 +107,7 @@ export function Me({ testMode }: { testMode: boolean }) {
   const reloadPlan = () => { st.reload(); ent.reload(); };
 
   return (
-    <Screen title="Me">
+    <Screen title="You" eyebrow="Settings and your data">
       <section className="flex flex-col gap-2" aria-labelledby="plan">
         <Label id="plan">Plan</Label>
         <Card className="flex flex-col gap-3">
@@ -115,7 +115,7 @@ export function Me({ testMode }: { testMode: boolean }) {
           {pro && ent.data && <Caption>{ent.data.status === "cancelled" ? "Cancelled. Pro stays on until" : "Renews on"} {ent.data.renews_or_ends_at ? new Date(ent.data.renews_or_ends_at).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }) : "the end of the period"}.</Caption>}
           {s.paused && ent.data && <Caption>Paused until {ent.data.pause_until ? new Date(ent.data.pause_until).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }) : "you resume"}. No charge while paused. Your records are kept.</Caption>}
           {!pro && !s.paused && <Caption>Free logging never expires. There is no trial: Free is yours to keep.</Caption>}
-          {!pro && !s.paused && <Link href="/upgrade" className="inline-flex min-h-12 items-center justify-center rounded-pill bg-brand px-5 font-semibold text-on-brand no-underline">See what Pro adds</Link>}
+          {!pro && !s.paused && <Link href="/upgrade" className="inline-flex min-h-12 items-center justify-center rounded-sm bg-brand px-5 font-semibold text-on-brand no-underline">See what Pro adds</Link>}
           {s.paused && <Button disabled={plan.saving} onClick={async () => { if ((await plan.run("POST", "/v1/billing/resume")) !== null) reloadPlan(); }}>{plan.saving ? "Resuming…" : "Resume Pro"}</Button>}
           {pro && ent.data?.status !== "cancelled" && (
             <div className="grid grid-cols-2 gap-2">
@@ -287,7 +287,7 @@ function CancelSheet({ onClose, onPause, onDone }: { onClose: () => void; onPaus
   return (
     <Sheet open onOpenChange={(o) => { if (!o && !save.saving) onClose(); }} title="Cancel Pro">
       <p>Cancelling never deletes your records or past reports. Pro stays on until the end of the period you paid for.</p>
-      <Link href="/doctor" className="inline-flex min-h-12 items-center justify-center rounded-pill border border-line bg-surface px-5 font-semibold text-ink no-underline">Download your doctor PDF first</Link>
+      <Link href="/doctor" className="inline-flex min-h-12 items-center justify-center rounded-sm border border-line bg-surface px-5 font-semibold text-ink no-underline">Download your doctor PDF first</Link>
       <Button variant="secondary" disabled={save.saving} onClick={onPause}>Pause instead</Button>
       <SaveStatus state={save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) onDone(); }} />
       <Button variant="danger" disabled={save.saving} onClick={async () => { if ((await save.run("POST", "/v1/billing/cancel")) !== null) onDone(); }}>{save.saving ? "Cancelling…" : "Cancel Pro"}</Button>
@@ -308,7 +308,7 @@ function HabitsSheet({ s, onClose, onSaved }: { s: State; onClose: () => void; o
           <div className="flex flex-wrap gap-2">
             {activities.filter((a) => a.group === group && a.id !== "ACT-16").map((a) => {
               const on = picked.includes(a.id);
-              if (PRO_ACTIVITY_IDS.has(a.id) && !pro) return <span key={a.id} className="inline-flex min-h-11 items-center gap-1.5 rounded-pill border border-line px-4 text-ink-muted"><Lock size={16} strokeWidth={1.75} aria-hidden />{a.label}<ProTag /></span>;
+              if (PRO_ACTIVITY_IDS.has(a.id) && !pro) return <span key={a.id} className="inline-flex min-h-11 items-center gap-1.5 rounded-sm border border-line px-4 text-ink-muted"><Lock size={16} strokeWidth={1.75} aria-hidden />{a.label}<ProTag /></span>;
               return <Chip key={a.id} selected={on} disabled={!on && picked.length >= 3} onClick={() => setPicked((p) => (on ? p.filter((x) => x !== a.id) : p.length < 3 ? [...p, a.id] : p))}>{a.label}</Chip>;
             })}
           </div>

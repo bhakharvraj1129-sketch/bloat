@@ -68,7 +68,7 @@ export function Review({ date }: { date: string }) {
         </Card>
         <p>{info.text}</p>
         {result.status === "CONFLICT" && <Link className="font-semibold" href={`/day/${date}`}>Open this day</Link>}
-        <Link href="/today" className="inline-flex min-h-12 items-center justify-center rounded-pill bg-brand px-5 font-semibold text-on-brand no-underline">Back to Today</Link>
+        <Link href="/today" className="inline-flex min-h-12 items-center justify-center rounded-sm bg-brand px-5 font-semibold text-on-brand no-underline">Back to Today</Link>
       </Screen>
     );
   }

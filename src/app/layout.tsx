@@ -1,14 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { TAGLINE } from "@/lib/wording";
 import { Suspense } from "react";
 import { PwaRegister } from "@/components/pwa";
 import { LeaveGuard, NavTracker } from "@/components/nav";
 
-// Fonts are downloaded at build time and served by Bloat itself: a phone never calls Google.
-const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["600"], variable: "--font-bricolage", display: "swap" });
-const body = DM_Sans({ subsets: ["latin"], weight: ["400", "600"], variable: "--font-dm-sans", display: "swap" });
+// System fonts only (Silver design): nothing is downloaded, so text never shifts while loading.
 
 export const metadata: Metadata = {
   title: { default: "Bloat: Bloating and Gut Tracker", template: "%s · Bloat" },
@@ -20,12 +17,13 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   width: "device-width", initialScale: 1, viewportFit: "cover",
-  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#f4f6f1" }, { media: "(prefers-color-scheme: dark)", color: "#111714" }],
+  themeColor: "#f5f5f6",
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    <html lang="en">
       <body>
         {children}
         <Suspense fallback={null}><NavTracker /></Suspense>

@@ -6,15 +6,15 @@ import { DOCTOR_SECTION_NAMES, includedSections, privateDoctorSnapshot } from "@
 // The doctor PDF, made on the server from an immutable snapshot. Plain black on white so it
 // prints and photocopies well. Page 1 is a two-minute summary (0.3 fix 25).
 const s = StyleSheet.create({
-  page: { padding: 40, fontSize: 10, fontFamily: "Helvetica", color: "#17211e", lineHeight: 1.4 },
+  page: { padding: 40, fontSize: 10, fontFamily: "Helvetica", color: "#171719", lineHeight: 1.4 },
   h1: { fontSize: 18, fontFamily: "Helvetica-Bold", marginBottom: 2 },
   h2: { fontSize: 12, fontFamily: "Helvetica-Bold", marginTop: 12, marginBottom: 4 },
-  muted: { color: "#55625c", fontSize: 9 },
-  row: { flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: "#dce3de", paddingVertical: 3 },
-  k: { width: "45%", color: "#55625c" }, v: { width: "55%" },
-  box: { borderWidth: 1, borderColor: "#17211e", borderRadius: 4, padding: 8, marginTop: 8 },
-  note: { backgroundColor: "#dcebe5", padding: 8, borderRadius: 4, marginTop: 8 },
-  footer: { position: "absolute", bottom: 20, left: 40, right: 40, fontSize: 8, color: "#55625c" },
+  muted: { color: "#626269", fontSize: 9 },
+  row: { flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: "#dedee2", paddingVertical: 3 },
+  k: { width: "45%", color: "#626269" }, v: { width: "55%" },
+  box: { borderWidth: 1, borderColor: "#171719", borderRadius: 4, padding: 8, marginTop: 8 },
+  note: { backgroundColor: "#eeeef0", padding: 8, borderRadius: 4, marginTop: 8 },
+  footer: { position: "absolute", bottom: 20, left: 40, right: 40, fontSize: 8, color: "#626269" },
   li: { marginBottom: 2 },
 });
 

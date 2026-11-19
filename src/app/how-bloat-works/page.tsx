@@ -1,5 +1,5 @@
-import { Card, Caption, Screen } from "@/components/ui";
-import { PublicFooter } from "@/components/public";
+import { Card, Caption } from "@/components/ui";
+import { PublicPage } from "@/components/public";
 import { COMPARISON_LINE, TRIGGERS_FOOTER } from "@/lib/wording";
 
 export const metadata = { title: "How Bloat works" };
@@ -7,7 +7,7 @@ export const metadata = { title: "How Bloat works" };
 // The methodology page: how scores and comparisons are calculated, in plain words.
 export default function Method() {
   return (
-    <Screen title="How Bloat works" back="/">
+    <PublicPage title="How Bloat works" eyebrow="Method">
       <p>Bloat shows what your own records say. Every number comes from a fixed rule, not from AI, and every result shows how many days it is based on.</p>
       <Card as="section">
         <h2 className="t-title">Bloat Score</h2>
@@ -45,7 +45,6 @@ export default function Method() {
         <h2 className="t-title">What Bloat does not do</h2>
         <p className="mt-2">Bloat is a wellness tracker. It does not name conditions, rate your symptoms or give medical advice. Check with your doctor before changing your diet.</p>
       </Card>
-      <PublicFooter />
-    </Screen>
+    </PublicPage>
   );
 }

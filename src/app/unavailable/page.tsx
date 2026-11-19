@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
-import { Button, Card, Caption, Field, Screen, inputClass } from "@/components/ui";
+import { Button, Card, Caption, Field, inputClass } from "@/components/ui";
+import { AuthPage } from "@/components/public";
 import { useRef } from "react";
 import { api, ApiFailure, newKey } from "@/lib/client/api";
 
@@ -12,7 +13,7 @@ export default function Unavailable() {
   const [message, setMessage] = useState("");
   const key = useRef(newKey()); // kept after a lost reply, so trying again never adds the email twice
   return (
-    <Screen title="Not available yet" back="/start">
+    <AuthPage title="Not available yet" back="/start">
       <p>Bloat isn&apos;t available in your country yet.</p>
       {state === "done" ? (
         <Card><p className="t-body-strong">You&apos;re on the waitlist</p><Caption>We&apos;ll email you once when Bloat opens in your country.</Caption></Card>
@@ -45,6 +46,6 @@ export default function Unavailable() {
           {state === "error" && <p role="alert" className="t-caption text-ink">{message}</p>}
         </form>
       )}
-    </Screen>
+    </AuthPage>
   );
 }

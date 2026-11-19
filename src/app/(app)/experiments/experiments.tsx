@@ -32,7 +32,7 @@ export function Experiments() {
   const fxSave = useSave<{ passed: boolean; notes: Note[] }>();
 
   return (
-    <ProScreen title="Experiments" back="/history" load={load}>
+    <ProScreen title="Experiments" eyebrow="Patterns" back="/insights" load={load}>
       {(d) => {
         const ready = d.prior_confirmed_days >= d.prior_needed;
         const row = (o: Offer) => (

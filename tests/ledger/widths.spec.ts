@@ -45,7 +45,7 @@ test.setTimeout(60 * 60_000);
 
 test("every screen at five widths", async ({ browser }) => {
   const today = new Date().toISOString().slice(0, 10);
-  const PUBLIC = ["/", "/start", "/help", "/sign-in", "/unavailable", "/terms", "/privacy", "/contact", "/how-bloat-works", "/offline"];
+  const PUBLIC = ["/", "/start", "/help", "/sign-in", "/unavailable", "/about", "/terms", "/privacy", "/contact", "/how-bloat-works", "/offline"];
   const PRIVATE = ["/today", "/history", `/day/${today}`, "/insights", "/journey", "/report", "/experiments", "/cards", "/learn", "/health", "/doctor", "/me", "/upgrade"];
   mkdirSync(SHOTS, { recursive: true });
 

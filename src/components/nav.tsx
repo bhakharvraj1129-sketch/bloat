@@ -44,7 +44,7 @@ export function BackLink({ fallback }: { fallback: string }) {
         if (e.defaultPrevented || !plainClick(e)) return;
         if (previousScreen()) { e.preventDefault(); router.back(); }
       }}
-      className="-ml-2 inline-flex min-h-11 w-fit items-center gap-1 rounded-pill px-2 font-semibold no-underline"
+      className="-ml-2 inline-flex min-h-11 w-fit items-center gap-1 rounded-sm px-2 font-semibold no-underline"
     >
       <ChevronLeft {...ICON} aria-hidden /> Back
     </Link>
@@ -92,8 +92,8 @@ export function LeaveGuard() {
           <Dialog.Title className="t-title">Leave without saving?</Dialog.Title>
           <Dialog.Description className="t-caption">What you entered on this screen hasn&apos;t been saved yet.</Dialog.Description>
           <div className="flex flex-col gap-2">
-            <Dialog.Close className="inline-flex min-h-12 w-full items-center justify-center rounded-pill bg-brand px-5 font-semibold text-on-brand">Stay and keep editing</Dialog.Close>
-            <button type="button" onClick={leave} className="inline-flex min-h-12 w-full items-center justify-center rounded-pill border border-line bg-surface px-5 font-semibold text-alert">Leave without saving</button>
+            <Dialog.Close className="inline-flex min-h-12 w-full items-center justify-center rounded-sm bg-brand px-5 font-semibold text-on-brand">Stay and keep editing</Dialog.Close>
+            <button type="button" onClick={leave} className="inline-flex min-h-12 w-full items-center justify-center rounded-sm border border-line bg-surface px-5 font-semibold text-alert">Leave without saving</button>
           </div>
         </Dialog.Content>
       </Dialog.Portal>

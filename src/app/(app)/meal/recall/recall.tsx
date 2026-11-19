@@ -28,7 +28,7 @@ export function Recall() {
     <ProScreen title="Add ingredients" back="/today" load={load}>
       {(d) => {
         const meal = d.meals[index];
-        if (!meal) return <><Card><p>All done. There are no more meals from the last 7 days to go through.</p></Card><Link href="/today" className="inline-flex min-h-12 items-center justify-center rounded-pill bg-brand px-5 font-semibold text-on-brand no-underline">Back to Today</Link></>;
+        if (!meal) return <><Card><p>All done. There are no more meals from the last 7 days to go through.</p></Card><Link href="/today" className="inline-flex min-h-12 items-center justify-center rounded-sm bg-brand px-5 font-semibold text-on-brand no-underline">Back to Today</Link></>;
         const next = () => { setItems(null); setAnswers({}); setMessage(null); save.reset(); setIndex((i) => i + 1); };
         const check = async () => {
           setBusy(true); setMessage(null);

@@ -15,7 +15,7 @@ export function ProToday({ state, onChanged }: { state: State; onChanged: () => 
     <>
       {pro.shortcuts && pro.shortcuts.length > 0 && (
         <nav aria-label="Shortcuts" className="flex flex-wrap gap-2">
-          {pro.shortcuts.map((s) => <Link key={s.href} href={s.href} className="inline-flex min-h-11 items-center rounded-pill border border-line bg-surface px-4 font-semibold text-ink no-underline">{s.label}</Link>)}
+          {pro.shortcuts.map((s) => <Link key={s.href} href={s.href} className="inline-flex min-h-11 items-center rounded-sm border border-line bg-surface px-4 font-semibold text-ink no-underline">{s.label}</Link>)}
         </nav>
       )}
       {pro.experiment && (

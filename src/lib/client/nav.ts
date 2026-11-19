@@ -31,12 +31,19 @@ const here = () => location.pathname + location.search;
 /** Called on every screen change. `fresh` is true on a full page load that was not a reload or Back/Forward. */
 export function recordVisit(fresh: boolean) {
   const cur = here();
-  if (fresh) return write([cur]);
-  const t = read();
+  const t = fresh ? [] : read();
   if (t[t.length - 1] === cur) return; // a reload, or the same screen again
   if (t.length >= 2 && t[t.length - 2] === cur) t.pop(); // went back one step
   else t.push(cur);
   write(t);
+  dispatchEvent(new Event(TRAIL_EVENT));
+}
+
+const TRAIL_EVENT = "bloat:trail";
+/** For useSyncExternalStore: re-read the trail whenever a screen change is recorded. */
+export function onTrailChange(l: () => void) {
+  addEventListener(TRAIL_EVENT, l);
+  return () => removeEventListener(TRAIL_EVENT, l);
 }
 
 /** The Bloat screen before this one in this tab, if there is one Back can safely return to. */

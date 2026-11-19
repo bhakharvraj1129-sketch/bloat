@@ -1,11 +1,11 @@
-import { Card, Caption, Screen } from "@/components/ui";
-import { PublicFooter } from "@/components/public";
+import { Card, Caption } from "@/components/ui";
+import { PublicPage } from "@/components/public";
 
 export const metadata = { title: "Privacy" };
 
 export default function Privacy() {
   return (
-    <Screen title="Privacy" back="/">
+    <PublicPage title="Privacy" eyebrow="Policies">
       <Card><p className="t-body-strong">Preview build</p><Caption>This is a test preview that uses made-up accounts only. The final Privacy Policy is prepared before Bloat opens to real users.</Caption></Card>
       <h2 className="t-title">What Bloat already does</h2>
       <ul className="list-disc pl-5">
@@ -17,7 +17,6 @@ export default function Privacy() {
         <li>Nothing is used for research or any other purpose without your separate, explicit consent.</li>
         <li>Download my data and Delete account are in Me, on every plan.</li>
       </ul>
-      <PublicFooter />
-    </Screen>
+    </PublicPage>
   );
 }

@@ -66,7 +66,7 @@ export function DayDetail({ date }: { date: string }) {
         </div>
       </Card>
       {finished && (
-        <Link href={`/review/${date}`} className="inline-flex min-h-12 items-center justify-center rounded-pill border border-line bg-surface px-5 font-semibold text-ink no-underline">
+        <Link href={`/review/${date}`} className="inline-flex min-h-12 items-center justify-center rounded-sm border border-line bg-surface px-5 font-semibold text-ink no-underline">
           {data.review ? "Change the review" : "Review this day"}
         </Link>
       )}

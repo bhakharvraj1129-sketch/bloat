@@ -1,7 +1,7 @@
 "use client";
 import * as Dialog from "@radix-ui/react-dialog";
 import Link from "next/link";
-import { X } from "lucide-react";
+import { TriangleAlert, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentProps, type ReactNode } from "react";
 import type { ApiFailure } from "@/lib/client/api";
 import type { SaveState } from "@/lib/client/hooks";
@@ -20,13 +20,13 @@ export function Button({ variant = "primary", size = "md", full = true, classNam
     <button
       {...rest}
       className={cx(
-        "inline-flex items-center justify-center gap-2 rounded-pill px-5 font-semibold transition-colors duration-150 disabled:cursor-not-allowed",
-        size === "lg" ? "min-h-16 text-lg" : "min-h-12",
+        "inline-flex items-center justify-center gap-2 rounded-sm border px-5 font-semibold transition-colors duration-150 disabled:cursor-not-allowed",
+        size === "lg" ? "min-h-14 text-lg" : "min-h-12",
         full && "w-full",
-        variant === "primary" && "bg-brand text-on-brand disabled:bg-surface disabled:text-ink-muted disabled:border disabled:border-line",
-        variant === "secondary" && "border border-line bg-surface text-ink disabled:text-ink-muted",
-        variant === "quiet" && "text-brand disabled:text-ink-muted",
-        variant === "danger" && "border border-line bg-surface text-alert",
+        variant === "primary" && "border-brand bg-brand text-on-brand hover:opacity-90 disabled:border-line disabled:bg-surface disabled:text-ink-muted disabled:hover:opacity-100",
+        variant === "secondary" && "border-line bg-surface text-ink hover:bg-subtle disabled:text-ink-muted disabled:hover:bg-surface",
+        variant === "quiet" && "border-transparent text-ink underline-offset-4 hover:underline disabled:text-ink-muted disabled:no-underline",
+        variant === "danger" && "border-line bg-surface text-alert hover:bg-alert-tint disabled:text-ink-muted disabled:hover:bg-surface",
         className,
       )}
     />
@@ -38,10 +38,10 @@ export function LinkButton({ href, children, variant = "primary", className }: {
     <Link
       href={href}
       className={cx(
-        "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-pill px-5 font-semibold no-underline",
-        variant === "primary" && "bg-brand text-on-brand",
-        variant === "secondary" && "border border-line bg-surface text-ink",
-        variant === "quiet" && "text-brand",
+        "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border px-5 font-semibold no-underline transition-colors duration-150",
+        variant === "primary" && "border-brand bg-brand text-on-brand hover:opacity-90",
+        variant === "secondary" && "border-line bg-surface text-ink hover:bg-subtle",
+        variant === "quiet" && "border-transparent text-ink hover:underline",
         className,
       )}
     >
@@ -51,7 +51,7 @@ export function LinkButton({ href, children, variant = "primary", className }: {
 }
 
 export function Card({ children, className, as: Tag = "div" }: { children: ReactNode; className?: string; as?: "div" | "section" | "li" }) {
-  return <Tag className={cx("rounded-lg border border-line bg-surface p-4", className)}>{children}</Tag>;
+  return <Tag className={cx("rounded-lg border border-line bg-surface p-5 md:p-6", className)}>{children}</Tag>;
 }
 
 export function Label({ children, className, id }: { children: ReactNode; className?: string; id?: string }) {
@@ -64,17 +64,17 @@ export function Caption({ children, className }: { children: ReactNode; classNam
 
 type ChipProps = { selected?: boolean; onClick?: () => void; children: ReactNode; tone?: "brand" | "alert"; disabled?: boolean; role?: "checkbox" | "radio"; title?: string };
 
-/** A selectable pill. Selection is shown with a fill and a check mark, never by colour alone. */
+/** A selectable option. Selection is shown with a fill, a check mark and its state, never by colour alone. */
 export function Chip({ selected = false, onClick, children, tone = "brand", disabled, role = "checkbox", title }: ChipProps) {
   return (
     <button
       type="button" role={role} aria-checked={selected} disabled={disabled} onClick={onClick} title={title}
       className={cx(
-        "inline-flex min-h-11 items-center gap-1.5 rounded-pill border px-4 text-left transition-colors duration-150",
-        selected && tone === "brand" && "border-brand bg-brand-tint font-semibold text-ink",
+        "inline-flex min-h-11 items-center gap-1.5 rounded-sm border px-4 text-left transition-colors duration-150",
+        selected && tone === "brand" && "border-brand bg-brand font-semibold text-on-brand",
         selected && tone === "alert" && "border-alert bg-alert-tint font-semibold text-alert",
-        !selected && "border-line bg-surface text-ink",
-        disabled && "text-ink-muted",
+        !selected && "border-control bg-surface text-ink hover:bg-subtle",
+        disabled && !selected && "cursor-not-allowed border-line text-ink-muted hover:bg-surface",
       )}
     >
       {selected && <span aria-hidden>✓</span>}
@@ -88,14 +88,14 @@ export function ChipGroup({ label, children, labelledBy }: { label?: string; chi
 }
 
 export function ProTag() {
-  return <span className="ml-1 rounded-pill border border-brand px-2 py-0.5 text-[0.8125rem] font-semibold leading-4 text-brand">Pro</span>;
+  return <span className="ml-1.5 inline-flex rounded-pill border border-line bg-subtle px-2 py-0.5 align-middle text-[0.8125rem] font-semibold leading-4 text-ink">Pro</span>;
 }
 
 export function scoreTone(n: number | null): { bg: string; fg: string } {
   if (n === null || n <= 0) return { bg: "bg-surface border border-line", fg: "text-ink" };
   if (n <= 3) return { bg: "bg-score-mild", fg: "text-on-score" };
   if (n <= 6) return { bg: "bg-score-moderate", fg: "text-on-score" };
-  if (n <= 8) return { bg: "bg-score-strong", fg: "text-on-score" };
+  if (n <= 8) return { bg: "bg-score-strong", fg: "text-on-score-strong" };
   return { bg: "bg-score-severe", fg: "text-on-score-severe" };
 }
 
@@ -104,7 +104,7 @@ export function ScoreBadge({ value, size = "md", unknown = false, label }: { val
   const tone = scoreTone(unknown ? null : value);
   const dims = size === "lg" ? "h-22 w-22 text-5xl" : size === "md" ? "h-12 w-12 text-xl" : "h-9 w-9 text-base";
   return (
-    <span aria-label={label} className={cx("inline-flex shrink-0 items-center justify-center rounded-pill font-display font-semibold tabular", dims, tone.bg, tone.fg)}>
+    <span aria-label={label} className={cx("inline-flex shrink-0 items-center justify-center rounded-pill font-display font-semibold tabular", dims, tone.bg, tone.fg, (value ?? 0) <= 3 && "border border-control")}>
       {unknown || value === null ? "?" : value}
     </span>
   );
@@ -118,16 +118,15 @@ export function StrengthScale({ value, onChange, min = 1, name }: { value: numbe
       <div role="radiogroup" aria-label={name} className="grid grid-cols-5 gap-2">
         {min === 0 && (
           <button type="button" role="radio" aria-checked={value === 0} onClick={() => onChange(0)}
-            className={cx("col-span-5 min-h-12 rounded-pill border font-semibold", value === 0 ? "border-brand bg-brand-tint" : "border-line bg-surface")}>
+            className={cx("col-span-5 min-h-12 rounded-sm border font-semibold transition-colors duration-150", value === 0 ? "border-brand bg-brand text-on-brand" : "border-control bg-surface hover:bg-subtle")}>
             {value === 0 && <span aria-hidden>✓ </span>}0 · No bloating
           </button>
         )}
         {numbers.map((n) => {
-          const tone = scoreTone(n);
           const on = value === n;
           return (
             <button key={n} type="button" role="radio" aria-checked={on} aria-label={`${n}`} onClick={() => onChange(n)}
-              className={cx("min-h-12 rounded-pill font-display text-lg font-semibold tabular transition-transform duration-150", tone.bg, tone.fg, on ? "outline-2 outline-offset-2 outline-ink scale-105" : "opacity-90")}>
+              className={cx("min-h-12 rounded-sm border text-lg font-semibold tabular transition-colors duration-150", on ? "border-brand bg-brand text-on-brand" : "border-control bg-surface text-ink hover:bg-subtle")}>
               {n}
             </button>
           );
@@ -168,17 +167,20 @@ export function Sheet({ open, onOpenChange, title, children, description, dirty 
       <Dialog.Portal>
         <Dialog.Overlay className="fade-in fixed inset-0 z-40 bg-ink/40" />
         <Dialog.Content
-          className="sheet-in fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[92dvh] w-full max-w-md flex-col rounded-t-lg border border-line bg-surface"
+          className={cx(
+            "sheet-in fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[92dvh] w-full max-w-lg flex-col rounded-t-lg border border-line bg-surface pb-[env(safe-area-inset-bottom)]",
+            "md:inset-x-auto md:bottom-auto md:left-1/2 md:top-1/2 md:max-h-[88dvh] md:w-[calc(100%-3rem)] md:max-w-xl md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-lg md:pb-0",
+          )}
         >
-          <div className="flex items-center justify-between gap-3 px-4 pb-2 pt-4">
+          <div className="flex items-center justify-between gap-3 px-5 pb-2 pt-5 md:px-7 md:pt-6">
             <Dialog.Title className="t-title">{title}</Dialog.Title>
-            <Dialog.Close className="inline-flex h-11 w-11 items-center justify-center rounded-pill text-ink-muted" aria-label="Close">
+            <Dialog.Close className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-sm text-ink hover:bg-subtle" aria-label="Close">
               <X {...ICON} aria-hidden />
             </Dialog.Close>
           </div>
-          {description ? <Dialog.Description className="px-4 t-caption">{description}</Dialog.Description> : <Dialog.Description className="sr-only">{title}</Dialog.Description>}
+          {description ? <Dialog.Description className="px-5 t-caption md:px-7">{description}</Dialog.Description> : <Dialog.Description className="sr-only">{title}</Dialog.Description>}
           {confirming && (
-            <div role="alert" className="mx-4 mt-2 flex flex-col gap-3 rounded-sm border border-line bg-ground p-4">
+            <div role="alert" className="mx-5 mt-2 flex flex-col gap-3 rounded-sm border border-line bg-subtle p-4 md:mx-7">
               <p className="t-body-strong">Close without saving?</p>
               <Caption>What you entered here hasn&apos;t been saved yet.</Caption>
               <div className="flex flex-col gap-2">
@@ -187,19 +189,28 @@ export function Sheet({ open, onOpenChange, title, children, description, dirty 
               </div>
             </div>
           )}
-          <div hidden={confirming} className="flex flex-col gap-6 overflow-y-auto px-4 pb-8 pt-2">{children}</div>
+          <div hidden={confirming} className="flex flex-col gap-6 overflow-y-auto px-5 pb-8 pt-2 md:px-7">{children}</div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
   );
 }
 
-export function Screen({ title, children, back, action, wide }: { title: string; children: ReactNode; back?: string; action?: ReactNode; wide?: boolean }) {
+/**
+ * A screen: Back (contextual, with a fixed parent as the fallback), a short label above the title,
+ * the title, an optional action, then the content. `width` keeps forms and reading comfortable:
+ * "form" 560px, "page" 720px (the default), "wide" 1120px for dashboards.
+ */
+export function Screen({ title, children, back, action, eyebrow, width = "page" }: { title: string; children: ReactNode; back?: string; action?: ReactNode; eyebrow?: ReactNode; width?: "form" | "page" | "wide" }) {
   return (
-    <main className={cx("mx-auto flex min-h-dvh w-full flex-col gap-6 px-4 pb-32 pt-8", wide ? "max-w-2xl" : "max-w-md")}>
-      <header className="flex flex-col gap-2">
+    <main className={cx(
+      "mx-auto flex min-h-dvh w-full flex-col gap-6 px-5 pb-32 pt-8 md:px-8 md:pb-16 md:pt-12",
+      width === "form" ? "max-w-[38rem]" : width === "wide" ? "max-w-[76rem] lg:px-12" : "max-w-[49rem]",
+    )}>
+      <header className="flex flex-col gap-3">
         {back && <BackLink fallback={back} />}
-        <div className="flex items-baseline justify-between gap-3">
+        {eyebrow && <p className="t-label">{eyebrow}</p>}
+        <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
           <h1 className="t-headline">{title}</h1>
           {action}
         </div>
@@ -266,7 +277,7 @@ export function Field({ label, children, hint }: { label: string; children: Reac
   );
 }
 
-export const inputClass = "min-h-12 w-full rounded-sm border border-line bg-surface px-3 text-ink placeholder:text-ink-muted";
+export const inputClass = "min-h-12 w-full rounded-sm border border-control bg-surface px-3 text-ink placeholder:text-ink-muted";
 
 export function Segmented<T extends string>({ value, onChange, options, label }: { value: T | null; onChange: (v: T) => void; options: Array<{ value: T; label: string }>; label: string }) {
   return (
@@ -283,8 +294,8 @@ export function Advice({ items }: { items: Array<{ code: string; sentence: strin
   if (!items.length) return null;
   const unique = [...new Map(items.map((i) => [i.sentence, i])).values()];
   return (
-    <div className="flex flex-col gap-2 rounded-lg bg-alert-tint p-4" role="note">
-      {unique.map((i) => <p key={i.sentence} className="font-semibold text-alert">{i.sentence}</p>)}
+    <div className="flex flex-col gap-2 rounded-lg border border-alert bg-alert-tint p-4" role="note">
+      {unique.map((i) => <p key={i.sentence} className="flex items-start gap-2 font-semibold text-alert"><TriangleAlert {...ICON} className="mt-0.5 shrink-0" aria-hidden />{i.sentence}</p>)}
       <p className="t-caption text-ink">{unique[0]!.source} · <Link href="/help">When to get medical help</Link></p>
     </div>
   );

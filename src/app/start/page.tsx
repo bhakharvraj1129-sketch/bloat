@@ -1,7 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button, Chip, Screen } from "@/components/ui";
+import { Button, Chip } from "@/components/ui";
+import { AuthPage } from "@/components/public";
 import { writePre } from "@/lib/client/pre";
 
 const OPTIONS = [["US", "United States"], ["CA", "Canada"], ["IN", "India"], ["OTHER", "Other"]] as const;
@@ -11,7 +12,7 @@ export default function Country() {
   const router = useRouter();
   const [value, setValue] = useState<string | null>(null);
   return (
-    <Screen title="Where do you live?" back="/">
+    <AuthPage title="Where do you live?" back="/">
       <p className="text-ink-muted">This sets your emergency number, units and date format.</p>
       <div role="radiogroup" aria-label="Country" className="flex flex-col gap-2">
         {OPTIONS.map(([code, name]) => (
@@ -29,6 +30,6 @@ export default function Country() {
         Continue
       </Button>
       {!value && <p className="t-caption">Choose a country to continue.</p>}
-    </Screen>
+    </AuthPage>
   );
 }

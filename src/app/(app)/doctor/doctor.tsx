@@ -35,7 +35,7 @@ export function Doctor() {
   const revoke = useSave();
 
   return (
-    <ProScreen title="Doctor report" back="/me" load={st}>
+    <ProScreen title="Doctor report" eyebrow="Patterns" back="/insights" load={st}>
       {() => (
         <>
           <Caption>A report of your own records to bring to an appointment. Everything in it is self-reported.</Caption>
@@ -69,7 +69,7 @@ export function Doctor() {
                 <Caption>Sections you switched off are left out of every part of the report, including the summary.</Caption>
                 <Card className="flex flex-col gap-2"><DoctorReportView snapshot={made.snapshot} /></Card>
               </section>
-              <a href={made.pdf_url} className="inline-flex min-h-12 items-center justify-center rounded-pill bg-brand px-5 font-semibold text-on-brand no-underline" download>Download PDF</a>
+              <a href={made.pdf_url} className="inline-flex min-h-12 items-center justify-center rounded-sm bg-brand px-5 font-semibold text-on-brand no-underline" download>Download PDF</a>
               <Caption>Downloaded copies can&apos;t be recalled. Once you save or send the file, Bloat can no longer remove it.</Caption>
 
               <section className="flex flex-col gap-3" aria-labelledby="share">

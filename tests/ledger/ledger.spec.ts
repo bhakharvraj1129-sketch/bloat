@@ -169,7 +169,7 @@ test.setTimeout(120 * 60_000);
 test("control ledger", async ({ browser }) => {
   const today = new Date().toISOString().slice(0, 10);
   const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-  const PUBLIC = ["/", "/start", "/help", "/help?signup=1", "/sign-in", "/sign-in?new=1", "/sign-in/code", "/unavailable", "/terms", "/privacy", "/contact", "/how-bloat-works", "/offline", "/share/not-a-real-token", "/admin"];
+  const PUBLIC = ["/", "/start", "/help", "/help?signup=1", "/sign-in", "/sign-in?new=1", "/sign-in/code", "/unavailable", "/about", "/terms", "/privacy", "/contact", "/how-bloat-works", "/offline", "/share/not-a-real-token", "/admin"];
   const PRIVATE = ["/today", "/history", `/day/${today}`, `/review/${yesterday}`, "/insights", "/journey", "/report", "/experiments", "/cards", "/learn", "/health", "/doctor", "/me", "/meal/recall", "/upgrade", "/setup"];
 
   const out = await browser.newContext({ serviceWorkers: "block" });
