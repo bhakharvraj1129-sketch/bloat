@@ -75,7 +75,7 @@ export function Today() {
       {!ep && today.episodes === 0 && !today.provisional_zero && (
         <>
           <Button variant="quiet" disabled={none.saving} onClick={async () => { const ok = await none.run("POST", `/v1/days/${today.date}/no-bloating-so-far`); if (ok) reload(); }}>No bloating so far today</Button>
-          <SaveStatus state={none.state === "saved" ? "idle" : none.state} error={none.error} onCheck={async () => { await none.check(); reload(); }} />
+          <SaveStatus state={none.state === "saved" ? "idle" : none.state} error={none.error} onCheck={async () => { if ((await none.check()).ok) reload(); }} />
         </>
       )}
 

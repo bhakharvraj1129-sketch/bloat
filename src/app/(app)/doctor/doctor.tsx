@@ -32,6 +32,7 @@ export function Doctor() {
   const [revoked, setRevoked] = useState(false);
   const make = useSave<Made>();
   const shareSave = useSave<Share>();
+  const revoke = useSave();
 
   return (
     <ProScreen title="Doctor report" back="/me" load={st}>
@@ -78,7 +79,8 @@ export function Doctor() {
                     <p className="t-body-strong">Link ready</p>
                     <p className="break-all tabular">{typeof location !== "undefined" ? location.origin : ""}{share.url}</p>
                     <Caption>Works until {new Date(share.expires_at).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })}. This link is shown once: copy it now. {share.note}</Caption>
-                    <Button variant="danger" onClick={async () => { await api("DELETE", `/v1/reports/${made.id}/shares?share=${share.share_id}`); setRevoked(true); }}>Revoke link</Button>
+                    <SaveStatus state={revoke.state === "saved" ? "idle" : revoke.state} error={revoke.error} onCheck={async () => { if ((await revoke.check()).ok) setRevoked(true); }} />
+                    <Button variant="danger" disabled={revoke.saving} onClick={async () => { if ((await revoke.run("DELETE", `/v1/reports/${made.id}/shares?share=${share.share_id}`)) !== null) setRevoked(true); }}>{revoke.saving ? "Revoking…" : "Revoke link"}</Button>
                   </Card>
                 ) : (
                   <>

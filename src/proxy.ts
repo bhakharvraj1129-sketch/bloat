@@ -24,7 +24,8 @@ export async function proxy(request: NextRequest) {
   if (!data.user && PRIVATE.some((p) => path === p || path.startsWith(`${p}/`))) {
     const to = request.nextUrl.clone();
     to.pathname = "/sign-in";
-    to.search = "";
+    // Come back to this screen after signing in (the path only, never the query string).
+    to.search = path === "/setup" ? "" : `?next=${encodeURIComponent(path)}`;
     return NextResponse.redirect(to);
   }
   // Private screens are never cached by the browser or any shared cache.

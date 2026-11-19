@@ -1,10 +1,12 @@
 "use client";
 import * as Dialog from "@radix-ui/react-dialog";
 import Link from "next/link";
-import { ChevronLeft, X } from "lucide-react";
-import type { ComponentProps, ReactNode } from "react";
+import { X } from "lucide-react";
+import { useEffect, useLayoutEffect, useRef, useState, type ComponentProps, type ReactNode } from "react";
 import type { ApiFailure } from "@/lib/client/api";
 import type { SaveState } from "@/lib/client/hooks";
+import { currentOpener, openSheet, returnFocus, useUnsavedGuard } from "@/lib/client/nav";
+import { BackLink } from "./nav";
 
 const cx = (...c: Array<string | false | null | undefined>) => c.filter(Boolean).join(" ");
 export { cx };
@@ -136,13 +138,36 @@ export function StrengthScale({ value, onChange, min = 1, name }: { value: numbe
   );
 }
 
-export function Sheet({ open, onOpenChange, title, children, description }: { open: boolean; onOpenChange: (o: boolean) => void; title: string; children: ReactNode; description?: string }) {
+/**
+ * A bottom sheet. The phone's Back button closes it (instead of leaving the screen), focus returns
+ * to the control that opened it, and when `dirty` is true closing asks before throwing away what
+ * was entered.
+ */
+export function Sheet({ open, onOpenChange, title, children, description, dirty = false }: { open: boolean; onOpenChange: (o: boolean) => void; title: string; children: ReactNode; description?: string; dirty?: boolean }) {
+  const [confirming, setConfirming] = useState(false);
+  const request = (o: boolean) => {
+    if (o) return onOpenChange(true);
+    if (dirty && !confirming) return setConfirming(true);
+    setConfirming(false);
+    onOpenChange(false);
+  };
+  const latest = useRef(request);
+  useEffect(() => { latest.current = request; });
+  useEffect(() => (open ? openSheet(() => latest.current(false)) : undefined), [open]);
+  // Remember what opened the sheet before focus moves into it (layout effects run first), and
+  // return focus there when it closes or unmounts.
+  useLayoutEffect(() => {
+    if (!open) return;
+    const opener = currentOpener();
+    return () => returnFocus(opener);
+  }, [open]);
+  useUnsavedGuard(open && dirty);
+
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root open={open} onOpenChange={request}>
       <Dialog.Portal>
         <Dialog.Overlay className="fade-in fixed inset-0 z-40 bg-ink/40" />
         <Dialog.Content
-          aria-describedby={description ? undefined : undefined}
           className="sheet-in fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[92dvh] w-full max-w-md flex-col rounded-t-lg border border-line bg-surface"
         >
           <div className="flex items-center justify-between gap-3 px-4 pb-2 pt-4">
@@ -152,7 +177,17 @@ export function Sheet({ open, onOpenChange, title, children, description }: { op
             </Dialog.Close>
           </div>
           {description ? <Dialog.Description className="px-4 t-caption">{description}</Dialog.Description> : <Dialog.Description className="sr-only">{title}</Dialog.Description>}
-          <div className="flex flex-col gap-6 overflow-y-auto px-4 pb-8 pt-2">{children}</div>
+          {confirming && (
+            <div role="alert" className="mx-4 mt-2 flex flex-col gap-3 rounded-sm border border-line bg-ground p-4">
+              <p className="t-body-strong">Close without saving?</p>
+              <Caption>What you entered here hasn&apos;t been saved yet.</Caption>
+              <div className="flex flex-col gap-2">
+                <Button variant="secondary" autoFocus onClick={() => setConfirming(false)}>Keep editing</Button>
+                <Button variant="danger" onClick={() => request(false)}>Close without saving</Button>
+              </div>
+            </div>
+          )}
+          <div hidden={confirming} className="flex flex-col gap-6 overflow-y-auto px-4 pb-8 pt-2">{children}</div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -163,11 +198,7 @@ export function Screen({ title, children, back, action, wide }: { title: string;
   return (
     <main className={cx("mx-auto flex min-h-dvh w-full flex-col gap-6 px-4 pb-32 pt-8", wide ? "max-w-2xl" : "max-w-md")}>
       <header className="flex flex-col gap-2">
-        {back && (
-          <Link href={back} className="-ml-2 inline-flex min-h-11 w-fit items-center gap-1 rounded-pill px-2 font-semibold no-underline">
-            <ChevronLeft {...ICON} aria-hidden /> Back
-          </Link>
-        )}
+        {back && <BackLink fallback={back} />}
         <div className="flex items-baseline justify-between gap-3">
           <h1 className="t-headline">{title}</h1>
           {action}

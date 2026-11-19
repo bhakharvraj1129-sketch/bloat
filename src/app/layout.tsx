@@ -2,7 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { TAGLINE } from "@/lib/wording";
+import { Suspense } from "react";
 import { PwaRegister } from "@/components/pwa";
+import { LeaveGuard, NavTracker } from "@/components/nav";
 
 // Fonts are downloaded at build time and served by Bloat itself: a phone never calls Google.
 const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["600"], variable: "--font-bricolage", display: "swap" });
@@ -26,6 +28,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${display.variable} ${body.variable}`}>
       <body>
         {children}
+        <Suspense fallback={null}><NavTracker /></Suspense>
+        <LeaveGuard />
         <PwaRegister />
       </body>
     </html>

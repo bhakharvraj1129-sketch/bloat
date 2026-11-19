@@ -1,5 +1,6 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
+import { safeNext } from "@/lib/next-path";
 import { useEffect, useState } from "react";
 import { Button, Caption, Field, Screen, inputClass } from "@/components/ui";
 import { browserSupabase } from "@/lib/client/supabase";
@@ -12,6 +13,7 @@ export function CodeForm() {
   const params = useSearchParams();
   const email = params.get("email") ?? "";
   const isNew = params.get("new") === "1";
+  const next = safeNext(params.get("next"));
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [sending, setSending] = useState(false);
@@ -35,7 +37,7 @@ export function CodeForm() {
     setBusy(false);
     const problem = verifyMessage(error);
     if (problem) return setMessage(problem);
-    router.push("/today");
+    router.push(next ?? "/today");
   }
 
   async function resend() {

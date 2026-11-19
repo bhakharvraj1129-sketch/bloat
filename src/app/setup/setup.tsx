@@ -8,6 +8,7 @@ import { QuestionField } from "@/components/question";
 import { clearPre, readPre } from "@/lib/client/pre";
 import { deviceZone } from "@/lib/client/api";
 import { useSave } from "@/lib/client/hooks";
+import { useUnsavedGuard } from "@/lib/client/nav";
 import { activities, ACTIVITY_GROUP_LABELS, country as countryCfg, PRO_ACTIVITY_IDS, question } from "@/lib/registry";
 import { HELP_PAGE_VERSION, HOW_BLOAT_WORKS } from "@/lib/wording";
 
@@ -59,6 +60,33 @@ export function Setup() {
   }, [router]);
 
   useEffect(() => { top.current?.focus(); window.scrollTo(0, 0); }, [step]);
+
+  // Each step gets its own browser history entry, so the phone's Back button goes to the previous
+  // step instead of leaving setup and losing every answer. Only steps already reached can be
+  // returned to, so Forward can never skip the consent step.
+  const reached = useRef(0);
+  useEffect(() => {
+    try { history.replaceState({ ...(history.state ?? {}), setupStep: 0 }, ""); } catch { /* history unavailable */ }
+    const onPop = (e: PopStateEvent) => {
+      const n = (e.state as { setupStep?: unknown } | null)?.setupStep;
+      setStep(typeof n === "number" ? Math.max(0, Math.min(n, reached.current)) : 0);
+    };
+    addEventListener("popstate", onPop);
+    return () => removeEventListener("popstate", onPop);
+  }, []);
+  const next = () => {
+    const n = step + 1;
+    reached.current = Math.max(reached.current, n);
+    try { history.pushState({ ...(history.state ?? {}), setupStep: n }, ""); } catch { /* history unavailable */ }
+    setStep(n);
+  };
+  const previous = () => {
+    if ((history.state as { setupStep?: unknown } | null)?.setupStep === step && step > 0) history.back();
+    else setStep((s) => Math.max(0, s - 1));
+  };
+  // Answers live only in this tab's memory until "Go to Today", so leaving asks first.
+  const started = step > 0 || Object.values(ticks).some(Boolean) || Object.keys(answers).length > 0 || meds.length > 0 || followed.length > 0;
+  useUnsavedGuard(started && save.state !== "saved");
 
   const set = (id: string) => (value: string | string[] | null) => setAnswers((a) => ({ ...a, [id]: { value, at: new Date().toISOString() } }));
   const val = (id: string) => answers[id]?.value ?? null;
@@ -230,12 +258,12 @@ export function Setup() {
 
       <div className="mt-2 flex flex-col gap-3">
         {step < 8 ? (
-          <Button disabled={!canContinue} onClick={() => setStep((s) => s + 1)}>Continue</Button>
+          <Button disabled={!canContinue} onClick={next}>Continue</Button>
         ) : (
           <Button onClick={finish} disabled={save.saving}>{save.saving ? "Saving…" : "Go to Today"}</Button>
         )}
-        {step > 0 && <Button variant="quiet" onClick={() => setStep((s) => s - 1)}>Back</Button>}
-        {step === 8 && <SaveStatus state={save.state} error={save.error} onCheck={async () => { const ok = await save.check(); if (ok !== null || save.state === "saved") { clearPre(); router.replace("/today"); } }} />}
+        {step > 0 && <Button variant="quiet" onClick={previous}>Back</Button>}
+        {step === 8 && <SaveStatus state={save.state} error={save.error} onCheck={async () => { const ok = await save.check(); if (ok.ok) { clearPre(); router.replace("/today"); } }} />}
       </div>
     </main>
   );

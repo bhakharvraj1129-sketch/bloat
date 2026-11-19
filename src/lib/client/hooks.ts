@@ -54,24 +54,28 @@ export function useSave<T = unknown>() {
     }
   }, []);
 
-  /** After a lost reply: ask the server, and send again with the same key if it was not saved. */
-  const check = useCallback(async (): Promise<T | null> => {
+  /**
+   * After a lost reply: ask the server, and send again with the same key if it was not saved.
+   * `ok` is true only when the server has confirmed the save.
+   */
+  const check = useCallback(async (): Promise<{ ok: boolean; value: T | null }> => {
     setState("saving");
     try {
       const status = await checkSaved(keyRef.current);
-      if (status.saved) { setState("saved"); keyRef.current = newKey(); return (status.response ?? null) as T | null; }
+      if (status.saved) { setState("saved"); keyRef.current = newKey(); return { ok: true, value: (status.response ?? null) as T | null }; }
       if (lastRef.current) {
         const out = await lastRef.current();
         setState("saved"); keyRef.current = newKey();
-        return out;
+        return { ok: true, value: out };
       }
       setState("error");
-      return null;
+      return { ok: false, value: null };
     } catch (e) {
       const f = e instanceof ApiFailure ? e : null;
       setError(f);
       setState(f?.unknownOutcome ? "unknown" : "error");
-      return null;
+      if (f && !f.unknownOutcome) keyRef.current = newKey();
+      return { ok: false, value: null };
     }
   }, []);
 

@@ -1,9 +1,8 @@
 "use client";
 import Link from "next/link";
-import { Caption, Card, Label } from "@/components/ui";
+import { Caption, Card, Label, SaveStatus } from "@/components/ui";
 import { ProScreen } from "@/components/pro";
-import { useLoad } from "@/lib/client/hooks";
-import { api } from "@/lib/client/api";
+import { useLoad, useSave } from "@/lib/client/hooks";
 
 type CardItem = { id: string; kind: string; title: string; text: string; label: string; sources: Array<{ name: string; url: string }>; hidden: boolean };
 type Article = { id: string; title: string; covers: string; sources: string[]; category: string; links_help_page?: boolean };
@@ -23,7 +22,7 @@ export function Learn() {
             <p className="t-body-strong">{c.title}</p>
             <p>{c.text}</p>
             <Caption>Source: {c.sources.map((s, i) => <span key={s.url}>{i > 0 ? ", " : ""}<a href={s.url} target="_blank" rel="noreferrer">{s.name}</a></span>)}</Caption>
-            {c.hidden && <button type="button" className="min-h-11 w-fit font-semibold text-brand" onClick={async () => { await api("POST", `/v1/cards/${c.id}/feedback`, { unhide: true }); load.reload(); }}>Un-hide</button>}
+            {c.hidden && <Unhide id={c.id} onDone={load.reload} />}
           </Card>
         );
         return (
@@ -63,5 +62,15 @@ export function Learn() {
         );
       }}
     </ProScreen>
+  );
+}
+
+function Unhide({ id, onDone }: { id: string; onDone: () => void }) {
+  const save = useSave();
+  return (
+    <>
+      <button type="button" disabled={save.saving} className="min-h-11 w-fit font-semibold text-brand disabled:text-ink-muted" onClick={async () => { if ((await save.run("POST", `/v1/cards/${id}/feedback`, { unhide: true })) !== null) onDone(); }}>{save.saving ? "Un-hiding…" : "Un-hide"}</button>
+      <SaveStatus state={save.state === "saved" ? "idle" : save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) onDone(); }} />
+    </>
   );
 }

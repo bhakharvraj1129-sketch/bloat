@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button, Caption, Card, ErrorState, Label, Loading, Screen, Chip } from "@/components/ui";
-import { useLoad } from "@/lib/client/hooks";
+import { Button, Caption, Card, ErrorState, Label, Loading, SaveStatus, Screen, Chip } from "@/components/ui";
+import { useLoad, useSave } from "@/lib/client/hooks";
 import { api } from "@/lib/client/api";
 import type { State } from "@/components/today/types";
 
@@ -29,6 +30,15 @@ export function Upgrade({ testMode }: { testMode: boolean }) {
   const [plan, setPlan] = useState<"annual" | "three_month" | "monthly">("annual");
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
+  const [answer, setAnswer] = useState<"yes_go_through_them" | "not_now" | null>(null);
+  const router = useRouter();
+  const offer = useSave();
+  const mock = useSave();
+  const answerOffer = async (a: "yes_go_through_them" | "not_now") => {
+    setAnswer(a);
+    if ((await offer.run("POST", "/v1/meals/recalled-check", { answer: a })) === null) return;
+    if (a === "yes_go_through_them") router.push("/meal/recall"); else recall.reload();
+  };
   if (ent.loading && !ent.data) return <Screen title="Bloat Pro" back="/me"><Loading /></Screen>;
   if (ent.error && !ent.data) return <Screen title="Bloat Pro" back="/me"><ErrorState error={ent.error} onRetry={ent.reload} /></Screen>;
   const e = ent.data!;
@@ -42,8 +52,9 @@ export function Upgrade({ testMode }: { testMode: boolean }) {
           <Card className="flex flex-col gap-3">
             <p className="t-body-strong">Add ingredients to your last 7 days of meals?</p>
             <Caption>You have {recall.data.meals.length} {recall.data.meals.length === 1 ? "meal" : "meals"} from the last 7 days with no ingredients. Anything you add is saved as &quot;added afterwards&quot; and labelled on results. This is offered once.</Caption>
-            <Button disabled={busy} onClick={async () => { setBusy(true); await api("POST", "/v1/meals/recalled-check", { answer: "yes_go_through_them" }).catch(() => {}); location.href = "/meal/recall"; }}>Yes, go through them</Button>
-            <Button variant="secondary" disabled={busy} onClick={async () => { setBusy(true); await api("POST", "/v1/meals/recalled-check", { answer: "not_now" }).catch(() => {}); recall.reload(); setBusy(false); }}>Not now</Button>
+            <Button disabled={offer.saving} onClick={() => answerOffer("yes_go_through_them")}>{offer.saving && answer === "yes_go_through_them" ? "Opening…" : "Yes, go through them"}</Button>
+            <Button variant="secondary" disabled={offer.saving} onClick={() => answerOffer("not_now")}>Not now</Button>
+            <SaveStatus state={offer.state === "saved" ? "idle" : offer.state} error={offer.error} onCheck={async () => { if ((await offer.check()).ok && answer) { if (answer === "yes_go_through_them") router.push("/meal/recall"); else recall.reload(); } }} />
           </Card>
         )}
         <Link href="/health" className="font-semibold">Add your health background (optional)</Link>
@@ -76,17 +87,18 @@ export function Upgrade({ testMode }: { testMode: boolean }) {
         </Caption>
         <Caption>The price charged follows the country of your payment method.</Caption>
       </section>
-      <Button disabled={busy} onClick={async () => {
-        setBusy(true);
+      <Button disabled={busy} aria-busy={busy || undefined} onClick={async () => {
+        setBusy(true); setMsg("");
         try { const r = await api<{ message: string }>("POST", "/v1/billing/checkout", { interval: plan }); setMsg(r.message); } catch { setMsg("That didn't work. Nothing was charged."); }
-        setBusy(false);
-      }}>Upgrade</Button>
+        finally { setBusy(false); }
+      }}>{busy ? "Opening checkout…" : "Upgrade"}</Button>
       {msg && <p role="status" className="t-caption text-ink">{msg}</p>}
       {testMode && (
         <Card className="flex flex-col gap-2">
           <p className="t-body-strong">Preview tools (synthetic accounts only)</p>
           <Caption>A mock purchase turns Pro on so its screens can be tried. No payment is involved.</Caption>
-          <Button variant="secondary" disabled={busy} onClick={async () => { setBusy(true); await api("POST", "/v1/billing/mock-purchase", { interval: plan }).catch(() => {}); ent.reload(); setBusy(false); }}>Mock purchase</Button>
+          <Button variant="secondary" disabled={mock.saving || busy} onClick={async () => { if ((await mock.run("POST", "/v1/billing/mock-purchase", { interval: plan })) !== null) ent.reload(); }}>{mock.saving ? "Turning Pro on…" : "Mock purchase"}</Button>
+          <SaveStatus state={mock.state === "saved" ? "idle" : mock.state} error={mock.error} onCheck={async () => { if ((await mock.check()).ok) ent.reload(); }} />
         </Card>
       )}
     </Screen>

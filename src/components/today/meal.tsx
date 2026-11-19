@@ -37,6 +37,8 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
   const [check, setCheck] = useState<Check | null>(null);
   const [checking, setChecking] = useState(false);
   const pendingPhoto = useRef<File | null>(null); // a photo waiting for the AI consent answer
+  const [agreeing, setAgreeing] = useState(false);
+  const consentKey = useRef(newKey());
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
   const [added, setAdded] = useState<string[]>([]);
   const [addText, setAddText] = useState("");
@@ -91,7 +93,7 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
 
   const title = step === "details" ? "Add meal" : step === "consent" ? "Before the first check" : "Ingredient check";
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title={title}>
+    <Sheet open={open} onOpenChange={onOpenChange} title={title} dirty={!!text.trim() && !save.saving}>
       {step === "details" && (
         <>
           <Field label={question("ML-01").prompt} hint={`${text.length}/300`}>
@@ -143,7 +145,7 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
           <QuestionField id="ML-05" value={pace} onChange={(v) => setPace(v as string | null)} hide={["skip"]} />
           <QuestionField id="ML-06" value={origin} onChange={(v) => setOrigin(v as string | null)} hide={["skip"]} />
           <AmbiguousChoice error={save.error} onChoose={(o) => finish(dishId ? { ...base(o), saved_dish_id: dishId } : base(o))} />
-          <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { await save.check(); onSaved(); onOpenChange(false); }} />
+          <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { if ((await save.check()).ok) { onSaved(); onOpenChange(false); } }} />
           {pro && !dishId ? (
             <>
               <Button onClick={runCheck} disabled={!text.trim() || checking || save.saving}>{checking ? "Checking…" : "Next: check ingredients"}</Button>
@@ -159,7 +161,21 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
       {step === "consent" && (
         <>
           <Card><p>{question("CN-04").prompt}</p><Caption className="mt-2">Only the dish name or the photo is sent. Nothing about your symptoms, health or identity ever is. You can withdraw this in Me.</Caption></Card>
-          <Button onClick={async () => { try { await api("POST", "/v1/consents", { type: "ai_meal" }); const photo = pendingPhoto.current; pendingPhoto.current = null; if (photo) await onPhoto(photo); else await runCheck(); } catch { setNotice("That didn't save. Try again."); } }} disabled={checking}>I agree</Button>
+          <Button aria-busy={agreeing || undefined} onClick={async () => {
+            if (agreeing) return;
+            setAgreeing(true); setNotice("");
+            try { await api("POST", "/v1/consents", { type: "ai_meal" }, { key: consentKey.current }); }
+            catch (e) {
+              setAgreeing(false);
+              // A lost reply keeps the same key, so trying again never records the agreement twice.
+              if (!(e instanceof ApiFailure && e.unknownOutcome)) consentKey.current = newKey();
+              setNotice(e instanceof ApiFailure && e.unknownOutcome ? "Connection lost. Your answer may not have been saved. Try again." : "That didn't save. Try again.");
+              return;
+            }
+            setAgreeing(false);
+            const photo = pendingPhoto.current; pendingPhoto.current = null;
+            if (photo) await onPhoto(photo); else await runCheck();
+          }} disabled={checking || agreeing}>{agreeing ? "Saving…" : "I agree"}</Button>
           <Button variant="secondary" onClick={() => finish(base())} disabled={save.saving}>No thanks, save the meal</Button>
           {notice && <p role="alert" className="t-caption text-ink">{notice}</p>}
         </>
@@ -202,7 +218,7 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
             <span>{question("ML-12").prompt}</span>
           </label>
           {asDish && <Field label="Place (optional)" hint="For example: Chipotle"><input className={inputClass} maxLength={80} value={place} onChange={(e) => setPlace(e.target.value)} /></Field>}
-          <SaveStatus state={save.state} error={save.error} onCheck={async () => { await save.check(); onSaved(); onOpenChange(false); }} />
+          <SaveStatus state={save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) { onSaved(); onOpenChange(false); } }} />
           <Button disabled={save.saving} onClick={() => finish({
             ...base(), mode: "marked",
             ingredients: [

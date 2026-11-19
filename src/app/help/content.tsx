@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { Button, Card, Screen } from "@/components/ui";
 import { helpPage } from "@/lib/wording";
 import { readPre, writePre } from "@/lib/client/pre";
+import { goBack } from "@/lib/client/nav";
 
 // Screen 04. Fixed NHS-based text; works without login; never says or implies all clear.
 export function HelpContent() {
@@ -19,8 +20,9 @@ export function HelpContent() {
   }, [pre]);
   const country = pre ?? fromAccount;
   const page = useMemo(() => helpPage(country), [country]);
+  const home = fromAccount ? "/today" : "/"; // signed in: Today; signed out: the start page
   return (
-    <Screen title={page.title} back={signup ? "/start" : undefined}>
+    <Screen title={page.title} back={signup ? "/start" : home}>
       <p>{page.intro}</p>
       {page.sections.map((s) => (
         <Card key={s.level} as="section">
@@ -36,7 +38,8 @@ export function HelpContent() {
           I&apos;ve read this
         </Button>
       ) : (
-        <Button variant="secondary" onClick={() => router.back()}>Back</Button>
+        // Back to the screen that linked here; opened directly, back to Today or the start page.
+        <Button variant="secondary" onClick={() => goBack(router, home)}>Back</Button>
       )}
     </Screen>
   );

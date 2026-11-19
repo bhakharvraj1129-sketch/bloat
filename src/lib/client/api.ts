@@ -1,4 +1,5 @@
 "use client";
+import { clearUnsaved } from "./nav";
 
 export class ApiFailure extends Error {
   constructor(public status: number, public code: string, message: string, public details: unknown, public saveKey: string | null) {
@@ -36,7 +37,10 @@ export async function api<T = unknown>(method: string, path: string, body?: unkn
   if (!res.ok) {
     const err = (data as { error?: { code?: string; message?: string; details?: unknown } } | null)?.error;
     if (res.status === 401 && typeof window !== "undefined" && !location.pathname.startsWith("/sign-in")) {
-      location.href = "/sign-in";
+      // The session ran out: sign in again and come back to this screen. Nothing more can be saved
+      // until then, so the "unsaved changes" warning would only block the way back.
+      clearUnsaved();
+      location.href = `/sign-in?next=${encodeURIComponent(location.pathname)}`;
     }
     throw new ApiFailure(res.status, err?.code ?? "ERROR", err?.message ?? "Something went wrong. Nothing was saved.", err?.details ?? null, key);
   }

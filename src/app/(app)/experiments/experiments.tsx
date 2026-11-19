@@ -7,6 +7,7 @@ import { QuestionField } from "@/components/question";
 import { ProScreen } from "@/components/pro";
 import { useLoad, useSave } from "@/lib/client/hooks";
 import { ApiFailure } from "@/lib/client/api";
+import { sheetsSettled } from "@/lib/client/nav";
 
 type Offer = { key: string; name: string; type: string; offered: boolean; reason: string | null; instruction: string; source: string; warning?: string | null; swap?: string };
 type Data = {
@@ -26,6 +27,8 @@ export function Experiments() {
   const [fx, setFx] = useState<Record<string, string | null>>({});
   const [notes, setNotes] = useState<Note[] | null>(null);
   const start = useSave<{ experiment: { id: string } }>();
+  // Close the sheet and let it tidy its history step first, so Back from the new experiment returns here.
+  const open = async (id: string) => { setPick(null); await sheetsSettled(); router.push(`/experiments/${id}`); };
   const fxSave = useSave<{ passed: boolean; notes: Note[] }>();
 
   return (
@@ -88,9 +91,10 @@ export function Experiments() {
               {pick?.warning && <p className="font-semibold">{pick.warning}</p>}
               <Caption>{d.stop_line}. You can end it at any time. Each day Bloat asks whether you did it.</Caption>
               {start.error && start.error.code !== "NETWORK" && <p role="alert" className="t-caption text-ink">{start.error.message}</p>}
+              {start.state === "unknown" && <SaveStatus state="unknown" error={start.error} onCheck={async () => { const r = await start.check(); if (r.ok && r.value) await open(r.value.experiment.id); }} />}
               <Button disabled={start.saving} onClick={async () => {
                 const out = await start.run("POST", "/v1/experiments", { key: pick!.key });
-                if (out) router.push(`/experiments/${out.experiment.id}`);
+                if (out) await open(out.experiment.id);
               }}>{start.saving ? "Starting…" : "Start today"}</Button>
             </Sheet>
 

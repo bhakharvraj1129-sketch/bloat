@@ -151,7 +151,7 @@ test("Q91 another country gets the honest waitlist; Q203 a Free user who opens Y
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByText("Bloat isn't available in your country yet.")).toBeVisible();
   await page.getByLabel("Your country").fill("France");
-  await page.getByLabel("Email (optional)").fill(email());
+  await page.getByRole("textbox", { name: /^Email/ }).fill(email()); // required by the server, so no longer labelled "optional"
   await page.getByRole("button", { name: "Join waitlist" }).click();
   await expect(page.getByText("You're on the waitlist")).toBeVisible();
 

@@ -55,7 +55,7 @@ export function ActivitySheet({ open, onOpenChange, state, onSaved, onExercise }
   }
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title="Add activity">
+    <Sheet open={open} onOpenChange={onOpenChange} title="Add activity" dirty={(picked.length > 0 || !!cups.trim()) && !save.saving}>
       <Caption>Tap what happened today. Anything you don&apos;t tap stays unknown, not &quot;No&quot;.</Caption>
       {followed.length > 0 && (
         <div className="flex flex-col gap-2"><Label>Habits you follow</Label><div className="flex flex-wrap gap-2">{followed.map(chip)}</div></div>
@@ -91,7 +91,7 @@ export function ActivitySheet({ open, onOpenChange, state, onSaved, onExercise }
           <Link href="/upgrade" className="inline-flex min-h-11 items-center font-semibold">See Pro<ProTag /></Link>
         </div>
       )}
-      <SaveStatus state={save.state} error={save.error} onCheck={async () => { await save.check(); onSaved(); onOpenChange(false); }} />
+      <SaveStatus state={save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) { onSaved(); onOpenChange(false); } }} />
       <Button onClick={submit} disabled={(picked.length === 0 && !cycle) || save.saving}>{save.saving ? "Saving…" : "Save"}</Button>
     </Sheet>
   );
@@ -109,14 +109,14 @@ export function ExerciseSheet({ open, onOpenChange, state, onSaved }: Props) {
   const save = useSave();
   const mins = length === "enter_minutes" ? Number(minutes) : length ? Number(length.replace("_min", "")) : 0;
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title="Log exercise">
+    <Sheet open={open} onOpenChange={onOpenChange} title="Log exercise" dirty={!!type && !save.saving}>
       <QuestionField id="EX-01" value={type} onChange={(v) => setType(v as string | null)} />
       <div className="flex flex-col gap-3"><p className="t-body-strong">{question("EX-02").prompt}</p><TimePick name="When did you start?" value={when} onChange={setWhen} /></div>
       <QuestionField id="EX-03" value={length} onChange={(v) => setLength(v as string | null)} />
       {length === "enter_minutes" && <Field label="Minutes"><input className={inputClass} inputMode="numeric" value={minutes} onChange={(e) => setMinutes(e.target.value.replace(/\D/g, ""))} /></Field>}
       <QuestionField id="EX-04" value={intensity} onChange={(v) => setIntensity(v as string | null)} />
       <QuestionField id="EX-05" value={near} onChange={(v) => setNear(v as string | null)} />
-      <SaveStatus state={save.state} error={save.error} onCheck={async () => { await save.check(); onSaved(); onOpenChange(false); }} />
+      <SaveStatus state={save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) { onSaved(); onOpenChange(false); } }} />
       <Button disabled={!type || !(mins > 0) || save.saving} onClick={async () => {
         const started = when.mode === "now" || when.mode === "unknown" ? { mode: "now", zone } : when;
         const ok = await save.run("POST", "/v1/exercise", { type, started, minutes: mins, ...(intensity ? { intensity } : {}), ...(near ? { meal_relation: near } : {}) });
@@ -136,12 +136,12 @@ export function BowelSheet({ open, onOpenChange, onSaved }: Props) {
   const [complete, setComplete] = useState<string | null>(null);
   const save = useSave();
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title="Log bowel movement">
+    <Sheet open={open} onOpenChange={onOpenChange} title="Log bowel movement" dirty={(!!look || !!strain || !!complete) && !save.saving}>
       <div className="flex flex-col gap-3"><p className="t-body-strong">When?</p><TimePick name="When?" value={when} onChange={setWhen} /></div>
       <QuestionField id="BW-02" value={look} onChange={(v) => setLook(v as string | null)} hide={["skip"]} />
       <QuestionField id="BW-03" value={strain} onChange={(v) => setStrain(v as string | null)} hide={["skip"]} />
       <QuestionField id="BW-04" value={complete} onChange={(v) => setComplete(v as string | null)} hide={["skip"]} />
-      <SaveStatus state={save.state} error={save.error} onCheck={async () => { await save.check(); onSaved(); onOpenChange(false); }} />
+      <SaveStatus state={save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) { onSaved(); onOpenChange(false); } }} />
       <Button disabled={save.saving} onClick={async () => {
         const occurred = when.mode === "now" || when.mode === "unknown" ? { mode: "now", zone } : when;
         const ok = await save.run("POST", "/v1/bowel", { occurred, ...(look ? { stool_type: look } : {}), ...(strain ? { strain } : {}), ...(complete ? { complete } : {}) });

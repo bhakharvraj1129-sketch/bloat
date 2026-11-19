@@ -145,7 +145,7 @@ export function Review({ date }: { date: string }) {
             </div>
           )}
           <Caption>Anything you leave blank stays unknown. It is never saved as &quot;No&quot;.</Caption>
-          <SaveStatus state={save.state} error={save.error} onCheck={async () => { const r = await save.check(); if (r) setResult(r); }} />
+          <SaveStatus state={save.state} error={save.error} onCheck={async () => { const r = await save.check(); if (r.value) setResult(r.value); }} />
           <Button onClick={finish} disabled={save.saving}>{save.saving ? "Saving…" : "Finish"}</Button>
           <Button variant="quiet" onClick={() => setStep(2)}>Back</Button>
         </>

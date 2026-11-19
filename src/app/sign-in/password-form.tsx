@@ -6,6 +6,7 @@ import { browserSupabase } from "@/lib/client/supabase";
 import { readPre, writePre } from "@/lib/client/pre";
 import { passwordSignInMessage, validateSignIn, type FieldErrors } from "@/lib/sign-in-messages";
 import type { AuthErrorLike } from "@/lib/otp-messages";
+import { safeNext } from "@/lib/next-path";
 
 // Screen 05, testing version: email and password for test accounts the owner set up in Supabase.
 // There is no sign-up here, and sign-ups are switched off in Supabase itself, so a new account
@@ -15,7 +16,8 @@ import type { AuthErrorLike } from "@/lib/otp-messages";
 // carries nothing), and is cleared from memory after each try.
 export function PasswordSignIn() {
   const router = useRouter();
-  const fromHelp = useSearchParams().get("new") === "1";
+  const params = useSearchParams();
+  const fromHelp = params.get("new") === "1";
   // False on the server and before hydration, true once the page can sign in.
   const ready = useSyncExternalStore(() => () => {}, () => true, () => false);
   const [email, setEmail] = useState("");
@@ -58,7 +60,7 @@ export function PasswordSignIn() {
       return passwordRef.current?.focus();
     }
     if (fromHelp) writePre({ adult: true });
-    router.replace("/today");
+    router.replace(safeNext(params.get("next")) ?? "/today");
     router.refresh();
   }
 

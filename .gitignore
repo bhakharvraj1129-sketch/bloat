@@ -13,3 +13,4 @@ supabase/.temp
 supabase/.branches
 .vercel
 .DS_Store
+test-evidence/

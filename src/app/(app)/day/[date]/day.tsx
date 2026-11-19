@@ -198,7 +198,7 @@ function EpisodeEdit({ ep, zone, onClose, onSaved }: { ep: Ep; zone: string; onC
       <div className="flex flex-col gap-3"><p className="t-body-strong">{question("EP-02").prompt}</p><TimePick name="Start" value={start} onChange={(v) => setStart(v.mode === "now" ? start : v)} labels={{ now: "Keep" }} /></div>
       <div className="flex flex-col gap-3"><p className="t-body-strong">{question("EP-06").prompt}</p><TimePick name="End" value={end} onChange={(v) => setEnd(v.mode === "now" ? end : v)} labels={{ now: "Keep" }} allowUnknown /></div>
       <AmbiguousChoice error={save.error} onChoose={(o) => submit(o)} />
-      <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { await save.check(); onSaved(); }} />
+      <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { if ((await save.check()).ok) onSaved(); }} />
       {save.error?.code === "REVISION_CONFLICT" && <Button variant="secondary" onClick={onSaved}>Reload this day</Button>}
       <Button onClick={() => submit()} disabled={save.saving}>{save.saving ? "Saving…" : "Save changes"}</Button>
     </Sheet>
@@ -210,10 +210,10 @@ function MealEdit({ meal, zone, onClose, onSaved }: { meal: MealRow; zone: strin
   const [when, setWhen] = useState<TimeValue>({ mode: "exact", local: toLocal(meal.eaten_at, zone), zone: deviceZone() });
   const save = useSave();
   return (
-    <Sheet open onOpenChange={(o) => { if (!o) onClose(); }} title="Edit meal">
+    <Sheet open onOpenChange={(o) => { if (!o) onClose(); }} title="Edit meal" dirty={text !== meal.dish_text && !save.saving}>
       <Field label="What did you have?" hint={`${text.length}/300`}><textarea className={`${inputClass} min-h-20 py-3`} maxLength={300} value={text} onChange={(e) => setText(e.target.value)} /></Field>
       <div className="flex flex-col gap-3"><p className="t-body-strong">When did you have it?</p><TimePick name="When" value={when} onChange={(v) => setWhen(v.mode === "now" ? when : v)} labels={{ now: "Keep" }} allowApproximate={false} /></div>
-      <SaveStatus state={save.state} error={save.error} onCheck={async () => { await save.check(); onSaved(); }} />
+      <SaveStatus state={save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) onSaved(); }} />
       {save.error?.code === "REVISION_CONFLICT" && <Button variant="secondary" onClick={onSaved}>Reload this day</Button>}
       <Button disabled={!text.trim() || save.saving} onClick={async () => { const ok = await save.run("PATCH", `/v1/meals/${meal.id}`, { dish_text: text.trim(), eaten: when }, { ifMatch: meal.revision }); if (ok) onSaved(); }}>{save.saving ? "Saving…" : "Save changes"}</Button>
     </Sheet>

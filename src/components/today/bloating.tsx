@@ -86,7 +86,7 @@ export function LogBloatingSheet({ open, onOpenChange, state, onSaved }: SheetPr
 
   const symptomPreview = (symptoms ?? []).filter((c) => c in COMMON_SYMPTOM_LEVEL).map((code) => ({ code, sentence: commonSymptomSentence(code)!, source: NHS_SOURCE_LABEL }));
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title="Log bloating">
+    <Sheet open={open} onOpenChange={onOpenChange} title="Log bloating" dirty={(strength !== null || warnings.length > 0) && !save.saving}>
       <div className="flex flex-col gap-3">
         <p className="t-body-strong">{question("EP-01").prompt}</p>
         <StrengthScale name="Strength, 1 to 10" value={strength} onChange={setStrength} />
@@ -111,7 +111,7 @@ export function LogBloatingSheet({ open, onOpenChange, state, onSaved }: SheetPr
       )}
       <Link href="/help" className="font-semibold">When to get medical help</Link>
       <AmbiguousChoice error={save.error} onChoose={(o) => submit(o)} />
-      <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { await save.check(); onSaved(); onOpenChange(false); }} />
+      <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { if ((await save.check()).ok) { onSaved(); onOpenChange(false); } }} />
       <Button onClick={() => submit()} disabled={strength === null || save.saving}>{save.saving ? "Saving…" : "Save"}</Button>
       {strength === null && <Caption>Choose a strength to save.</Caption>}
     </Sheet>
@@ -143,7 +143,7 @@ export function OngoingSheet({ open, onOpenChange, state, onSaved, onEnd }: Shee
           <p className="t-body-strong">How strong is it now?</p>
           <StrengthScale name="New strength reading" value={strength} onChange={setStrength} />
           <Button disabled={strength === null || save.saving} onClick={async () => { const ok = await save.run("POST", `/v1/episodes/${ep.id}/samples`, { strength }); if (ok) { setUpdating(false); setStrength(null); onSaved(); } }}>{save.saving ? "Saving…" : "Save reading"}</Button>
-          <SaveStatus state={save.state} error={save.error} onCheck={async () => { await save.check(); onSaved(); }} />
+          <SaveStatus state={save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) onSaved(); }} />
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-2">
@@ -209,7 +209,7 @@ export function EndSheet({ open, onOpenChange, state, onSaved, earlier }: SheetP
       </div>
       {state.plan === "pro" && <QuestionField id="EP-09" value={eased} onChange={(v) => setEased(v as string | null)} />}
       <AmbiguousChoice error={save.error} onChoose={(o) => submit(o)} />
-      <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { await save.check(); onSaved(); onOpenChange(false); }} />
+      <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { if ((await save.check()).ok) { onSaved(); onOpenChange(false); } }} />
       <Button onClick={() => submit()} disabled={save.saving || timeMissing}>{save.saving ? "Saving…" : "Save"}</Button>
     </Sheet>
   );
