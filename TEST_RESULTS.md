@@ -1,6 +1,32 @@
 # Test results
 
-Last run: 18 Nov 2026. The newest results (email-and-password sign-in) are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 19 Nov 2026. The newest results (navigation and action repairs) are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+
+## Navigation and action repairs (19 Nov 2026)
+
+### Local (local Supabase in Docker; nothing hosted)
+
+Fixed build = commit `b888008` plus the Contact link change, served on port 3100. Earlier build = commit
+`dc88b37` (the last deployed one), served from a separate copy on port 3200 against the same local database.
+
+| Check | Result |
+|---|---|
+| Rule tests `pnpm test` (adds 2 return-path tests) | 94 passed, 0 failed |
+| API tests `pnpm test:api` | 134 passed, 0 failed |
+| Browser tests `pnpm test:e2e` (adds 14 navigation tests; one older test updated for the corrected waitlist label) | 31 passed, 0 failed |
+| The 14 navigation tests on the earlier build | **14 failed**, each at the defect it checks (see `docs/control-ledger.md`, "Defects reproduced and repaired") |
+| Control ledger crawler, fixed build: 740 controls and pages for signed-out, Free and Pro | 620 pass, 0 fail, 49 checked by named tests, 71 listed |
+| Control ledger crawler, earlier build | 598 pass, **19 fail** (empty "Send code" and "Join waitlist" did nothing visible) |
+| Five widths (320, 390, 768, 1024, 1440) on 23 screens: sideways scrolling | 0 of 180 in both builds |
+| Outside source links (NHS, NIDDK, BDA, CDC, PMC): 7 addresses | All HTTP 200 |
+| Type check, lint | 0 errors (5 old warnings) |
+
+Not tested: real phones (iOS Safari, Android Chrome); a slow or flaky real network (lost replies were simulated
+by blocking requests in the browser); screen readers other than the accessibility tree.
+
+### Hosted preview
+
+See the section below this one once the deploy of this round is checked.
 
 ## Email-and-password sign-in (18 Nov 2026)
 

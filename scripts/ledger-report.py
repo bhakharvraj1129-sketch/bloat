@@ -86,6 +86,42 @@ def main():
         for r, p in changed:
             lines.append(f"| {r['who']} | `{r['route']}` | {esc(r['name'])} | {p['status']}: {esc(effect_text(p))} | {r['status']}: {esc(effect_text(r))} |")
 
+    lines += [
+        "",
+        "## Defects reproduced and repaired (targeted tests)",
+        "",
+        "The crawler only sees whether something visible happened. These tests check the result itself.",
+        "Each was run against the earlier build (commit `dc88b37`, local copy on port 3200) and the fixed",
+        "build (local, port 3100) on 19 Nov 2026: all 14 failed before, at the line shown, and pass after.",
+        "Tests: `tests/e2e/navigation.spec.ts`.",
+        "",
+        "| # | Defect (earlier build) | What the earlier build did | Fixed behaviour |",
+        "|---|---|---|---|",
+        "| 1 | Back went to a fixed screen, not where you came from | Today, then a day, then Back: History | Back returns to Today; a direct link falls back to the parent |",
+        "| 2 | The phone's Back button left the screen when a sheet was open | Me, Today, open a sheet, Back: Me | Back closes the sheet and stays on Today; focus returns to the button that opened it (it went to the page body before, on every sheet) |",
+        "| 3 | Closing a filled-in sheet lost what was typed | Escape closed \"Add meal\" at once | Asks \"Close without saving?\"; Keep editing keeps the text |",
+        "| 4 | The phone's Back button in setup left setup and lost every answer | Back from step 3 left setup | Back goes to the previous step, answers kept |",
+        "| 5 | \"Check save status\" closed the sheet even when the check failed | Sheet closed as if saved | Sheet stays open and says the connection was lost; the next check saves once |",
+        "| 6 | Health background hid a failed part of its save | No message, \"Saved\" shown | The failure is shown; nothing says Saved until every part is saved |",
+        "| 7 | The recall screen turned on the AI check without asking | Consent recorded on \"Check ingredients\" | Shows the CN-04 agreement first; nothing recorded until \"I agree\" |",
+        "| 8 | Withdraw consent and Remove medicine acted at once, with no progress or error | Request sent on the first tap | Asks first, shows progress, reports failures |",
+        "| 9 | A double tap on Download started two exports | 2 export requests | 1 request; buttons locked while preparing |",
+        "| 10 | An expired session lost the screen you were on | Sent to `/sign-in`, then Today | `/sign-in?next=...` returns to the same screen (only Bloat screens accepted) |",
+        "| 11 | Empty waitlist and email-code forms gave no message in the app | Browser bubble only, or nothing | Inline message in the app's own wording; waitlist email no longer wrongly labelled optional |",
+        "| 12 | The help page's Back did nothing useful on a direct link | Went to a blank page | Returns to the start page (signed out) or Today (signed in) |",
+        "| 13 | Profile switches (Keep my meal photos, Hide charts, Units) snapped back while saving | The tick did not stay | Shows the choice at once, locks while saving, goes back with a message if it fails |",
+        "| 14 | Leaving a screen with unsaved changes gave no warning | Tab bar left Health background, edits lost | Asks \"Leave without saving?\"; Back still goes to the previous screen |",
+        "",
+        "Also repaired in the same round (checked by the full browser and API suites): Pause, Resume, Cancel Pro and",
+        "Mock purchase now show progress and errors; the delete-account sheet no longer says \"Nothing was deleted\" when",
+        "the connection drops (it offers \"Check and finish\"); starting an experiment shows a lost-reply state; the",
+        "AI-check agreement in the meal sheet cannot be sent twice; a time zone typo and a lost connection get different",
+        "messages; the Contact page's help link no longer reloads the whole app.",
+        "",
+        "Note: the crawler ran with local test mode on and email-code sign-in (the local default). The preview uses",
+        "password sign-in; its signed-out screens are checked by `tests/hosted/navigation.spec.ts`.",
+    ]
+
     fails = [r for r in rows if r["status"] == "fail"]
     lines += ["", "## Still failing in the fixed build", ""]
     lines += [f"- {r['who']} `{r['route']}` {esc(r['name'])}: {esc(effect_text(r))}" for r in fails] or ["- None."]

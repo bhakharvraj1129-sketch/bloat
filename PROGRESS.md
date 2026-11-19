@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 18 Nov 2026 (afternoon). Branch: `claude/bloat-software-build-uxzoru`.
+Last updated: 19 Nov 2026. Branch: `claude/bloat-software-build-uxzoru`.
 
 ## Where things stand
 
@@ -13,6 +13,31 @@ The whole app is built end to end. A **public preview** runs on Vercel against t
 - The hosted checks that need a signed-in account (correct sign-in, refresh, sign-out, isolation) did not run on the hosted preview this time: the Supabase connector asked the owner to confirm creating the temporary test accounts and got no answer. They pass locally.
 
 Read next: `TEST_RESULTS.md` (newest first, local and hosted kept apart), `DEPLOYMENT.md` (owner steps and how to restore email sign-in), `DECISIONS.md`.
+
+## Done on 19 Nov: navigation and action repairs (design package still blocked)
+
+The request had two parts: (1) apply the "Bloat / Silver" design package, (2) repair navigation and actions.
+
+**(1) Design package: not started, blocked.** The package (Preview.html, Design-and-UX-Spec.md, tokens.css,
+source-control-inventory.csv) was shared only as a ChatGPT library link. This environment cannot open
+chatgpt.com (blocked by the network rules, and the link needs the owner's own login). It is not in the
+owner's Google Drive, not on any branch of the repository, and Gmail needs the owner to sign in again.
+No colours, layout or wording were invented in its place. Owner action: add the four files to
+`docs/design/silver/` on this branch (or upload them into the chat).
+
+**(2) Navigation and actions: done locally, deployed.** See `docs/control-ledger.md`.
+1. Control ledger: a crawler lists and presses every control on 30 screens for signed-out, Free and Pro
+   visitors (740 rows). Fixed build: 620 pass, 0 fail, 49 checked by named tests, 71 listed (fields, disabled,
+   inside sheets). Earlier build with the same crawler: 19 fail.
+2. 14 defects reproduced first on the earlier build, then repaired (each test fails before, passes after):
+   contextual Back with a safe parent; phone Back closes sheets; focus returns to the opener; setup steps
+   in history; "close without saving?" and "leave without saving?"; honest "Check save status"; health
+   background no longer hides failures; recall screen asks before turning on the AI check; confirm before
+   withdraw and remove; single export on double tap; return to the same screen after an expired session;
+   inline form messages; Help page Back on a direct link; profile switches that stay put while saving.
+3. Every save button found calling the server directly now uses the shared save hook: "Saving…", locked
+   against double taps, clear error, and "Check save status" after a lost reply, keeping the same key.
+4. Five widths (320, 390, 768, 1024, 1440): no sideways scrolling on any of 23 screens, in either build.
 
 ## Done on 18 Nov (afternoon): email-and-password sign-in
 
@@ -58,10 +83,11 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 
 ## Next steps, in order
 
-1. Owner: in Supabase (bloat-test), switch off "Allow new users to sign up", then create `bloat-tester@bloat.test` with Auto Confirm and a strong password (DEPLOYMENT.md, "Sign-in method").
-2. Owner: answer the Supabase connector's confirmation when asked, so the temporary verification accounts can be created; then run the full hosted suite (10 checks) and delete those accounts. **This is the exact next unfinished task.**
-3. Before inviting anyone outside: restore email sign-in (DEPLOYMENT.md, "Before inviting anyone outside").
-4. Owner: staff email for founder tools; open decisions in DECISIONS.md; AI key and spending limit when ready.
+1. Owner: add the "Bloat / Silver" design files to `docs/design/silver/` (Preview.html, Design-and-UX-Spec.md, tokens.css, source-control-inventory.csv). Then: replace the tokens in `src/app/globals.css` from tokens.css, restyle the shared components and shells, then the screens in the order homepage, sign-in, setup, Today, History, Patterns, reports, You, the rest; rerun the ledger (`docs/control-ledger.md`) and the five-width check.
+2. Owner: in Supabase (bloat-test), switch off "Allow new users to sign up", then create `bloat-tester@bloat.test` with Auto Confirm and a strong password (DEPLOYMENT.md, "Sign-in method"). Checked 19 Nov: sign-ups still on, account not created.
+3. Owner: answer the Supabase connector's confirmation when asked, so the temporary verification accounts can be created; then run the full hosted suite (10 checks) and delete those accounts. **This is the exact next unfinished task.**
+4. Before inviting anyone outside: restore email sign-in (DEPLOYMENT.md, "Before inviting anyone outside").
+5. Owner: staff email for founder tools; open decisions in DECISIONS.md; AI key and spending limit when ready.
 
 ## Later (ideas not in the plan, so not built)
 
