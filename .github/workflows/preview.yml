@@ -69,6 +69,8 @@ jobs:
         run: ./scripts/ci-env.sh
       - name: Build and start the app on port 3100
         run: ./scripts/serve.sh
+      - name: PDF text tool for the report tests
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
       - name: API tests
         run: pnpm test:api
       - name: Browser for the phone-screen tests
