@@ -44,6 +44,9 @@ Choices made while building, with the reason. "Needs the owner" means: please sa
     - **About page (new):** only facts already true of the product (intended use, how it works, privacy promises). **Needs the owner:** company name and a monitored support address for About and Contact. Nothing was invented, and Contact still has no form.
     - **Defect found while restyling (also on the live site):** a global link colour rule outranked the button text colour, so filled link buttons ("Get started", "See what Pro adds", "Download PDF", "Go to Today") showed their text in the same colour as their background. Fixed by moving element defaults into the base layer; a browser test now checks every filled button and link for readable text.
 
+22. **Publishing the testing preview only after checks (22 Nov 2026).** The owner asked that a successful build alone is never treated as a tested release. `vercel.json` switches off Vercel's automatic Git builds; `.github/workflows/preview.yml` publishes only after the local suites (typecheck, lint, rule, API and browser tests) and six account-free hosted checks on the new, not-yet-public deployment pass, then confirms which deployment the address serves. The signed-in hosted suite stays manual, because it needs owner-approved accounts. The only secret is `VERCEL_TOKEN`, held by GitHub. Trade-off: until the owner adds that secret, nothing new is published (fail closed).
+23. **"Check and finish" after a lost account-deletion reply (22 Nov 2026).** If the session is no longer accepted, the app treats the deletion as done, because only a completed deletion (or a separate sign-out) ends the session at that moment. The person is then signed out and sent to the start page, as after a normal deletion. Rare exception: if the session ended for another reason at that same moment (for example, signing out everywhere from another device), the account may still exist, and signing in again would show it.
+
 ## Where the plan was unclear and what was built (needs the owner)
 
 1. **"Worth watching" for a negative difference.** The plan says a difference of 1 point or more in the same direction in both halves. Built: either direction counts, and the text only states the two averages. Never "protective".
@@ -60,6 +63,7 @@ Choices made while building, with the reason. "Needs the owner" means: please sa
 12. **Custom habits** (plan A13: can be logged, not compared) are not built.
 13. **Quarterly summary** is labelled "later" in the plan. A snapshot is stored every 90 days of Pro; there is no screen.
 14. **"English only" note on the help page (Q70)** is not shown: the words need your yes.
+15. **"Is it still happening?" comes back after Yes or Not sure.** The answer is not stored (only an anonymous event), so on the next app open the question is asked again while the bloating record has been open 8 hours or more. Built as the plan reads; tested as such. Say if you want a quiet period after an answer (for example, ask again only after another 8 hours).
 
 ## Still open in the plan itself
 

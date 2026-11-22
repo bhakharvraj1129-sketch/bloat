@@ -1,0 +1,174 @@
+# Publishing the shared testing preview (https://bloat-preview.vercel.app).
+#
+# A build that compiles is not a tested release. Vercel's automatic Git builds are switched off
+# (vercel.json), so the preview addresses move only when this workflow has passed, in this order:
+#
+#   1. checks   BLOCKS  typecheck, lint, rule tests, then the local Supabase stack, the app build,
+#                       the API tests and the browser tests on a phone screen.
+#   2. build    BLOCKS  Vercel builds the commit as a new preview deployment. No public address
+#                       points at it yet.
+#   3. smoke    BLOCKS  The account-free hosted checks (@smoke) run against that new deployment.
+#   4. publish          Only now the two preview addresses move to it. Then the workflow confirms
+#                       that bloat-preview.vercel.app serves exactly that deployment.
+#   5. after            The same hosted checks again on the public address. A failure here turns the
+#                       run red but cannot un-publish: roll back by pointing the address at the
+#                       previous deployment (DEPLOYMENT.md, "Publishing the preview").
+#
+# The signed-in hosted suite needs owner-approved synthetic accounts and stays a manual step.
+#
+# Secrets: only VERCEL_TOKEN, stored as a GitHub repository secret by the owner and never written
+# here. Everything below in plain text is public: the Vercel team and project IDs, the bloat-test
+# project URL and its publishable key (every visitor's browser receives it), and the local-only test
+# values written by scripts/ci-env.sh.
+
+name: Preview
+
+on:
+  push:
+    branches: ["claude/bloat-software-build-uxzoru"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+  VERCEL_CLI: vercel@65.12.0
+  VERCEL_ORG_ID: team_Wj95GJFGqhuogHHSfPsLO3vg
+  VERCEL_PROJECT_ID: prj_VU5KCPfstYnPIRIiKnlXC01WHich
+  HOSTED_SUPABASE_URL: https://qntazirusbuwfmnmihzu.supabase.co
+  HOSTED_SUPABASE_KEY: sb_publishable_0lvRB1qc9_ZO_2MaIWFsVQ_SW9DNghd
+
+jobs:
+  checks:
+    name: Checks (block publishing)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Rule tests
+        run: pnpm test
+      - name: Start the local Supabase stack
+        run: pnpm db:start
+      - name: Local test settings
+        run: ./scripts/ci-env.sh
+      - name: Build and start the app on port 3100
+        run: ./scripts/serve.sh
+      - name: API tests
+        run: pnpm test:api
+      - name: Browser for the phone-screen tests
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Browser tests (phone screen)
+        run: pnpm test:e2e
+      - name: Keep the failure screenshots (synthetic local data only)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-failures
+          path: test-results
+          retention-days: 7
+          if-no-files-found: ignore
+
+  build:
+    name: Build on Vercel (not yet published)
+    needs: checks
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/claude/bloat-software-build-uxzoru'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Stop if the Vercel token is missing
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::Publishing is blocked: the VERCEL_TOKEN repository secret is not set (DEPLOYMENT.md, 'Publishing the preview')."
+            exit 1
+          fi
+      - uses: actions/checkout@v5
+      # Uploaded without Git history, so Vercel cannot attach the branch address to it on its own.
+      # The address moves only in the publish job, after the hosted checks.
+      - name: Copy the commit's files
+        run: |
+          mkdir "$RUNNER_TEMP/src"
+          git archive HEAD | tar -x -C "$RUNNER_TEMP/src"
+      - name: Vercel build
+        id: deploy
+        working-directory: ${{ runner.temp }}/src
+        run: |
+          url=$(npx --yes "$VERCEL_CLI" deploy --yes --token "$VERCEL_TOKEN" --meta commit="$GITHUB_SHA" --meta source=preview-workflow 2>"$RUNNER_TEMP/deploy.log") || { tail -40 "$RUNNER_TEMP/deploy.log"; exit 1; }
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Commit $GITHUB_SHA built as $url" >> "$GITHUB_STEP_SUMMARY"
+
+  smoke:
+    name: Hosted checks on the new build (block publishing)
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Account-free hosted checks
+        run: pnpm test:hosted --grep @smoke
+        env:
+          HOSTED_URL: ${{ needs.build.outputs.url }}
+
+  publish:
+    name: Publish to the preview addresses
+    needs: [build, smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      URL: ${{ needs.build.outputs.url }}
+    steps:
+      - name: Point the addresses at the tested build
+        run: |
+          for host in bloat-preview.vercel.app bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app; do
+            npx --yes "$VERCEL_CLI" alias set "$URL" "$host" --token "$VERCEL_TOKEN" --scope typeshi2
+          done
+      - name: Confirm which deployment the address serves
+        run: |
+          api() { curl -fsS -H "Authorization: Bearer $VERCEL_TOKEN" "https://api.vercel.com$1?teamId=$VERCEL_ORG_ID"; }
+          built=$(api "/v13/deployments/${URL#https://}" | jq -r .id)
+          served=$(api "/v4/aliases/bloat-preview.vercel.app" | jq -r .deploymentId)
+          echo "Commit $GITHUB_SHA, deployment $built; bloat-preview.vercel.app serves $served" >> "$GITHUB_STEP_SUMMARY"
+          [ -n "$built" ] && [ "$built" = "$served" ] || { echo "::error::bloat-preview.vercel.app does not serve the tested deployment"; exit 1; }
+
+  after:
+    name: Hosted checks on the public address (after publishing)
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Account-free hosted checks
+        run: pnpm test:hosted --grep @smoke
+        env:
+          HOSTED_URL: https://bloat-preview.vercel.app

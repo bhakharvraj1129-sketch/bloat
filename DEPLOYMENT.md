@@ -6,7 +6,7 @@ A **public preview** exists (the owner's decision, 18 Nov 2026). It runs on the 
 
 | Part | State |
 |---|---|
-| Public preview | `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`. Opens without any Vercel login. Tied to branch `claude/bloat-software-build-uxzoru`: every push rebuilds it. **Sign-in: email and password for owner-provisioned test accounts only** (since 18 Nov, commit `940a00d`, deployment `dpl_92qDryyhPyPmfHvD7zVQbQLT6sXR`). See "Sign-in method". |
+| Public preview | `https://bloat-preview.vercel.app` (and `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`). Opens without any Vercel login. Since 22 Nov it is published only by the Preview workflow after its checks pass ("Publishing the preview"); before that, every push rebuilt it. **Sign-in: email and password for owner-provisioned test accounts only** (since 18 Nov, commit `940a00d`, deployment `dpl_92qDryyhPyPmfHvD7zVQbQLT6sXR`). See "Sign-in method". |
 | GitHub | Branch `claude/bloat-software-build-uxzoru` on `bhakharvraj1129-sketch/bloat`. No pull request. |
 | Supabase `bloat-test` (`qntazirusbuwfmnmihzu`) | Six migrations applied, matching the files in `supabase/migrations/` by version: `20261117051631 foundation`, `20261117051734 server_functions`, `20261117051738 synthetic_test_users`, `20261117061403 country_capability_set`, `20261117174442 doctor_report_privacy`, `20261117182606 server_functions_not_for_signed_in_users`. |
 | Harmless extra statement in the hosted foundation migration | When the foundation file was applied by hand through the connector on 17 Nov, one extra line went in: `insert into public.feature_flags (key, enabled, note) select 'x', false, null where false;`. `where false` means it inserts nothing (zero rows). It is in the recorded statement on `bloat-test` but not in the checked-in file. Schema fingerprints were identical before and after. Left as is: migrations are never edited after they are applied. |
@@ -98,20 +98,50 @@ values ('preview', encode(sha256(convert_to('<the secret>', 'utf8')), 'hex'));
 
 ## Addresses
 
-- Testing preview, dedicated address: `https://bloat-preview.vercel.app`. It is a Vercel project domain tied to the
-  branch `claude/bloat-software-build-uxzoru`, so it always shows that branch's newest build (added 19 Nov 2026).
+- Testing preview, dedicated address: `https://bloat-preview.vercel.app` (added 19 Nov 2026).
 - The same build: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`.
+- Since 22 Nov 2026 both addresses move **only** through the Preview workflow, after its checks pass ("Publishing the preview"). A push no longer publishes by itself.
 - `bloat-olive.vercel.app` is the project's production address. There is no production deployment, on purpose.
 - If email sign-in is restored, add `https://bloat-preview.vercel.app/auth/callback` to Supabase's redirect URLs.
 
+## Publishing the preview (quality gates)
+
+A build that compiles is not a tested release. `vercel.json` switches off Vercel's automatic Git builds, so a push to the branch no longer changes what testers see. The workflow `.github/workflows/preview.yml` runs on every push to `claude/bloat-software-build-uxzoru` (and the checks alone on pull requests):
+
+| Step | Blocks publishing? | What runs |
+|---|---|---|
+| 1. Checks | Yes | Typecheck, lint, rule tests; then the local Supabase stack in Docker, `scripts/ci-env.sh` (local-only test settings), the app build, the API tests and the browser tests on a phone screen. |
+| 2. Vercel build | Yes | Vercel builds the commit with the Preview variables. Nothing public points at it yet. |
+| 3. Hosted checks on the new build | Yes | The six account-free hosted checks (`pnpm test:hosted --grep @smoke`): signed-out return path, Back on public pages, empty-form messages, opens with no Vercel login, signed-out data refused, nobody can create an account. |
+| 4. Publish | - | Both addresses are pointed at the tested build; the workflow then confirms through Vercel which deployment `bloat-preview.vercel.app` serves and fails if it is not that one. The run summary records commit and deployment. |
+| 5. Hosted checks after publishing | No (reports only) | The same six checks on `https://bloat-preview.vercel.app`. A failure turns the run red; roll back as below. |
+| Signed-in hosted suite | No (manual) | Needs owner-approved synthetic accounts and a one-off password ("Hosted test run"). Run it on the published build before calling a milestone tested. |
+
+Not in the workflow: the control crawl, the link-by-link navigation run and the five-width check in `tests/ledger/` (long evidence runs, made by hand for the verification report), and checks on real phones.
+
+**Owner step, needed once, or the preview stops updating.** Until it is done, the workflow stops at step 2 with "the VERCEL_TOKEN repository secret is not set", and the preview stays on the last published build. That is on purpose: nothing untested gets published.
+
+1. On vercel.com: Account Settings, Tokens, Create. Name it `bloat-preview-publish`, scope: team `typeshi2`, expiry: 90 days.
+2. On github.com, repository `bloat`: Settings, Secrets and variables, Actions, New repository secret. Name `VERCEL_TOKEN`, paste the token there (not in chat, not in a file).
+3. In the Actions tab, open the latest "Preview" run and choose "Re-run all jobs".
+
+The token is never written to the repository or printed in the run log (GitHub masks it). Replace it before it expires, the same way.
+
+**Roll back** (if step 5 fails, or a problem is found later): in Vercel, project `bloat`, Deployments, open the previous good deployment, and assign `bloat-preview.vercel.app` to it (Domains, or "Assign domain"). Then fix the commit; the next passing run publishes again.
+
+**What a CI run costs:** the checks take most of the time. Locally the browser tests take about 7 minutes and the API tests about 3; with installing and starting the local Supabase stack, expect roughly 20 to 30 minutes per push (an estimate: the workflow has not run on GitHub yet). On a private repository this uses GitHub Actions minutes from the free monthly allowance.
+
 ## Hosted test run
 
-The hosted browser suite (`tests/hosted/preview.spec.ts`) signs in through the app's own email-and-password form. For each run:
+The six account-free hosted checks run in the Preview workflow on every publish (`pnpm test:hosted --grep @smoke`). The signed-in hosted suite (`tests/hosted/preview.spec.ts` and `signed-in-navigation.spec.ts`) signs in through the app's own email-and-password form and needs accounts made for the run. For each run:
 
-1. Make a one-off random password in a local file (never printed or committed) and its bcrypt hash.
-2. Create the run's synthetic accounts in `bloat-test` with that hash (roles: public, p1, diary, iso_a, iso_b, export, and `pro-tester@bloat.test` for Pro). This is done through the Supabase connector and needs the owner's confirmation there.
-3. Run: `NODE_USE_ENV_PROXY=1 HOSTED_URL=<preview> HOSTED_SUPABASE_URL=<project URL> HOSTED_SUPABASE_KEY=<publishable key> HOSTED_ACCOUNTS=<role=email,...> HOSTED_PASSWORD=<from the file> pnpm test:hosted`. Use fresh accounts for every run (the checks count entries), except `pro-tester@bloat.test`, whose hash can be replaced. Files run in name order: `signed-in-navigation.spec.ts` relies on accounts set up by `preview.spec.ts`.
-4. Delete the accounts and the password file after the run.
+1. Ask the owner to approve the exact list of accounts first (roles: public, p1, diary, iso_a, iso_b, export, and `pro-tester@bloat.test` for Pro), each marked `synthetic_test_run = <date>` in its user metadata.
+2. Make a one-off random password in a local file (never printed or committed) and its bcrypt hash. Create the accounts in `bloat-test` with that hash, through the Supabase connector (needs the owner's confirmation there) or the owner pasting the prepared SQL into the Supabase SQL editor.
+3. Run: `NODE_USE_ENV_PROXY=1 HOSTED_URL=<preview> HOSTED_SUPABASE_URL=<project URL> HOSTED_SUPABASE_KEY=<publishable key> HOSTED_ACCOUNTS=<role=email,...> HOSTED_PASSWORD=<from the file> pnpm test:hosted`. Record the commit and the deployment ID the address served during the run. Use fresh accounts for every run (the checks count entries). Files run in name order: `signed-in-navigation.spec.ts` relies on accounts set up by `preview.spec.ts`.
+4. Delete the accounts, using only the approved list: read their IDs, emails and marker first and stop on any difference. Deleting a user in `auth.users` removes its sessions, refresh tokens, identities and every app row (they cascade). Then confirm with read-only queries that all of them are gone.
+5. Deleting the password file only stops new password sign-ins. It does not end sessions already issued; deleting the accounts (step 4) does.
+
+What happens to a token issued before an account is deleted (checked locally by `tests/api/slice-a-account.test.ts`, "a deleted account's earlier tokens"): the app checks every request with Supabase Auth, so `/v1` answers 401 at once; Supabase refuses the user lookup (403) and the refresh token (400). The access token itself stays signature-valid until it expires (the project's token lifetime; Supabase's default is one hour), so a direct database read with it is not refused by the token check, but it returns no rows, because every row went with the account, and direct writes are refused (403).
 
 ## Replace a key
 
