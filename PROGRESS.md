@@ -4,17 +4,55 @@ Last updated: 22 Nov 2026. Branch: `claude/bloat-software-build-uxzoru`.
 
 ## Where things stand
 
-The whole app is built end to end. A **public preview** runs on Vercel against the hosted `bloat-test` database, with synthetic data, a labelled mock AI and mock billing. No real payments, no real AI calls.
+The app is built end to end and runs as a public testing preview on Vercel against the hosted `bloat-test` database, with synthetic data, a labelled mock AI and mock billing. No production site, no real payments, no real AI calls.
 
-- Public preview: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app` (no Vercel login).
-- **Sign-in is now email and password, temporarily, for owner-provisioned test accounts only** (commit `940a00d`). Email codes stay in the code for later. See DEPLOYMENT.md, "Sign-in method".
-- Test mode stays off on the preview (`BLOAT_TEST_LOGIN=0`): no old test login, no shared password, no mock purchase.
-- **Waiting on the owner (two Supabase dashboard steps):** switch off "Allow new users to sign up", and create `bloat-tester@bloat.test` with a strong password. Until sign-ups are off, someone could still create an account by calling Supabase directly.
-- The hosted checks that need a signed-in account (correct sign-in, refresh, sign-out, isolation) did not run on the hosted preview this time: the Supabase connector asked the owner to confirm creating the temporary test accounts and got no answer. They pass locally.
+- Testing preview: `https://bloat-preview.vercel.app` (the same build at the branch address). Since 22 Nov it is published only by the Preview workflow, after its checks pass (DEPLOYMENT.md, "Publishing the preview").
+- Sign-in: email and password, for owner-provisioned test accounts only. Sign-ups are off in Supabase itself. Test mode is off on the preview (`BLOAT_TEST_LOGIN=0`).
+- **This milestone is not complete.** Open, in order:
+  1. Owner: add the `VERCEL_TOKEN` repository secret on GitHub (DEPLOYMENT.md, "Publishing the preview"). Until then the workflow stops before publishing and the preview stays on the current build.
+  2. Delete the 19 temporary accounts from 19 Nov. The list is verified; the approval prompt timed out (report, section 8).
+  3. Publish `2f22cc4` through the gate, then run the signed-in hosted checks on it with the 7 approved accounts, then delete them and check their old tokens on the hosted project (report, sections 6 and 7). Blocked on the same database approval.
+  4. The actions still checked only partly (report, section 5).
+  5. The real-phone checks below.
 
-Read next: `TEST_RESULTS.md` (newest first, local and hosted kept apart), `DEPLOYMENT.md` (owner steps and how to restore email sign-in), `DECISIONS.md`.
+Read next: `docs/verification-report.md` (what was checked, where, and on which build), `TEST_RESULTS.md`, `DEPLOYMENT.md`, `DECISIONS.md`.
 
-## Done on 22 Nov: verification round
+## Owner checklist: the main journeys on your phone
+
+Use `https://bloat-preview.vercel.app` and your test account `bloat-tester@bloat.test`. Type made-up entries only, never real health details. Tick each line only if you saw the result written after the arrow.
+
+1. Open the address in your phone's browser. → The homepage shows "Sign in", not "Get started". No Vercel login page.
+2. Sign in. → You land on Today. Pull to refresh → you are still signed in.
+3. Log bloating, pick a strength, Save. → "Saved", and it shows on Today. Change the strength, then End it. → Each shows "Saved".
+4. Add a meal (type a dish). If the ingredient check is offered, run it, then Save. → The meal shows on Today and on History.
+5. History: open today, edit the meal's text, Save. Then delete it. → After a refresh it is gone.
+6. Log a bowel movement and some exercise (Pro). Delete one of them from the day screen. → It is gone after a refresh.
+7. Patterns and Experiments: open both. → Patterns shows charts or says there is not enough yet; on Experiments, "Choose" is greyed out with a reason until you have 4 confirmed days in the past week.
+8. You: change units; add a medicine, then remove it. → Each shows "Saved" and stays after a refresh.
+9. Doctor report: make one with Medicines and Health switched off. → The preview leaves both out. Create a share link, open it in a private tab (it opens), revoke it, reload the private tab (it no longer opens).
+10. Export JSON and CSV. → Both files download and open.
+11. Back: use the app's Back and your phone's Back on a few screens, and with a sheet open. → You return to the screen you came from; an open sheet closes first.
+12. Turn on flight mode, try to save a meal. → A clear message and your text is kept. Turn flight mode off, tap Save again. → It saves once (one entry, not two).
+13. Sign out, then press Back. → You see Sign in, not your entries.
+
+Do not use "Delete my account" on `bloat-tester@bloat.test`: it removes your test account and you would need to make it again in the Supabase dashboard.
+
+## Done on 22 Nov (afternoon): closing the gaps, publishing gate
+
+Application commit `2f22cc4`. The preview serves `af950f5` (deployment `dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj`) until the publishing gate can run.
+1. The open actions from the morning are now checked on the screen, three ways each (saves and persists, failure
+   shown with retry, double tap saves once): "Is it still happening?", deleting bloating and bowel records,
+   experiment daily answer, End early, weekly check, add back, resume, Learn "Un-hide", meal with ingredient check,
+   share link create and revoke, account deletion. 51 actions in all, 159 of 159 passed.
+2. Four defects found and fixed: no retry for a failed ingredient check; an experiment's End error hidden behind
+   its sheet; account deletion with a lost reply ending at Sign in; and the Pro coverage endpoint, which `.gitignore`
+   had kept out of every commit (found by the first CI run on a clean checkout).
+3. What a deleted account's earlier tokens can still do was measured locally (report, section 6).
+4. Publishing gate: Vercel's automatic builds are off; the Preview workflow publishes only after the checks pass.
+   Needs the owner's `VERCEL_TOKEN` secret.
+5. Blocked: the signed-in hosted checks and both account clean-ups need database approval (see "Where things stand").
+
+## Done on 22 Nov: verification round 1
 
 See `docs/verification-report.md`. Outcomes are now checked, not just clicks: 37 save and edit actions (data change,
 refresh, failure with retry, double tap), and 238 link clicks (destination and Back) at phone and desktop width.

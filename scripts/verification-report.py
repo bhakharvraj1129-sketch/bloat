@@ -8,7 +8,8 @@ Inputs (made by the local runs described in the report):
   e2e-results.json                  every browser test incl. tests/e2e/mutations.spec.ts (JSON reporter)
   mutations-before-delete-fix.json  the save/edit checks before the delete fix
   widths-after.json                 five-width check
-The hand-written parts (hosted, accounts, limits) are in HOSTED and LIMITS below.
+The hand-written parts are docs/verification-report.summary.md (results at a glance) and
+docs/verification-report.parts.md (defects, open items, hosted evidence, accounts, limits).
 """
 import json
 import os
@@ -68,9 +69,11 @@ def main():
         "What has been checked, how, and what is still not proven. \"Clicked\" and \"verified\" are kept apart:",
         "a control that responded is not counted as working unless its outcome was checked. Local results",
         "(local Supabase in Docker, synthetic accounts, test mode on) and hosted results (the public preview",
-        "and `bloat-test`) are kept apart. Rebuild with `python3 scripts/verification-report.py`.",
+        "and `bloat-test`) are kept apart, and nothing here comes from a real phone. Rebuild with",
+        "`python3 scripts/verification-report.py`.",
         "",
     ]
+    L += [open(os.path.join(ROOT, "docs", "verification-report.summary.md")).read().rstrip(), ""]
 
     # 1. Ledger reconciliation
     rows = ledger["rows"]
@@ -89,7 +92,7 @@ def main():
     L += [
         "## 1. The control crawl, reconciled",
         "",
-        f"Crawl of the final build on {ledger['when'][:16].replace('T', ' ')} UTC, phone width, signed-out, Free and Pro visitors.",
+        f"Crawl of the application commit named above, on {ledger['when'][:16].replace('T', ' ')} UTC, phone width, signed-out, Free and Pro visitors.",
         f"Total rows: **{len(rows)}** = {len(pages)} screen loads + {len(ctrls)} control rows. The same control appears once per",
         f"screen and visitor (for example the four tabs on every signed-in screen), so there are {len(set((r['name'], r['href'] or '', r['role']) for r in ctrls))} distinct controls.",
         "",
@@ -115,7 +118,7 @@ def main():
     L += [
         "## 2. Navigation: destination and Back, by real clicks",
         "",
-        f"`tests/ledger/navigate.spec.ts`, final build, run {nav['when'][:16].replace('T', ' ')} UTC. Every distinct visible in-app link on every",
+        f"`tests/ledger/navigate.spec.ts`, application commit named above, run {nav['when'][:16].replace('T', ' ')} UTC. Every distinct visible in-app link on every",
         "screen was clicked (header, footer and tab links from two screens each), for signed-out, Free and Pro visitors, at",
         "412px (phone) and 1440px (desktop). The destination must be the link's own address, or the documented rule for",
         "that visitor (signed out: Sign in with the screen remembered; Free on a Pro screen: Bloat Pro). Then Back was pressed:",
@@ -153,12 +156,12 @@ def main():
     L += [
         "## 3. Save and edit actions: real outcomes",
         "",
-        "`tests/e2e/mutations.spec.ts`, final build, local. Each action is checked three ways, with a new synthetic account each time:",
+        "`tests/e2e/mutations.spec.ts`, application commit named above, local. Each action is checked three ways, with a new synthetic account each time:",
         "",
         "- **Saves and persists:** the save request succeeds, the intended record changes when read back from the API (or the local",
         "  database for the waitlist), and after a full page refresh the screen still shows it.",
-        "- **Failure:** the server is made to fail. The failure message must appear on screen, the form must stay open with what",
-        "  was entered, nothing may change, and pressing the same button again must save it.",
+        "- **Failure:** the server is made to fail. The failure message must appear on screen (inside the sheet, when one is open),",
+        "  the form must stay open with what was entered, nothing may change, and pressing the same button again must save it.",
         "- **Double tap:** two quick taps must send one save request and change the record once.",
         "",
         "| Action | Saves and persists | Failure shown, retry works | Double tap saves once |",
@@ -170,11 +173,11 @@ def main():
     for t, st in extra:
         L.append(f"| {t} | {'pass' if st == 'passed' else 'FAIL'} | | |")
     passed = sum(1 for s in mut if s[3] == "passed")
-    L += ["", f"Result: {passed} of {len(mut)} passed ({len(actions)} actions x 3, plus {len(extra)} rule check)."]
+    L += ["", f"Result: {passed} of {len(mut)} passed ({len(actions)} actions x 3, plus {len(extra)} single checks: the rows without three columns)."]
     if mut_before:
         mb = [s for s in specs(mut_before) if s[3] != "passed"]
         if mb:
-            L += ["", "Before the fix in section 4, on the same checks:"]
+            L += ["", "Before fix 1 in section 4 (earlier the same day), on the same checks:"]
             for f, d, t, st, msg in mb:
                 L.append(f"- {d}: {t}: {msg}")
     other = Counter((s[0], s[3]) for s in allspecs if not s[0].endswith("mutations.spec.ts"))

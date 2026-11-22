@@ -127,6 +127,8 @@ Not in the workflow: the control crawl, the link-by-link navigation run and the 
 
 The token is never written to the repository or printed in the run log (GitHub masks it). Replace it before it expires, the same way.
 
+A commit whose message contains `[skip ci]` skips the whole workflow, publishing included, so it can never reach the preview. Use it only for commits that change notes, not the app.
+
 **Roll back** (if step 5 fails, or a problem is found later): in Vercel, project `bloat`, Deployments, open the previous good deployment, and assign `bloat-preview.vercel.app` to it (Domains, or "Assign domain"). Then fix the commit; the next passing run publishes again.
 
 **What a CI run costs:** the checks take most of the time. Locally the browser tests take about 7 minutes and the API tests about 3; with installing and starting the local Supabase stack, expect roughly 20 to 30 minutes per push (an estimate: the workflow has not run on GitHub yet). On a private repository this uses GitHub Actions minutes from the free monthly allowance.

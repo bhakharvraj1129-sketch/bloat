@@ -1,10 +1,50 @@
 # Test results
 
-Last run: 22 Nov 2026. The newest results (verification round) are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 22 Nov 2026. The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
 
-## Verification round (22 Nov 2026)
+## Verification round 2 (22 Nov 2026, afternoon): closing the gaps
 
-Full detail, with every count reconciled: `docs/verification-report.md`. "Clicked" and "verified" are kept apart there.
+Application commit **`2f22cc4`** (local results ran on files whose app code is exactly `2f22cc4`). The public preview serves **`af950f5`** (deployment `dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj`), which lacks one API endpoint that `.gitignore` had hidden (defect below). Full detail: `docs/verification-report.md`. Local, hosted and manual-device evidence are kept apart.
+
+### Local (local Supabase in Docker; synthetic accounts; test mode on)
+
+| Check | Result |
+|---|---|
+| Rule tests `pnpm test` | 96 passed, 0 failed |
+| API tests `pnpm test:api` (adds "a deleted account's earlier tokens") | 135 passed, 0 failed |
+| Browser tests `tests/e2e`, phone screen | 190 passed, 0 failed, 0 flaky (7.3 minutes) |
+| Save and edit outcomes (`mutations.spec.ts`): 51 actions x 3 (saves and persists; failure shown inside the open sheet, nothing changes, retry saves; double tap saves once) plus 6 single checks | 159 of 159 |
+| Navigation by real clicks, destination and Back (`tests/ledger/navigate.spec.ts`) | 238 clicks: 238 right destination, 238 Back returned |
+| Control crawl, reconciled | 1,292 rows: 834 passed (74 screen loads, 244 clicked and responded, 516 link targets loaded without clicking), 0 failed, 49 skipped on purpose (20 destructive, each covered by a named test; 29 outside links), 409 excluded (332 hidden at phone width, 32 disabled, 45 fields), 0 blocked |
+| Five widths, sideways scrolling | 0 of 185 with sideways scrolling |
+| Type check, lint | 0 errors (5 old warnings) |
+
+Defects found and fixed (each reproduced first): no way to retry a failed ingredient check; an experiment's End error hidden behind its sheet; account deletion with a lost reply ending at Sign in instead of finishing; and, found by the first CI run on a clean checkout, the Pro coverage endpoint `/v1/insights/coverage` was never committed (an ignore rule for test-coverage output matched it), so every Vercel build lacked it. No screen calls it.
+
+A deleted account's earlier tokens, measured locally: app API 401 at once; Supabase user lookup 403; refresh refused (400); direct database read 200 with 0 rows (the token stays signature-valid until it expires, but nothing is left); direct write 403.
+
+### Hosted (`bloat-test`, the public preview)
+
+| Check | Result |
+|---|---|
+| Account-free hosted checks (6) on `af950f5`, deployment `dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj`, 22 Nov 14:36 UTC, through the branch address (this workspace's network blocks `bloat-preview.vercel.app`; Vercel reports both addresses on this deployment) | 6 of 6 passed |
+| Signed-in hosted checks (9), on the served build | **Blocked**: the 7 approved accounts need the old `pro-tester@bloat.test` deleted first, with the 19 below |
+| Deleted-account token check on the hosted project | **Blocked** (same reason) |
+| 19 temporary accounts from 19 Nov | **Not deleted.** List verified again at 18:18 UTC (same 19 IDs, marker, 34 sessions); the delete was sent and its approval prompt timed out (6th try). Nothing deleted |
+
+### Manual device
+
+| Check | Result |
+|---|---|
+| Main journeys on a real phone with `af950f5` | **Not done.** Owner checklist in `PROGRESS.md` |
+
+### Publishing gate (CI)
+
+`vercel.json` switches off Vercel's automatic Git builds (checked: no deployment for `4640ac2`, `7d6fd03` or `2f22cc4`); `.github/workflows/preview.yml` publishes only after its checks pass. Runs: 1 (`4640ac2`) failed at setup (a mistake in the new workflow), fixed; 2 (`7d6fd03`) failed in the API tests, 130 of 135 (four needed the missing `pdftotext` tool, one found the hidden endpoint), both fixed; 3 (`2f22cc4`): typecheck, lint, rule tests and API tests passed on a clean checkout; browser tests still running when this was written. Publishing needs the owner's `VERCEL_TOKEN` secret (DEPLOYMENT.md, "Publishing the preview"); until then `2f22cc4` is not on the preview.
+
+## Verification round 1 (22 Nov 2026, morning)
+
+Full detail, with every count reconciled: `docs/verification-report.md` as of commit `56cdc01` (the current report covers round 2). "Clicked" and "verified" are kept apart there.
 
 ### Local (local Supabase in Docker; synthetic accounts)
 
@@ -28,8 +68,8 @@ always refused; Back skipped the Sign in and offline screens; email-code sign-in
 |---|---|
 | Sign-ups off at the provider; direct and email-code sign-up refused (422 `signup_disabled`); old test login 404; no account created | Passed (22 Nov, after the owner switched sign-ups off) |
 | Owner's own journey with `bloat-tester@bloat.test` on `bloat-preview.vercel.app`: sign-in, setup, refresh, sign-out | Owner reported all steps worked; server records confirm one successful password sign-in (12:14:56 UTC), setup saved, sign-out (12:17:24 UTC), 0 sessions afterwards. The password never left the owner |
-| Account-free hosted checks on the final build `fcbce97` (deployment `dpl_4LQ7BSEBSQ39QfkxEvR5smXULMm5`, served at `bloat-preview.vercel.app` and the branch address) | 6 of 6 passed |
-| Signed-in hosted checks on the final commit | **Not re-run**: they need new temporary accounts while the 19 earlier ones still await deletion. Last run on `10cd14e`: 14 of 15 (the failure was the sign-up switch, now fixed) |
+| Account-free hosted checks on build `fcbce97` (deployment `dpl_4LQ7BSEBSQ39QfkxEvR5smXULMm5`, served at `bloat-preview.vercel.app` and the branch address) | 6 of 6 passed |
+| Signed-in hosted checks on `fcbce97` | **Not re-run**: they need new temporary accounts while the 19 earlier ones still await deletion. Last run on `10cd14e`: 14 of 15 (the failure was the sign-up switch, now fixed) |
 | 19 temporary accounts from the 19 Nov runs | **Still present, 34 live sessions.** Deletion requested through the Supabase connector; the approval prompt timed out |
 
 ## Bloat / Silver design (19 Nov 2026, afternoon)
