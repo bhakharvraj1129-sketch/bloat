@@ -6,14 +6,13 @@ Last updated: 22 Nov 2026. Branch: `claude/bloat-software-build-uxzoru`.
 
 The app is built end to end and runs as a public testing preview on Vercel against the hosted `bloat-test` database, with synthetic data, a labelled mock AI and mock billing. No production site, no real payments, no real AI calls.
 
-- Testing preview: `https://bloat-preview.vercel.app` (the same build at the branch address). Since 22 Nov it is published only by the Preview workflow, after its checks pass (DEPLOYMENT.md, "Publishing the preview").
+- Testing preview: `https://bloat-preview.vercel.app`, serving commit `adfe49b` as deployment `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ`, published on 22 Nov by the Preview workflow after its checks passed. All 15 hosted checks passed on it, including the signed-in ones.
 - Sign-in: email and password, for owner-provisioned test accounts only. Sign-ups are off in Supabase itself. Test mode is off on the preview (`BLOAT_TEST_LOGIN=0`).
-- **This milestone is not complete.** Open, in order:
-  1. Owner: add the `VERCEL_TOKEN` repository secret on GitHub (DEPLOYMENT.md, "Publishing the preview"). Until then the workflow stops before publishing and the preview stays on the current build.
-  2. Delete the 19 temporary accounts from 19 Nov. The list is verified; the approval prompt timed out (report, section 8).
-  3. Publish `2f22cc4` through the gate, then run the signed-in hosted checks on it with the 7 approved accounts, then delete them and check their old tokens on the hosted project (report, sections 6 and 7). Blocked on the same database approval.
-  4. The actions still checked only partly (report, section 5).
-  5. The real-phone checks below.
+- No temporary test accounts remain (both sets deleted and verified).
+- Still open:
+  1. The real-phone checks below (pending).
+  2. Whether Vercel's Ignored Build Step really skips a Git build: configured and read back, not proven. Proving it needs a test push to a separate branch, with your OK.
+  3. The actions still checked only partly (report, section 5).
 
 Read next: `docs/verification-report.md` (what was checked, where, and on which build), `TEST_RESULTS.md`, `DEPLOYMENT.md`, `DECISIONS.md`.
 

@@ -61,19 +61,34 @@ Deleting an account does not make every token already issued invalid at that mom
 | Direct database write | 403 | **403** |
 | Screen: `/history` with the old cookie | 200, the screen | 307 to `/sign-in?next=%2Fhistory` (shown for completeness; the rows above are the evidence that data is protected) |
 
-Hosted: **Not done.** It runs on one of the 7 approved accounts after the signed-in hosted checks, before those accounts are deleted (section 7).
+**Hosted, 22 Nov 20:27 to 20:28 UTC, on `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` (`adfe49b`).** Account `run-p1@bloat.test`, after the full hosted suite. Session A was captured; the account was then deleted through the app's own "Delete my account" using a separate session B (as from a second device); then session A was used again. Same results as the local rehearsal:
+
+| Same session A (access token unexpired: about 3,590 s left) | Before deletion | After deletion |
+|---|---|---|
+| App `/v1/me/state`, `/v1/history` (token and cookie) | 200 with the account's data (15 and 9 data fields) | **401, no data fields** |
+| App `/v1/reports` (Pro, Free account) | 403 Pro needed | **401** |
+| App: save a meal | 201 | **401** |
+| Supabase Auth user lookup | 200 | **403** |
+| Refresh token for a new session | (not used before) | **400** |
+| Direct database read: meals, profiles | 200, 2 meals and 1 profile | **200, 0 rows** |
+| Direct database write | 403 | **403** |
+| Screen: `/history` with the old cookie | 200, the screen | 307 to `/sign-in?next=%2Fhistory` (reported apart; not the evidence) |
+
+Raw statuses and counts (no tokens): `test-evidence/ledger/hosted-old-token-before.json` and `-after.json` (local evidence folder, not committed). The session file was deleted after the check.
 
 ## 7. Hosted preview evidence
 
-Kept apart from the local results above. Nothing here comes from a real phone.
+Kept apart from the local results above. Nothing here comes from a real phone. The hosted checks ran through the branch address, because this workspace's network blocks `bloat-preview.vercel.app`; Vercel reports both addresses on the same deployment.
 
 | Check | Build | Result |
 |---|---|---|
-| Account-free hosted checks (6): signed-out return path, Back on public pages, empty-form messages, opens with no Vercel login, signed-out data refused, nobody can create an account | `af950f5`, deployment `dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj`, 22 Nov 14:36 UTC, through the branch address (this workspace's network blocks `bloat-preview.vercel.app`; Vercel reports both addresses on this deployment) | **Passed, 6 of 6.** The same six passed on `fcbce97` earlier the same day |
-| Sign-ups off at the provider | 22 Nov | **Passed.** Supabase reports `disable_signup: true`; direct and email-code sign-up refused with 422 `signup_disabled`; old test login 404; 0 accounts created by the attempt |
-| The owner's own login journey (`bloat-tester@bloat.test`), without the password leaving the owner | 22 Nov, 12:14 to 12:17 UTC, the build the address served then | **Passed (owner, by hand).** Owner reported every step working. Server records: created 11:47 UTC (confirmed, one email identity); one successful password sign-in 12:14:56 UTC, no failed attempts; setup saved; sign-out 12:17:24 UTC; afterwards 0 sessions and 0 live refresh tokens. Designated Pro test address, no staff access |
-| Signed-in hosted checks (9: test-only switches off, saving and History, the diary flow, two-account isolation, report privacy and share links, exports, password sign-in and sign-out, two signed-in navigation checks) | The served build (`af950f5` now; `2f22cc4` once published) | **Blocked.** It needs the 7 temporary accounts the owner approved on 22 Nov: `run-public`, `run-p1`, `run-diary`, `run-isoa`, `run-isob` and `run-export` at `bloat.test`, and `pro-tester@bloat.test` (after the old one is deleted), all marked `synthetic_test_run = 2026-11-22`. They were not created: the old `pro-tester@bloat.test` must be deleted first (with the 19), and that deletion is waiting for approval (section 8). The creation statement is prepared and was rehearsed locally (7 stand-in accounts made, signed in with the one-off password, wrong password refused, then deleted). Last run of all 15 hosted checks: commit `10cd14e`, 19 Nov, 14 of 15 (the failure was the sign-up switch, now fixed) |
-| Deleted-account token check on the hosted project | - | **Blocked** with the suite above |
+| Full hosted suite (`pnpm test:hosted`, 15 checks): signed-out return path, Back on public pages, empty-form messages, opens with no Vercel login, test-only switches off, signed-out data refused, saving a meal and seeing it in History after a refresh, the diary flow, two-account isolation through the app and the database, report privacy with Medicines and Health off plus share link open and revoke, JSON and CSV exports, password sign-in and sign-out ending the old token, nobody can create an account, two signed-in navigation checks | `adfe49b`, `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ`, 22 Nov about 20:26 UTC, with the 7 approved accounts | **Passed, 15 of 15** |
+| Account-free checks (6), inside GitHub run 6: on the new deployment's own URL before publishing, and on `bloat-preview.vercel.app` after | Same | **Passed**, 6 of 6 both times |
+| The coverage endpoint (section 4, row 8) | Same | **Passed**: 401 signed out (exists); `af950f5` answered 404 |
+| A deleted account's earlier session (section 6) | Same | **Passed** |
+| "Delete my account" through the app, 7 accounts | Same | **Passed**: 7 of 7 deleted; each token refused at once afterwards; database check in section 8 |
+| Account-free checks on the previous build | `af950f5`, `dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj`, 14:36 UTC | Passed, 6 of 6 |
+| The owner's own login journey (`bloat-tester@bloat.test`), without the password leaving the owner | 22 Nov, 12:14 to 12:17 UTC, the build the address served then | **Passed (owner, by hand).** Server records: one successful password sign-in, setup saved, sign-out, then 0 sessions. Designated Pro test address, no staff access |
 
 ## 8. Temporary test accounts
 
@@ -88,18 +103,28 @@ The 19 accounts from the 19 Nov runs were read from `bloat-test` on 22 Nov (ID, 
 
 Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, none still open, and no stored files. The owner's addresses (including `bloat-tester@bloat.test`, which has no marker) and `vraj@example.com` are not on the list.
 
-**Status: not deleted.** The owner chose deletion through the connector's approval prompt. The list was read and compared again twice, at 18:18 UTC and at about 19:30 UTC on 22 Nov: the same 19 email-and-ID pairs as above, all with the marker, and no other marked account (34 sessions, 34 live refresh tokens, 19 identities). Before the second try, their data was counted: 0 stored files and rows in 21 app tables (including 12 meals, 4 bloating records, 3 reports, 3 share links, 231 question answers, 60 consents, 69 command-log and 12 audit-log rows). Every app table that holds a user's rows is set to delete them with the user (checked in the database's foreign keys), so deleting the 19 users removes all of it. The delete of exactly those 19 was sent at 18:18 and again at about 19:30 UTC; both approval prompts got no answer within the time limit (7 tries in all since 19 Nov). Nothing was deleted. After deletion, the same counts must all be 0; the statements for that are prepared and were rehearsed on the local database with 7 stand-in accounts (all counts 0 afterwards). Because the approval prompt keeps timing out, the owner will run the deletion in the Supabase SQL Editor: `docs/ops/delete-19-synthetic-accounts-2026-11-19.sql` lists the 19 accounts first, then deletes only if exactly those 19 ID-and-email pairs carry the marker and no other account does, otherwise it stops with "ABORTED ... Nothing deleted". Rehearsed locally: an extra marked account and a wrong email each stopped it with nothing deleted; the matching case deleted exactly the listed accounts.
+**Status: deleted and verified.** After the approval prompt had timed out 7 times, the owner ran the guarded SQL (`docs/ops/delete-19-synthetic-accounts-2026-11-19.sql`) in the Supabase SQL Editor. It lists the 19 first and deletes only if exactly those ID-and-email pairs carry the marker and no other account does. Read-only check at 20:12 UTC on 22 Nov: 0 users (by ID, by email and by marker), 0 sessions, 0 refresh tokens, 0 identities, 0 MFA factors, 0 stored files, and 0 rows for these IDs in all 48 app tables. The owner's `bloat-tester@bloat.test` is still there (no marker, its profile intact).
+
+**This run's 7 accounts** (`run-public`, `run-p1`, `run-diary`, `run-isoa`, `run-isob`, `run-export` at `bloat.test`, and `pro-tester@bloat.test`, marked `2026-11-22`) were created at about 20:25 UTC with only the bcrypt hash of a one-off password sent; the password stayed in a private file. After the hosted suite and the old-token check, each was deleted through the app's own "Delete my account" (`tests/hosted/delete-accounts.ts`; `run-p1` as part of the old-token check). Read-only check afterwards: 0 users (by ID, by email and by marker), 0 sessions, 0 refresh tokens, 0 identities, 0 stored files, 0 rows in all 48 app tables; the app keeps its designed deletion record for each (7 rows holding only a SHA-256 hash of the account ID, so a restored backup cannot bring the account back). No account with any `synthetic_test_run` marker remains. The password, its hash and the session file were then deleted.
 
 ## 9. Which build the addresses serve, and what publishes it
 
-**Served now:** `https://bloat-preview.vercel.app` and the branch address serve commit `af950f5`, deployment `dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj` (Vercel reports both addresses on it). Up to and including `af950f5`, the addresses followed every successful Vercel build of the branch, with no tests in between.
+**Served now:** `https://bloat-preview.vercel.app` and the branch address serve deployment `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` (`bloat-1gx9xzdwr-typeshi2.vercel.app`, created by the Vercel CLI from GitHub run 6), checked through Vercel before and after the hosted tests. Before that they served `af950f5` (`dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj`), the last build made by Vercel's own Git builds.
+
+**Tested revision = deployed revision, and how that is known:**
+
+- Run 6 was started by hand (`workflow_dispatch`) on the branch after confirming its head was `adfe49b803f88c8300a01afe27cca8bb7ff449d4`; GitHub reports that exact commit for the run, and each job checks out the run's commit.
+- The run's Vercel build is the only deployment made since `af950f5` (Vercel's list), and the run's hosted-check step records the URL it tested: `https://bloat-1gx9xzdwr-typeshi2.vercel.app`.
+- Source files: Vercel listed 205 of the deployment's files (its listing is partial); all 205 are byte-identical to `adfe49b` (SHA-1 of content). The `tests/hosted` folder was listed in full and holds exactly `adfe49b`'s five files, not the script added later in `b755b1b`.
+- The run's own last step compared the build with what `bloat-preview.vercel.app` serves, through the Vercel API, and passed.
+- Not available: the commit label the workflow attaches to the deployment does not show in the Vercel tool used here, so it was not used as evidence.
 
 **The publishing gate (from commit `4640ac2`):**
 
-- `vercel.json` switches off Vercel's automatic Git builds. Checked: Vercel made no deployment for `4640ac2`, `7d6fd03` or `2f22cc4`, so pushing no longer changes what testers see.
-- Second layer, **configured but not verified**: on 22 Nov at about 19:40 UTC the project's Ignored Build Step was set to `test -n "$VERCEL_GIT_COMMIT_SHA"`, meant to skip any Git-triggered build (a push, "Redeploy", a deploy hook) even if `vercel.json` changes. The Vercel tool used cannot read the value back, a changed project timestamp is not evidence of the value, and no Git build has tested it. The workflow now reads the value back through the Vercel API before every publish and stops if it differs (a read-only check that cannot touch the preview). Still possible by hand: a Vercel team member assigning the address in the dashboard or with their own CLI login (DEPLOYMENT.md lists every path).
+- `vercel.json` switches off Vercel's automatic Git builds. Checked: no Git-triggered deployment for any of the 10 pushes since `af950f5` (5 of them without `[skip ci]`); the only deployment since is the one run 6 made.
+- Second layer: the Vercel project's Ignored Build Step, set on 22 Nov about 19:40 UTC to `test -n "$VERCEL_GIT_COMMIT_SHA"`, meant to skip any Git-triggered build (a push, "Redeploy", a deploy hook) even if `vercel.json` changes. **Configured and read back:** run 6 read it through the Vercel API before building and it matched (the step stops the publish if it does not). **Not proven to block a Git build:** no Git build has been attempted since it was set (`vercel.json` already stops them), and proving it needs a test build on a separate branch that the dedicated address is not tied to, which was not done. Still possible by hand: a Vercel team member assigning the address in the dashboard or with their own CLI login (DEPLOYMENT.md lists every path).
 - `.github/workflows/preview.yml` runs on every push. **Blocks publishing:** typecheck, lint, rule tests, the local Supabase stack, the app build, API tests and browser tests on a clean checkout; then a Vercel build that nothing public points at yet; then the six account-free hosted checks against that new build. **Only then** both addresses move to it, and the workflow confirms through Vercel which deployment `bloat-preview.vercel.app` serves. **Afterwards, reporting only:** the same six checks on the public address. **Manual:** the signed-in hosted checks (they need owner-approved accounts).
-- The only secret is `VERCEL_TOKEN`, a GitHub repository secret, never in the workflow file or the log. It was still not set at 19:38 UTC on 22 Nov (run 3's publish step, re-run then, stopped at "token is missing" again), so no run has published: `2f22cc4` waits for it.
+- The only secret is `VERCEL_TOKEN`, a GitHub repository secret added by the owner on 22 Nov (after 20:06 UTC), never in the workflow file or the log.
 
 **The workflow's runs so far (GitHub Actions, "Preview"):**
 
@@ -108,6 +133,9 @@ Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, no
 | 1 | `4640ac2` | Failed at setup | A mistake in the new workflow: `actions/setup-node@v5` looks for pnpm before corepack provides it. Fixed in `7d6fd03` |
 | 2 | `7d6fd03` | Failed in the API tests (130 of 135 passed) | Four report tests need the `pdftotext` tool, which the GitHub machine lacks (now installed by the workflow). One was a real defect: section 4, defect 8. Both fixed in `2f22cc4` |
 | 3 | `2f22cc4` | **Checks passed** (18:17 to 18:28 UTC); publishing stopped, as designed | Typecheck, lint, rule tests, API tests (135) and browser tests all passed on a clean checkout. The next step stopped at "the VERCEL_TOKEN repository secret is not set", so nothing was built on Vercel or published |
+| 4 | `8877f49` | Cancelled | A newer push started run 5 (the workflow keeps one run per branch) |
+| 5 | `5a78d98` | **Checks passed**; publishing stopped at 20:06 UTC, as designed | The token was not set yet |
+| 6 | `adfe49b` (started by hand) | **Passed, published** (20:13 to 20:26 UTC) | Checks passed; deployment controls read back and matched; Vercel build `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ`; 6 hosted checks passed on it; both addresses moved; served deployment confirmed; 6 hosted checks passed again on the public address |
 
 ## 10. Limits of this verification
 
@@ -117,5 +145,4 @@ Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, no
 - Lost replies and server failures were simulated in the browser; no real network faults.
 - The local suites test a local build of the commit, with test mode on and a local database. The preview is a separate Vercel build of the same commit, with test mode off and `bloat-test`. Only the hosted checks run against the published build itself.
 - AI uses the labelled mock provider; payments are switched off; email delivery is not used on the preview.
-- The CI workflow's publishing steps (Vercel build, hosted checks on the new build, moving the addresses) have not run yet: they need the owner's `VERCEL_TOKEN`.
 - Light theme only, as the owner confirmed on 22 Nov; no dark theme was added.

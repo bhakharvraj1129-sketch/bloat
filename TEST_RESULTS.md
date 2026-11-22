@@ -1,6 +1,25 @@
 # Test results
 
-Last run: 22 Nov 2026. The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 22 Nov 2026 (evening). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+
+## Live verification (22 Nov 2026, evening): published build `adfe49b`
+
+Tested and published revision `adfe49b803f88c8300a01afe27cca8bb7ff449d4`, Vercel deployment `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ`, served at `https://bloat-preview.vercel.app`. App code identical to `2f22cc4`. Details and how tested and deployed are tied together: `docs/verification-report.md`, sections 7 to 9.
+
+| Check | Where | Result |
+|---|---|---|
+| Typecheck, lint, rule, API and browser tests on a clean checkout | GitHub run 6 (started by hand on `adfe49b`) | Passed |
+| Deployment controls read back before building | GitHub run 6 | Passed (`vercel.json` Git builds off; Ignored Build Step matches) |
+| Account-free hosted checks on the new build, then on the public address | GitHub run 6 | 6 of 6, both times |
+| Full hosted suite with the 7 approved accounts | Live, about 20:26 UTC | **15 of 15 passed** |
+| Deleted account's earlier session: protected data | Live | Passed (data before; after: app 401 with no data, auth 403, refresh 400, database 0 rows, writes 403) |
+| Same session: screen | Live | Redirects to Sign in (reported apart) |
+| Coverage endpoint restored | Live | 401 signed out (was 404 on `af950f5`) |
+| 19 old accounts deleted (owner ran the guarded SQL) | `bloat-test` | Verified: all counts 0; owner account intact |
+| 7 run accounts deleted through "Delete my account" | Live and `bloat-test` | Verified: 7 of 7 deleted, all counts 0, 7 hash-only deletion records kept by design |
+| Git builds off through `vercel.json` | Vercel | No Git-triggered deployment for 10 pushes |
+| Ignored Build Step blocks a Git build | - | **Not proven** (configured and read back only) |
+| Real phones | - | **Pending** |
 
 ## Verification round 2 (22 Nov 2026, afternoon): closing the gaps
 
