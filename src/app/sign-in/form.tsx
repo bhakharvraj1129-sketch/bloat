@@ -67,7 +67,7 @@ export function SignIn({ testLogin, google: googleOn }: { testLogin: boolean; go
     try {
       writePre({ adult: isNew ? true : undefined });
       await api("POST", "/v1/auth/test-login", { email, password, create: isNew });
-      router.push(next ?? "/today");
+      router.replace(next ?? "/today");
     } catch (err) {
       setMessage(err instanceof ApiFailure ? err.message : "Could not sign in.");
     } finally {

@@ -17,8 +17,9 @@ type Router = { back: () => void; push: (href: string) => void };
 
 const TRAIL = "bloat.trail";
 const MAX = 40;
-// Screens that redirect or only make sense once: Back never returns to these.
-const SKIP = /^\/(sign-in|auth|setup|offline)(\/|\?|$)/;
+// Screens that only make sense once: Back never returns to these. (The Sign in page itself is a
+// normal step back for someone signed out; after a successful sign-in it is replaced in history.)
+const SKIP = /^\/(sign-in\/code|auth|setup)(\/|\?|$)/;
 
 function read(): string[] {
   try { const v = JSON.parse(sessionStorage.getItem(TRAIL) ?? "[]"); return Array.isArray(v) ? v.filter((x) => typeof x === "string") : []; } catch { return []; }

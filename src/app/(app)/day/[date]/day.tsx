@@ -172,12 +172,13 @@ export function DayDetail({ date }: { date: string }) {
 
       <Sheet open={!!confirm} onOpenChange={(o) => { if (!o) { setConfirm(null); del.reset(); } }} title="Delete this?">
         <p>This removes {confirm?.what} for good. Anything worked out from it is recalculated.</p>
-        <SaveStatus state={del.state === "saved" ? "idle" : del.state} error={del.error} />
+        <SaveStatus state={del.state === "saved" ? "idle" : del.state} error={del.error} onCheck={async () => { if ((await del.check()).ok) { setConfirm(null); del.reset(); reload(); } }} />
         <Button variant="danger" disabled={del.saving} onClick={async () => {
-          await del.run("DELETE", confirm!.path, undefined, confirm!.rev !== undefined ? { ifMatch: confirm!.rev } : {});
+          // Close only once the server has confirmed the delete; a failure stays on screen.
+          if ((await del.run("DELETE", confirm!.path, undefined, confirm!.rev !== undefined ? { ifMatch: confirm!.rev } : {})) === null) return;
           setConfirm(null); del.reset(); reload();
         }}>{del.saving ? "Deleting…" : "Delete"}</Button>
-        <Button variant="secondary" onClick={() => setConfirm(null)}>Keep it</Button>
+        <Button variant="secondary" disabled={del.saving} onClick={() => setConfirm(null)}>Keep it</Button>
       </Sheet>
     </Screen>
   );

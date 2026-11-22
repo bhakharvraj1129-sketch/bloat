@@ -20,9 +20,12 @@ export function NavTracker() {
     if (first.current) {
       first.current = false;
       const nav = performance.getEntriesByType?.("navigation")[0] as PerformanceNavigationTiming | undefined;
-      // A typed address, a bookmark or a link from elsewhere starts a new trail; a reload or the
-      // browser's Back and Forward keep it.
-      fresh = !nav || (nav.type !== "reload" && nav.type !== "back_forward");
+      // A typed address, a bookmark or a link from another site starts a new trail. A reload, the
+      // browser's Back and Forward, or a full page load from another Bloat page (such as Try again
+      // on the offline page) keeps it.
+      let fromBloat = false;
+      try { fromBloat = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch { fromBloat = false; }
+      fresh = !nav || (nav.type !== "reload" && nav.type !== "back_forward" && !fromBloat);
     }
     recordVisit(fresh);
   }, [path, search]);

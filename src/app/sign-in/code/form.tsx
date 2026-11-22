@@ -38,7 +38,7 @@ export function CodeForm() {
     setBusy(false);
     const problem = verifyMessage(error);
     if (problem) return setMessage(problem);
-    router.push(next ?? "/today");
+    router.replace(next ?? "/today"); // the sign-in steps leave history once signed in
   }
 
   async function resend() {

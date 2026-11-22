@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 19 Nov 2026. Branch: `claude/bloat-software-build-uxzoru`.
+Last updated: 22 Nov 2026. Branch: `claude/bloat-software-build-uxzoru`.
 
 ## Where things stand
 
@@ -13,6 +13,17 @@ The whole app is built end to end. A **public preview** runs on Vercel against t
 - The hosted checks that need a signed-in account (correct sign-in, refresh, sign-out, isolation) did not run on the hosted preview this time: the Supabase connector asked the owner to confirm creating the temporary test accounts and got no answer. They pass locally.
 
 Read next: `TEST_RESULTS.md` (newest first, local and hosted kept apart), `DEPLOYMENT.md` (owner steps and how to restore email sign-in), `DECISIONS.md`.
+
+## Done on 22 Nov: verification round
+
+See `docs/verification-report.md`. Outcomes are now checked, not just clicks: 37 save and edit actions (data change,
+refresh, failure with retry, double tap), and 238 link clicks (destination and Back) at phone and desktop width.
+Four defects found and fixed (hidden delete failure, experiments offered before they could start, two Back cases,
+sign-in steps left in history). The owner switched Supabase sign-ups off and made `bloat-tester@bloat.test`; the
+sign-up check passes and the owner's own sign-in journey is confirmed from server records.
+
+Still open: deleting the 19 temporary accounts (the connector's approval prompt timed out; see the report, section 7),
+and the actions listed in the report's section 5, which are verified only partly or at server level.
 
 ## Done on 19 Nov (afternoon): Bloat / Silver design applied
 
@@ -101,9 +112,9 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 
 ## Next steps, in order
 
-1. Owner: company name and a monitored support address for About and Contact; yes or no on a dark theme before launch (DECISIONS.md 21).
-2. Owner: in Supabase (bloat-test), switch off "Allow new users to sign up", then create `bloat-tester@bloat.test` with Auto Confirm and a strong password (DEPLOYMENT.md, "Sign-in method"). Checked 19 Nov: sign-ups still on, account not created.
-3. Owner: answer the Supabase connector's confirmation when asked, so the temporary verification accounts can be created; then run the full hosted suite (10 checks) and delete those accounts. **This is the exact next unfinished task.**
+1. Owner: company name and a monitored support address for About and Contact. (Light-only design confirmed 22 Nov; no dark mode.)
+2. Done 22 Nov: sign-ups are off and `bloat-tester@bloat.test` exists (verified).
+3. Owner: approve deleting the 19 temporary accounts (listed in `docs/verification-report.md`, section 7), in the Supabase connector or the dashboard. Then re-run the signed-in hosted checks on the newest commit with fresh accounts and delete those too.
 4. Before inviting anyone outside: restore email sign-in (DEPLOYMENT.md, "Before inviting anyone outside").
 5. Owner: staff email for founder tools; open decisions in DECISIONS.md; AI key and spending limit when ready.
 

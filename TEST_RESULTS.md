@@ -1,6 +1,35 @@
 # Test results
 
-Last run: 19 Nov 2026. The newest results (Silver design) are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 22 Nov 2026. The newest results (verification round) are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+
+## Verification round (22 Nov 2026)
+
+Full detail, with every count reconciled: `docs/verification-report.md`. "Clicked" and "verified" are kept apart there.
+
+### Local (local Supabase in Docker; synthetic accounts)
+
+| Check | Result |
+|---|---|
+| Rule tests `pnpm test` | 96 passed, 0 failed |
+| API tests `pnpm test:api` | 134 passed, 0 failed |
+| Browser tests `tests/e2e` (adds `mutations.spec.ts`: 37 save and edit actions x 3 outcome checks, plus 1 rule check) | 143 passed, 0 failed |
+| Save and edit outcomes (data change read back, refresh, failure shown with retry, double tap saves once) | 112 of 112 |
+| Navigation by real clicks: destination and Back, phone and desktop, signed-out, Free and Pro (`tests/ledger/navigate.spec.ts`) | 238 clicks: 238 right destination, 238 Back returned (8 Back failures before the fixes) |
+| Control crawl, reconciled | 1,292 rows: 834 passed (74 screen loads, 244 clicked and responded, 516 link targets loaded without clicking), 0 failed, 49 skipped on purpose (20 destructive, 29 outside links), 409 excluded (332 hidden at phone width, 32 disabled, 45 fields), 0 blocked |
+| Five widths, sideways scrolling | 0 of 185 |
+| Type check, lint | 0 errors (5 old warnings) |
+
+Defects found and fixed: a failed delete on the day screen was hidden; experiments could be chosen when starting was
+always refused; Back skipped the Sign in and offline screens; email-code sign-in left its steps in history.
+
+### Hosted
+
+| Check | Result |
+|---|---|
+| Sign-ups off at the provider; direct and email-code sign-up refused (422 `signup_disabled`); old test login 404; no account created | Passed (22 Nov, after the owner switched sign-ups off) |
+| Owner's own journey with `bloat-tester@bloat.test` on `bloat-preview.vercel.app`: sign-in, setup, refresh, sign-out | Owner reported all steps worked; server records confirm one successful password sign-in (12:14:56 UTC), setup saved, sign-out (12:17:24 UTC), 0 sessions afterwards. The password never left the owner |
+| Signed-in hosted checks on the final commit | **Not re-run**: they need new temporary accounts while the 19 earlier ones still await deletion. Last run on `10cd14e`: 14 of 15 (the failure was the sign-up switch, now fixed) |
+| 19 temporary accounts from the 19 Nov runs | **Still present, 34 live sessions.** Deletion requested through the Supabase connector; the approval prompt timed out |
 
 ## Bloat / Silver design (19 Nov 2026, afternoon)
 

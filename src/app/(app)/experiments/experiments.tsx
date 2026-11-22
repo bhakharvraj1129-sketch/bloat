@@ -41,7 +41,7 @@ export function Experiments() {
             <p>{o.instruction}</p>
             <Caption>{o.type === "habit" ? "7 days" : "Up to 2 weeks, then 1 week adding it back"} · Source: {o.source}</Caption>
             {o.warning && <Caption>{o.warning}</Caption>}
-            {o.offered ? <Button variant="secondary" disabled={!!d.active} onClick={() => { start.reset(); setPick(o); }}>Choose</Button> : <Caption>{o.reason}</Caption>}
+            {o.offered ? <Button variant="secondary" disabled={!!d.active || !ready} onClick={() => { start.reset(); setPick(o); }}>Choose</Button> : <Caption>{o.reason}</Caption>}
           </Card>
         );
         return (

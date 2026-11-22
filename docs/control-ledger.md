@@ -4,13 +4,13 @@ Every control on every screen, for each kind of visitor, as found by the crawler
 `tests/ledger/ledger.spec.ts` on the local stack (synthetic accounts only). Rebuild with
 `python3 scripts/ledger-report.py`.
 
-- Crawled: 2026-11-19T11:35:41.939Z (fixed build). Earlier build for comparison: 2026-11-19T10:29:42.661Z.
+- Crawled: 2026-11-22T13:15:53.100Z (fixed build). Earlier build for comparison: 2026-11-19T10:29:42.661Z.
 - **pass**: the control did what it should (opened its screen, a sheet, sent its request, or changed what is shown).
 - **fail**: it did nothing visible, threw an error, could not be clicked, or sat under another element.
 - **check**: deliberately not clicked by the crawler (destructive, or an outside link); each is covered by a named test below.
 - **listed**: a text field, a disabled button, or a control inside a closed sheet; the targeted tests fill and use these.
 
-Totals (fixed build): pass 840, fail 0, check 49, listed 403.
+Totals (fixed build): pass 834, fail 0, check 49, listed 409.
 Totals (earlier build, same crawler): pass 598, fail 19, check 49, listed 71.
 
 ## Changed since the earlier build
@@ -28,8 +28,6 @@ Totals (earlier build, same crawler): pass 598, fail 19, check 49, listed 71.
 | signed-out | `/how-bloat-works` | Contact | pass: link: /contact → HTTP 200 | listed: not visible on this screen state |
 | signed-out | `/today` | Send code | fail: NO EFFECT: no navigation, dialog, request or DOM change in 1.3 s | pass: changed: 1 DOM changes |
 | signed-out | `/history` | Send code | fail: NO EFFECT: no navigation, dialog, request or DOM change in 1.3 s | pass: changed: 1 DOM changes |
-| signed-out | `/day/2026-11-19` | Send code | fail: NO EFFECT: no navigation, dialog, request or DOM change in 1.3 s | pass: changed: 1 DOM changes |
-| signed-out | `/review/2026-11-18` | Send code | fail: NO EFFECT: no navigation, dialog, request or DOM change in 1.3 s | pass: changed: 1 DOM changes |
 | signed-out | `/insights` | Send code | fail: NO EFFECT: no navigation, dialog, request or DOM change in 1.3 s | pass: changed: 1 DOM changes |
 | signed-out | `/journey` | Send code | fail: NO EFFECT: no navigation, dialog, request or DOM change in 1.3 s | pass: changed: 1 DOM changes |
 | signed-out | `/report` | Send code | fail: NO EFFECT: no navigation, dialog, request or DOM change in 1.3 s | pass: changed: 1 DOM changes |
@@ -46,10 +44,6 @@ Totals (earlier build, same crawler): pass 598, fail 19, check 49, listed 71.
 | free | `/today` | History | pass: link: /history → HTTP 200 | listed: not visible on this screen state |
 | free | `/history` | Today | pass: link: /today → HTTP 200 | listed: not visible on this screen state |
 | free | `/history` | History | pass: link: /history → HTTP 200 | listed: not visible on this screen state |
-| free | `/day/2026-11-19` | Today | pass: link: /today → HTTP 200 | listed: not visible on this screen state |
-| free | `/day/2026-11-19` | History | pass: link: /history → HTTP 200 | listed: not visible on this screen state |
-| free | `/review/2026-11-18` | Today | pass: link: /today → HTTP 200 | listed: not visible on this screen state |
-| free | `/review/2026-11-18` | History | pass: link: /history → HTTP 200 | listed: not visible on this screen state |
 | free | `/insights` | Today | pass: link: /today → HTTP 200 | listed: not visible on this screen state |
 | free | `/insights` | History | pass: link: /history → HTTP 200 | listed: not visible on this screen state |
 | free | `/journey` | Today | pass: link: /today → HTTP 200 | listed: not visible on this screen state |
@@ -83,10 +77,6 @@ Totals (earlier build, same crawler): pass 598, fail 19, check 49, listed 71.
 | pro | `/today` | History | pass: link: /history → HTTP 200 | listed: not visible on this screen state |
 | pro | `/history` | Today | pass: link: /today → HTTP 200 | listed: not visible on this screen state |
 | pro | `/history` | History | pass: link: /history → HTTP 200 | listed: not visible on this screen state |
-| pro | `/day/2026-11-19` | Today | pass: link: /today → HTTP 200 | listed: not visible on this screen state |
-| pro | `/day/2026-11-19` | History | pass: link: /history → HTTP 200 | listed: not visible on this screen state |
-| pro | `/review/2026-11-18` | Today | pass: link: /today → HTTP 200 | listed: not visible on this screen state |
-| pro | `/review/2026-11-18` | History | pass: link: /history → HTTP 200 | listed: not visible on this screen state |
 | pro | `/insights` | Today | pass: link: /today → HTTP 200 | listed: not visible on this screen state |
 | pro | `/insights` | History | pass: link: /history → HTTP 200 | listed: not visible on this screen state |
 | pro | `/journey` | Today | pass: link: /today → HTTP 200 | listed: not visible on this screen state |
@@ -96,6 +86,12 @@ Totals (earlier build, same crawler): pass 598, fail 19, check 49, listed 71.
 | pro | `/experiments` | Today | pass: link: /today → HTTP 200 | listed: not visible on this screen state |
 | pro | `/experiments` | History | pass: link: /history → HTTP 200 | listed: not visible on this screen state |
 | pro | `/experiments` | When to get medical help | pass: link: /help → HTTP 200 | listed: not visible on this screen state |
+| pro | `/experiments` | Choose | pass: dialog: Slow breathing | listed: disabled until its form is ready |
+| pro | `/experiments` | Choose | pass: dialog: Slow breathing | listed: disabled until its form is ready |
+| pro | `/experiments` | Choose | pass: dialog: Slow breathing | listed: disabled until its form is ready |
+| pro | `/experiments` | Choose | pass: dialog: Slow breathing | listed: disabled until its form is ready |
+| pro | `/experiments` | Choose | pass: dialog: Slow breathing | listed: disabled until its form is ready |
+| pro | `/experiments` | Choose | pass: dialog: Slow breathing | listed: disabled until its form is ready |
 | pro | `/cards` | Today | pass: link: /today → HTTP 200 | listed: not visible on this screen state |
 | pro | `/cards` | History | pass: link: /history → HTTP 200 | listed: not visible on this screen state |
 | pro | `/learn` | Today | pass: link: /today → HTTP 200 | listed: not visible on this screen state |
@@ -496,7 +492,7 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 17 | Terms | link | pass | link: /terms → HTTP 200 |
 | 18 | Contact | link | pass | link: /contact → HTTP 200 |
 
-### signed-out · `/day/2026-11-19`
+### signed-out · `/day/2026-11-22`
 
 | # | Control | Kind | Result | What happened |
 |---|---|---|---|---|
@@ -520,7 +516,7 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 17 | Terms | link | pass | link: /terms → HTTP 200 |
 | 18 | Contact | link | pass | link: /contact → HTTP 200 |
 
-### signed-out · `/review/2026-11-18`
+### signed-out · `/review/2026-11-21`
 
 | # | Control | Kind | Result | What happened |
 |---|---|---|---|---|
@@ -843,11 +839,11 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 4 | Patterns | link | listed | not visible on this screen state |
 | 5 | You | link | listed | not visible on this screen state |
 | 6 | When to get medical help | link | listed | not visible on this screen state |
-| 7 | Bloating ongoing Since 6:27 am · strength 4 | button | pass | dialog: Bloating now |
+| 7 | Bloating ongoing Since 8:08 am · strength 4 | button | pass | dialog: Bloating now |
 | 8 | Add meal | button | pass | dialog: Add meal |
 | 9 | Add activity | button | pass | dialog: Add activity |
 | 10 | What Pro adds | link | pass | link: /upgrade → HTTP 200 |
-| 11 | Edit today's entries | link | pass | link: /day/2026-11-19 → HTTP 200 |
+| 11 | Edit today's entries | link | pass | link: /day/2026-11-22 → HTTP 200 |
 | 12 | Today | link | pass | link: /today → HTTP 200 |
 | 13 | History | link | pass | link: /history → HTTP 200 |
 | 14 | Patterns | link | pass | link: /insights → HTTP 200 |
@@ -864,7 +860,7 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 4 | Patterns | link | listed | not visible on this screen state |
 | 5 | You | link | listed | not visible on this screen state |
 | 6 | When to get medical help | link | listed | not visible on this screen state |
-| 7 | ? Thu Nov 19 · today Highest logged 4 · review to confirm 1 episode 1  | link | pass | link: /day/2026-11-19 → HTTP 200 |
+| 7 | ? Sun Nov 22 · today Highest logged 4 · review to confirm 1 episode 1  | link | pass | link: /day/2026-11-22 → HTTP 200 |
 | 8 | Chart and 7-day averagePro Your daily scores as a chart. | link | pass | link: /upgrade → HTTP 200 |
 | 9 | Possible triggersPro Foods and habits compared with your scores, with  | link | pass | link: /upgrade → HTTP 200 |
 | 10 | Weekly report and Your journeyPro Your records summed up, and a report | link | pass | link: /upgrade → HTTP 200 |
@@ -873,11 +869,11 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 13 | Patterns | link | pass | link: /insights → HTTP 200 |
 | 14 | You | link | pass | link: /me → HTTP 200 |
 
-### free · `/day/2026-11-19`
+### free · `/day/2026-11-22`
 
 | # | Control | Kind | Result | What happened |
 |---|---|---|---|---|
-| 0 | HTTP 200 → /day/2026-11-19 | page | pass | HTTP 200 → /day/2026-11-19 |
+| 0 | HTTP 200 → /day/2026-11-22 | page | pass | HTTP 200 → /day/2026-11-22 |
 | 1 | bloat. | link | listed | not visible on this screen state |
 | 2 | Today | link | listed | not visible on this screen state |
 | 3 | History | link | listed | not visible on this screen state |
@@ -894,11 +890,11 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 14 | Patterns | link | pass | link: /insights → HTTP 200 |
 | 15 | You | link | pass | link: /me → HTTP 200 |
 
-### free · `/review/2026-11-18`
+### free · `/review/2026-11-21`
 
 | # | Control | Kind | Result | What happened |
 |---|---|---|---|---|
-| 0 | HTTP 200 → /review/2026-11-18 | page | pass | HTTP 200 → /review/2026-11-18 |
+| 0 | HTTP 200 → /review/2026-11-21 | page | pass | HTTP 200 → /review/2026-11-21 |
 | 1 | bloat. | link | listed | not visible on this screen state |
 | 2 | Today | link | listed | not visible on this screen state |
 | 3 | History | link | listed | not visible on this screen state |
@@ -1203,11 +1199,11 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 4 | Patterns | link | listed | not visible on this screen state |
 | 5 | You | link | listed | not visible on this screen state |
 | 6 | When to get medical help | link | listed | not visible on this screen state |
-| 7 | Bloating ongoing Since 6:27 · strength 4 | button | pass | dialog: Bloating now |
+| 7 | Bloating ongoing Since 8:08 · strength 4 | button | pass | dialog: Bloating now |
 | 8 | Add meal | button | pass | dialog: Add meal |
 | 9 | Add activity | button | pass | dialog: Add activity |
 | 10 | What Pro adds | link | pass | link: /upgrade → HTTP 200 |
-| 11 | Edit today's entries | link | pass | link: /day/2026-11-19 → HTTP 200 |
+| 11 | Edit today's entries | link | pass | link: /day/2026-11-22 → HTTP 200 |
 | 12 | Today | link | pass | link: /today → HTTP 200 |
 | 13 | History | link | pass | link: /history → HTTP 200 |
 | 14 | Patterns | link | pass | link: /insights → HTTP 200 |
@@ -1310,7 +1306,7 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 4 | Patterns | link | listed | not visible on this screen state |
 | 5 | You | link | listed | not visible on this screen state |
 | 6 | When to get medical help | link | listed | not visible on this screen state |
-| 7 | Bloating ongoing Since 6:31 am · strength 4 | button | pass | dialog: Bloating now |
+| 7 | Bloating ongoing Since 8:11 am · strength 4 | button | pass | dialog: Bloating now |
 | 8 | Add meal | button | pass | dialog: Add meal |
 | 9 | Add activity | button | pass | dialog: Add activity |
 | 10 | Log bowel movement | button | pass | dialog: Log bowel movement |
@@ -1320,7 +1316,7 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 14 | Experiments | link | pass | link: /experiments → HTTP 200 |
 | 15 | Doctor report | link | pass | link: /doctor → HTTP 200 |
 | 16 | TODAY'S CARD · TIP Eat more slowly | link | pass | link: /cards → HTTP 200 |
-| 17 | Edit today's entries | link | pass | link: /day/2026-11-19 → HTTP 200 |
+| 17 | Edit today's entries | link | pass | link: /day/2026-11-22 → HTTP 200 |
 | 18 | Today | link | pass | link: /today → HTTP 200 |
 | 19 | History | link | pass | link: /history → HTTP 200 |
 | 20 | Patterns | link | pass | link: /insights → HTTP 200 |
@@ -1344,17 +1340,17 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 11 | Your journey | link | pass | link: /journey → HTTP 200 |
 | 12 | Weekly report | link | pass | link: /report → HTTP 200 |
 | 13 | Experiments | link | pass | link: /experiments → HTTP 200 |
-| 14 | ? Thu Nov 19 · today Highest logged 4 · review to confirm 1 episode 1  | link | pass | link: /day/2026-11-19 → HTTP 200 |
+| 14 | ? Sun Nov 22 · today Highest logged 4 · review to confirm 1 episode 1  | link | pass | link: /day/2026-11-22 → HTTP 200 |
 | 15 | Today | link | pass | link: /today → HTTP 200 |
 | 16 | History | link | pass | link: /history → HTTP 200 |
 | 17 | Patterns | link | pass | link: /insights → HTTP 200 |
 | 18 | You | link | pass | link: /me → HTTP 200 |
 
-### pro · `/day/2026-11-19`
+### pro · `/day/2026-11-22`
 
 | # | Control | Kind | Result | What happened |
 |---|---|---|---|---|
-| 0 | HTTP 200 → /day/2026-11-19 | page | pass | HTTP 200 → /day/2026-11-19 |
+| 0 | HTTP 200 → /day/2026-11-22 | page | pass | HTTP 200 → /day/2026-11-22 |
 | 1 | bloat. | link | listed | not visible on this screen state |
 | 2 | Today | link | listed | not visible on this screen state |
 | 3 | History | link | listed | not visible on this screen state |
@@ -1371,11 +1367,11 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 14 | Patterns | link | pass | link: /insights → HTTP 200 |
 | 15 | You | link | pass | link: /me → HTTP 200 |
 
-### pro · `/review/2026-11-18`
+### pro · `/review/2026-11-21`
 
 | # | Control | Kind | Result | What happened |
 |---|---|---|---|---|
-| 0 | HTTP 200 → /review/2026-11-18 | page | pass | HTTP 200 → /review/2026-11-18 |
+| 0 | HTTP 200 → /review/2026-11-21 | page | pass | HTTP 200 → /review/2026-11-21 |
 | 1 | bloat. | link | listed | not visible on this screen state |
 | 2 | Today | link | listed | not visible on this screen state |
 | 3 | History | link | listed | not visible on this screen state |
@@ -1437,7 +1433,7 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 7 | Back | link | pass | link: /insights → HTTP 200 |
 | 8 | Open possible triggers | link | pass | link: /insights → HTTP 200 |
 | 9 | See experiments | link | pass | link: /experiments → HTTP 200 |
-| 10 | Make doctor report | link | pass | link: /doctor?from=2026-11-19&to=2026-11-18 → HTTP 200 |
+| 10 | Make doctor report | link | pass | link: /doctor?from=2026-11-22&to=2026-11-21 → HTTP 200 |
 | 11 | Today | link | pass | link: /today → HTTP 200 |
 | 12 | History | link | pass | link: /history → HTTP 200 |
 | 13 | Patterns | link | pass | link: /insights → HTTP 200 |
@@ -1473,12 +1469,12 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 6 | When to get medical help | link | listed | not visible on this screen state |
 | 7 | Back | link | pass | link: /insights → HTTP 200 |
 | 8 | When to get medical help | link | pass | link: /help → HTTP 200 |
-| 9 | Choose | button | pass | dialog: Eat more slowly |
-| 10 | Choose | button | pass | dialog: No gum or hard candy |
-| 11 | Choose | button | pass | dialog: No straws |
-| 12 | Choose | button | pass | dialog: Fewer fizzy drinks |
-| 13 | Choose | button | pass | dialog: Walk after meals |
-| 14 | Choose | button | pass | dialog: Slow breathing |
+| 9 | Choose | button | listed | disabled until its form is ready |
+| 10 | Choose | button | listed | disabled until its form is ready |
+| 11 | Choose | button | listed | disabled until its form is ready |
+| 12 | Choose | button | listed | disabled until its form is ready |
+| 13 | Choose | button | listed | disabled until its form is ready |
+| 14 | Choose | button | listed | disabled until its form is ready |
 | 15 | Answer the safety questions | button | pass | dialog: Before a food swap |
 | 16 | Today | link | pass | link: /today → HTTP 200 |
 | 17 | History | link | pass | link: /history → HTTP 200 |
@@ -1732,7 +1728,7 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 4 | Patterns | link | listed | not visible on this screen state |
 | 5 | You | link | listed | not visible on this screen state |
 | 6 | When to get medical help | link | listed | not visible on this screen state |
-| 7 | Bloating ongoing Since 6:31 · strength 4 | button | pass | dialog: Bloating now |
+| 7 | Bloating ongoing Since 8:11 · strength 4 | button | pass | dialog: Bloating now |
 | 8 | Add meal | button | pass | dialog: Add meal |
 | 9 | Add activity | button | pass | dialog: Add activity |
 | 10 | Log bowel movement | button | pass | dialog: Log bowel movement |
@@ -1742,7 +1738,7 @@ password sign-in; its signed-out screens are checked by `tests/hosted/navigation
 | 14 | Experiments | link | pass | link: /experiments → HTTP 200 |
 | 15 | Doctor report | link | pass | link: /doctor → HTTP 200 |
 | 16 | TODAY'S CARD · TIP Eat more slowly | link | pass | link: /cards → HTTP 200 |
-| 17 | Edit today's entries | link | pass | link: /day/2026-11-19 → HTTP 200 |
+| 17 | Edit today's entries | link | pass | link: /day/2026-11-22 → HTTP 200 |
 | 18 | Today | link | pass | link: /today → HTTP 200 |
 | 19 | History | link | pass | link: /history → HTTP 200 |
 | 20 | Patterns | link | pass | link: /insights → HTTP 200 |
