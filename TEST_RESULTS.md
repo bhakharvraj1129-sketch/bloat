@@ -40,7 +40,7 @@ A deleted account's earlier tokens, measured locally: app API 401 at once; Supab
 
 ### Publishing gate (CI)
 
-`vercel.json` switches off Vercel's automatic Git builds (checked: no deployment for `4640ac2`, `7d6fd03` or `2f22cc4`); `.github/workflows/preview.yml` publishes only after its checks pass. Runs: 1 (`4640ac2`) failed at setup (a mistake in the new workflow), fixed; 2 (`7d6fd03`) failed in the API tests, 130 of 135 (four needed the missing `pdftotext` tool, one found the hidden endpoint), both fixed; 3 (`2f22cc4`): typecheck, lint, rule tests and API tests passed on a clean checkout; browser tests still running when this was written. Publishing needs the owner's `VERCEL_TOKEN` secret (DEPLOYMENT.md, "Publishing the preview"); until then `2f22cc4` is not on the preview.
+`vercel.json` switches off Vercel's automatic Git builds (checked: no deployment for `4640ac2`, `7d6fd03` or `2f22cc4`); `.github/workflows/preview.yml` publishes only after its checks pass. Runs: 1 (`4640ac2`) failed at setup (a mistake in the new workflow), fixed; 2 (`7d6fd03`) failed in the API tests, 130 of 135 (four needed the missing `pdftotext` tool, one found the hidden endpoint), both fixed; 3 (`2f22cc4`): every check passed on a clean checkout, browser tests included (11 minutes), then it stopped at the missing `VERCEL_TOKEN`, as designed: nothing published. Publishing needs the owner's `VERCEL_TOKEN` secret (DEPLOYMENT.md, "Publishing the preview"); until then `2f22cc4` is not on the preview.
 
 ## Verification round 1 (22 Nov 2026, morning)
 

@@ -25,7 +25,7 @@ Words used: **Passed** (the outcome was checked and was right), **Failed**, **Sk
 | Check | Result |
 |---|---|
 | Run 3 on `2f22cc4`: typecheck, lint, rule tests, local Supabase, build, API tests | **Passed** (135 API tests) |
-| Run 3 on `2f22cc4`: browser tests | Running when this was written (section 9) |
+| Run 3 on `2f22cc4`: browser tests | **Passed** (11 minutes for all checks) |
 | Earlier runs 1 and 2 | **Failed**: a workflow setup mistake, then the missing PDF tool and a real defect (section 9); all fixed |
 
 ### Hosted evidence (the public preview and the `bloat-test` database)
@@ -37,7 +37,7 @@ Words used: **Passed** (the outcome was checked and was right), **Failed**, **Sk
 | Signed-in hosted checks (9), on the served build | **Blocked**: the 7 approved accounts need the old `pro-tester@bloat.test` deleted first, with the 19 (section 7) |
 | A deleted account's earlier tokens, on the hosted project | **Blocked**, same reason |
 | Deleting the 19 temporary accounts from 19 Nov | **Not done**: list verified again at 18:18 UTC; the delete was sent and its approval prompt timed out (section 8) |
-| Publishing steps of the gate (Vercel build, hosted checks on it, moving the addresses) | **Not run**: they need the owner's `VERCEL_TOKEN` (section 9) |
+| Publishing steps of the gate (Vercel build, hosted checks on it, moving the addresses) | **Blocked, as designed**: run 3 stopped at "VERCEL_TOKEN is not set"; nothing was published (section 9) |
 
 ### Manual device evidence
 

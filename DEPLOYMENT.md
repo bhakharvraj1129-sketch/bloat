@@ -131,7 +131,7 @@ A commit whose message contains `[skip ci]` skips the whole workflow, publishing
 
 **Roll back** (if step 5 fails, or a problem is found later): in Vercel, project `bloat`, Deployments, open the previous good deployment, and assign `bloat-preview.vercel.app` to it (Domains, or "Assign domain"). Then fix the commit; the next passing run publishes again.
 
-**What a CI run costs:** the checks take most of the time. Locally the browser tests take about 7 minutes and the API tests about 3; with installing and starting the local Supabase stack, expect roughly 20 to 30 minutes per push (an estimate: the workflow has not run on GitHub yet). On a private repository this uses GitHub Actions minutes from the free monthly allowance.
+**What a CI run costs:** the checks take most of the time. Locally the browser tests take about 7 minutes and the API tests about 3; with installing and starting the local Supabase stack, the checks took 11 minutes on GitHub (run 3, 22 Nov), plus a few minutes for the Vercel build and hosted checks once publishing is set up. On a private repository this uses GitHub Actions minutes from the free monthly allowance.
 
 ## Hosted test run
 

@@ -33,7 +33,7 @@ Words used: **Passed** (the outcome was checked and was right), **Failed**, **Sk
 | Check | Result |
 |---|---|
 | Run 3 on `2f22cc4`: typecheck, lint, rule tests, local Supabase, build, API tests | **Passed** (135 API tests) |
-| Run 3 on `2f22cc4`: browser tests | Running when this was written (section 9) |
+| Run 3 on `2f22cc4`: browser tests | **Passed** (11 minutes for all checks) |
 | Earlier runs 1 and 2 | **Failed**: a workflow setup mistake, then the missing PDF tool and a real defect (section 9); all fixed |
 
 ### Hosted evidence (the public preview and the `bloat-test` database)
@@ -45,7 +45,7 @@ Words used: **Passed** (the outcome was checked and was right), **Failed**, **Sk
 | Signed-in hosted checks (9), on the served build | **Blocked**: the 7 approved accounts need the old `pro-tester@bloat.test` deleted first, with the 19 (section 7) |
 | A deleted account's earlier tokens, on the hosted project | **Blocked**, same reason |
 | Deleting the 19 temporary accounts from 19 Nov | **Not done**: list verified again at 18:18 UTC; the delete was sent and its approval prompt timed out (section 8) |
-| Publishing steps of the gate (Vercel build, hosted checks on it, moving the addresses) | **Not run**: they need the owner's `VERCEL_TOKEN` (section 9) |
+| Publishing steps of the gate (Vercel build, hosted checks on it, moving the addresses) | **Blocked, as designed**: run 3 stopped at "VERCEL_TOKEN is not set"; nothing was published (section 9) |
 
 ### Manual device evidence
 
@@ -191,7 +191,7 @@ Five widths (320, 390, 768, 1024, 1440px): 185 screen and width checks, 0 with s
 
 ## 4. Defects found and fixed in this verification round
 
-Rows 1, 3, 5, 6, 7 and 8 were reproduced by a test on the build before the fix, and that test passes after it (row 8: in CI, see section 9). Row 2 was shown by a captured server reply, row 4 by reading the code; both now have passing tests. Rows 1 to 4 were fixed in commit `fcbce97`, rows 5 to 7 in `af950f5`, row 8 in `2f22cc4`.
+Rows 1, 3, 5, 6, 7 and 8 were reproduced by a test on the build before the fix, and that test passes after it (row 8: in CI run 3, see section 9). Row 2 was shown by a captured server reply, row 4 by reading the code; both now have passing tests. Rows 1 to 4 were fixed in commit `fcbce97`, rows 5 to 7 in `af950f5`, row 8 in `2f22cc4`.
 
 | # | Defect | Evidence before | Fix |
 |---|---|---|---|
@@ -284,7 +284,7 @@ Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, no
 |---|---|---|---|
 | 1 | `4640ac2` | Failed at setup | A mistake in the new workflow: `actions/setup-node@v5` looks for pnpm before corepack provides it. Fixed in `7d6fd03` |
 | 2 | `7d6fd03` | Failed in the API tests (130 of 135 passed) | Four report tests need the `pdftotext` tool, which the GitHub machine lacks (now installed by the workflow). One was a real defect: section 4, defect 8. Both fixed in `2f22cc4` |
-| 3 | `2f22cc4` | Running when this was written | Typecheck, lint, rule tests and API tests (135, with the PDF tool installed) passed on a clean checkout; the browser tests were still running. The result is in the Actions tab and will be recorded here |
+| 3 | `2f22cc4` | **Checks passed** (18:17 to 18:28 UTC); publishing stopped, as designed | Typecheck, lint, rule tests, API tests (135) and browser tests all passed on a clean checkout. The next step stopped at "the VERCEL_TOKEN repository secret is not set", so nothing was built on Vercel or published |
 
 ## 10. Limits of this verification
 
