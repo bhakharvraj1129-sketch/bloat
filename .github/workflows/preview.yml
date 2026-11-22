@@ -104,6 +104,17 @@ jobs:
             exit 1
           fi
       - uses: actions/checkout@v5
+      # Read back the two settings that stop any other path from updating the preview, and refuse to
+      # publish if either has changed: vercel.json keeps Vercel's Git builds off, and the project's
+      # Ignored Build Step skips every Git-triggered build. Read-only; changes nothing on Vercel.
+      - name: Check the deployment controls (read back)
+        run: |
+          jq -e '.git.deploymentEnabled == false and (has("ignoreCommand") | not)' vercel.json > /dev/null \
+            || { echo "::error::vercel.json must keep git.deploymentEnabled false and set no ignoreCommand"; exit 1; }
+          got=$(curl -fsS -H "Authorization: Bearer $VERCEL_TOKEN" "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID?teamId=$VERCEL_ORG_ID" | jq -r '.commandForIgnoringBuildStep // "(not set)"')
+          echo "Vercel project Ignored Build Step, read back: $got" >> "$GITHUB_STEP_SUMMARY"
+          [ "$got" = 'test -n "$VERCEL_GIT_COMMIT_SHA"' ] \
+            || { echo "::error::The Vercel project's Ignored Build Step is not the expected command"; exit 1; }
       # Uploaded without Git history, so Vercel cannot attach the branch address to it on its own.
       # The address moves only in the publish job, after the hosted checks.
       - name: Copy the commit's files

@@ -38,6 +38,8 @@ Words used: **Passed** (the outcome was checked and was right), **Failed**, **Sk
 | A deleted account's earlier tokens, on the hosted project | **Blocked**, same reason |
 | Deleting the 19 temporary accounts from 19 Nov | **Not done**: list checked again (exact match, 34 sessions, data counted); the delete was sent at 18:18 and about 19:30 UTC and both approval prompts got no answer (section 8) |
 | Publishing steps of the gate (Vercel build, hosted checks on it, moving the addresses) | **Blocked, as designed**: `VERCEL_TOKEN` still not set at 19:38 UTC; nothing was published (section 9) |
+| Git builds off through `vercel.json` | **Passed**: Vercel made no deployment for the 5 pushes since `af950f5` |
+| Vercel Ignored Build Step (second layer against other paths) | **Configured, not verified**: set, but not read back and not tested by a Git build. The workflow reads it back before its next publish |
 
 ### Manual device evidence
 
