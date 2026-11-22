@@ -44,8 +44,8 @@ Words used: **Passed** (the outcome was checked and was right), **Failed**, **Sk
 | Sign-ups off at the provider (part of the six) | **Passed**: `disable_signup: true`, sign-up refused with 422 |
 | Signed-in hosted checks (9), on the served build | **Blocked**: the 7 approved accounts need the old `pro-tester@bloat.test` deleted first, with the 19 (section 7) |
 | A deleted account's earlier tokens, on the hosted project | **Blocked**, same reason |
-| Deleting the 19 temporary accounts from 19 Nov | **Not done**: list verified again at 18:18 UTC; the delete was sent and its approval prompt timed out (section 8) |
-| Publishing steps of the gate (Vercel build, hosted checks on it, moving the addresses) | **Blocked, as designed**: run 3 stopped at "VERCEL_TOKEN is not set"; nothing was published (section 9) |
+| Deleting the 19 temporary accounts from 19 Nov | **Not done**: list checked again (exact match, 34 sessions, data counted); the delete was sent at 18:18 and about 19:30 UTC and both approval prompts got no answer (section 8) |
+| Publishing steps of the gate (Vercel build, hosted checks on it, moving the addresses) | **Blocked, as designed**: `VERCEL_TOKEN` still not set at 19:38 UTC; nothing was published (section 9) |
 
 ### Manual device evidence
 
@@ -266,7 +266,7 @@ The 19 accounts from the 19 Nov runs were read from `bloat-test` on 22 Nov (ID, 
 
 Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, none still open, and no stored files. The owner's addresses (including `bloat-tester@bloat.test`, which has no marker) and `vraj@example.com` are not on the list.
 
-**Status: not deleted.** The owner chose deletion through the connector's approval prompt. At 18:18 UTC the list was read again (the same 19 IDs, all with the marker, 34 live sessions, no other marked account), and the delete of exactly those 19 was sent; its approval prompt timed out at about 18:22 UTC, as on every earlier try (6 in all). Nothing was deleted. The prepared statement deletes only rows that match both the marker and one of the 19 IDs, and returns the emails it deleted. After deletion, read-only queries must show 0 users, 0 sessions, 0 refresh tokens, 0 identities and 0 app rows for these IDs. The same delete and check statements were rehearsed on the local database with 7 stand-in accounts: all counts were 0 afterwards.
+**Status: not deleted.** The owner chose deletion through the connector's approval prompt. The list was read and compared again twice, at 18:18 UTC and at about 19:30 UTC on 22 Nov: the same 19 email-and-ID pairs as above, all with the marker, and no other marked account (34 sessions, 34 live refresh tokens, 19 identities). Before the second try, their data was counted: 0 stored files and rows in 21 app tables (including 12 meals, 4 bloating records, 3 reports, 3 share links, 231 question answers, 60 consents, 69 command-log and 12 audit-log rows). Every app table that holds a user's rows is set to delete them with the user (checked in the database's foreign keys), so deleting the 19 users removes all of it. The delete of exactly those 19 was sent at 18:18 and again at about 19:30 UTC; both approval prompts got no answer within the time limit (7 tries in all since 19 Nov). Nothing was deleted. After deletion, the same counts must all be 0; the statements for that are prepared and were rehearsed on the local database with 7 stand-in accounts (all counts 0 afterwards).
 
 ## 9. Which build the addresses serve, and what publishes it
 
@@ -275,8 +275,9 @@ Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, no
 **The publishing gate (from commit `4640ac2`):**
 
 - `vercel.json` switches off Vercel's automatic Git builds. Checked: Vercel made no deployment for `4640ac2`, `7d6fd03` or `2f22cc4`, so pushing no longer changes what testers see.
+- Second layer, set on 22 Nov about 19:40 UTC: the project's Ignored Build Step `test -n "$VERCEL_GIT_COMMIT_SHA"` skips any Git-triggered build (a push, "Redeploy", a deploy hook), even if `vercel.json` changes. The gate uploads files without Git history, so its build is not skipped. The Vercel tool used cannot read the value back, and the Git side was not tested by a live push (that test could publish untested code). Still possible by hand: a Vercel team member assigning the address in the dashboard or with their own CLI login (DEPLOYMENT.md lists every path).
 - `.github/workflows/preview.yml` runs on every push. **Blocks publishing:** typecheck, lint, rule tests, the local Supabase stack, the app build, API tests and browser tests on a clean checkout; then a Vercel build that nothing public points at yet; then the six account-free hosted checks against that new build. **Only then** both addresses move to it, and the workflow confirms through Vercel which deployment `bloat-preview.vercel.app` serves. **Afterwards, reporting only:** the same six checks on the public address. **Manual:** the signed-in hosted checks (they need owner-approved accounts).
-- The only secret is `VERCEL_TOKEN`, a GitHub repository secret, never in the workflow file or the log. It is not set yet, so no run can publish: `2f22cc4` waits for it.
+- The only secret is `VERCEL_TOKEN`, a GitHub repository secret, never in the workflow file or the log. It was still not set at 19:38 UTC on 22 Nov (run 3's publish step, re-run then, stopped at "token is missing" again), so no run has published: `2f22cc4` waits for it.
 
 **The workflow's runs so far (GitHub Actions, "Preview"):**
 

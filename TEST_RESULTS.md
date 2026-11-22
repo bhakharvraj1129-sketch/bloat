@@ -30,7 +30,7 @@ A deleted account's earlier tokens, measured locally: app API 401 at once; Supab
 | Account-free hosted checks (6) on `af950f5`, deployment `dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj`, 22 Nov 14:36 UTC, through the branch address (this workspace's network blocks `bloat-preview.vercel.app`; Vercel reports both addresses on this deployment) | 6 of 6 passed |
 | Signed-in hosted checks (9), on the served build | **Blocked**: the 7 approved accounts need the old `pro-tester@bloat.test` deleted first, with the 19 below |
 | Deleted-account token check on the hosted project | **Blocked** (same reason) |
-| 19 temporary accounts from 19 Nov | **Not deleted.** List verified again at 18:18 UTC (same 19 IDs, marker, 34 sessions); the delete was sent and its approval prompt timed out (6th try). Nothing deleted |
+| 19 temporary accounts from 19 Nov | **Not deleted.** List checked again at 18:18 and about 19:30 UTC (same 19 email-and-ID pairs, marker, 34 sessions; data counted); the delete was sent both times and both approval prompts got no answer (7 tries since 19 Nov). Nothing deleted |
 
 ### Manual device
 
@@ -40,7 +40,7 @@ A deleted account's earlier tokens, measured locally: app API 401 at once; Supab
 
 ### Publishing gate (CI)
 
-`vercel.json` switches off Vercel's automatic Git builds (checked: no deployment for `4640ac2`, `7d6fd03` or `2f22cc4`); `.github/workflows/preview.yml` publishes only after its checks pass. Runs: 1 (`4640ac2`) failed at setup (a mistake in the new workflow), fixed; 2 (`7d6fd03`) failed in the API tests, 130 of 135 (four needed the missing `pdftotext` tool, one found the hidden endpoint), both fixed; 3 (`2f22cc4`): every check passed on a clean checkout, browser tests included (11 minutes), then it stopped at the missing `VERCEL_TOKEN`, as designed: nothing published. Publishing needs the owner's `VERCEL_TOKEN` secret (DEPLOYMENT.md, "Publishing the preview"); until then `2f22cc4` is not on the preview.
+`vercel.json` switches off Vercel's automatic Git builds (checked: no deployment for `4640ac2`, `7d6fd03` or `2f22cc4`); `.github/workflows/preview.yml` publishes only after its checks pass. Runs: 1 (`4640ac2`) failed at setup (a mistake in the new workflow), fixed; 2 (`7d6fd03`) failed in the API tests, 130 of 135 (four needed the missing `pdftotext` tool, one found the hidden endpoint), both fixed; 3 (`2f22cc4`): every check passed on a clean checkout, browser tests included (11 minutes), then it stopped at the missing `VERCEL_TOKEN`, as designed: nothing published. Publishing needs the owner's `VERCEL_TOKEN` secret (DEPLOYMENT.md, "Publishing the preview"): still missing at 19:38 UTC, so `2f22cc4` is not on the preview. Second layer against other paths: the Vercel project's Ignored Build Step now skips every Git-triggered build (set about 19:40 UTC).
 
 ## Verification round 1 (22 Nov 2026, morning)
 

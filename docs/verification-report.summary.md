@@ -36,8 +36,8 @@ Words used: **Passed** (the outcome was checked and was right), **Failed**, **Sk
 | Sign-ups off at the provider (part of the six) | **Passed**: `disable_signup: true`, sign-up refused with 422 |
 | Signed-in hosted checks (9), on the served build | **Blocked**: the 7 approved accounts need the old `pro-tester@bloat.test` deleted first, with the 19 (section 7) |
 | A deleted account's earlier tokens, on the hosted project | **Blocked**, same reason |
-| Deleting the 19 temporary accounts from 19 Nov | **Not done**: list verified again at 18:18 UTC; the delete was sent and its approval prompt timed out (section 8) |
-| Publishing steps of the gate (Vercel build, hosted checks on it, moving the addresses) | **Blocked, as designed**: run 3 stopped at "VERCEL_TOKEN is not set"; nothing was published (section 9) |
+| Deleting the 19 temporary accounts from 19 Nov | **Not done**: list checked again (exact match, 34 sessions, data counted); the delete was sent at 18:18 and about 19:30 UTC and both approval prompts got no answer (section 8) |
+| Publishing steps of the gate (Vercel build, hosted checks on it, moving the addresses) | **Blocked, as designed**: `VERCEL_TOKEN` still not set at 19:38 UTC; nothing was published (section 9) |
 
 ### Manual device evidence
 

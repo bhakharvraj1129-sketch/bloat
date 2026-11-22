@@ -119,6 +119,17 @@ A build that compiles is not a tested release. `vercel.json` switches off Vercel
 
 Not in the workflow: the control crawl, the link-by-link navigation run and the five-width check in `tests/ledger/` (long evidence runs, made by hand for the verification report), and checks on real phones.
 
+**Every way the dedicated address could change, and what stops it** (checked 22 Nov):
+
+| Path | What happens now |
+|---|---|
+| A push to the branch (Vercel's Git build) | Blocked twice: `vercel.json` turns Git builds off, and the project's "Ignored Build Step" is `test -n "$VERCEL_GIT_COMMIT_SHA"`, which skips any build that comes from a Git commit even if `vercel.json` is changed. Seen: no deployment for 4 pushes since `af950f5`. The second layer was set on 22 Nov at about 19:40 UTC; the tool used cannot read the value back, so check it once in Vercel: project `bloat`, Settings, Git, Ignored Build Step |
+| "Redeploy" in the dashboard, or a deploy hook | Also Git builds, so the Ignored Build Step skips them. No deploy hook was created for this project |
+| Pushes to other branches (for example `main`) | Skipped the same way; their builds could never take this address anyway, because it is tied to this branch |
+| The Preview workflow | The only automatic path: it uploads the commit's files without Git history (so its build is not skipped), runs the hosted checks on the new build, then moves the address |
+| A person with access to the Vercel team (dashboard "Assign domain", or the Vercel CLI with their own login) | Cannot be blocked by a setting: this is an owner-level action. Do not move the address by hand; if you must (roll back), note it in DEPLOYMENT.md |
+| Someone with push access weakening the workflow | Possible, but it is a visible commit to `.github/workflows/preview.yml` or `vercel.json`; review any change to those two files |
+
 **Owner step, needed once, or the preview stops updating.** Until it is done, the workflow stops at step 2 with "the VERCEL_TOKEN repository secret is not set", and the preview stays on the last published build. That is on purpose: nothing untested gets published.
 
 1. On vercel.com: Account Settings, Tokens, Create. Name it `bloat-preview-publish`, scope: team `typeshi2`, expiry: 90 days.
