@@ -239,7 +239,20 @@ Deleting an account does not make every token already issued invalid at that mom
 | Direct database write with the old access token | 403: signed-in users can never write to tables directly |
 | The app on a second device signed in before the deletion (browser test) | `/v1/me/state` answers 401 and a private screen sends it to Sign in |
 
-Hosted: the same check is planned for the temporary accounts of the next hosted run (section 7), after they are deleted. Not yet done.
+**Protected data, not just the screen.** `tests/hosted/old-token.ts` runs the same session through every layer in two steps around a deletion: `capture` signs in and records what the session can do, `check` repeats it after the deletion. Rehearsed against the local stack on 22 Nov with a stand-in account that had a saved meal:
+
+| Same session (access token unexpired: about 3,600 s left) | Before deletion | After deletion |
+|---|---|---|
+| App `/v1/me/state`, `/v1/history` (token and cookie) | 200 with the account's data (15 and 9 data fields) | **401, no data fields** |
+| App `/v1/reports` (Pro, Free account) | 403 Pro needed | **401** |
+| App: save a meal | 201 | **401** |
+| Supabase Auth user lookup | 200 | **403** |
+| Refresh token for a new session | (not used before) | **400** |
+| Direct database read: meals, profiles | 200, 2 meals and 1 profile | **200, 0 rows** (token signature still valid; nothing left to read) |
+| Direct database write | 403 | **403** |
+| Screen: `/history` with the old cookie | 200, the screen | 307 to `/sign-in?next=%2Fhistory` (shown for completeness; the rows above are the evidence that data is protected) |
+
+Hosted: **Not done.** It runs on one of the 7 approved accounts after the signed-in hosted checks, before those accounts are deleted (section 7).
 
 ## 7. Hosted preview evidence
 

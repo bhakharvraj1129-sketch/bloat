@@ -17,7 +17,7 @@ export function account(role: string): string {
   return email;
 }
 
-export async function sessionFor(role: string): Promise<{ cookies: Array<{ name: string; value: string }>; token: string }> {
+export async function sessionFor(role: string): Promise<{ cookies: Array<{ name: string; value: string }>; token: string; refresh: string }> {
   const jar = new Map<string, string>();
   const client = createServerClient(SUPABASE_URL, SUPABASE_KEY, {
     cookies: { getAll: () => [...jar].map(([name, value]) => ({ name, value })), setAll: (list) => { for (const c of list) jar.set(c.name, c.value); } },
@@ -25,5 +25,5 @@ export async function sessionFor(role: string): Promise<{ cookies: Array<{ name:
   const { data, error } = await client.auth.signInWithPassword({ email: account(role), password: PASSWORD });
   if (error || !data.session) throw new Error(`sign-in for ${role} failed: ${error?.message}`);
   await new Promise((r) => setTimeout(r, 50));
-  return { cookies: [...jar].filter(([, v]) => v).map(([name, value]) => ({ name, value })), token: data.session.access_token };
+  return { cookies: [...jar].filter(([, v]) => v).map(([name, value]) => ({ name, value })), token: data.session.access_token, refresh: data.session.refresh_token };
 }
