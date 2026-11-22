@@ -28,6 +28,7 @@ always refused; Back skipped the Sign in and offline screens; email-code sign-in
 |---|---|
 | Sign-ups off at the provider; direct and email-code sign-up refused (422 `signup_disabled`); old test login 404; no account created | Passed (22 Nov, after the owner switched sign-ups off) |
 | Owner's own journey with `bloat-tester@bloat.test` on `bloat-preview.vercel.app`: sign-in, setup, refresh, sign-out | Owner reported all steps worked; server records confirm one successful password sign-in (12:14:56 UTC), setup saved, sign-out (12:17:24 UTC), 0 sessions afterwards. The password never left the owner |
+| Account-free hosted checks on the final build `fcbce97` (deployment `dpl_4LQ7BSEBSQ39QfkxEvR5smXULMm5`, served at `bloat-preview.vercel.app` and the branch address) | 6 of 6 passed |
 | Signed-in hosted checks on the final commit | **Not re-run**: they need new temporary accounts while the 19 earlier ones still await deletion. Last run on `10cd14e`: 14 of 15 (the failure was the sign-up switch, now fixed) |
 | 19 temporary accounts from the 19 Nov runs | **Still present, 34 live sessions.** Deletion requested through the Supabase connector; the approval prompt timed out |
 
