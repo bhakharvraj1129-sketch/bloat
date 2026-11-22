@@ -86,12 +86,14 @@ export function Experiment({ id }: { id: string }) {
               </section>
             )}
 
-            <SaveStatus state={act.state === "saved" ? "idle" : act.state} error={act.error} />
-            {!finished && <Button variant="danger" onClick={() => setEnding(true)}>End early</Button>}
+            {!ending && <SaveStatus state={act.state === "saved" ? "idle" : act.state} error={act.error} onCheck={async () => { if ((await act.check()).ok) load.reload(); }} />}
+            {!finished && <Button variant="danger" onClick={() => { act.reset(); setEnding(true); }}>End early</Button>}
 
             <Sheet open={ending} onOpenChange={setEnding} title="End this experiment">
               <QuestionField id="XP-03" value={reason} onChange={(v) => setReason(v as string | null)} />
-              <Button variant="danger" disabled={!reason || act.saving} onClick={async () => { const ok = await post("end", { reason }); if (ok) setEnding(false); }}>End experiment</Button>
+              {/* Shown inside the sheet, so a failed save is never hidden behind it. */}
+              <SaveStatus state={act.state === "saved" ? "idle" : act.state} error={act.error} onCheck={async () => { if ((await act.check()).ok) { setEnding(false); load.reload(); } }} />
+              <Button variant="danger" disabled={!reason || act.saving} onClick={async () => { const ok = await post("end", { reason }); if (ok) setEnding(false); }}>{act.saving ? "Ending…" : "End experiment"}</Button>
             </Sheet>
           </>
         );

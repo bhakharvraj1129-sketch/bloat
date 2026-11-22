@@ -6,7 +6,7 @@ const BASE = process.env.HOSTED_URL!;
 test.beforeAll(() => { if (!BASE) throw new Error("Set HOSTED_URL"); });
 const home = new RegExp(`^${BASE.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")}/?$`);
 
-test("hosted: a private screen sends a signed-out visitor to sign in, remembering where they were going", async ({ page }) => {
+test("hosted: a private screen sends a signed-out visitor to sign in, remembering where they were going", { tag: "@smoke" }, async ({ page }) => {
   await page.goto("/me", { waitUntil: "load" });
   await expect(page).toHaveURL(/\/sign-in\?next=%2Fme$/);
   await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
@@ -14,7 +14,7 @@ test("hosted: a private screen sends a signed-out visitor to sign in, rememberin
   await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible(); // an outside address is ignored
 });
 
-test("hosted: Back returns to the page you came from, and to the start page on a direct link", async ({ page }) => {
+test("hosted: Back returns to the page you came from, and to the start page on a direct link", { tag: "@smoke" }, async ({ page }) => {
   await page.goto("/contact", { waitUntil: "load" });
   await page.getByRole("main").getByRole("link", { name: "When to get medical help" }).first().click();
   await expect(page.getByRole("heading", { name: /When to get medical help/ })).toBeVisible();
@@ -34,7 +34,7 @@ test("hosted: Back returns to the page you came from, and to the start page on a
   await expect(help).toHaveURL(home);
 });
 
-test("hosted: empty forms explain what is missing instead of doing nothing", async ({ page }) => {
+test("hosted: empty forms explain what is missing instead of doing nothing", { tag: "@smoke" }, async ({ page }) => {
   await page.goto("/unavailable", { waitUntil: "load" });
   await page.getByRole("button", { name: "Join waitlist" }).click();
   await expect(page.getByText("Enter your country and a valid email address.")).toBeVisible();

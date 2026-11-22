@@ -11,6 +11,7 @@ export const PASSWORD = process.env.HOSTED_PASSWORD!;
 const ACCOUNTS = Object.fromEntries((process.env.HOSTED_ACCOUNTS ?? "").split(",").filter(Boolean).map((pair) => pair.split("=") as [string, string]));
 
 export function account(role: string): string {
+  if (!PASSWORD) throw new Error("Set HOSTED_PASSWORD (this check needs the run's synthetic accounts)");
   const email = ACCOUNTS[role];
   if (!email) throw new Error(`HOSTED_ACCOUNTS has no "${role}" account`);
   return email;

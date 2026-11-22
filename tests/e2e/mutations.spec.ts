@@ -68,6 +68,52 @@ async function account(context: BrowserContext, role: Action["role"]): Promise<C
 const st = async (c: Ctx) => (await c.api("GET", "/v1/me/state")).body;
 const day = async (c: Ctx) => (await c.api("GET", `/v1/days/${c.today}`)).body;
 const dialog = (c: Ctx, name: string | RegExp) => c.page.getByRole("dialog", { name });
+const userId = (c: Ctx) => sql(`select id from auth.users where email = '${c.seed.email}'`);
+const events = (c: Ctx, name: string) => Number(sql(`select count(*) from public.product_events where user_id = '${userId(c)}' and name = '${name}'`));
+const localAgo = (minsAgo: number) => new Date(Date.now() - minsAgo * 60_000).toLocaleString("sv-SE", { timeZone: "America/New_York" }).replace(" ", "T").slice(0, 16);
+
+/** Local fixture: the account started 10 days ago and the last 4 days have confirmed reviews (experiments need them). */
+async function readyForExperiments(c: Ctx) {
+  sql(`update public.profiles set created_at = now() - interval '10 days' where user_id = '${userId(c)}'`);
+  for (let k = 1; k <= 4; k++) {
+    const d = new Date(Date.parse(`${c.today}T12:00:00Z`) - k * 86_400_000).toISOString().slice(0, 10);
+    const nextNoon = new Date(Date.parse(`${d}T12:00:00Z`) + 86_400_000 + 4 * 3_600_000).toISOString();
+    expect((await c.api("PUT", `/v1/days/${d}/review`, { worst: 0, whole_day: "yes" }, nextNoon)).status).toBeLessThan(300);
+  }
+}
+async function startExperiment(c: Ctx, key: string) {
+  await readyForExperiments(c);
+  if (key.startsWith("swap_")) expect((await c.api("POST", "/v1/experiments/checks", { fx01: "no", fx02: "no", fx03: "no", fx04: "no" })).status).toBe(201);
+  const r = await c.api("POST", "/v1/experiments", { key });
+  expect(r.status, JSON.stringify(r.body)).toBeLessThan(300);
+  c.seed.xp = r.body.experiment.id;
+}
+const xpResult = async (c: Ctx) => (await c.api("GET", `/v1/experiments/${c.seed.xp}/result`)).body;
+/** Local fixture: the running swap started 7 days ago, so the weekly check and adding back are due. */
+const ageSwap = (c: Ctx) => sql(`update public.experiments set started_on = started_on - 7 where id = '${c.seed.xp}'`);
+async function endedEpisode(c: Ctx) {
+  const ep = await c.api("POST", "/v1/episodes", { strength: 4, started: { mode: "exact", local: localAgo(50), zone: "America/New_York" } });
+  expect(ep.status).toBe(201);
+  const id = ep.body.episode?.id ?? (await st(c)).open_episode.id;
+  expect((await c.api("POST", `/v1/episodes/${id}/end`, { ended: { mode: "exact", local: localAgo(20), zone: "America/New_York" } })).status).toBeLessThan(300);
+}
+/** Local fixture: an open bloating record that started 9 hours ago, so "Is it still happening?" is asked. */
+async function longOpenEpisode(c: Ctx) {
+  expect((await c.api("POST", "/v1/episodes", { strength: 3, started: { mode: "now" } })).status).toBe(201);
+  sql(`update public.episodes set started_at = started_at - interval '9 hours' where user_id = '${userId(c)}'`);
+  sql(`update public.strength_samples set observed_at = observed_at - interval '9 hours' where user_id = '${userId(c)}'`);
+}
+const shares = (c: Ctx, where = "true") => Number(sql(`select count(*) from public.report_shares where user_id = '${userId(c)}' and ${where}`));
+async function previewReport(c: Ctx) {
+  await c.page.goto("/doctor");
+  await c.page.getByRole("button", { name: "Preview report" }).click();
+  await expect(c.page.getByRole("button", { name: "Create share link" })).toBeVisible();
+}
+async function fillShare(c: Ctx) {
+  await c.page.getByLabel("Who is it for?").fill("Dr Test");
+  await c.page.getByLabel("What is it for?").fill("Appointment");
+  await c.page.getByRole("checkbox", { name: /I agree to share this report/ }).check();
+}
 
 const ACTIONS: Action[] = [
   {
@@ -280,6 +326,150 @@ const ACTIONS: Action[] = [
     changed: async (c) => (await day(c)).exercise.length === 0,
     after: async (c) => { await expect(c.page.getByText(/Walking, 20 min/)).toHaveCount(0); },
   },
+  // ---- third batch: the gaps listed in the 22 Nov report ----
+  {
+    name: "Answer 'Is it still happening?': Yes", role: "free",
+    setup: longOpenEpisode,
+    open: async (c) => { await c.page.goto("/today"); await expect(dialog(c, "Is it still happening?")).toBeVisible(); },
+    submit: (c) => dialog(c, "Is it still happening?").getByRole("button", { name: "Yes", exact: true }),
+    write: { method: "POST", path: /\/v1\/episodes\/[^/]+\/still-happening$/ },
+    // The answer is recorded as one event; the bloating record stays open (the app never closes it by itself).
+    changed: async (c) => events(c, "still_happening_answered") === 1 && (await st(c)).open_episode !== null,
+    // The answer itself is not stored, so on the next app open the question is asked again while the
+    // record stays open over 8 hours (plan EP-07, "on app open"); the record is still open.
+    after: async (c) => { await expect(dialog(c, "Is it still happening?")).toBeVisible(); expect((await st(c)).open_episode).not.toBeNull(); },
+  },
+  {
+    name: "Answer 'Is it still happening?': Not sure", role: "free",
+    setup: longOpenEpisode,
+    open: async (c) => { await c.page.goto("/today"); await expect(dialog(c, "Is it still happening?")).toBeVisible(); },
+    submit: (c) => dialog(c, "Is it still happening?").getByRole("button", { name: "Not sure", exact: true }),
+    write: { method: "POST", path: /\/v1\/episodes\/[^/]+\/still-happening$/ },
+    changed: async (c) => events(c, "still_happening_answered") === 1 && (await st(c)).open_episode !== null,
+    // The answer itself is not stored, so on the next app open the question is asked again while the
+    // record stays open over 8 hours (plan EP-07, "on app open"); the record is still open.
+    after: async (c) => { await expect(dialog(c, "Is it still happening?")).toBeVisible(); expect((await st(c)).open_episode).not.toBeNull(); },
+  },
+  {
+    name: "Delete a bloating record", role: "free",
+    setup: endedEpisode,
+    open: async (c) => { await c.page.goto(`/day/${c.today}`); await c.page.getByRole("button", { name: "Delete", exact: true }).first().click(); },
+    submit: (c) => dialog(c, "Delete this?").getByRole("button", { name: "Delete", exact: true }),
+    write: { method: "DELETE", path: /\/v1\/episodes\/[^/]+$/ },
+    changed: async (c) => (await day(c)).episodes.length === 0,
+    after: async (c) => { await expect(c.page.getByRole("button", { name: "Edit times" })).toHaveCount(0); },
+  },
+  {
+    name: "Delete a bowel record (Pro)", role: "pro",
+    setup: async (c) => { expect((await c.api("POST", "/v1/bowel", { occurred: { mode: "now" } })).status).toBe(201); },
+    open: async (c) => { await c.page.goto(`/day/${c.today}`); await c.page.locator("section", { hasText: "Bowel and exercise" }).getByRole("button", { name: "Delete" }).click(); },
+    submit: (c) => dialog(c, "Delete this?").getByRole("button", { name: "Delete", exact: true }),
+    write: { method: "DELETE", path: /\/v1\/bowel\/[^/]+$/ },
+    changed: async (c) => (await day(c)).bowel.length === 0,
+    after: async (c) => { await expect(c.page.getByText(/^Bowel movement/)).toHaveCount(0); },
+  },
+  {
+    name: "Answer today's experiment question (Pro)", role: "pro",
+    setup: (c) => startExperiment(c, "eat_more_slowly"),
+    open: async (c) => { await c.page.goto(`/experiments/${c.seed.xp}`); },
+    submit: (c) => c.page.getByRole("button", { name: "Yes", exact: true }),
+    write: { method: "POST", path: /\/v1\/experiments\/[^/]+\/days$/ },
+    changed: async (c) => { const r = await xpResult(c); return r.answered_today && r.days.some((d: any) => d.date === r.today && d.answer === "yes"); },
+    after: async (c) => { await expect(c.page.getByText("Today's answer is saved: Yes.", { exact: false })).toBeVisible(); },
+  },
+  {
+    name: "End an experiment early (Pro)", role: "pro",
+    setup: (c) => startExperiment(c, "eat_more_slowly"),
+    open: async (c) => { await c.page.goto(`/experiments/${c.seed.xp}`); await c.page.getByRole("button", { name: "End early" }).click(); await dialog(c, "End this experiment").getByRole("radio", { name: "Too hard to keep up" }).click(); },
+    submit: (c) => dialog(c, "End this experiment").getByRole("button", { name: "End experiment" }),
+    write: { method: "POST", path: /\/v1\/experiments\/[^/]+\/end$/ },
+    changed: async (c) => (await xpResult(c)).experiment.phase === "ENDED_EARLY",
+    after: async (c) => { await expect(c.page.getByText("Finished", { exact: true })).toBeVisible(); },
+  },
+  {
+    name: "Weekly check during a food swap (Pro)", role: "pro",
+    setup: async (c) => { await startExperiment(c, "swap_lactose_free_dairy"); ageSwap(c); },
+    open: async (c) => {
+      await c.page.goto(`/experiments/${c.seed.xp}`);
+      await expect(c.page.getByText("A quick weekly check")).toBeVisible();
+      const card = c.page.locator("div", { has: c.page.getByText("A quick weekly check") }).last();
+      for (const g of await card.getByRole("group").all()) await g.getByRole("radio", { name: "No", exact: true }).click();
+    },
+    submit: (c) => c.page.locator("div", { has: c.page.getByText("A quick weekly check") }).last().getByRole("button", { name: "Save", exact: true }),
+    write: { method: "POST", path: /\/v1\/experiments\/[^/]+\/wellbeing$/ },
+    changed: async (c) => (await xpResult(c)).wellbeing_due === false,
+    after: async (c) => { await expect(c.page.getByText("A quick weekly check")).toHaveCount(0); },
+  },
+  {
+    name: "Finish a swap and start adding back (Pro)", role: "pro",
+    setup: async (c) => { await startExperiment(c, "swap_lactose_free_dairy"); ageSwap(c); },
+    open: async (c) => { await c.page.goto(`/experiments/${c.seed.xp}`); },
+    submit: (c) => c.page.getByRole("button", { name: "Finish the swap and start adding back" }),
+    write: { method: "POST", path: /\/v1\/experiments\/[^/]+\/add-back$/ },
+    changed: async (c) => (await xpResult(c)).experiment.phase === "ADDING_BACK",
+    after: async (c) => { await expect(c.page.getByText(/Adding back/).first()).toBeVisible(); },
+  },
+  {
+    name: "Resume a paused swap (Pro)", role: "pro",
+    setup: async (c) => { await startExperiment(c, "swap_lactose_free_dairy"); ageSwap(c); expect((await c.api("POST", `/v1/experiments/${c.seed.xp}/wellbeing`, { wb01: "yes", wb02: "no" })).body.paused).toBe(true); },
+    open: async (c) => { await c.page.goto(`/experiments/${c.seed.xp}`); },
+    submit: (c) => c.page.getByRole("button", { name: "Resume" }),
+    write: { method: "POST", path: /\/v1\/experiments\/[^/]+\/resume$/ },
+    changed: async (c) => (await xpResult(c)).experiment.phase !== "PAUSED",
+    after: async (c) => { await expect(c.page.getByRole("button", { name: "Resume" })).toHaveCount(0); },
+  },
+  {
+    name: "Un-hide a card in Learn (Pro)", role: "pro",
+    setup: async (c) => {
+      const card = (await c.api("GET", "/v1/cards/today")).body.card;
+      expect(card).toBeTruthy(); c.seed.card = card.id;
+      expect((await c.api("POST", `/v1/cards/${card.id}/feedback`, { other: "hide_this_card" })).status).toBeLessThan(300);
+    },
+    open: async (c) => { await c.page.goto("/learn"); },
+    submit: (c) => c.page.getByRole("button", { name: "Un-hide" }).first(),
+    write: { method: "POST", path: /\/v1\/cards\/[^/]+\/feedback$/ },
+    changed: async (c) => (await c.api("GET", "/v1/library")).body.cards.some((x: any) => x.id === c.seed.card && x.hidden === false),
+    after: async (c) => { await expect(c.page.getByRole("button", { name: "Un-hide" })).toHaveCount(0); },
+  },
+  {
+    name: "Save a meal with its ingredient check (Pro)", role: "pro",
+    setup: async (c) => { expect((await c.api("POST", "/v1/consents", { type: "ai_meal" })).status).toBeLessThan(300); },
+    open: async (c) => {
+      await c.page.goto("/today"); await c.page.getByRole("button", { name: "Add meal" }).click();
+      const d = dialog(c, /Add meal|Ingredient check/);
+      await d.getByLabel("What did you have?").fill("Matrix dal tadka");
+      await d.getByRole("button", { name: "Next: check ingredients" }).click();
+      await d.getByRole("button", { name: "Had all of these" }).click();
+    },
+    submit: (c) => dialog(c, "Ingredient check").getByRole("button", { name: "Save", exact: true }),
+    write: { method: "POST", path: /\/v1\/meals$/ },
+    changed: async (c) => (await day(c)).meals.some((m: any) => m.dish_text === "Matrix dal tadka" && m.ingredients.length > 0 && m.ingredients.every((i: any) => i.answer === "had")),
+    after: async (c) => { await expect(c.page.getByText("Matrix dal tadka")).toBeVisible(); },
+  },
+  {
+    name: "Create a report share link (Pro)", role: "pro",
+    open: async (c) => { await previewReport(c); await fillShare(c); },
+    submit: (c) => c.page.getByRole("button", { name: "Create share link" }),
+    write: { method: "POST", path: /\/v1\/reports\/[^/]+\/shares$/ },
+    changed: async (c) => shares(c) === 1,
+    after: async (c) => { expect(shares(c, "revoked_at is null")).toBe(1); },
+  },
+  {
+    name: "Revoke a report share link (Pro)", role: "pro",
+    open: async (c) => { await previewReport(c); await fillShare(c); await c.page.getByRole("button", { name: "Create share link" }).click(); await expect(c.page.getByText("Link ready")).toBeVisible(); },
+    submit: (c) => c.page.getByRole("button", { name: "Revoke link" }),
+    write: { method: "DELETE", path: /\/v1\/reports\/[^/]+\/shares$/ },
+    changed: async (c) => shares(c, "revoked_at is not null") === 1,
+    after: async (c) => { expect(shares(c, "revoked_at is null")).toBe(0); },
+  },
+  {
+    name: "Delete my account", role: "free", failText: "That didn't work. Nothing was deleted. Try again.",
+    open: async (c) => { await c.page.goto("/me"); await c.page.getByRole("button", { name: "Delete account" }).click(); await dialog(c, "Delete account").getByLabel("Type DELETE to confirm").fill("DELETE"); },
+    submit: (c) => dialog(c, "Delete account").getByRole("button", { name: "Delete my account" }),
+    write: { method: "POST", path: /\/v1\/account\/delete$/ },
+    changed: async (c) => sql(`select count(*) from auth.users where email = '${c.seed.email}'`) === "0",
+    after: async (c) => { await c.page.goto("/today"); await expect(c.page).toHaveURL(/\/sign-in/); },
+  },
   // ---- second batch ----
   {
     name: "Finish the morning review", role: "free",
@@ -452,8 +642,11 @@ for (const a of ACTIONS) {
         ? route.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ error: { code: "ERROR", message: FAIL_MESSAGE } }) })
         : route.continue());
       await a.open(c);
+      // When the action happens in a sheet, the message must appear inside that sheet, not behind it.
+      const inSheet = (await c.page.getByRole("dialog").count()) > 0;
       await a.submit(c).click();
-      await expect(c.page.getByText(a.failText ?? FAIL_MESSAGE).first(), "failure message on screen").toBeVisible();
+      const scope = inSheet ? c.page.getByRole("dialog").last() : c.page.locator("body");
+      await expect(scope.getByText(a.failText ?? FAIL_MESSAGE).first(), `failure message on screen${inSheet ? ", inside the sheet" : ""}`).toBeVisible();
       await expect(a.submit(c), "the form is still there").toBeVisible();
       expect(await a.changed(c), "nothing changed").toBe(before);
       await c.page.unroute("**/v1/**");
@@ -484,4 +677,88 @@ test("experiments cannot be chosen before there are enough confirmed days, and t
   const choose = c.page.getByRole("button", { name: "Choose" });
   expect(await choose.count()).toBeGreaterThan(0);
   for (const b of await choose.all()) await expect(b).toBeDisabled(); // it used to be enabled, and starting was then refused
+});
+
+test("'Is it still happening?': No, it ended opens the end time, and saving it closes the record", async ({ context }) => {
+  const c = await account(context, "free");
+  await longOpenEpisode(c);
+  await c.page.goto("/today");
+  await dialog(c, "Is it still happening?").getByRole("button", { name: "No, it ended" }).click();
+  const end = dialog(c, "Bloating ended");
+  await expect(end).toBeVisible();
+  await expect(end.getByRole("button", { name: "Save" })).toBeDisabled(); // ended earlier: an end time (or "I don't know") is needed
+  await end.getByRole("radio", { name: "I don't know" }).click();
+  await end.getByRole("button", { name: "Save" }).click();
+  await expect.poll(async () => (await st(c)).open_episode).toBeNull();
+  expect(events(c, "still_happening_answered")).toBe(1);
+});
+
+test("ingredient check fails: the message shows, the dish is kept, Try the check again works, and the meal still saves", async ({ context }) => {
+  const c = await account(context, "pro");
+  expect((await c.api("POST", "/v1/consents", { type: "ai_meal" })).status).toBeLessThan(300);
+  await c.page.goto("/today");
+  await c.page.getByRole("button", { name: "Add meal" }).click();
+  await dialog(c, "Add meal").getByLabel("What did you have?").fill("Matrix bean chilli");
+  let checks = 0;
+  await c.page.route("**/v1/food-suggestions", (r) => { checks++; return r.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ error: { code: "ERROR", message: FAIL_MESSAGE } }) }); });
+  await dialog(c, "Add meal").getByRole("button", { name: "Next: check ingredients" }).click();
+  const d = dialog(c, "Ingredient check");
+  await expect(d.getByText("Your meal is saved when you tap Save. Add ingredients yourself, or try the check again later.")).toBeVisible();
+  await expect(d.getByText("Matrix bean chilli")).toBeVisible(); // the dish is kept
+  await c.page.unroute("**/v1/food-suggestions");
+  await d.getByRole("button", { name: "Try the check again" }).click();
+  await expect(d.getByRole("button", { name: "Had all of these" })).toBeVisible(); // the check worked this time
+  expect(checks).toBe(1);
+  // The meal saves with what was marked; the earlier failure left nothing behind.
+  await d.getByRole("button", { name: "Save", exact: true }).click();
+  await expect.poll(async () => (await day(c)).meals.filter((m: any) => m.dish_text === "Matrix bean chilli").length).toBe(1);
+  expect(Number(sql(`select count(*) from public.food_suggestions where user_id = '${userId(c)}'`))).toBeLessThanOrEqual(1);
+});
+
+test("ingredient check fails and the person saves anyway: the meal saves without ingredients", async ({ context }) => {
+  const c = await account(context, "pro");
+  expect((await c.api("POST", "/v1/consents", { type: "ai_meal" })).status).toBeLessThan(300);
+  await c.page.route("**/v1/food-suggestions", (r) => r.abort());
+  await c.page.goto("/today");
+  await c.page.getByRole("button", { name: "Add meal" }).click();
+  await dialog(c, "Add meal").getByLabel("What did you have?").fill("Matrix soup");
+  await dialog(c, "Add meal").getByRole("button", { name: "Next: check ingredients" }).click();
+  const d = dialog(c, "Ingredient check");
+  await expect(d.getByRole("button", { name: "Try the check again" })).toBeVisible();
+  await d.getByRole("button", { name: "Save", exact: true }).click();
+  await expect.poll(async () => (await day(c)).meals.filter((m: any) => m.dish_text === "Matrix soup").length).toBe(1);
+});
+
+test("deleting the account with a lost reply: it says so, and Check and finish completes it once", async ({ context }) => {
+  const c = await account(context, "free");
+  await c.page.goto("/me");
+  await c.page.getByRole("button", { name: "Delete account" }).click();
+  const d = dialog(c, "Delete account");
+  await d.getByLabel("Type DELETE to confirm").fill("DELETE");
+  // The server deletes the account, but the reply never arrives.
+  await c.page.route("**/v1/account/delete", async (r) => { await r.fetch(); await r.abort(); });
+  await d.getByRole("button", { name: "Delete my account" }).click();
+  await expect(d.getByText("Connection lost. We can't tell yet whether your account was deleted.")).toBeVisible();
+  expect(sql(`select count(*) from auth.users where email = '${c.seed.email}'`)).toBe("0"); // it was deleted
+  await c.page.unroute("**/v1/account/delete");
+  await d.getByRole("button", { name: "Check and finish" }).click();
+  await expect(c.page).toHaveURL(/127\.0\.0\.1:\d+\/$/);
+});
+
+test("after an account is deleted on one device, the other device's earlier sign-in stops working", async ({ browser }) => {
+  // Device A and device B are both signed in to the same synthetic account (two separate sessions).
+  const a = await browser.newContext({ serviceWorkers: "block" });
+  const c = await account(a, "free");
+  const b = await browser.newContext({ serviceWorkers: "block" });
+  const pageB = await b.newPage();
+  await pageB.goto("/");
+  expect((await pageB.request.post("/v1/auth/test-login", { data: { email: c.seed.email, password: "synthetic-password-1" } })).ok()).toBe(true);
+  await c.page.goto("/today");
+  await expect(c.page.getByRole("heading", { name: "Today", exact: true })).toBeVisible();
+  expect((await pageB.request.post("/v1/account/delete", { data: { confirm: "DELETE" }, headers: { "idempotency-key": crypto.randomUUID() } })).status()).toBe(200);
+  // Device A still holds its earlier session cookie: the app no longer accepts it.
+  expect((await c.page.request.get("/v1/me/state")).status()).toBe(401);
+  await c.page.goto("/history");
+  await expect(c.page).toHaveURL(/\/sign-in/);
+  await a.close(); await b.close();
 });

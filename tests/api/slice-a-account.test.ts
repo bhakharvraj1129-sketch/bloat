@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { randomUUID } from "node:crypto";
-import { anon, asUser, at, BASE, call, exact, HELP_VERSION, newUser, NY, onboarded, onboardingBody, srvRpc } from "./helpers";
+import { ANON, anon, asUser, at, BASE, call, exact, HELP_VERSION, newUser, NY, onboarded, onboardingBody, srvRpc, SUPABASE_URL } from "./helpers";
 
 const D = "2026-11-10";
 const now = at(D, "15:00", NY);
@@ -220,5 +220,33 @@ describe("Slice A: export, save status and account deletion (plan B04)", () => {
     await expect(srvRpc("srv_tx", { p_user: u.id, p_ops: [{ op: "insert", table: "day_marks", row: { date: D, no_bloating_at: new Date().toISOString() } }] })).rejects.toThrow();
     // re-applying tombstones (run after a backup restore) finds nothing left to delete
     expect(await srvRpc<number>("srv_reapply_tombstones", {})).toBe(0);
+  });
+
+  it("a deleted account's earlier tokens: the app refuses them at once, Supabase refuses the user lookup and the refresh, and direct reads return nothing", async () => {
+    const u = await onboarded();
+    await call(u, "POST", "/v1/meals", { save_key: randomUUID(), dish_text: "token check toast", eaten: { mode: "now" } });
+    // A second, separate session for the same account (another device), issued before the deletion.
+    const { data: other } = await anon().auth.signInWithPassword({ email: u.email, password: "synthetic-password-1" });
+    const access = other.session!.access_token, refresh = other.session!.refresh_token;
+    const exp = JSON.parse(Buffer.from(access.split(".")[1]!, "base64url").toString()).exp as number;
+    expect((await call(u, "POST", "/v1/account/delete", { confirm: "DELETE" })).status).toBe(200);
+    expect(exp * 1000).toBeGreaterThan(Date.now() + 60_000); // the old token has not expired: what follows is the server refusing it
+    // 1. The app checks every request with Supabase Auth: refused at once.
+    expect((await call({ ...u, token: access }, "GET", "/v1/me/state")).status).toBe(401);
+    expect((await call({ ...u, token: access }, "POST", "/v1/meals", { save_key: randomUUID(), dish_text: "after delete", eaten: { mode: "now" } })).status).toBe(401);
+    // 2. Supabase Auth no longer knows the user, and the refresh token cannot make a new session.
+    const who = await fetch(`${SUPABASE_URL}/auth/v1/user`, { headers: { apikey: ANON, Authorization: `Bearer ${access}` } });
+    expect(who.status).toBeGreaterThanOrEqual(400);
+    const renew = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, { method: "POST", headers: { apikey: ANON, "Content-Type": "application/json" }, body: JSON.stringify({ refresh_token: refresh }) });
+    expect(renew.status).toBeGreaterThanOrEqual(400);
+    // 3. A signed token is still well-formed until it expires, so direct database reads are not refused
+    //    by the token check itself; they return nothing because every row went with the account, and
+    //    the database never accepts writes from signed-in users.
+    const rest = await fetch(`${SUPABASE_URL}/rest/v1/meals?select=id`, { headers: { apikey: ANON, Authorization: `Bearer ${access}` } });
+    const rows = rest.ok ? await rest.json() : [];
+    expect(rows).toEqual([]);
+    const write = await fetch(`${SUPABASE_URL}/rest/v1/meals`, { method: "POST", headers: { apikey: ANON, Authorization: `Bearer ${access}`, "Content-Type": "application/json" }, body: JSON.stringify({ dish_text: "x" }) });
+    expect(write.ok).toBe(false);
+    console.log(`deleted-account token: app 401; auth/v1/user ${who.status}; refresh ${renew.status}; rest read ${rest.status} with ${rows.length} rows; rest write ${write.status}`);
   });
 });

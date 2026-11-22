@@ -483,7 +483,13 @@ function DeleteSheet({ onClose }: { onClose: () => void }) {
       {del.state === "unknown" && (
         <div role="alert" className="flex flex-col gap-2">
           <p className="t-caption text-ink">Connection lost. We can&apos;t tell yet whether your account was deleted.</p>
-          <Button variant="secondary" onClick={async () => { if ((await del.check()).ok) await finish(); }}>Check and finish</Button>
+          <Button variant="secondary" disabled={busy} onClick={async () => {
+            // Deleting the account ends its sessions, so if this session is no longer accepted the
+            // deletion went through. Otherwise ask the server, and send again with the same key if needed.
+            const accepted = await fetch("/v1/me/state", { cache: "no-store" }).then((r) => r.status !== 401).catch(() => true);
+            if (!accepted) return finish();
+            if ((await del.check()).ok) await finish();
+          }}>Check and finish</Button>
         </div>
       )}
       <Button variant="danger" disabled={text !== "DELETE" || busy} onClick={async () => {

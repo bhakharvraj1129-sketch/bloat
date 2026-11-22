@@ -14,8 +14,10 @@ import { account, PASSWORD, SUPABASE_KEY, SUPABASE_URL, sessionFor } from "./ses
 const BASE = process.env.HOSTED_URL!;
 const stamp = Date.now();
 
+// Checks tagged @smoke need no account: they run on every publish (.github/workflows/preview.yml).
+// The others need the run's synthetic accounts (HOSTED_ACCOUNTS, HOSTED_PASSWORD) and stop at once without them.
 test.beforeAll(() => {
-  for (const k of ["HOSTED_URL", "HOSTED_SUPABASE_URL", "HOSTED_SUPABASE_KEY", "HOSTED_ACCOUNTS", "HOSTED_PASSWORD"]) if (!process.env[k]) throw new Error(`Set ${k}`);
+  for (const k of ["HOSTED_URL", "HOSTED_SUPABASE_URL", "HOSTED_SUPABASE_KEY"]) if (!process.env[k]) throw new Error(`Set ${k}`);
 });
 
 /** Signs in through the app's own email-and-password form, the way a tester does. */
@@ -67,7 +69,7 @@ function pdfText(bytes: Buffer): string {
   return execFileSync("pdftotext", ["-layout", file, "-"], { encoding: "utf8" }).replace(/\s+/g, " ");
 }
 
-test("public: a fresh signed-out browser opens the preview with no Vercel login, sees the app, and private screens send it to the app's own sign-in", async ({ browser }) => {
+test("public: a fresh signed-out browser opens the preview with no Vercel login, sees the app, and private screens send it to the app's own sign-in", { tag: "@smoke" }, async ({ browser }) => {
   const context = await browser.newContext();
   const page = await context.newPage();
   const res = await page.goto(BASE);
@@ -117,7 +119,7 @@ test("public: test-only switches are off (no password sign-in, no mock purchase,
   await context.close();
 });
 
-test("public: signed-out requests and direct database calls cannot read or change private records", async ({ request }) => {
+test("public: signed-out requests and direct database calls cannot read or change private records", { tag: "@smoke" }, async ({ request }) => {
   for (const pathName of ["/v1/history", "/v1/me/state", "/v1/days/2026-11-01", "/v1/reports", `/v1/export/${crypto.randomUUID()}?token=x`]) {
     expect((await request.get(`${BASE}${pathName}`)).status(), pathName).toBe(401);
   }
@@ -339,7 +341,7 @@ test("password sign-in: wrong details get one generic message, correct details s
   await context.close();
 });
 
-test("nobody can create an account: sign-ups are off in Supabase itself, the email-code route creates nothing, and the old test login is gone", async ({ request }) => {
+test("nobody can create an account: sign-ups are off in Supabase itself, the email-code route creates nothing, and the old test login is gone", { tag: "@smoke" }, async ({ request }) => {
   const settings = await (await fetch(`${SUPABASE_URL}/auth/v1/settings`, { headers: { apikey: SUPABASE_KEY } })).json();
   // Checked first, so no sign-up request (and no email) is ever sent while sign-ups are still on.
   expect(settings.disable_signup, "Supabase still allows new sign-ups (Authentication, Sign In / Providers, 'Allow new users to sign up')").toBe(true);

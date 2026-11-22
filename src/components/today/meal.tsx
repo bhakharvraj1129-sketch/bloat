@@ -45,6 +45,7 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
   const [asDish, setAsDish] = useState(false);
   const [place, setPlace] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
+  const [checkFailed, setCheckFailed] = useState(false); // the check request itself failed: it can be tried again
   const fileRef = useRef<HTMLInputElement>(null);
   const save = useSave<{ meal: { ai_check_status: string } }>();
 
@@ -69,11 +70,12 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
   async function runCheck() {
     setChecking(true); setNotice(null);
     try {
+      // The same save key every time, so trying again never creates a second suggestion record.
       const res = await api<Check>("POST", "/v1/food-suggestions", { save_key: saveKey.current, dish_text: text.trim() });
-      setCheck(res); setStep("check");
+      setCheck(res); setCheckFailed(false); setStep("check");
     } catch (e) {
       if (e instanceof ApiFailure && e.code === "CONSENT_REQUIRED") setStep("consent");
-      else { setCheck({ status: "failed", dishes: [], items: [], message: "Your meal is saved when you tap Save. Add ingredients yourself, or try the check again later.", provider_label: "" }); setStep("check"); }
+      else { setCheck({ status: "failed", dishes: [], items: [], message: "Your meal is saved when you tap Save. Add ingredients yourself, or try the check again later.", provider_label: "" }); setCheckFailed(true); setStep("check"); }
     } finally { setChecking(false); }
   }
 
@@ -203,7 +205,10 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
               <Caption>Anything you leave untouched is saved as Not sure, never as Didn&apos;t have.</Caption>
             </>
           ) : (
-            <Card><p>{check.message ?? "The check couldn't tell what is in this dish."}</p><Caption className="mt-2">Your meal still saves. You can add ingredients yourself below.</Caption></Card>
+            <>
+              <Card><p>{check.message ?? "The check couldn't tell what is in this dish."}</p><Caption className="mt-2">Your meal still saves. You can add ingredients yourself below.</Caption></Card>
+              {checkFailed && <Button variant="secondary" disabled={checking || save.saving} onClick={runCheck}>{checking ? "Checking…" : "Try the check again"}</Button>}
+            </>
           )}
           <div className="flex flex-col gap-2">
             <Label>Add an ingredient</Label>
