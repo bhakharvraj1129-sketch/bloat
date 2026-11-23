@@ -1096,3 +1096,38 @@ test("export: a server failure and a lost connection get different messages, for
   expect((await file).suggestedFilename()).toMatch(/\.json$/);
   expect(downloads).toBe(1);
 });
+
+test("delete account with kept photos while storage fails: the sheet says nothing was deleted; after storage recovers the same button deletes photos and account", async ({ context }) => {
+  const c = await account(context, "pro");
+  expect((await c.api("POST", "/v1/consents", { type: "ai_meal" })).status).toBeLessThan(300);
+  expect((await c.api("PATCH", "/v1/me/profile", { keep_meal_photos: true })).status).toBe(200);
+  const bytes = Array.from(await photo());
+  const kept = await c.page.evaluate(async (b) => {
+    const form = new FormData();
+    form.set("photo", new Blob([new Uint8Array(b)], { type: "image/jpeg" }), "synthetic.jpg");
+    form.set("save_key", crypto.randomUUID());
+    return (await (await fetch("/v1/meal-photos", { method: "POST", body: form })).json()).kept;
+  }, bytes);
+  expect(kept).toBe(true);
+  const uid = userId(c);
+  const stored = () => Number(sql(`select count(*) from storage.objects where bucket_id = 'meal-photos' and name like '${uid}/%'`));
+  expect(stored()).toBe(1);
+  const name = `test_storage_${Date.now()}`;
+  sql(`create function private.${name}() returns trigger language plpgsql as $$ begin if old.name like '${uid}/%' then raise exception 'TEST_STORAGE_DOWN'; end if; return old; end $$; create trigger ${name} before delete on storage.objects for each row execute function private.${name}();`);
+  try {
+    await c.page.goto("/me");
+    await c.page.getByRole("button", { name: "Delete account" }).click();
+    const d = dialog(c, "Delete account");
+    await d.getByLabel("Type DELETE to confirm").fill("DELETE");
+    await d.getByRole("button", { name: "Delete my account" }).click();
+    await expect(d.getByText("That didn't work. Nothing was deleted. Try again.")).toBeVisible({ timeout: 20000 });
+    expect(sql(`select count(*) from auth.users where id = '${uid}'`)).toBe("1");
+    expect(stored()).toBe(1);
+  } finally {
+    sql(`drop trigger if exists ${name} on storage.objects; drop function if exists private.${name}();`);
+  }
+  await dialog(c, "Delete account").getByRole("button", { name: "Delete my account" }).click();
+  await expect(c.page).toHaveURL(/127\.0\.0\.1:\d+\/$/, { timeout: 20000 });
+  expect(sql(`select count(*) from auth.users where id = '${uid}'`)).toBe("0");
+  expect(stored()).toBe(0);
+});
