@@ -1,23 +1,24 @@
 # Deployment
 
-A **public testing preview** exists (the owner's decision, 18 Nov 2026). It runs on the hosted `bloat-test` database with synthetic data, a labelled mock AI and mock billing. There is no production site and no real payments.
+A **public testing preview** exists (the owner's decision, 18 Nov 2026). It runs on the hosted `bloat-test` database with synthetic data, a labelled mock AI and mock billing. There is no production build and no real payments. Since 24 Nov 2026 the project's main addresses show that same test build (the owner's decision); that is not a launch.
 
 This file has the **current state** first, then **how things are done now** (publishing, hosted test runs, the test account, keys), then a short **history**. What remains to decide or build is in `PROGRESS.md`, "What remains".
 
-## Current state (verified 23 Nov 2026)
+## Current state (verified 23 Nov 2026; GitHub and the main addresses updated 24 Nov)
 
 | Part | State | Evidence |
 |---|---|---|
 | Public preview | `https://bloat-preview.vercel.app` and the branch address serve commit `83fe4da`, deployment `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`. Opens without any Vercel login. **Frozen for the owner's review** (below) | Published by the Preview workflow, run 12, 23 Nov 15:36 UTC; Vercel reports both addresses on it; hosted check "opens with no Vercel login" passed on it |
+| Main addresses | `bloat-olive.vercel.app`, `bloat-typeshi2.vercel.app` and `bloat-git-main-typeshi2.vercel.app` point at the same frozen deployment, `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`, since 24 Nov 2026 (the owner's request). Before that they served the docs-only `main` deployment of 15 Nov, which answered 404. Still no production build; the page stays hidden from search engines | Alias assignments read back; `bloat-olive.vercel.app` opened with status 200 and the robots "noindex" tag, 24 Nov |
 | Publishing | Only the Preview workflow (`.github/workflows/preview.yml`) moves the addresses, after its checks pass. Its `VERCEL_TOKEN` repository secret is in place (added by the owner on 22 Nov) | Runs 6, 9, 10, 11 and 12 published; Vercel lists no other deployment since `af950f5` |
-| GitHub | Branch `claude/bloat-software-build-uxzoru` on `bhakharvraj1129-sketch/bloat`. No pull request | |
+| GitHub | Branch `claude/bloat-software-build-uxzoru` on `bhakharvraj1129-sketch/bloat`. On 24 Nov 2026, at the owner's request, `main` was fast-forwarded to it (`8d2d4d7` to `3646f92`, no new commits). A push to `main` publishes nothing (Git builds are off and the workflow runs only for the branch). Later commits go to the branch; `main` catches up only when the owner asks | `git ls-remote`, 24 Nov |
 | Supabase `bloat-test` (`qntazirusbuwfmnmihzu`) | Six migrations applied, matching `supabase/migrations/` by version: `20261117051631 foundation`, `20261117051734 server_functions`, `20261117051738 synthetic_test_users`, `20261117061403 country_capability_set`, `20261117174442 doctor_report_privacy`, `20261117182606 server_functions_not_for_signed_in_users` | Migration list read on 23 Nov |
 | Supabase Auth | Sign-ups **off** in Supabase itself; email-and-password sign-in for accounts made in the dashboard; Google off; custom SMTP off (built-in mailer, project-team addresses only, 2 emails an hour) | Sign-ups: hosted check "nobody can create an account" passed on the current build. Mailer and Google: last read on 18 Nov |
 | Accounts | The owner's test account `bloat-tester@bloat.test` (with its sample meal, bloating record and report). No synthetic test accounts remain | Read-only checks after the last hosted run, 23 Nov |
 | Data outside migrations | One row in `private.server_secrets`, `preview-2026-11-17`, holding only the SHA-256 hash of the preview secret | |
 | Vercel project `bloat` | Team `typeshi2`. Vercel Authentication off (since 18 Nov). Git builds off (`vercel.json`); Ignored Build Step `test -n "$VERCEL_GIT_COMMIT_SHA"` | Every workflow run reads both back before building (run 12: matched) |
 | Vercel variables (Preview only) | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `BLOAT_SERVER_SECRET` (sensitive, owner-entered), `BLOAT_AI_PROVIDER=mock`, `BLOAT_BILLING_PROVIDER=mock`, `BLOAT_TEST_LOGIN=0`, `BLOAT_PRO_TEST_EMAILS`, `BLOAT_SIGN_IN_METHOD=password`. Not set: `BLOAT_STAFF_EMAILS` (founder tools off), any AI key | Variable list read on 23 Nov |
-| Vercel project `bloat-zlrr` (duplicate) | No variables, no domains, no production deployment; its automatic builds are skipped. Nothing depends on it; the owner can delete it | Checked 18 Nov; unchanged since (project list, 23 Nov) |
+| Vercel project `bloat-zlrr` (duplicate) | No variables, no domains, no production deployment; its automatic builds are skipped. Nothing depends on it. On 24 Nov the owner asked for it to go; deleting is done by the owner in Vercel (project `bloat-zlrr`, Settings, General, Delete Project) | Checked 18 Nov; unchanged since (project list, 23 Nov) |
 | AI key, Resend, Sentry, payments | Not connected | Variable list, 23 Nov |
 
 ## Frozen for review (from 23 Nov 2026, evening)
@@ -29,7 +30,7 @@ Both addresses serve `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (commit `83fe4da`). Whil
 - Testing preview, dedicated address: `https://bloat-preview.vercel.app`.
 - The same build: `https://bloat-git-claude-bloat-software-build-uxzoru-typeshi2.vercel.app`.
 - Both addresses move **only** through the Preview workflow, after its checks pass. A push does not publish by itself.
-- `bloat-olive.vercel.app` is the project's production address. There is no production deployment, on purpose.
+- `bloat-olive.vercel.app` (with `bloat-typeshi2.vercel.app` and `bloat-git-main-typeshi2.vercel.app`) is the project's production address. Since 24 Nov 2026 it points at the same frozen test deployment, by the owner's decision. There is still no production build. The Preview workflow does not move these addresses: after the next publish they stay on the older deployment until someone moves them (Vercel, project `bloat`, Deployments, the new deployment, Assign domain) and records it here.
 
 ## Publishing the preview (the only way)
 
@@ -202,3 +203,4 @@ Kept for the record; true on the date given, not necessarily now.
 - **19 Nov 2026.** The dedicated address `https://bloat-preview.vercel.app` added. Until 22 Nov every push rebuilt the preview.
 - **22 Nov 2026.** The owner switched Supabase sign-ups off and made `bloat-tester@bloat.test`. Git builds switched off and the Preview workflow made the only publishing path; the owner added `VERCEL_TOKEN`; run 6 published `adfe49b`. The 19 temporary accounts from 19 Nov and the 7 accounts of that evening's run were deleted and verified.
 - **23 Nov 2026.** Runs 9 to 12 published `0d537d2`, `7713098`, `62431c7` and `83fe4da`; the preview was frozen on `83fe4da`. Every set of synthetic accounts used for hosted runs that day was deleted through the app and verified.
+- **24 Nov 2026.** At the owner's request: `main` fast-forwarded to the build branch (`3646f92`), and the three production addresses moved from the 15 Nov docs-only deployment (404) to the frozen review deployment `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`. Nothing was built or published, and no variable or setting changed. The owner deletes the duplicate project `bloat-zlrr` in the dashboard.
