@@ -26,6 +26,7 @@ type Action = {
   changed: (c: Ctx) => Promise<boolean>; // read back: did the intended change happen?
   failText?: string; // the screen's own failure wording, when it does not show the server's message
   after: (c: Ctx) => Promise<void>; // after a refresh, the screen shows it
+  settle?: (c: Ctx) => Promise<void>; // when the screen moves on by itself after saving: wait for that before the refresh
 };
 
 /** Local database only (Docker), for records no API returns to the browser, such as the waitlist. */
@@ -510,6 +511,8 @@ const ACTIONS: Action[] = [
     submit: (c) => dialog(c, "Delete account").getByRole("button", { name: "Delete my account" }),
     write: { method: "POST", path: /\/v1\/account\/delete$/ },
     changed: async (c) => sql(`select count(*) from auth.users where email = '${c.seed.email}'`) === "0",
+    // After deleting, the app signs out and goes to the start page on its own.
+    settle: async (c) => { await expect(c.page).toHaveURL(/127\.0\.0\.1:\d+\/$/, { timeout: 20000 }); },
     after: async (c) => { await c.page.goto("/today"); await expect(c.page).toHaveURL(/\/sign-in/); },
   },
   // ---- second batch ----
@@ -876,6 +879,7 @@ for (const a of ACTIONS) {
       const reply = await res;
       expect(reply.status(), `write status: ${reply.status() >= 300 ? await reply.text() : ""}`).toBeLessThan(300);
       await expect.poll(() => a.changed(c), { message: "intended data change" }).toBe(true);
+      await a.settle?.(c);
       await c.page.reload();
       await c.page.waitForLoadState("networkidle");
       await a.after(c);
