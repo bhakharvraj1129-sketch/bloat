@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Button, Caption, Card, Label } from "@/components/ui";
+import { Button, Caption, Card, Label, SaveStatus } from "@/components/ui";
 import { useSave } from "@/lib/client/hooks";
 import type { State } from "./types";
 
@@ -23,6 +23,7 @@ export function ProToday({ state, onChanged }: { state: State; onChanged: () => 
           <Label>Experiment · {pro.experiment.phase === "ADDING_BACK" ? "adding back" : pro.experiment.phase === "PAUSED" ? "paused" : `day ${pro.experiment.day} of ${pro.experiment.of}`}</Label>
           <p className="t-body-strong">{pro.experiment.name}</p>
           {pro.experiment.phase === "RUNNING" && !pro.experiment.answered_today && (
+            <>
             <div className="grid grid-cols-3 gap-2">
               {(["yes", "partly", "no"] as const).map((a) => (
                 <Button key={a} variant="secondary" disabled={xp.saving} onClick={async () => { const ok = await xp.run("POST", `/v1/experiments/${pro.experiment!.id}/days`, { answer: a }); if (ok) onChanged(); }}>
@@ -30,6 +31,8 @@ export function ProToday({ state, onChanged }: { state: State; onChanged: () => 
                 </Button>
               ))}
             </div>
+            <SaveStatus state={xp.state === "saved" ? "idle" : xp.state} error={xp.error} onCheck={async () => { if ((await xp.check()).ok) onChanged(); }} />
+            </>
           )}
           {pro.experiment.answered_today && <Caption>Today&apos;s answer is saved.</Caption>}
           <Link href={`/experiments/${pro.experiment.id}`} className="font-semibold">Open experiment</Link>
@@ -46,6 +49,7 @@ export function ProToday({ state, onChanged }: { state: State; onChanged: () => 
           <Label>Next best log</Label>
           <p>{pro.next_best_log.text}</p>
           <Button variant="quiet" full={false} disabled={dismiss.saving} onClick={async () => { const ok = await dismiss.run("POST", "/v1/insights/suggestions/dismiss", { id: pro.next_best_log!.id }); if (ok) onChanged(); }}>Not useful</Button>
+          <SaveStatus state={dismiss.state === "saved" ? "idle" : dismiss.state} error={dismiss.error} onCheck={async () => { if ((await dismiss.check()).ok) onChanged(); }} />
         </Card>
       )}
     </>

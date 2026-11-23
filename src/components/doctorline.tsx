@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Caption } from "./ui";
+import { Caption, SaveStatus } from "./ui";
 import { useSave } from "@/lib/client/hooks";
 
 export type DoctorLineData = { show: boolean; days: number; window: number; sentence: string; ovarianSentence: string | null; shortened: boolean; source: string; sourceUrl: string };
@@ -21,6 +21,7 @@ export function DoctorLineBox({ line, onChanged }: { line: DoctorLineData; onCha
               I&apos;ve spoken to a doctor about this
             </button>
           )}
+          {onChanged && <SaveStatus state={save.state === "saved" ? "idle" : save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) onChanged(); }} />}
         </>
       )}
     </aside>
