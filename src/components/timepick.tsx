@@ -2,15 +2,21 @@
 import { useState } from "react";
 import { Button, Caption, Chip, inputClass } from "./ui";
 import { deviceZone, type ApiFailure } from "@/lib/client/api";
+import { localParts } from "@/lib/time";
 
 export type TimeValue =
   | { mode: "now"; zone: string }
   | { mode: "exact" | "approximate"; local: string; zone: string; offset_min?: number }
   | { mode: "unknown" };
 
-function nowLocal(): string {
-  const d = new Date();
+/** The current wall-clock time, in `zone` when given, otherwise in this device's zone. */
+function nowLocal(zone?: string): string {
   const p = (n: number) => String(n).padStart(2, "0");
+  if (zone) {
+    const t = localParts(Date.now(), zone);
+    return `${t.y}-${p(t.m)}-${p(t.d)}T${p(t.h)}:${p(t.mi)}`;
+  }
+  const d = new Date();
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
@@ -21,12 +27,14 @@ type Props = {
   allowApproximate?: boolean;
   allowUnknown?: boolean;
   name: string;
+  /** The time zone a typed time is in (and "now" for the latest allowed time). Defaults to this device's zone. */
+  zone?: string;
 };
 
 /** Now / choose a time / roughly / I don't know. Times are never guessed for the user. */
-export function TimePick({ value, onChange, labels = {}, allowApproximate = true, allowUnknown = false, name }: Props) {
-  const zone = deviceZone();
-  const pick = (mode: "exact" | "approximate") => onChange({ mode, local: "local" in value ? value.local : nowLocal(), zone });
+export function TimePick({ value, onChange, labels = {}, allowApproximate = true, allowUnknown = false, name, zone: inZone }: Props) {
+  const zone = inZone ?? deviceZone();
+  const pick = (mode: "exact" | "approximate") => onChange({ mode, local: "local" in value ? value.local : nowLocal(inZone), zone });
   return (
     <div className="flex flex-col gap-3">
       <div role="radiogroup" aria-label={name} className="flex flex-wrap gap-2">
@@ -38,7 +46,7 @@ export function TimePick({ value, onChange, labels = {}, allowApproximate = true
       {(value.mode === "exact" || value.mode === "approximate") && (
         <label className="flex flex-col gap-2">
           <span className="t-caption">{value.mode === "approximate" ? "About when? Your best estimate is fine; it is saved as approximate." : "Date and time"}</span>
-          <input type="datetime-local" className={inputClass} value={value.local} max={nowLocal()} onChange={(e) => onChange({ mode: value.mode, local: e.target.value, zone })} />
+          <input type="datetime-local" className={inputClass} value={value.local} max={nowLocal(inZone)} onChange={(e) => onChange({ mode: value.mode, local: e.target.value, zone })} />
         </label>
       )}
     </div>

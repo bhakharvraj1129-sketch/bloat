@@ -167,8 +167,8 @@ export function DayDetail({ date }: { date: string }) {
         </section>
       )}
 
-      {editEp && <EpisodeEdit ep={editEp} zone={data.zone} onClose={() => setEditEp(null)} onSaved={() => { setEditEp(null); reload(); }} />}
-      {editMeal && <MealEdit meal={editMeal} zone={data.zone} onClose={() => setEditMeal(null)} onSaved={() => { setEditMeal(null); reload(); }} />}
+      {editEp && <EpisodeEdit ep={editEp} zone={data.zone} clock={clock} onClose={() => setEditEp(null)} onSaved={() => { setEditEp(null); reload(); }} />}
+      {editMeal && <MealEdit meal={editMeal} zone={data.zone} clock={clock} onClose={() => setEditMeal(null)} onSaved={() => { setEditMeal(null); reload(); }} />}
 
       <Sheet open={!!confirm} onOpenChange={(o) => { if (!o) { setConfirm(null); del.reset(); } }} title="Delete this?">
         <p>This removes {confirm?.what} for good. Anything worked out from it is recalculated.</p>
@@ -184,20 +184,53 @@ export function DayDetail({ date }: { date: string }) {
   );
 }
 
-function EpisodeEdit({ ep, zone, onClose, onSaved }: { ep: Ep; zone: string; onClose: () => void; onSaved: () => void }) {
-  const dz = deviceZone();
-  const [start, setStart] = useState<TimeValue>({ mode: ep.start_precision === "approximate" ? "approximate" : "exact", local: toLocal(ep.started_at, zone), zone: dz });
-  const [end, setEnd] = useState<TimeValue>(ep.ended_at ? { mode: ep.end_precision === "approximate" ? "approximate" : "exact", local: toLocal(ep.ended_at, zone), zone: dz } : { mode: "unknown" });
+/**
+ * A saved time in an edit sheet. "Keep" is chosen first and sends nothing, so the saved time stays
+ * exactly as it is (to the second). A new time is entered in the account's time zone, the zone the
+ * day screen shows times in; when this device is in another zone, the sheet says so.
+ * `value` null means Keep.
+ */
+function SavedTimePick({ name, saved, savedText, zone, value, onChange, allowApproximate = true, allowUnknown = false }: {
+  name: string; saved: string | null; savedText: string; zone: string; value: TimeValue | null; onChange: (v: TimeValue | null) => void;
+  allowApproximate?: boolean; allowUnknown?: boolean;
+}) {
+  const original = saved ? toLocal(saved, zone) : null;
+  return (
+    <>
+      <TimePick
+        name={name} zone={zone} labels={{ now: "Keep" }} allowApproximate={allowApproximate} allowUnknown={allowUnknown}
+        value={value ?? { mode: "now", zone }}
+        onChange={(v) => {
+          if (v.mode === "now") return onChange(null);
+          // Leaving Keep for a time starts from the saved time, not from now.
+          if (value === null && original && (v.mode === "exact" || v.mode === "approximate")) return onChange({ ...v, local: original });
+          onChange(v);
+        }}
+      />
+      {value === null ? <Caption>Keeps the saved time: {savedText}.</Caption>
+        : value.mode !== "unknown" && zone !== deviceZone() ? <Caption>Times here are in your Bloat time zone, {zone}.</Caption> : null}
+    </>
+  );
+}
+
+function EpisodeEdit({ ep, zone, clock, onClose, onSaved }: { ep: Ep; zone: string; clock: (iso: string) => string; onClose: () => void; onSaved: () => void }) {
+  const [start, setStart] = useState<TimeValue | null>(null); // null: keep the saved time
+  const [end, setEnd] = useState<TimeValue | null>(null);
   const save = useSave();
   const submit = async (offset?: number) => {
+    if (start === null && end === null) return onClose(); // nothing changed
     const fix = (t: TimeValue) => (t.mode === "exact" || t.mode === "approximate" ? { ...t, ...(offset !== undefined ? { offset_min: offset } : {}) } : t);
-    const ok = await save.run("PATCH", `/v1/episodes/${ep.id}`, { started: fix(start), ended: fix(end) }, { ifMatch: ep.revision });
+    const body = { ...(start ? { started: fix(start) } : {}), ...(end ? { ended: fix(end) } : {}) };
+    const ok = await save.run("PATCH", `/v1/episodes/${ep.id}`, body, { ifMatch: ep.revision });
     if (ok) onSaved();
   };
+  const about = (precision: string | null) => (precision === "approximate" ? "about " : "");
   return (
     <Sheet open onOpenChange={(o) => { if (!o) onClose(); }} title="Edit times">
-      <div className="flex flex-col gap-3"><p className="t-body-strong">{question("EP-02").prompt}</p><TimePick name="Start" value={start} onChange={(v) => setStart(v.mode === "now" ? start : v)} labels={{ now: "Keep" }} /></div>
-      <div className="flex flex-col gap-3"><p className="t-body-strong">{question("EP-06").prompt}</p><TimePick name="End" value={end} onChange={(v) => setEnd(v.mode === "now" ? end : v)} labels={{ now: "Keep" }} allowUnknown /></div>
+      <div className="flex flex-col gap-3"><p className="t-body-strong">{question("EP-02").prompt}</p>
+        <SavedTimePick name="Start" saved={ep.started_at} savedText={`${about(ep.start_precision)}${clock(ep.started_at)}`} zone={zone} value={start} onChange={setStart} /></div>
+      <div className="flex flex-col gap-3"><p className="t-body-strong">{question("EP-06").prompt}</p>
+        <SavedTimePick name="End" saved={ep.ended_at} savedText={ep.ended_at ? `${about(ep.end_precision)}${clock(ep.ended_at)}` : "not known"} zone={zone} value={end} onChange={setEnd} allowUnknown /></div>
       <AmbiguousChoice error={save.error} onChoose={(o) => submit(o)} />
       <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { if ((await save.check()).ok) onSaved(); }} />
       {save.error?.code === "REVISION_CONFLICT" && <Button variant="secondary" onClick={onSaved}>Reload this day</Button>}
@@ -206,17 +239,26 @@ function EpisodeEdit({ ep, zone, onClose, onSaved }: { ep: Ep; zone: string; onC
   );
 }
 
-function MealEdit({ meal, zone, onClose, onSaved }: { meal: MealRow; zone: string; onClose: () => void; onSaved: () => void }) {
+function MealEdit({ meal, zone, clock, onClose, onSaved }: { meal: MealRow; zone: string; clock: (iso: string) => string; onClose: () => void; onSaved: () => void }) {
   const [text, setText] = useState(meal.dish_text);
-  const [when, setWhen] = useState<TimeValue>({ mode: "exact", local: toLocal(meal.eaten_at, zone), zone: deviceZone() });
+  const [when, setWhen] = useState<TimeValue | null>(null); // null: keep the saved time
   const save = useSave();
+  const submit = async (offset?: number) => {
+    if (text.trim() === meal.dish_text && when === null) return onClose(); // nothing changed
+    // A name-only change sends no time, so the saved time stays exactly as it is.
+    const eaten = when && (when.mode === "exact" || when.mode === "approximate") && offset !== undefined ? { ...when, offset_min: offset } : when;
+    const ok = await save.run("PATCH", `/v1/meals/${meal.id}`, { dish_text: text.trim(), ...(eaten ? { eaten } : {}) }, { ifMatch: meal.revision });
+    if (ok) onSaved();
+  };
   return (
     <Sheet open onOpenChange={(o) => { if (!o) onClose(); }} title="Edit meal" dirty={text !== meal.dish_text && !save.saving}>
       <Field label="What did you have?" hint={`${text.length}/300`}><textarea className={`${inputClass} min-h-20 py-3`} maxLength={300} value={text} onChange={(e) => setText(e.target.value)} /></Field>
-      <div className="flex flex-col gap-3"><p className="t-body-strong">When did you have it?</p><TimePick name="When" value={when} onChange={(v) => setWhen(v.mode === "now" ? when : v)} labels={{ now: "Keep" }} allowApproximate={false} /></div>
-      <SaveStatus state={save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) onSaved(); }} />
+      <div className="flex flex-col gap-3"><p className="t-body-strong">When did you have it?</p>
+        <SavedTimePick name="When" saved={meal.eaten_at} savedText={clock(meal.eaten_at)} zone={zone} value={when} onChange={setWhen} allowApproximate={false} /></div>
+      <AmbiguousChoice error={save.error} onChoose={(o) => submit(o)} />
+      <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { if ((await save.check()).ok) onSaved(); }} />
       {save.error?.code === "REVISION_CONFLICT" && <Button variant="secondary" onClick={onSaved}>Reload this day</Button>}
-      <Button disabled={!text.trim() || save.saving} onClick={async () => { const ok = await save.run("PATCH", `/v1/meals/${meal.id}`, { dish_text: text.trim(), eaten: when }, { ifMatch: meal.revision }); if (ok) onSaved(); }}>{save.saving ? "Saving…" : "Save changes"}</Button>
+      <Button disabled={!text.trim() || save.saving} onClick={() => submit()}>{save.saving ? "Saving…" : "Save changes"}</Button>
     </Sheet>
   );
 }
