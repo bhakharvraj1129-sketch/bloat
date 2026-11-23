@@ -4,7 +4,7 @@ import path from "node:path";
 import acceptance from "@data/Bloat_Acceptance_v4.3.json";
 import { config, questions, checkAnswer, emergencyNumber, helpline, prices, formatMoney, thresholds, aiProtection } from "@/lib/registry";
 import { BANNED_PHRASES, helpPage, HELP_PAGE_VERSION, levelSentence, INTENDED_USE, COMPARISON_LINE, TRIGGERS_FOOTER, NHS_SOURCE_LABEL } from "@/lib/wording";
-import { analysisDate, formatDate, offsetMinutes, splitByDate, zonedToUtc, localDate } from "@/lib/time";
+import { analysisDate, formatDate, formatRange, offsetMinutes, splitByDate, zonedToUtc, localDate } from "@/lib/time";
 import { effectivePlan } from "@/lib/domain/plan";
 import { buildDoctorLine } from "@/lib/domain/doctorline";
 import { EXPERIMENTS, isNeverOffered, fxResult } from "@/lib/domain/experiments";
@@ -196,6 +196,12 @@ describe("Time rules (plan A03)", () => {
   it("Q65 dates are shown with the month as a word, so MM/DD and DD/MM can never be confused", () => {
     expect(formatDate("2026-04-03", "MM/DD")).toBe("Fri Apr 3");
     expect(formatDate("2026-04-03", "DD/MM")).toBe("Fri 3 Apr");
+  });
+  it("a date range is never shown backwards: no finished day yet gives no range (external report B3)", () => {
+    expect(formatRange("2026-11-01", "2026-11-22", "MM/DD")).toBe("Nov 1 to Nov 22");
+    expect(formatRange("2026-11-01", "2026-11-22", "DD/MM")).toBe("1 Nov to 22 Nov");
+    expect(formatRange("2026-11-22", "2026-11-22", "DD/MM")).toBe("22 Nov to 22 Nov");
+    expect(formatRange("2026-11-23", "2026-11-22", "DD/MM")).toBeNull();
   });
 });
 

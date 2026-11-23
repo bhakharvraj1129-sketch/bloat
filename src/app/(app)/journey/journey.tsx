@@ -6,7 +6,7 @@ import { HourChart, TrendLine } from "@/components/charts";
 import { DoctorLineBox, type DoctorLineData } from "@/components/doctorline";
 import { ProScreen, signed } from "@/components/pro";
 import { useLoad } from "@/lib/client/hooks";
-import { formatDate, formatDuration } from "@/lib/time";
+import { formatDate, formatDuration, formatRange } from "@/lib/time";
 
 type Figures = { days: number; confirmed_days: number; typical_score: number | null; episodes_per_week: number | null; typical_episode_minutes: number | null; completeness: number | null };
 type Pattern = { label: string; with_days: number; without_days: number; mean_with: number | null; mean_without: number | null; first_half: number | null; second_half: number | null };
@@ -35,13 +35,14 @@ export function Journey() {
   return (
     <ProScreen title="Your journey" eyebrow="Patterns" back="/insights" load={load}>
       {(d) => {
+        const range = formatRange(d.from, d.to, d.date_format); // null: no finished day yet
         const doctorButton = <LinkButton href={`/doctor?from=${d.doctor_report.from}&to=${d.doctor_report.to}`}>Make doctor report</LinkButton>;
         const sections: Record<string, ReactNode> = {
           doctor: (
             <section key="doctor" className="flex flex-col gap-2" aria-labelledby="j-doc">
               <Label id="j-doc">For your doctor visit</Label>
               <Card className="flex flex-col gap-3">
-                <p>{d.since.confirmed_days} confirmed days from {formatDate(d.from, d.date_format, false)} to {formatDate(d.to, d.date_format, false)}. Bloating on {d.since.bloating_days_30} of the last 30 days.</p>
+                <p>{range ? `${d.since.confirmed_days} confirmed days from ${range}.` : "No finished days yet."} Bloating on {d.since.bloating_days_30} of the last 30 days.</p>
                 {doctorButton}
               </Card>
             </section>
@@ -160,7 +161,7 @@ export function Journey() {
         };
         return (
           <>
-            <Caption>{formatDate(d.from, d.date_format, false)} to {formatDate(d.to, d.date_format, false)}</Caption>
+            <Caption>{range ?? "No finished days yet."}</Caption>
             {d.section_order.map((k) => sections[k])}
             {d.doctor_line && <DoctorLineBox line={d.doctor_line} />}
             {!d.section_order.includes("doctor") && doctorButton}

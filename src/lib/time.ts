@@ -170,6 +170,11 @@ export function formatDate(date: string, dateFormat: "MM/DD" | "DD/MM", withWeek
   return withWeekday ? `${DAYS[weekday(date)]} ${body}` : body;
 }
 
+/** "Nov 1 to Nov 22", or null when the range has no finished day yet (it would start after it ends). */
+export function formatRange(from: string, to: string, dateFormat: "MM/DD" | "DD/MM"): string | null {
+  return from > to ? null : `${formatDate(from, dateFormat, false)} to ${formatDate(to, dateFormat, false)}`;
+}
+
 export function formatClock(ms: number, zone: string, units: "us" | "metric"): string {
   const p = localParts(ms, zone);
   if (units === "metric") return `${p.h}:${pad(p.mi)}`;

@@ -4,7 +4,7 @@ import { Caption, Card, Label } from "@/components/ui";
 import { CompareBars } from "@/components/charts";
 import { ProScreen, signed } from "@/components/pro";
 import { useLoad } from "@/lib/client/hooks";
-import { formatDate } from "@/lib/time";
+import { formatDate, formatRange } from "@/lib/time";
 
 type Item = {
   target: { label: string; kind: string; id: string }; state: string; with_days: number; without_days: number; mean_with: number | null; mean_without: number | null;
@@ -51,7 +51,7 @@ export function Triggers() {
     <ProScreen title="Possible triggers" eyebrow="Patterns" load={load}>
       {(d) => (
         <>
-          <Caption>{d.header} {formatDate(d.from, d.date_format, false)} to {formatDate(d.to, d.date_format, false)}.{d.recalled_days ? ` Includes ${d.recalled_days} days with ingredients added afterwards.` : ""}{d.mostly_days ? ` Includes ${d.mostly_days} "mostly" days.` : ""}</Caption>
+          <Caption>{d.header} {formatRange(d.from, d.to, d.date_format) ?? "No finished days yet"}.{d.recalled_days ? ` Includes ${d.recalled_days} days with ingredients added afterwards.` : ""}{d.mostly_days ? ` Includes ${d.mostly_days} "mostly" days.` : ""}</Caption>
 
           {d.needs_correction.length > 0 && (
             <Card className="flex flex-col gap-2">
