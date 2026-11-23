@@ -85,13 +85,18 @@ export function Me({ testMode }: { testMode: boolean }) {
     if (exporting) return;
     setExporting(true);
     setExportMsg("Preparing your download…");
+    // A lost connection and a server that answered with an error get different messages.
+    const noConnection = "That didn't work. Check your connection and try again.";
+    const serverFailed = (status: number) => status === 503 ? "Your download couldn't be finished, so nothing was saved. Try again in a moment." : "That didn't work. Try again.";
     try {
-      const job = await api<{ download_url: string }>("POST", "/v1/export", { format });
+      let job: { download_url: string };
+      try { job = await api<{ download_url: string }>("POST", "/v1/export", { format }); }
+      catch (e) { setExportMsg(e instanceof ApiFailure && !e.unknownOutcome ? serverFailed(e.status) : noConnection); return; }
       // Fetch the file first, so a failure shows here instead of a broken or partial file.
       const res = await fetch(job.download_url, { cache: "no-store", credentials: "same-origin" });
       if (!res.ok) {
         await res.text().catch(() => "");
-        setExportMsg(res.status === 503 ? "Your download couldn't be finished, so nothing was saved. Try again in a moment." : "That didn't work. Try again.");
+        setExportMsg(serverFailed(res.status));
         return;
       }
       const blob = await res.blob();
@@ -101,7 +106,7 @@ export function Me({ testMode }: { testMode: boolean }) {
       a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
       setExportMsg("Your download is complete.");
-    } catch { setExportMsg("That didn't work. Check your connection and try again."); }
+    } catch { setExportMsg(noConnection); } // the file request itself failed: no answer from the server
     finally { setExporting(false); }
   }
   const reloadPlan = () => { st.reload(); ent.reload(); };
