@@ -1,6 +1,39 @@
 # Test results
 
-Last run: 23 Nov 2026. The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 23 Nov 2026 (10:30 UTC). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+
+## Hosted suite on the published build, then section 5 on the screen (23 Nov 2026)
+
+**Hosted, on `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` (`0d537d2`), not republished for it.** Seven separate synthetic accounts, created with only a password hash; the owner's `bloat-tester@bloat.test` and its sample entries were not used or changed.
+
+| Check | Where | Result |
+|---|---|---|
+| Full hosted suite: the 15 existing checks plus Your journey with no finished day (no backwards date range) | Live, 09:28 to 09:30 UTC | **16 of 16 passed** |
+| The 7 accounts deleted through "Delete my account" | Live | 7 of 7 deleted; each token refused at once |
+| Read-only database check afterwards (repeated about 10:00 UTC) | `bloat-test` | 0 users by ID and email, 0 marked accounts, 0 sessions, identities, files, profiles, meals, bloating records. `bloat-tester` unchanged (1 meal, 1 bloating record) |
+
+**Local, section 5 actions on the screen** (local Supabase, synthetic accounts, labelled mock AI, no paid AI call). Each action: saves and persists after a refresh; a server failure is shown and nothing changes, then the same button saves; a double tap sends one write.
+
+| Check | Result |
+|---|---|
+| 12 new actions x 3 outcomes, on the published app code (`d0d7383`) | 33 passed, **3 failed**: the failure checks of the doctor reminder (History), the experiment answer (Today) and "Not useful" (Today). A failed save showed nothing |
+| Same 36 after the fix (`7713098`) | **36 of 36 passed** |
+| Single checks: photo with the local mock; "Yes, go through them" and Skip; a failed export (two ways) then a retry; founder tools (Set limit, kill switch off and on, a refused change) | **4 of 4 passed** |
+| Founder tools double tap | Two requests go out (buttons not disabled while saving); same saved value. Noted, not changed |
+
+**Fix published** (focused: the app's usual save message under the three buttons, `7713098`).
+
+| Check | Where | Result |
+|---|---|---|
+| Rule tests / API tests | Local, `7713098` | 97 of 97 / 135 of 135 |
+| Browser tests, all | Local, `7713098` | **250 of 250**, 0 flaky |
+| Type check, lint | Local | 0 errors (5 old warnings) |
+| GitHub run 10 (push of `7713098`) | CI | All checks passed (browser 250 of 250); controls read back; built `dpl_E8w2BwFqLPuj59xLtcptnRVWT1fB`; 6 of 6 live checks before publishing; published; served deployment confirmed; 6 of 6 again on the public address |
+| Tested = deployed | Vercel | Both addresses on `dpl_E8w2BwFqLPuj59xLtcptnRVWT1fB`; 207 of 207 listed source files byte-identical to `7713098`, incl. both changed files |
+| The three save messages on the live preview | Live | **Not run**: needs several days of back-dated records, which the preview cannot create without editing the database by hand. The gate ran them on the deployed commit |
+| Real phones | - | **Pending** |
+| Real AI provider (photo and dish check) | - | **Pending** (not connected; needs your approval of a key and a spending limit) |
+
 
 ## External report fixes (23 Nov 2026): published build `0d537d2`
 
@@ -22,7 +55,7 @@ Published revision `0d537d27fcbaf4ea047fff6f3b01a1e0b6c0a420` (app code equals `
 | GitHub run 9 (`0d537d2`, started by hand) | CI | All checks passed; controls read back; built, checked live (6 of 6), published, served deployment confirmed, checked again (6 of 6) |
 | B1 to B4 on the published build (account Asia/Kolkata, browser America/Los_Angeles) | Live | Passed |
 | Test account deleted through "Delete my account" and verified | Live and `bloat-test` | 0 rows anywhere; one hash-only deletion record |
-| Full signed-in hosted suite (15) on this build | Live | **Not re-run** (last passed on `adfe49b`) |
+| Full signed-in hosted suite (15) on this build | Live | Not re-run at the time; re-run later the same day: 16 of 16 (above) |
 | Real phones | - | **Pending** |
 
 ## Live verification (22 Nov 2026, evening): published build `adfe49b`

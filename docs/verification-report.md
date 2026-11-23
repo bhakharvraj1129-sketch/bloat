@@ -8,31 +8,39 @@ and `bloat-test`) are kept apart, and nothing here comes from a real phone. Rebu
 
 ## Results at a glance
 
-**Tested and published revision: `0d537d27fcbaf4ea047fff6f3b01a1e0b6c0a420`** (23 Nov 2026), served at `https://bloat-preview.vercel.app` as Vercel deployment **`dpl_59A4HADi2dEAD26ivcfdoXVWPf9K`**. It holds the fixes for the four defects of the external report of 23 Nov (section 4, B1 to B4). Its app code equals `d0d7383`; `0d537d2` only added notes.
+**Tested and published revision: `7713098f673cc6cb7d79804646339c680361d7ff`** (23 Nov 2026, 10:01 UTC), served at `https://bloat-preview.vercel.app` as Vercel deployment **`dpl_E8w2BwFqLPuj59xLtcptnRVWT1fB`** (`bloat-dhi38m7bd-typeshi2.vercel.app`). It adds one focused fix to the previous build: three buttons that showed nothing when their save failed now show the app's usual save message (section 4, S1 to S3).
 
-How tested and deployed are tied together (section 9): GitHub run 9 was started by hand on the branch and reports commit `0d537d2`; it built `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` and ran its hosted checks against exactly that URL before publishing; every source file Vercel listed for that deployment (207 of 628; its listing is partial) is byte-identical to `0d537d2`; Vercel reports both preview addresses on it. The previous published build was `adfe49b` (`dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ`, 22 Nov).
+How tested and deployed are tied together (section 9): GitHub run 10 started on the push of `7713098` and reports that commit; it built `dpl_E8w2BwFqLPuj59xLtcptnRVWT1fB` and ran its hosted checks against exactly that URL before publishing; every source file Vercel listed for that deployment (207 of 629; its listing is partial), including both changed files, is byte-identical to `7713098`; Vercel reports both preview addresses on it. The previous published build was `0d537d2` (`dpl_59A4HADi2dEAD26ivcfdoXVWPf9K`, 23 Nov 07:26 UTC), on which the full signed-in hosted suite passed 16 of 16 before this fix.
+
+### Section 5 actions on the screen (23 Nov)
+
+| Item | Local | Live |
+|---|---|---|
+| 12 actions checked only through the API before (Pro bloating fields, ingredient marking, saved dishes, photo check, recalled meals, swap safety questions, card, doctor reminder, two Today buttons): saves and persists, failure shown, double tap | **33 of 36 passed** on the published code; **3 failed** (S1 to S3: a failed save showed nothing). After the fix: **36 of 36 passed** | Not run live: these need several days of back-dated records, which the preview cannot create without editing the database by hand. The gate ran all 36 on the deployed commit |
+| Single checks: photo with the local mock; "Yes, go through them"; a failed export, then a retry; founder tools | **4 of 4 passed** | Not run (founder tools have no staff account on the preview, by design) |
+| Photo check with a real AI provider | **Pending**: no provider connected; needs your approval of a key and a spending limit | **Pending** |
 
 ### Fixes from the external report (23 Nov)
 
-| Defect | Local (old code, then fix) | Live, on `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` |
+| Defect | Local (old code, then fix) | Live, on `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` (and unchanged in the current build) |
 |---|---|---|
 | B1: changing only a meal's name failed or moved its time when the phone and account zones differed | Reproduced (14 of 15 new checks failed); all 15 pass | **Passed**: account in Asia/Kolkata, browser in America/Los_Angeles; rename saved, saved time identical |
 | B2: "Keep" had no effect | Reproduced; passes | **Passed**: Keep chosen, kept the time after another time was picked |
-| B3: backwards date range on Patterns (and Your journey) for a new account | Reproduced on both screens; pass | **Passed** on Patterns ("No finished days yet."); Your journey checked locally only |
+| B3: backwards date range on Patterns (and Your journey) for a new account | Reproduced on both screens; pass | **Passed** on Patterns ("No finished days yet.") and, in the full hosted run, on Your journey |
 | B4: "Nothing was logged" on a day with a meal | Reproduced; passes | **Passed** ("No bloating was logged and there is no review.") |
 
 Words used: **Passed** (the outcome was checked and was right), **Failed**, **Skipped** (left out on purpose, with the reason), **Blocked** (could not run; the reason is given), **Not done**.
 
 ### Local evidence (this workspace: local Supabase in Docker, synthetic accounts, test mode on)
 
-Rule, API and browser tests re-run on 23 Nov on the final code; the crawl, the navigation run and the width check are from 22 Nov (`2f22cc4` app code; the four fixes since change the day screen's edit sheets and two date lines).
+Rule, API and browser tests re-run on 23 Nov on the final code (`7713098`); the crawl, the navigation run and the width check are from 22 Nov (`2f22cc4` app code; the fixes since change the day screen's edit sheets, two date lines and three save messages).
 
 | Check | Result |
 |---|---|
 | Rule tests `pnpm test` | **Passed**, 97 of 97 |
 | API tests `pnpm test:api` (real HTTP against the local app), incl. a deleted account's earlier tokens (section 6) | **Passed**, 135 of 135 |
-| Browser tests `tests/e2e`, phone screen (Chromium, Pixel 7 size), incl. 20 new checks for B1 to B4 | **Passed**, 210 of 210, 0 flaky (23 Nov, final code) |
-| &nbsp;&nbsp;of which save and edit outcomes, 51 actions x 3 plus 6 single checks (section 3) | **Passed**, 159 of 159 |
+| Browser tests `tests/e2e`, phone screen (Chromium, Pixel 7 size), incl. 20 checks for B1 to B4 and 40 for section 5 | **Passed**, 250 of 250, 0 flaky (23 Nov, final code) |
+| &nbsp;&nbsp;of which save and edit outcomes, 63 actions x 3 plus 9 single checks (sections 3 and 5) | **Passed**, 198 of 198 |
 | Navigation by real clicks, destination and Back, signed-out, Free and Pro, 412px and 1440px (section 2) | **Passed**, 238 clicks: 238 right destination, 238 Back returned |
 | Control crawl (section 1) | 1,292 rows: **834 passed** (74 screen loads, 244 clicked and responded, 516 link targets loaded without clicking), 0 failed, 49 skipped on purpose (20 destructive, each covered by a named test; 29 outside links), 409 excluded (332 hidden at phone width, 32 disabled, 45 fields), 0 blocked |
 | Five widths, 320 to 1440px | **Passed**, 0 of 185 with sideways scrolling |
@@ -42,6 +50,7 @@ Rule, API and browser tests re-run on 23 Nov on the final code; the crawl, the n
 
 | Check | Result |
 |---|---|
+| Run 10 (push of `7713098`): all checks (browser 250 of 250), controls read back, Vercel build, 6 hosted checks before and after publishing | **Passed**, published `dpl_E8w2BwFqLPuj59xLtcptnRVWT1fB` (09:48 to 10:03 UTC, 23 Nov) |
 | Run 9 (started by hand, commit `0d537d2`): all checks, controls read back, Vercel build, hosted checks before and after publishing | **Passed**, published `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` (07:12 to 07:26 UTC, 23 Nov) |
 | Run 7 (commit `8d7ae58`) | **Failed, nothing published**: one browser check still expected the old "Roughly" chip on reopening (updated in `d0d7383`) |
 | Run 8 (commit `d0d7383`) | **Failed, nothing published**: GitHub's machine could not start the local mail test service (port already in use), before any test ran |
@@ -54,7 +63,16 @@ Rule, API and browser tests re-run on 23 Nov on the final code; the crawl, the n
 
 ### Hosted evidence (the public preview and the `bloat-test` database)
 
-On `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` (23 Nov): the 6 account-free checks passed twice inside run 9, the B1 to B4 live check passed with one synthetic account (`pro-tester@bloat.test`, marked `2026-11-23`), and that account was then deleted through "Delete my account" and verified gone (0 rows anywhere; one hash-only deletion record). The full signed-in suite (15 checks) was **not** re-run on this build; it last passed on `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ`, below.
+On `dpl_E8w2BwFqLPuj59xLtcptnRVWT1fB` (`7713098`, 23 Nov 10:01 UTC): the 6 account-free checks passed twice inside run 10 (on the new build's own URL before publishing, then on the public address). The signed-in suite was not re-run on it: the change is three save messages, all checked by the gate on this commit.
+
+On `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` (`0d537d2`, 23 Nov):
+
+| Check | Result |
+|---|---|
+| Full hosted suite, 09:28 to 09:30 UTC: the 15 checks below plus Your journey with no finished day, 7 separate synthetic accounts | **Passed, 16 of 16** |
+| Those 7 accounts deleted through "Delete my account" | **Passed**: 7 of 7, each token refused at once; read-only check: 0 rows anywhere, no marked account left; `bloat-tester` untouched (1 meal, 1 bloating record) |
+| B1 to B4 live check (one account, deleted afterwards and verified) | **Passed** |
+| 6 account-free checks, twice inside run 9 | **Passed** |
 
 On `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` (`adfe49b`, 22 Nov):
 
@@ -66,7 +84,7 @@ On `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` (`adfe49b`, 22 Nov):
 | The same session: screen (reported separately) | `/history` redirects to Sign in. Not counted as evidence that data is protected |
 | Deleting the 19 temporary accounts from 19 Nov (owner ran the guarded SQL) | **Passed**: read-only check at 20:12 UTC shows 0 users, sessions, refresh tokens, identities, stored files and rows in all 48 app tables; the owner's `bloat-tester@bloat.test` is intact |
 | Deleting the 7 accounts of this run (through the app's own "Delete my account") | **Passed**: 7 of 7 answered "deleted" and their tokens were refused at once; read-only check shows 0 users, sessions, refresh tokens, identities, stored files and app rows; the app kept only its 7 deletion records (a hash of each account ID). No account with a test marker remains |
-| Git builds off through `vercel.json` | **Passed**: no Git-triggered deployment for any of the 14 pushes since `af950f5` (to 23 Nov) |
+| Git builds off through `vercel.json` | **Passed**: no Git-triggered deployment for any push since `af950f5`; Vercel lists only the three deployments the workflow made (runs 6, 9 and 10) |
 | Vercel Ignored Build Step (second layer) | **Configured and read back** (run 6). **Not proven to block a Git build**: that needs a test build on a separate branch, not done (section 9) |
 
 ### Manual device evidence
@@ -74,13 +92,13 @@ On `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` (`adfe49b`, 22 Nov):
 | Check | Result |
 |---|---|
 | The owner's own sign-in, setup, refresh and sign-out on the preview (22 Nov, earlier build) | Passed, reported by the owner and confirmed from server records (section 7) |
-| The main journeys on a real phone with `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` | **Not done (pending).** Checklist for the owner in `PROGRESS.md` |
+| The main journeys on a real phone with `dpl_E8w2BwFqLPuj59xLtcptnRVWT1fB` | **Not done (pending).** Checklist for the owner in `PROGRESS.md` |
 | External tester, 23 Nov, cloud Chrome browser with the owner's test account on `adfe49b` | Their report: four defects (now fixed) and the checks they passed; not a real phone |
 | iOS Safari, Android Chrome, screen reader, 200% zoom | **Not done** |
 
 ### Not claimed
 
-This report does not say that every button or feature works. It says which outcomes were checked, where, and on which build. The actions still checked only partly are listed in section 5. Real-phone checks are pending, and the Ignored Build Step's effect on a Git build is not proven.
+This report does not say that every button or feature works. It says which outcomes were checked, where, and on which build. The actions still checked only partly are listed in section 5. Real-phone checks and a real AI provider are pending, and the Ignored Build Step's effect on a Git build is not proven.
 
 ## 1. The control crawl, reconciled
 
@@ -196,19 +214,34 @@ Before the fixes in section 4, the same run had 8 Back failures:
 | Hide today's card (Pro) | pass | pass | pass |
 | Join the waitlist | pass | pass | pass |
 | Finish setup | pass | pass | pass |
+| Log bloating with a warning sign, how it feels and other symptoms (Pro) | pass | pass | pass |
+| Mark ingredients one by one after the check (Pro) | pass | pass | pass |
+| Save a dish with a meal (Pro) | pass | pass | pass |
+| Add a meal from a saved dish (Pro) | pass | pass | pass |
+| Photo ingredient check: items marked one by one and saved (Pro, provider result is a fixture) | pass | pass | pass |
+| Answer the recalled-meals offer: Not now (Pro) | pass | pass | pass |
+| Add ingredients to an earlier meal on the recall screen (Pro) | pass | pass | pass |
+| Answer the safety questions before a food swap (Pro) | pass | pass | pass |
+| Mark today's card Not relevant (Pro) | pass | pass | pass |
+| Answer the doctor reminder in History: I've spoken to a doctor | pass | pass | pass |
+| Answer the experiment on Today (Pro) | pass | pass | pass |
+| Dismiss the next best log on Today: Not useful (Pro) | pass | pass | pass |
 | experiments cannot be chosen before there are enough confirmed days, and the screen says why | pass | | |
 | 'Is it still happening?': No, it ended opens the end time, and saving it closes the record | pass | | |
 | ingredient check fails: the message shows, the dish is kept, Try the check again works, and the meal still saves | pass | | |
 | ingredient check fails and the person saves anyway: the meal saves without ingredients | pass | | |
 | deleting the account with a lost reply: it says so, and Check and finish completes it once | pass | | |
 | after an account is deleted on one device, the other device's earlier sign-in stops working | pass | | |
+| photo check with the local mock: it can't tell from the photo, the screen says so, and the typed meal saves | pass | | |
+| recalled-meals offer: Yes, go through them opens the recall screen, and the offer is not shown again | pass | | |
+| export: a failed export says so on screen, nothing downloads, and trying again downloads the file | pass | | |
 
-Result: 159 of 159 passed (51 actions x 3, plus 6 single checks: the rows without three columns).
+Result: 198 of 198 passed (63 actions x 3, plus 9 single checks: the rows without three columns).
 
 Before fix 1 in section 4 (earlier the same day), on the same checks:
 - Delete a meal: a server failure is shown, nothing changes, and the same button then saves: Error: failure message on screen
 
-The other browser tests on the same build: admin.spec.ts 1 of 1, core.spec.ts 11 of 11, email-code.spec.ts 5 of 5, empty-states.spec.ts 5 of 5, navigation.spec.ts 14 of 14, time-edits.spec.ts 15 of 15.
+The other browser tests on the same build: admin.spec.ts 2 of 2, core.spec.ts 11 of 11, email-code.spec.ts 5 of 5, empty-states.spec.ts 5 of 5, navigation.spec.ts 14 of 14, time-edits.spec.ts 15 of 15.
 
 Five widths (320, 390, 768, 1024, 1440px): 185 screen and width checks, 0 with sideways scrolling.
 
@@ -244,25 +277,57 @@ Live, on `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` (23 Nov): B1, B2, B3 (Patterns) and 
 
 One existing check changed with B2: "Edit the times of a bloating record" expected the reopened sheet to show "Roughly" chosen; it now opens on Keep and shows "Keeps the saved time: about …". GitHub run 7 (commit `8d7ae58`) failed on exactly that check and published nothing; the updated check is in `d0d7383`.
 
+### Section 5 checks of 23 Nov (S1 to S3)
+
+Found by the new screen checks in section 5, on the app code that was published (`d0d7383`, `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K`). Each failure check failed before the fix (`test-evidence/ledger/section5-repro-2026-11-23.txt`: 3 failed, the 6 save and double-tap checks passed) and passes after it.
+
+| # | Defect | Fix | Commit |
+|---|---|---|---|
+| S1 | History, doctor reminder: when saving "I've spoken to a doctor about this" failed, nothing was shown, so it looked saved | The app's usual save message now shows under the button: the reason when it fails, "Check save status" when the reply is lost (`src/components/doctorline.tsx`) | `7713098` |
+| S2 | Today, running experiment: when saving Yes, Partly or No failed, nothing was shown | Same save message under the three buttons (`src/components/today/pro.tsx`) | `7713098` |
+| S3 | Today, next best log: when "Not useful" failed, nothing was shown | Same save message under the button (same file) | `7713098` |
+
+No wording, rule or design changed: it is the same message component every other save uses. A scan of every screen found no other save whose failure is never shown.
+
 ## 5. What is still not verified for every outcome
 
-Closed in this round (now in section 3 with all three outcomes on the screen): "Is it still happening?" Yes and Not sure (No, it ended has its own test); deleting a bloating record and a bowel record through the day screen; the experiment daily answer, End early, the weekly check during a swap, Finish and add back, Resume; Learn "Un-hide"; saving a meal with its ingredient check, plus a failed check with retry and with Save anyway; creating and revoking a report share link; deleting the account, plus a lost reply and a second device.
+Closed on 22 Nov (now in section 3 with all three outcomes on the screen): "Is it still happening?" Yes and Not sure (No, it ended has its own test); deleting a bloating record and a bowel record through the day screen; the experiment daily answer, End early, the weekly check during a swap, Finish and add back, Resume; Learn "Un-hide"; saving a meal with its ingredient check, plus a failed check with retry and with Save anyway; creating and revoking a report share link; deleting the account, plus a lost reply and a second device.
 
-Still open. "Server tests" means `tests/api` checks the endpoint's data change and its refusals, not the screen.
+**Closed on 23 Nov**, on the screen, local stack, labelled mock AI, no paid AI call. For each action: (1) it saves the intended change, read back from the API, and the change is still there after a refresh; (2) a server failure is shown on the screen, nothing changes, and the same button then saves; (3) a double tap sends one write. 12 new actions, 36 checks, all passed after the fix in section 4 (S1 to S3):
+
+| Action | Saved outcome that was checked |
+|---|---|
+| Log bloating with a warning sign, how it feels and another symptom (Pro) | Strength 6, "Vomiting", "Visible swelling" and "Nausea" all saved on the same record; NHS advice shown |
+| Mark ingredients one by one after the check (Pro) | Exactly as marked: one Had, one Didn't have, every untouched item Not sure (never Didn't have) |
+| Save a dish with a meal (Pro) | The dish and its place are saved and offered as a chip next time |
+| Add a meal from a saved dish (Pro) | The meal saves with the dish's ingredients, marked as from a saved dish |
+| Photo ingredient check, items marked one by one (Pro) | The meal saves as a photo meal; each item "Seen in photo" with its answer exactly as marked. The provider's answer is a stored fixture, replayed by the app's own server (the local mock cannot read photos) |
+| Recalled-meals offer on Upgrade: Not now (Pro) | Recorded once; the offer does not come back |
+| Recall screen: add ingredients to an earlier meal (Pro) | Saved as "added afterwards" (recalled), answers exactly as marked; then "All done" |
+| Safety questions before a food swap (Pro) | Saved; swaps are then offered and the questions are not asked again |
+| Today's card: Not relevant (Pro) | Feedback saved as not relevant |
+| Doctor reminder in History: I've spoken to a doctor (13 bloating days in 30) | The reminder is shortened; the button goes; the NHS note stays |
+| Today: answer the running experiment (Pro) | Today's answer saved ("Partly"); Today says it is saved |
+| Today: "Not useful" on the next best log (Pro) | The suggestion is dismissed and does not show again |
+
+Single checks, also passed: the photo with the local mock (it cannot tell, the screen says "The photo didn't show clearly what the dish is. Type the dish instead.", the typed meal saves, no photo is kept); "Yes, go through them" opens the recall screen, the offer is recorded once, and "Skip this meal" saves nothing; a failed export (request refused, then file not finished) shows a message each time and downloads nothing, and trying again downloads the file once; the founder tools (below).
+
+Still open:
 
 | Action | What is verified | What is not |
 |---|---|---|
-| Warning signs and symptoms logged with bloating (Pro fields) | Saved and shown (core test); they go through the same Save as "Log bloating" (all three outcomes checked) | Failure and double tap for the Pro symptom fields specifically |
-| Ingredient check: photo input, marking items, saved dishes; recall screen saving ingredients | Typed-dish check on the screen (section 3); server tests | Photo path and saved dishes on the screen; a real AI provider (not connected) |
-| Experiment swap safety check (the questions asked before each food swap; the tests answer them through the API) | Server tests | The screen |
-| Card "Not relevant", doctor reminder answer, dismissing a suggestion | Server tests (most) | The screens |
-| Upgrade: recalled-meals offer answer | Server tests | The screen |
-| Export JSON and CSV | Complete files and one request on double tap (browser tests) | A failed export on the screen in this round (covered in the 18 Nov round) |
-| Founder tools (`/admin`) actions | Staff sign-in with an authenticator code; server tests for the actions | The founder screens' buttons |
+| Photo ingredient check | The screen path above, with the local mock and with a stored provider answer | A real AI provider reading a real photo. Not connected; it needs your approval of the key and a spending limit. **Pending** |
+| Founder tools (`/admin`) | Locally, on the screen: staff sign-in with an authenticator code; Set limit saves and still shows after a refresh; the AI kill switch turns off and back on, each saved and shown; a refused change says "That change was refused." and changes nothing | A double tap sends **two** requests (the buttons are not disabled while saving). Both set the same value, so the saved result is the same, and each is written to the audit log. Noted, not changed. Not tried on the hosted preview (no staff account there, by design) |
 | "Is it still happening?" after answering Yes or Not sure | The answer is recorded and the record stays open | Whether the question should come back on the next app open (it does, by design, while the record is open 8 hours or more). Question for the owner, not a defect |
 | Mock purchase | Local test mode only; hidden on the preview (hosted check) | Not part of the product |
+| Every check in this section on a real phone | Not done | **Pending** (owner checklist in `PROGRESS.md`) |
 
-Also observed, not changed: the morning review accepts a day from before the account existed, but such days never count anywhere (the app ignores days before an account's start). Harmless; noted for the owner. Account deletion removes kept meal photos before the account; if that photo removal fails, the account is still deleted and the photos may stay in storage (the removal result is not checked). The 19 temporary accounts hold no stored files; noted as a limitation, not changed in this round.
+Also observed, not changed:
+
+- When the export request itself fails with a server error, the message reads "That didn't work. Check your connection and try again." even when the connection is fine. Wording only.
+- The recalled-meals offer records "offered" in one database step and the answer (with its duplicate-tap record) in a second. If the first step succeeded and the second failed, trying again would be refused as "already offered". Not seen in any test; noted against the rule that a save and its duplicate-tap record land together.
+- The morning review accepts a day from before the account existed, but such days never count anywhere (the app ignores days before an account's start). Harmless.
+- Account deletion removes kept meal photos before the account; if that photo removal fails, the account is still deleted and the photos may stay in storage (the removal result is not checked). No test account holds stored files.
 
 ## 6. A deleted account's earlier sign-in
 
@@ -311,6 +376,8 @@ Kept apart from the local results above. Nothing here comes from a real phone. T
 
 | Check | Build | Result |
 |---|---|---|
+| Full hosted suite (`pnpm test:hosted`), the 15 checks below plus "Your journey with no finished day says so and shows no backwards date range" (external report B3), 7 separate synthetic accounts | `0d537d2`, `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K`, 23 Nov 09:28 to 09:30 UTC (`test-evidence/ledger/hosted-full-59A4.txt`) | **Passed, 16 of 16** |
+| "Delete my account" through the app, those 7 accounts | Same | **Passed**: 7 of 7 deleted; each token refused at once afterwards (`hosted-delete-59A4.txt`); database check in section 8 |
 | Full hosted suite (`pnpm test:hosted`, 15 checks): signed-out return path, Back on public pages, empty-form messages, opens with no Vercel login, test-only switches off, signed-out data refused, saving a meal and seeing it in History after a refresh, the diary flow, two-account isolation through the app and the database, report privacy with Medicines and Health off plus share link open and revoke, JSON and CSV exports, password sign-in and sign-out ending the old token, nobody can create an account, two signed-in navigation checks | `adfe49b`, `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ`, 22 Nov about 20:26 UTC, with the 7 approved accounts | **Passed, 15 of 15** |
 | Account-free checks (6), inside GitHub run 6: on the new deployment's own URL before publishing, and on `bloat-preview.vercel.app` after | Same | **Passed**, 6 of 6 both times |
 | The coverage endpoint (section 4, row 8) | Same | **Passed**: 401 signed out (exists); `af950f5` answered 404 |
@@ -338,9 +405,11 @@ Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, no
 
 **23 Nov, B1 to B4 live check:** one account, `pro-tester@bloat.test` (marked `2026-11-23`, ID `6e37465a-86ac-483c-9476-e1599891d5a8`), created with only a password hash, used for `tests/hosted/reported-fixes.spec.ts`, then deleted through "Delete my account" (answer: deleted; its token refused at once). Read-only check afterwards: 0 users (by ID, email and marker), 0 sessions, refresh tokens, identities and stored files, 0 rows across all 48 app tables; one hash-only deletion record. The owner's `bloat-tester@bloat.test` and the external tester's synthetic meal and bloating record on it were not touched.
 
+**23 Nov, full hosted suite on `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K`:** seven new accounts (`run-public`, `run-p1`, `run-diary`, `run-isoa`, `run-isob`, `run-export` at `bloat.test`, and `pro-tester@bloat.test`, marked `2026-11-23`), created with only the bcrypt hash of a one-off password, which stayed in a private file. After the 16 checks each was deleted through "Delete my account" (answer: deleted; its token refused at once), and the password file was destroyed. Read-only check, repeated at about 10:00 UTC: 0 users by ID and by email, 0 accounts with any test marker, 0 sessions, identities and stored files, 0 profiles, meals and bloating records for these IDs. The owner's `bloat-tester@bloat.test` is untouched: still 1 meal and 1 bloating record (the external tester's synthetic entries).
+
 ## 9. Which build the addresses serve, and what publishes it
 
-**Served now (23 Nov):** `https://bloat-preview.vercel.app` and the branch address serve deployment `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` (`bloat-fe4z4x081-typeshi2.vercel.app`), built by GitHub run 9 from commit `0d537d2`, which holds the B1 to B4 fixes. Tied together the same way as for run 6 below: the run's commit, the URL its hosted step tested, the 207 listed source files (all byte-identical to `0d537d2`, including notes that exist only in that commit), and Vercel's answer for both addresses. Before that (22 Nov): `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` from run 6 (`adfe49b`); before that `af950f5` (`dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj`), the last build made by Vercel's own Git builds.
+**Served now (23 Nov, from 10:01 UTC):** `https://bloat-preview.vercel.app` and the branch address serve deployment `dpl_E8w2BwFqLPuj59xLtcptnRVWT1fB` (`bloat-dhi38m7bd-typeshi2.vercel.app`), built by GitHub run 10 from commit `7713098`, which adds the S1 to S3 fix (section 4). Tied together the same way as for run 6 below: the run started on the push of `7713098` and reports that commit; its hosted-check step tested exactly `https://bloat-dhi38m7bd-typeshi2.vercel.app`; its publish step confirmed through the Vercel API that `bloat-preview.vercel.app` serves that build; Vercel lists 207 of the deployment's source files (its listing is partial) and all 207 are byte-identical to `7713098`, including `src/components/doctorline.tsx` and `src/components/today/pro.tsx`, which differ from the previous build; Vercel reports both addresses on it, and it is the only deployment made since run 9. Before that: `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` from run 9 (`0d537d2`, B1 to B4 fixes), then `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` from run 6 (`adfe49b`, 22 Nov), then `af950f5` (`dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj`), the last build made by Vercel's own Git builds.
 
 **Tested revision = deployed revision, and how that is known:**
 
@@ -352,7 +421,7 @@ Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, no
 
 **The publishing gate (from commit `4640ac2`):**
 
-- `vercel.json` switches off Vercel's automatic Git builds. Checked: no Git-triggered deployment for any of the 14 pushes since `af950f5` (17 commits); the only deployments since are the two the workflow made (runs 6 and 9).
+- `vercel.json` switches off Vercel's automatic Git builds. Checked: no Git-triggered deployment for any push since `af950f5`; the only deployments since are the three the workflow made (runs 6, 9 and 10).
 - Second layer: the Vercel project's Ignored Build Step, set on 22 Nov about 19:40 UTC to `test -n "$VERCEL_GIT_COMMIT_SHA"`, meant to skip any Git-triggered build (a push, "Redeploy", a deploy hook) even if `vercel.json` changes. **Configured and read back:** run 6 read it through the Vercel API before building and it matched (the step stops the publish if it does not). **Not proven to block a Git build:** no Git build has been attempted since it was set (`vercel.json` already stops them), and proving it needs a test build on a separate branch that the dedicated address is not tied to, which was not done. Still possible by hand: a Vercel team member assigning the address in the dashboard or with their own CLI login (DEPLOYMENT.md lists every path).
 - `.github/workflows/preview.yml` runs on every push. **Blocks publishing:** typecheck, lint, rule tests, the local Supabase stack, the app build, API tests and browser tests on a clean checkout; then a Vercel build that nothing public points at yet; then the six account-free hosted checks against that new build. **Only then** both addresses move to it, and the workflow confirms through Vercel which deployment `bloat-preview.vercel.app` serves. **Afterwards, reporting only:** the same six checks on the public address. **Manual:** the signed-in hosted checks (they need owner-approved accounts).
 - The only secret is `VERCEL_TOKEN`, a GitHub repository secret added by the owner on 22 Nov (after 20:06 UTC), never in the workflow file or the log.
@@ -370,6 +439,7 @@ Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, no
 | 7 | `8d7ae58` (B1 to B4 fixes) | **Failed, nothing published** (23 Nov) | 209 of 210 browser checks passed; "Edit the times of a bloating record" still expected the old "Roughly" chip when the sheet reopens. The gate did its job; the check was updated in `d0d7383` |
 | 8 | `d0d7383` | **Failed, nothing published** | GitHub's machine could not start the local mail test service ("port 54324 already in use") before any test ran; a machine problem, not the app |
 | 9 | `0d537d2` (started by hand; app code equals `d0d7383`) | **Passed, published** (07:12 to 07:26 UTC, 23 Nov) | Checks passed; controls read back and matched; Vercel build `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K`; 6 hosted checks passed on it; addresses moved; served deployment confirmed; 6 hosted checks passed again on the public address |
+| 10 | `7713098` (push; S1 to S3 fix) | **Passed, published** (09:48 to 10:03 UTC, 23 Nov) | Checks passed (browser 250 of 250, incl. the 40 new section 5 checks); controls read back and matched; Vercel build `dpl_E8w2BwFqLPuj59xLtcptnRVWT1fB`; 6 hosted checks passed on it; addresses moved; served deployment confirmed; 6 hosted checks passed again on the public address |
 
 ## 10. Limits of this verification
 
@@ -378,6 +448,7 @@ Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, no
 - 200% browser zoom not tested; text uses rem units so the phone's text-size setting scales it.
 - Lost replies and server failures were simulated in the browser; no real network faults.
 - The local suites test a local build of the commit, with test mode on and a local database. The preview is a separate Vercel build of the same commit, with test mode off and `bloat-test`. Only the hosted checks run against the published build itself.
-- AI uses the labelled mock provider; payments are switched off; email delivery is not used on the preview.
+- AI uses the labelled mock provider; payments are switched off; email delivery is not used on the preview. The photo check's "items seen in the photo" path was checked with a stored provider answer that the app's own server replays; no real AI read a real photo. A real-provider evaluation is pending your approval of a key and a spending limit.
+- The three save messages fixed on 23 Nov (S1 to S3) were checked locally and by the gate on the deployed commit, not on the live preview: showing them there needs several days of back-dated records, which the preview cannot create without editing the database by hand.
 - Light theme only, as the owner confirmed on 22 Nov; no dark theme was added.
 

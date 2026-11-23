@@ -1,18 +1,20 @@
 # Progress
 
-Last updated: 22 Nov 2026. Branch: `claude/bloat-software-build-uxzoru`.
+Last updated: 23 Nov 2026. Branch: `claude/bloat-software-build-uxzoru`.
 
 ## Where things stand
 
 The app is built end to end and runs as a public testing preview on Vercel against the hosted `bloat-test` database, with synthetic data, a labelled mock AI and mock billing. No production site, no real payments, no real AI calls.
 
-- Testing preview: `https://bloat-preview.vercel.app`, serving commit `0d537d2` as deployment `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K`, published on 23 Nov by the Preview workflow (run 9) after its checks passed. It fixes the four defects of the external report of 23 Nov (time edits across time zones, "Keep", a backwards date range, and "Nothing was logged" on a day with a meal); all four were re-checked on it. The full signed-in hosted suite last ran on the previous build (15 of 15).
+- Testing preview: `https://bloat-preview.vercel.app`, serving commit `7713098` as deployment `dpl_E8w2BwFqLPuj59xLtcptnRVWT1fB`, published on 23 Nov by the Preview workflow (run 10) after its checks passed. Compared with the build before (`0d537d2`), it only fixes three buttons that showed nothing when their save failed: "I've spoken to a doctor about this" on History, and the experiment answer and "Not useful" on Today. On that previous build the full signed-in hosted suite passed 16 of 16 on 23 Nov.
 - Sign-in: email and password, for owner-provisioned test accounts only. Sign-ups are off in Supabase itself. Test mode is off on the preview (`BLOAT_TEST_LOGIN=0`).
 - No temporary test accounts remain (all sets deleted and verified, last on 23 Nov).
 - Still open:
   1. The real-phone checks below (pending).
   2. Whether Vercel's Ignored Build Step really skips a Git build: configured and read back, not proven. Proving it needs a test push to a separate branch, with your OK.
-  3. The actions still checked only partly (report, section 5).
+  3. A real AI provider for the photo and dish check: not connected. It needs your approval of a key and a spending limit.
+  4. The founder tools send two requests on a double tap (same result each time). Noted, not changed.
+  5. Smaller notes for you in the report, section 5 ("Also observed, not changed").
 
 Read next: `docs/verification-report.md` (what was checked, where, and on which build), `TEST_RESULTS.md`, `DEPLOYMENT.md`, `DECISIONS.md`.
 
@@ -35,6 +37,12 @@ Use `https://bloat-preview.vercel.app` and your test account `bloat-tester@bloat
 13. Sign out, then press Back. → You see Sign in, not your entries.
 
 Do not use "Delete my account" on `bloat-tester@bloat.test`: it removes your test account and you would need to make it again in the Supabase dashboard.
+
+## Done on 23 Nov
+
+- Fixed the four defects of the external report (B1 to B4), published as `0d537d2` (run 9) and re-checked live.
+- Ran the full signed-in hosted suite on that build with 7 separate synthetic accounts: 16 of 16 passed (the 15 checks plus Your journey with no finished day). The 7 accounts were deleted through the app and checked gone; `bloat-tester` was not touched.
+- Checked the 12 remaining actions of report section 5 on the screen (saves and persists, failure shown, double tap), plus 4 single checks. Three buttons showed nothing when their save failed; fixed in `7713098` and published by run 10. Details: report sections 4 (S1 to S3) and 5.
 
 ## Done on 22 Nov (afternoon): closing the gaps, publishing gate
 
