@@ -1051,29 +1051,44 @@ test("recalled-meals offer: Yes, go through them opens the recall screen, and th
   expect((await day(c)).meals[0].ingredients).toEqual([]);
 });
 
-test("export: a failed export says so on screen, nothing downloads, and trying again downloads the file", async ({ context }) => {
+test("export: a server failure and a lost connection get different messages, for the request and for the file; nothing downloads; trying again downloads once", async ({ context }) => {
   const c = await account(context, "free");
   await c.page.goto("/me");
   let downloads = 0;
   c.page.on("download", () => { downloads++; });
-  // 1. The export request itself fails.
-  await c.page.route("**/v1/export", (route) => route.request().method() === "POST"
-    ? route.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ error: { code: "ERROR", message: FAIL_MESSAGE } }) })
-    : route.fallback());
-  await c.page.getByRole("button", { name: "JSON" }).click();
-  await expect(c.page.getByText("That didn't work. Check your connection and try again.")).toBeVisible();
+  const NO_CONNECTION = "That didn't work. Check your connection and try again.";
+  const SERVER = "That didn't work. Try again.";
+  const INCOMPLETE = "Your download couldn't be finished, so nothing was saved. Try again in a moment.";
+  const shows = async (text: string) => {
+    await expect(c.page.getByText(text, { exact: true })).toBeVisible();
+    for (const other of [NO_CONNECTION, SERVER, INCOMPLETE].filter((t) => t !== text)) await expect(c.page.getByText(other, { exact: true })).toHaveCount(0);
+  };
+  const FILE = /\/v1\/export\/[^/?]+\?token=/;
+  const serverError = (status: number) => ({ status, contentType: "application/json", body: JSON.stringify({ error: { code: "ERROR", message: FAIL_MESSAGE } }) });
+  const button = (f: string) => c.page.getByRole("button", { name: f, exact: true });
+
+  // The export request: the server answers with an error, then the connection is lost.
+  await c.page.route("**/v1/export", (route) => route.request().method() === "POST" ? route.fulfill(serverError(500)) : route.fallback());
+  await button("JSON").click(); await shows(SERVER);
   await c.page.unroute("**/v1/export");
-  // 2. The file could not be finished (the server answers 503).
-  await c.page.route(/\/v1\/export\/[^/?]+\?token=/, (route) => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: { code: "EXPORT_INCOMPLETE", message: "x" } }) }));
-  await c.page.getByRole("button", { name: "CSV" }).click();
-  await expect(c.page.getByText("Your download couldn't be finished, so nothing was saved. Try again in a moment.")).toBeVisible();
-  await c.page.unroute(/\/v1\/export\/[^/?]+\?token=/);
+  await c.page.route("**/v1/export", (route) => route.request().method() === "POST" ? route.abort("internetdisconnected") : route.fallback());
+  await button("CSV").click(); await shows(NO_CONNECTION);
+  await c.page.unroute("**/v1/export");
+  // The file: not finished (503), another server error, then the connection is lost.
+  await c.page.route(FILE, (route) => route.fulfill(serverError(503)));
+  await button("JSON").click(); await shows(INCOMPLETE);
+  await c.page.unroute(FILE);
+  await c.page.route(FILE, (route) => route.fulfill(serverError(500)));
+  await button("CSV").click(); await shows(SERVER);
+  await c.page.unroute(FILE);
+  await c.page.route(FILE, (route) => route.abort("internetdisconnected"));
+  await button("JSON").click(); await shows(NO_CONNECTION);
+  await c.page.unroute(FILE);
   expect(downloads, "no file after a failure").toBe(0);
-  // 3. Trying again works.
+  // Trying again works, once.
   const file = c.page.waitForEvent("download");
-  await c.page.getByRole("button", { name: "JSON" }).click();
+  await button("JSON").click();
   await expect(c.page.getByText("Your download is complete.")).toBeVisible({ timeout: 20000 });
-  const name = (await file).suggestedFilename();
-  expect(name).toMatch(/\.json$/);
+  expect((await file).suggestedFilename()).toMatch(/\.json$/);
   expect(downloads).toBe(1);
 });
