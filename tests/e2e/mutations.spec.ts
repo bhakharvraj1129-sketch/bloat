@@ -115,6 +115,42 @@ async function fillShare(c: Ctx) {
   await c.page.getByRole("checkbox", { name: /I agree to share this report/ }).check();
 }
 
+/** Local fixture: one Free meal today, then the account upgrades (the recalled-meals offer needs it). */
+async function freeMealThenPro(c: Ctx, dish: string) {
+  expect((await c.api("POST", "/v1/meals", { save_key: crypto.randomUUID(), dish_text: dish, eaten: { mode: "now" } })).status).toBe(201);
+  expect((await c.api("POST", "/v1/billing/mock-purchase", { interval: "three_month" })).status).toBe(200);
+}
+const pastDay = (c: Ctx, k: number) => new Date(Date.parse(`${c.today}T12:00:00Z`) - k * 86_400_000).toISOString().slice(0, 10);
+const nyClock = (date: string, time: string) => new Date(`${date}T${time}:00-05:00`).toISOString();
+/** Local fixture: bloating logged on 13 of the last 30 days, so History shows the doctor reminder. */
+async function bloatingOn13Days(c: Ctx) {
+  sql(`update public.profiles set created_at = now() - interval '40 days' where user_id = '${userId(c)}'`);
+  for (let k = 1; k <= 13; k++) {
+    const d = pastDay(c, k);
+    const ep = await c.api("POST", "/v1/episodes", { strength: 4, started: { mode: "exact", local: `${d}T10:00`, zone: "America/New_York" } }, nyClock(d, "12:00"));
+    expect(ep.status, JSON.stringify(ep.body)).toBe(201);
+    expect((await c.api("POST", `/v1/episodes/${ep.body.episode.id}/end`, { ended: { mode: "exact", local: `${d}T11:00`, zone: "America/New_York" } }, nyClock(d, "12:00"))).status).toBeLessThan(300);
+  }
+  expect((await c.api("GET", "/v1/history")).body.doctor_line?.show).toBe(true);
+}
+/** Local fixture: a habit that is not followed, tapped on 6 days, so Today suggests following it. */
+async function unfollowedHabitOn6Days(c: Ctx) {
+  sql(`update public.profiles set created_at = now() - interval '10 days' where user_id = '${userId(c)}'`);
+  for (let k = 1; k <= 6; k++) {
+    const d = pastDay(c, k);
+    expect((await c.api("PUT", `/v1/days/${d}/activities`, { taps: [{ activity_id: "ACT-03" }] }, nyClock(d, "20:00"))).status).toBeLessThan(300);
+  }
+  const nbl = (await st(c)).pro?.next_best_log;
+  expect(nbl?.id).toBe("follow:ACT-03");
+  c.seed.nbl = nbl.id;
+}
+const todayExperiment = (c: Ctx) => c.page.locator("div", { has: c.page.getByText(/^Experiment · /) }).filter({ has: c.page.getByRole("link", { name: "Open experiment" }) }).last();
+/** A small synthetic photo (plain colour), made on the spot. */
+async function photo(): Promise<Buffer> {
+  const sharp = (await import("sharp")).default;
+  return sharp({ create: { width: 64, height: 64, channels: 3, background: { r: 200, g: 140, b: 80 } } }).jpeg().toBuffer();
+}
+
 const ACTIONS: Action[] = [
   {
     name: "Log bloating", role: "free",
@@ -615,6 +651,212 @@ const ACTIONS: Action[] = [
     write: { method: "POST", path: /\/v1\/onboarding\/commit$/ },
     changed: async (c) => (await st(c)).onboarded === true,
     after: async (c) => { await expect(c.page.getByRole("heading", { name: "Today", exact: true })).toBeVisible(); },
+  },  // Section 5 of the verification report (23 Nov): the actions that were checked only through the API.
+  {
+    name: "Log bloating with a warning sign, how it feels and other symptoms (Pro)", role: "pro",
+    open: async (c) => {
+      await c.page.goto("/today"); await c.page.getByRole("button", { name: "I feel bloated" }).click();
+      const d = dialog(c, "Log bloating");
+      await d.getByRole("radio", { name: "6", exact: true }).click();
+      await d.getByRole("checkbox", { name: "Vomiting", exact: true }).click();
+      await d.getByRole("group", { name: "What does it feel like?" }).getByRole("checkbox", { name: "Visible swelling" }).click();
+      await d.getByRole("group", { name: "Anything else with it?" }).getByRole("checkbox", { name: "Nausea" }).click();
+    },
+    submit: (c) => dialog(c, "Log bloating").getByRole("button", { name: "Save" }),
+    write: { method: "POST", path: /\/v1\/episodes$/ },
+    changed: async (c) => (await day(c)).episodes.some((e: any) => e.warning_signs.includes("vomiting") && e.feel?.includes("visible_swelling") && e.symptoms.includes("nausea") && e.samples.some((s: any) => s.strength === 6)),
+    after: async (c) => { await expect(c.page.getByRole("button", { name: /Bloating ongoing/ })).toContainText("strength 6"); },
+  },
+  {
+    name: "Mark ingredients one by one after the check (Pro)", role: "pro",
+    setup: async (c) => { expect((await c.api("POST", "/v1/consents", { type: "ai_meal" })).status).toBeLessThan(300); },
+    open: async (c) => {
+      await c.page.goto("/today"); await c.page.getByRole("button", { name: "Add meal" }).click();
+      const d = dialog(c, /Add meal|Ingredient check/);
+      await d.getByLabel("What did you have?").fill("Matrix chana masala");
+      await d.getByRole("button", { name: "Next: check ingredients" }).click();
+      const groups = d.getByRole("radiogroup", { name: /^Did you have / });
+      await expect(groups.first()).toBeVisible();
+      c.seed.items = (await groups.evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")!.replace(/^Did you have (.*)\?$/, "$1"))));
+      expect(c.seed.items.length).toBeGreaterThanOrEqual(3);
+      await d.getByRole("radiogroup", { name: `Did you have ${c.seed.items[0]}?` }).getByRole("radio", { name: "Had", exact: true }).click();
+      await d.getByRole("radiogroup", { name: `Did you have ${c.seed.items[1]}?` }).getByRole("radio", { name: "Didn't have" }).click();
+    },
+    submit: (c) => dialog(c, /Add meal|Ingredient check/).getByRole("button", { name: "Save", exact: true }),
+    write: { method: "POST", path: /\/v1\/meals$/ },
+    changed: async (c) => {
+      const m = (await day(c)).meals.find((x: any) => x.dish_text === "Matrix chana masala");
+      if (!m) return false;
+      const ans = Object.fromEntries(m.ingredients.map((i: any) => [i.name, i.answer]));
+      const items: string[] = c.seed.items;
+      // Each answer exactly as marked; the untouched ones stay Not sure, never Didn't have.
+      return m.ingredients.length === items.length && ans[items[0]!] === "had" && ans[items[1]!] === "didnt_have" && items.slice(2).every((n) => ans[n] === "not_sure");
+    },
+    after: async (c) => { await c.page.goto(`/day/${c.today}`); await expect(c.page.getByText("Matrix chana masala")).toBeVisible(); },
+  },
+  {
+    name: "Save a dish with a meal (Pro)", role: "pro",
+    setup: async (c) => { expect((await c.api("POST", "/v1/consents", { type: "ai_meal" })).status).toBeLessThan(300); },
+    open: async (c) => {
+      await c.page.goto("/today"); await c.page.getByRole("button", { name: "Add meal" }).click();
+      const d = dialog(c, /Add meal|Ingredient check/);
+      await d.getByLabel("What did you have?").fill("Matrix bean burrito");
+      await d.getByRole("button", { name: "Next: check ingredients" }).click();
+      await d.getByRole("button", { name: "Had all of these" }).click();
+      await d.getByRole("checkbox", { name: "Save as one of my dishes" }).check();
+      await d.getByLabel("Place (optional)").fill("Matrix Cafe");
+    },
+    submit: (c) => dialog(c, /Add meal|Ingredient check/).getByRole("button", { name: "Save", exact: true }),
+    write: { method: "POST", path: /\/v1\/meals$/ },
+    changed: async (c) => ((await st(c)).pro?.saved_dishes ?? []).some((d: any) => d.name === "Matrix bean burrito" && d.place === "Matrix Cafe"),
+    after: async (c) => {
+      await c.page.getByRole("button", { name: "Add meal" }).click();
+      await expect(dialog(c, "Add meal").getByRole("radio", { name: "Matrix bean burrito – Matrix Cafe" })).toBeVisible();
+    },
+  },
+  {
+    name: "Add a meal from a saved dish (Pro)", role: "pro",
+    setup: async (c) => {
+      const r = await c.api("POST", "/v1/meals", {
+        save_key: crypto.randomUUID(), dish_text: "Matrix home soup", eaten: { mode: "exact", local: localAgo(300), zone: "America/New_York" }, mode: "marked",
+        ingredients: [{ name: "lentils", answer: "had", kind: "added" }, { name: "garlic", answer: "had", kind: "added" }], save_as_dish: { place: "Home" },
+      });
+      expect(r.status, JSON.stringify(r.body)).toBe(201);
+    },
+    open: async (c) => {
+      await c.page.goto("/today"); await c.page.getByRole("button", { name: "Add meal" }).click();
+      await dialog(c, "Add meal").getByRole("radio", { name: "Matrix home soup – Home" }).click();
+    },
+    submit: (c) => dialog(c, "Add meal").getByRole("button", { name: "Save", exact: true }),
+    write: { method: "POST", path: /\/v1\/meals$/ },
+    changed: async (c) => (await day(c)).meals.some((m: any) => m.source === "saved_dish" && m.dish_text === "Matrix home soup – Home"
+      && m.ingredients.length === 2 && m.ingredients.every((i: any) => i.source === "saved_dish" && i.answer === "had")),
+    after: async (c) => { await c.page.goto(`/day/${c.today}`); await expect(c.page.getByText("Matrix home soup – Home")).toBeVisible(); },
+  },
+  {
+    name: "Photo ingredient check: items marked one by one and saved (Pro, provider result is a fixture)", role: "pro",
+    setup: async (c) => {
+      expect((await c.api("POST", "/v1/consents", { type: "ai_meal" })).status).toBeLessThan(300);
+      // Food groups from the local mock check, so the fixture uses real group codes.
+      const typed = await c.api("POST", "/v1/food-suggestions", { save_key: crypto.randomUUID(), dish_text: "burrito" });
+      expect(typed.body.status).toBe("ok");
+      c.seed.photoItems = typed.body.items.slice(0, 3).map((i: any) => ({ ...i, source_label: "seen_in_photo" }));
+    },
+    open: async (c) => {
+      // No AI provider is connected (and the local mock cannot see), so the provider's answer for this
+      // photo is stored as a fixture under the photo's save key; the app's own server then replays it.
+      await c.page.route("**/v1/meal-photos", async (route) => {
+        const key = /name="save_key"\r\n\r\n([^\r\n]+)/.exec(route.request().postDataBuffer()?.toString("latin1") ?? "")?.[1];
+        expect(key).toBeTruthy();
+        const output = JSON.stringify({ dishes: ["Matrix photo burrito"], items: c.seed.photoItems, provider_label: "Test data (mock)" }).replace(/'/g, "''");
+        sql(`insert into public.food_suggestions (user_id, save_key, purpose, input_hash, output, model, prompt_version, status) values ('${userId(c)}', '${key}', 'DISH_RECOGNITION_FROM_PHOTO', 'fixture', '${output}'::jsonb, 'mock-ingredients-1', 'ingredients-v1', 'ok') on conflict do nothing`);
+        await route.fallback();
+      });
+      await c.page.goto("/today"); await c.page.getByRole("button", { name: "Add meal" }).click();
+      const d = dialog(c, /Add meal|Ingredient check/);
+      await d.locator('input[type="file"]').setInputFiles({ name: "meal.jpg", mimeType: "image/jpeg", buffer: await photo() });
+      const items: Array<{ name: string }> = c.seed.photoItems;
+      await expect(d.getByText("Seen in photo").first()).toBeVisible();
+      await expect(d.getByText("Matrix photo burrito")).toBeVisible();
+      await d.getByRole("radiogroup", { name: `Did you have ${items[0]!.name}?` }).getByRole("radio", { name: "Had", exact: true }).click();
+      await d.getByRole("radiogroup", { name: `Did you have ${items[1]!.name}?` }).getByRole("radio", { name: "Didn't have" }).click();
+    },
+    submit: (c) => dialog(c, /Add meal|Ingredient check/).getByRole("button", { name: "Save", exact: true }),
+    write: { method: "POST", path: /\/v1\/meals$/ },
+    changed: async (c) => {
+      const m = (await day(c)).meals.find((x: any) => x.dish_text === "Matrix photo burrito");
+      if (!m || m.source !== "photo") return false;
+      const items: Array<{ name: string }> = c.seed.photoItems;
+      const by = Object.fromEntries(m.ingredients.map((i: any) => [i.name, i]));
+      return m.ingredients.length === 3 && m.ingredients.every((i: any) => i.source_label === "seen_in_photo")
+        && by[items[0]!.name]?.answer === "had" && by[items[1]!.name]?.answer === "didnt_have" && by[items[2]!.name]?.answer === "not_sure";
+    },
+    after: async (c) => { await c.page.goto(`/day/${c.today}`); await expect(c.page.getByText("Matrix photo burrito")).toBeVisible(); },
+  },
+  {
+    name: "Answer the recalled-meals offer: Not now (Pro)", role: "free",
+    setup: async (c) => { await freeMealThenPro(c, "Matrix free toast"); },
+    open: async (c) => { await c.page.goto("/upgrade"); await expect(c.page.getByRole("button", { name: "Yes, go through them" })).toBeVisible(); },
+    submit: (c) => c.page.getByRole("button", { name: "Not now" }),
+    write: { method: "POST", path: /\/v1\/meals\/recalled-check$/ },
+    changed: async (c) => (await c.api("GET", "/v1/meals/recalled-check")).body.offered === true,
+    after: async (c) => { await expect(c.page.getByRole("button", { name: "Yes, go through them" })).toHaveCount(0); },
+  },
+  {
+    name: "Add ingredients to an earlier meal on the recall screen (Pro)", role: "free",
+    setup: async (c) => { await freeMealThenPro(c, "Matrix chana masala"); expect((await c.api("POST", "/v1/consents", { type: "ai_meal" })).status).toBeLessThan(300); },
+    open: async (c) => {
+      await c.page.goto("/meal/recall");
+      await expect(c.page.getByText("Matrix chana masala")).toBeVisible();
+      await c.page.getByRole("button", { name: "Check ingredients" }).click();
+      const groups = c.page.getByRole("radiogroup", { name: /^Did you have / });
+      await expect(groups.first()).toBeVisible();
+      c.seed.items = await groups.evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")!.replace(/^Did you have (.*)\?$/, "$1")));
+      await c.page.getByRole("radiogroup", { name: `Did you have ${c.seed.items[0]}?` }).getByRole("radio", { name: "Had", exact: true }).click();
+      await c.page.getByRole("radiogroup", { name: `Did you have ${c.seed.items[1]}?` }).getByRole("radio", { name: "Didn't have" }).click();
+    },
+    submit: (c) => c.page.getByRole("button", { name: "Save and next" }),
+    write: { method: "PUT", path: /\/v1\/meals\/[^/]+\/ingredients$/ },
+    changed: async (c) => {
+      const m = (await day(c)).meals.find((x: any) => x.dish_text === "Matrix chana masala");
+      if (!m || !m.ingredients.length) return false;
+      const ans = Object.fromEntries(m.ingredients.map((i: any) => [i.name, i]));
+      const items: string[] = c.seed.items;
+      return m.ingredients.every((i: any) => i.source === "recalled") && ans[items[0]!]?.answer === "had" && ans[items[1]!]?.answer === "didnt_have" && items.slice(2).every((n) => ans[n]?.answer === "not_sure");
+    },
+    after: async (c) => { await expect(c.page.getByText("All done. There are no more meals from the last 7 days to go through.")).toBeVisible(); },
+  },
+  {
+    name: "Answer the safety questions before a food swap (Pro)", role: "pro",
+    setup: (c) => readyForExperiments(c),
+    open: async (c) => {
+      await c.page.goto("/experiments");
+      await c.page.getByRole("button", { name: "Answer the safety questions" }).click();
+      const d = dialog(c, "Before a food swap");
+      for (const g of await d.getByRole("group").all()) await g.getByRole("radio", { name: "No", exact: true }).click();
+    },
+    submit: (c) => dialog(c, "Before a food swap").getByRole("button", { name: "Continue" }),
+    write: { method: "POST", path: /\/v1\/experiments\/checks$/ },
+    changed: async (c) => (await c.api("GET", "/v1/experiments")).body.swap_check?.needed === false,
+    after: async (c) => { await expect(c.page.getByRole("button", { name: "Answer the safety questions" })).toHaveCount(0); },
+  },
+  {
+    name: "Mark today's card Not relevant (Pro)", role: "pro",
+    open: async (c) => { await c.page.goto("/cards"); },
+    submit: (c) => c.page.getByRole("button", { name: "Not relevant" }),
+    write: { method: "POST", path: /\/v1\/cards\/[^/]+\/feedback$/ },
+    changed: async (c) => (await c.api("GET", "/v1/cards/today")).body.feedback?.other === "not_relevant",
+    after: async (c) => { expect((await c.api("GET", "/v1/cards/today")).body.feedback?.other).toBe("not_relevant"); },
+  },
+  {
+    name: "Answer the doctor reminder in History: I've spoken to a doctor", role: "free",
+    setup: (c) => bloatingOn13Days(c),
+    open: async (c) => { await c.page.goto("/history"); await expect(c.page.getByRole("complementary", { name: "A note from the NHS" })).toBeVisible(); },
+    submit: (c) => c.page.getByRole("button", { name: "I've spoken to a doctor about this" }),
+    write: { method: "POST", path: /\/v1\/nudges\/doctor\/response$/ },
+    changed: async (c) => (await c.api("GET", "/v1/history")).body.doctor_line?.shortened === true,
+    after: async (c) => {
+      await expect(c.page.getByRole("complementary", { name: "A note from the NHS" })).toBeVisible();
+      await expect(c.page.getByRole("button", { name: "I've spoken to a doctor about this" })).toHaveCount(0);
+    },
+  },
+  {
+    name: "Answer the experiment on Today (Pro)", role: "pro",
+    setup: (c) => startExperiment(c, "eat_more_slowly"),
+    open: async (c) => { await c.page.goto("/today"); await expect(todayExperiment(c)).toBeVisible(); },
+    submit: (c) => todayExperiment(c).getByRole("button", { name: "Partly", exact: true }),
+    write: { method: "POST", path: /\/v1\/experiments\/[^/]+\/days$/ },
+    changed: async (c) => { const r = await xpResult(c); return r.answered_today && r.days.some((d: any) => d.date === r.today && d.answer === "partly"); },
+    after: async (c) => { await expect(c.page.getByText("Today's answer is saved.")).toBeVisible(); },
+  },
+  {
+    name: "Dismiss the next best log on Today: Not useful (Pro)", role: "pro",
+    setup: (c) => unfollowedHabitOn6Days(c),
+    open: async (c) => { await c.page.goto("/today"); await expect(c.page.getByText("Next best log")).toBeVisible(); },
+    submit: (c) => c.page.getByRole("button", { name: "Not useful" }),
+    write: { method: "POST", path: /\/v1\/insights\/suggestions\/dismiss$/ },
+    changed: async (c) => (await st(c)).pro?.next_best_log?.id !== c.seed.nbl,
+    after: async (c) => { await expect(c.page.getByText("Next best log")).toHaveCount(0); },
   },
 ];
 
@@ -767,4 +1009,71 @@ test("after an account is deleted on one device, the other device's earlier sign
   await c.page.goto("/history");
   await expect(c.page).toHaveURL(/\/sign-in/);
   await a.close(); await b.close();
+});
+
+// Section 5 (23 Nov): single checks for paths the action table above cannot express.
+
+test("photo check with the local mock: it can't tell from the photo, the screen says so, and the typed meal saves", async ({ context }) => {
+  const c = await account(context, "pro");
+  expect((await c.api("POST", "/v1/consents", { type: "ai_meal" })).status).toBeLessThan(300);
+  await c.page.goto("/today"); await c.page.getByRole("button", { name: "Add meal" }).click();
+  const d = dialog(c, "Add meal");
+  const sent = c.page.waitForResponse((r) => r.request().method() === "POST" && r.url().endsWith("/v1/meal-photos"));
+  await d.locator('input[type="file"]').setInputFiles({ name: "meal.jpg", mimeType: "image/jpeg", buffer: await photo() });
+  const reply = await sent;
+  expect(reply.status()).toBe(200);
+  expect((await reply.json()).status).toBe("abstained");
+  await expect(d.getByText("The photo didn't show clearly what the dish is. Type the dish instead.")).toBeVisible();
+  await d.getByLabel("What did you have?").fill("Matrix typed after photo");
+  await d.getByRole("button", { name: "Save without the check" }).click();
+  await expect(d).toBeHidden();
+  await expect.poll(async () => (await day(c)).meals.map((m: any) => m.dish_text)).toEqual(["Matrix typed after photo"]);
+  // The photo was not kept: "Keep my meal photos" is off by default.
+  expect(sql(`select count(*) from public.meal_photos where user_id = '${userId(c)}'`)).toBe("0");
+});
+
+test("recalled-meals offer: Yes, go through them opens the recall screen, and the offer is not shown again", async ({ context }) => {
+  const c = await account(context, "free");
+  await freeMealThenPro(c, "Matrix free toast");
+  await c.page.goto("/upgrade");
+  await c.page.getByRole("button", { name: "Yes, go through them" }).click();
+  await expect(c.page).toHaveURL(/\/meal\/recall$/);
+  await expect(c.page.getByText("Matrix free toast")).toBeVisible();
+  expect((await c.api("GET", "/v1/meals/recalled-check")).body.offered).toBe(true);
+  expect(events(c, "recalled_check_answered")).toBe(1);
+  await c.page.goto("/upgrade");
+  await expect(c.page.getByRole("heading", { name: /Pro/ }).first()).toBeVisible();
+  await expect(c.page.getByRole("button", { name: "Yes, go through them" })).toHaveCount(0);
+  // Skipping the meal on the recall screen saves nothing for it.
+  await c.page.goto("/meal/recall");
+  await c.page.getByRole("button", { name: "Skip this meal" }).click();
+  await expect(c.page.getByText("All done. There are no more meals from the last 7 days to go through.")).toBeVisible();
+  expect((await day(c)).meals[0].ingredients).toEqual([]);
+});
+
+test("export: a failed export says so on screen, nothing downloads, and trying again downloads the file", async ({ context }) => {
+  const c = await account(context, "free");
+  await c.page.goto("/me");
+  let downloads = 0;
+  c.page.on("download", () => { downloads++; });
+  // 1. The export request itself fails.
+  await c.page.route("**/v1/export", (route) => route.request().method() === "POST"
+    ? route.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ error: { code: "ERROR", message: FAIL_MESSAGE } }) })
+    : route.fallback());
+  await c.page.getByRole("button", { name: "JSON" }).click();
+  await expect(c.page.getByText("That didn't work. Check your connection and try again.")).toBeVisible();
+  await c.page.unroute("**/v1/export");
+  // 2. The file could not be finished (the server answers 503).
+  await c.page.route(/\/v1\/export\/[^/?]+\?token=/, (route) => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: { code: "EXPORT_INCOMPLETE", message: "x" } }) }));
+  await c.page.getByRole("button", { name: "CSV" }).click();
+  await expect(c.page.getByText("Your download couldn't be finished, so nothing was saved. Try again in a moment.")).toBeVisible();
+  await c.page.unroute(/\/v1\/export\/[^/?]+\?token=/);
+  expect(downloads, "no file after a failure").toBe(0);
+  // 3. Trying again works.
+  const file = c.page.waitForEvent("download");
+  await c.page.getByRole("button", { name: "JSON" }).click();
+  await expect(c.page.getByText("Your download is complete.")).toBeVisible({ timeout: 20000 });
+  const name = (await file).suggestedFilename();
+  expect(name).toMatch(/\.json$/);
+  expect(downloads).toBe(1);
 });

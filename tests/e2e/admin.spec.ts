@@ -1,7 +1,10 @@
 import { expect, test } from "@playwright/test";
+import { execFileSync } from "node:child_process";
 import { anon, srvRpc, STAFF_EMAIL, totp } from "../api/helpers";
 
 const PASSWORD = "synthetic-password-1";
+// Both tests use the one staff account, so they run one after the other.
+test.describe.configure({ mode: "serial" });
 
 test("Q76: founder tools open only for a staff account after an authenticator code", async ({ page }) => {
   // Start from a staff account with no second step set up yet.
@@ -40,4 +43,67 @@ test("Q76: founder tools open only for a staff account after an authenticator co
   // A refresh keeps the verified session; the tools still open without a new scan.
   await page.reload();
   await expect(page.getByText("AI spending this month")).toBeVisible({ timeout: 20000 });
+});
+
+// Section 5 (23 Nov): the founder tools' buttons, on the screen, with their saved result.
+// LOCAL stack only. The settings are put back as they were at the end.
+function sql(query: string): string {
+  return execFileSync("docker", ["exec", "supabase_db_bloat", "psql", "-U", "postgres", "-tAc", query], { encoding: "utf8" }).trim();
+}
+
+test("founder tools: Set limit and the AI kill switch save, a refused change says so, and a double tap sends two identical changes", async ({ page }) => {
+  const old = await anon().auth.signInWithPassword({ email: STAFF_EMAIL, password: PASSWORD });
+  if (old.data.user) await srvRpc("srv_delete_account", { p_user: old.data.user.id });
+  const limitBefore = sql("select monthly_limit_micros from private.ai_settings");
+  const aiBefore = sql("select enabled from public.feature_flags where key = 'ai_enabled'");
+  expect(aiBefore).toBe("t");
+  try {
+    expect((await page.request.post("/v1/auth/test-login", { data: { email: STAFF_EMAIL, password: PASSWORD, create: true } })).ok()).toBe(true);
+    await page.goto("/admin");
+    await expect(page.getByAltText("Code to scan with your authenticator app")).toBeVisible({ timeout: 20000 });
+    const secret = (await page.locator("span.break-all").innerText()).trim();
+    await page.getByLabel("6-digit code from your app").fill(totp(secret));
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page.getByText("AI spending this month")).toBeVisible({ timeout: 20000 });
+
+    // Set limit: saved, shown, and still there after a refresh.
+    await page.getByLabel("Monthly limit in US dollars").fill("12.5");
+    await page.getByRole("button", { name: "Set limit" }).click();
+    await expect(page.getByText("Saved.")).toBeVisible();
+    expect(sql("select monthly_limit_micros from private.ai_settings")).toBe("12500000");
+    await page.reload();
+    await expect(page.getByText(/of \$12\.50/)).toBeVisible({ timeout: 20000 });
+
+    // A refused change: the screen says so and nothing changes.
+    await page.route("**/v1/admin", (route) => route.request().method() === "POST"
+      ? route.fulfill({ status: 500, contentType: "application/json", body: "{}" }) : route.fallback());
+    await page.getByLabel("Monthly limit in US dollars").fill("99");
+    await page.getByRole("button", { name: "Set limit" }).click();
+    await expect(page.getByText("That change was refused.")).toBeVisible();
+    expect(sql("select monthly_limit_micros from private.ai_settings")).toBe("12500000");
+    await page.unroute("**/v1/admin");
+
+    // Double tap: the button is not disabled while saving, so two requests go out. Both set the same
+    // value, so the saved result is the same; each is in the audit log.
+    let posts = 0;
+    page.on("request", (r) => { if (r.method() === "POST" && r.url().endsWith("/v1/admin")) posts++; });
+    await page.getByLabel("Monthly limit in US dollars").fill("13");
+    await page.getByRole("button", { name: "Set limit" }).dblclick();
+    await expect.poll(() => sql("select monthly_limit_micros from private.ai_settings")).toBe("13000000");
+    await page.waitForTimeout(1500);
+    expect(posts, "requests from a double tap").toBe(2);
+
+    // Kill switch: off, then back on, each saved and shown.
+    await page.getByRole("button", { name: "Turn all AI off now (kill switch)" }).click();
+    await expect(page.getByRole("button", { name: "Turn AI back on" })).toBeVisible();
+    expect(sql("select enabled from public.feature_flags where key = 'ai_enabled'")).toBe("f");
+    await page.reload();
+    await expect(page.getByRole("button", { name: "Turn AI back on" })).toBeVisible({ timeout: 20000 });
+    await page.getByRole("button", { name: "Turn AI back on" }).click();
+    await expect(page.getByRole("button", { name: "Turn all AI off now (kill switch)" })).toBeVisible();
+    expect(sql("select enabled from public.feature_flags where key = 'ai_enabled'")).toBe("t");
+  } finally {
+    sql(`update private.ai_settings set monthly_limit_micros = ${limitBefore}`);
+    sql(`update public.feature_flags set enabled = ${aiBefore === "t"} where key = 'ai_enabled'`);
+  }
 });
