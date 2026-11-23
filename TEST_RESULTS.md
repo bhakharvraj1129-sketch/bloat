@@ -1,6 +1,29 @@
 # Test results
 
-Last run: 23 Nov 2026 (10:30 UTC). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 23 Nov 2026 (12:40 UTC). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+
+## Final round (23 Nov 2026): published build `62431c7`
+
+Published revision `62431c71ffe13e48404db7b21e31c0823eb73dfb`, Vercel deployment `dpl_AvmuUC34HMhQpEj34UsAk6ekV2Lm`, served at `https://bloat-preview.vercel.app` (GitHub run 11).
+
+| Check | Where | Result |
+|---|---|---|
+| Counts reconciled with the raw results file | Local | 250 browser checks; save file 63 x 3 + 9 = 198; section 5: 36 + 4. One wording error corrected ("207 of 629") |
+| Recalled-meals offer, database refuses the answer, then its duplicate-tap record (2 checks) | Local, published code `7713098` | **2 failed**: offer left used with no answer; the same request again refused (409) and the answer lost |
+| Same 2 checks | Local, fixed code | **2 of 2 passed**: nothing left behind; the same request then saves once |
+| Export: server error vs lost connection, for the request and the file | Local, published code / fixed | **Failed** (a server error said "Check your connection") / **passed** |
+| Founder tools: double tap side effects | Local, published code | Measured: 2 requests, 2 setting writes, 2 change and 2 reload audit records; lost connection showed nothing |
+| Founder tools check: 1 request, 1 write, 1 change record, 1 reload record; slower second tap ignored; lost connection shown | Local, fixed code | **Passed** |
+| Rule tests / API tests | Local, final code | 97 of 97 / 137 of 137 |
+| Browser tests, all | Local, final code | First full run: 249 of 250 (the delete-account check raced the app's own move to the start page; 45 of 45 on repeat). Check fixed (test only). Then **250 of 250**, 0 retried |
+| Type check, lint | Local | 0 errors (5 old warnings) |
+| GitHub run 11 (push of `62431c7`) | CI | All checks passed (API 137, browser 250); controls read back; built `dpl_AvmuUC34HMhQpEj34UsAk6ekV2Lm`; 6 of 6 live checks before publishing; published; served deployment confirmed; 6 of 6 again after |
+| Tested = deployed | Vercel | Both addresses on `dpl_AvmuUC34HMhQpEj34UsAk6ekV2Lm`; 207 of 207 listed source files byte-identical to `62431c7` (490 of 630 files listed) |
+| Full hosted suite, first attempt (7 accounts) | Live | 15 of 16: the diary check's navigation raced the app's history step after a sheet closed; data saved correctly. Check fixed (test only) |
+| Full hosted suite, repeat with 7 fresh accounts | Live | **16 of 16 passed** |
+| Export messages | Live | **Passed** |
+| 14 accounts deleted through the app, then read-only checks | Live, `bloat-test` | 0 rows anywhere, no marked accounts; `bloat-tester` identical before and after |
+| Real phones / real AI provider / founder tools on the preview / the 3 history-dependent screens on the preview | - | **Pending** |
 
 ## Hosted suite on the published build, then section 5 on the screen (23 Nov 2026)
 

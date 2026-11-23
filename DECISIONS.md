@@ -65,6 +65,8 @@ Choices made while building, with the reason. "Needs the owner" means: please sa
 14. **"English only" note on the help page (Q70)** is not shown: the words need your yes.
 15. **"Is it still happening?" comes back after Yes or Not sure.** The answer is not stored (only an anonymous event), so on the next app open the question is asked again while the bloating record has been open 8 hours or more. Built as the plan reads; tested as such. Say if you want a quiet period after an answer (for example, ask again only after another 8 hours).
 
+16. **Founder tools: a change and its audit record are written in two database steps** (the setting, then the audit row). If the second step failed, the change would have no audit record. Found on 23 Nov; not changed. Making them one step needs a new database function, so a new migration applied to `bloat-test`. Say if you want it. (The double tap on these buttons is fixed: one change, one record.)
+
 ## Still open in the plan itself
 
 Business entity and payment provider (Gate 2); legal template service (Gate 1); region for `bloat-live` (earlier answer: `us-east-1`).

@@ -60,6 +60,17 @@ async function addMeal(page: Page, dish: string) {
   await sheet.getByLabel("What did you have?").fill(dish);
   await sheet.getByRole("button", { name: /^Save( without the check)?$/ }).click();
   await expect(page.getByText(dish)).toBeVisible({ timeout: 20000 });
+  await sheetClosed(page);
+}
+
+/**
+ * A sheet closed by Save steps back in the browser history a moment later (the entry the phone's
+ * Back would otherwise land on). The app's own links wait for that; a test that opens another
+ * address must wait too, or its navigation is cancelled (seen once on 23 Nov: net::ERR_ABORTED).
+ */
+async function sheetClosed(page: Page) {
+  await expect(page.getByRole("dialog")).toHaveCount(0, { timeout: 20000 });
+  await page.waitForFunction(() => !(history.state as Record<string, unknown> | null)?.bloatSheet, undefined, { timeout: 20000 });
 }
 
 function pdfText(bytes: Buffer): string {
