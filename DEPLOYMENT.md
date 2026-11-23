@@ -96,6 +96,10 @@ values ('preview', encode(sha256(convert_to('<the secret>', 'utf8')), 'hex'));
 4. Create a Vercel project from this repo, framework Next.js, and add the variables above for Preview, with `BLOAT_TEST_LOGIN=0`.
 5. Before removing deployment protection, check on the new build that `POST /v1/auth/test-login` answers 404 and the sign-in page has no test password form.
 
+## Frozen for review (from 23 Nov 2026, evening)
+
+Both addresses serve `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (commit `83fe4da`, run 12). While the owner reviews feature by feature, nothing is published except a fix for a reproducible issue the owner sends, through the Preview workflow as usual. Notes-only commits carry `[skip ci]`, so they run no workflow and cannot publish.
+
 ## Addresses
 
 - Testing preview, dedicated address: `https://bloat-preview.vercel.app` (added 19 Nov 2026).

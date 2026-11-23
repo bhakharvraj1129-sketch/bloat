@@ -18,6 +18,9 @@ from collections import Counter, OrderedDict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "test-evidence", "ledger")
+# Which app code each raw result file was produced on (kept by hand, checked against the run logs).
+CRAWL_CODE = "2f22cc4"  # ledger-after.json, navigate.json, widths-after.json: 22 Nov
+FINAL_CODE = "83fe4da"  # e2e-results.json: 23 Nov, the published build
 OUT = os.path.join(ROOT, "docs", "verification-report.md")
 
 
@@ -92,7 +95,7 @@ def main():
     L += [
         "## 1. The control crawl, reconciled",
         "",
-        f"Crawl of the application commit named above, on {ledger['when'][:16].replace('T', ' ')} UTC, phone width, signed-out, Free and Pro visitors.",
+        f"Crawl of app code `{CRAWL_CODE}` (not the final build; the fixes since are in section 4), on {ledger['when'][:16].replace('T', ' ')} UTC, phone width, signed-out, Free and Pro visitors.",
         f"Total rows: **{len(rows)}** = {len(pages)} screen loads + {len(ctrls)} control rows. The same control appears once per",
         f"screen and visitor (for example the four tabs on every signed-in screen), so there are {len(set((r['name'], r['href'] or '', r['role']) for r in ctrls))} distinct controls.",
         "",
@@ -118,7 +121,7 @@ def main():
     L += [
         "## 2. Navigation: destination and Back, by real clicks",
         "",
-        f"`tests/ledger/navigate.spec.ts`, application commit named above, run {nav['when'][:16].replace('T', ' ')} UTC. Every distinct visible in-app link on every",
+        f"`tests/ledger/navigate.spec.ts`, app code `{CRAWL_CODE}` (not the final build), run {nav['when'][:16].replace('T', ' ')} UTC. Every distinct visible in-app link on every",
         "screen was clicked (header, footer and tab links from two screens each), for signed-out, Free and Pro visitors, at",
         "412px (phone) and 1440px (desktop). The destination must be the link's own address, or the documented rule for",
         "that visitor (signed out: Sign in with the screen remembered; Free on a Pro screen: Bloat Pro). Then Back was pressed:",
@@ -156,7 +159,7 @@ def main():
     L += [
         "## 3. Save and edit actions: real outcomes",
         "",
-        "`tests/e2e/mutations.spec.ts`, application commit named above, local. Each action is checked three ways, with a new synthetic account each time:",
+        f"`tests/e2e/mutations.spec.ts`, local, app code `{FINAL_CODE}` (the final build), run {e2e['stats']['startTime'][:16].replace('T', ' ')} UTC. Each action is checked three ways, with a new synthetic account each time:",
         "",
         "- **Saves and persists:** the save request succeeds, the intended record changes when read back from the API (or the local",
         "  database for the waitlist), and after a full page refresh the screen still shows it.",

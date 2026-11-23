@@ -1,21 +1,22 @@
 # Progress
 
-Last updated: 23 Nov 2026. Branch: `claude/bloat-software-build-uxzoru`.
+Last updated: 23 Nov 2026 (evening). Branch: `claude/bloat-software-build-uxzoru`.
 
 ## Where things stand
 
 The app is built end to end and runs as a public testing preview on Vercel against the hosted `bloat-test` database, with synthetic data, a labelled mock AI and mock billing. No production site, no real payments, no real AI calls.
 
-- Testing preview: `https://bloat-preview.vercel.app`, serving commit `62431c7` as deployment `dpl_AvmuUC34HMhQpEj34UsAk6ekV2Lm`, published on 23 Nov by the Preview workflow (run 11) after its checks passed. The full signed-in hosted suite passed 16 of 16 on it. Its last three fixes: the recalled-meals offer saves all or nothing; export tells a lost connection apart from a server error; founder tool buttons send one change per tap.
+- Testing preview: `https://bloat-preview.vercel.app`, serving commit `83fe4da` as deployment `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`, published on 23 Nov at 15:36 UTC by the Preview workflow (run 12) after its checks passed. The full signed-in hosted suite passed 16 of 16 on it.
+- **Frozen for your feature-by-feature review (from 23 Nov, evening).** No features, redesigns or fixes are published until you send a reproducible issue. Notes-only commits use `[skip ci]` and do not publish. A fix you ask for goes through the same gate and gets its own entry in the report.
 - Sign-in: email and password, for owner-provisioned test accounts only. Sign-ups are off in Supabase itself. Test mode is off on the preview (`BLOAT_TEST_LOGIN=0`).
 - No temporary test accounts remain (all sets deleted and verified, last on 23 Nov).
-- Still open: the one list of remaining gaps is in `docs/verification-report.md`, "Remaining gaps". In short:
-  1. Pending: real phones; a real AI provider (needs your approval of a key and a spending limit); founder tools on the preview; the doctor reminder, the experiment answer on Today and "Not useful" on Today on the preview (they need several days of records).
-  2. The recalled-meals fix can only be forced to fail on the local database, not live.
-  3. Vercel's Ignored Build Step: configured and read back, not proven. Proving it needs a test push to a separate branch, with your OK.
-  4. A founder change and its audit record are written in two steps. Fixing that needs a new migration: your decision.
-  5. The crawl, click-through and width runs are from 22 Nov and were not repeated on the final code.
-  6. For your decision: "Is it still happening?" re-asks while a record is open 8 hours or more (DECISIONS Q15), plus two small notes in the report.
+- Still open: `docs/verification-report.md`, top: "Launch blockers that remain" and "Tests still not performed". In short:
+  1. Real phones, a screen reader and 200% zoom: not done.
+  2. A real AI provider (photo and dish check): not connected; needs your approval of a key and a spending limit.
+  3. Email-code sign-in with working email for real users (the preview uses password sign-in for test accounts, marked temporary).
+  4. Plan gates: business entity and payments (Gate 2, payments off), legal text (Gate 1), `bloat-live`.
+  5. Your decisions: DECISIONS open items 15 to 18 (re-asking "Is it still happening?", the founder audit step, a background deletion job, kept photos of deleted meals).
+  6. Not run on the preview: founder tools, the three checks that need several days of records, and the failure cases that can only be forced locally.
 
 Read next: `docs/verification-report.md` (what was checked, where, and on which build), `TEST_RESULTS.md`, `DEPLOYMENT.md`, `DECISIONS.md`.
 
@@ -44,6 +45,7 @@ Do not use "Delete my account" on `bloat-tester@bloat.test`: it removes your tes
 - Fixed the four defects of the external report (B1 to B4), published as `0d537d2` (run 9) and re-checked live.
 - Ran the full signed-in hosted suite on that build with 7 separate synthetic accounts: 16 of 16 passed (the 15 checks plus Your journey with no finished day). The 7 accounts were deleted through the app and checked gone; `bloat-tester` was not touched.
 - Checked the 12 remaining actions of report section 5 on the screen (saves and persists, failure shown, double tap), plus 4 single checks. Three buttons showed nothing when their save failed; fixed in `7713098` and published by run 10. Details: report sections 4 (S1 to S3) and 5.
+- Last fix before the freeze: deleting an account could leave kept photos in storage if storage failed. Photos are now removed first, with retries, and the account is deleted only when they are gone; otherwise nothing is deleted and the person is told to try again. Published as `83fe4da` (run 12); hosted suite 16 of 16 on it; a live check kept 2 synthetic photos and saw them removed with the account.
 - Final round: reconciled every test count with the raw results; found and fixed three more defects (the recalled-meals offer could be left half-saved, export said "check your connection" for a server error, founder tools sent two changes on a double tap and showed nothing on a lost connection); published as `62431c7` (run 11); full hosted suite 16 of 16 on it with fresh accounts, all deleted afterwards; `bloat-tester` untouched.
 
 ## Done on 22 Nov (afternoon): closing the gaps, publishing gate

@@ -1,6 +1,24 @@
 # Test results
 
-Last run: 23 Nov 2026 (12:40 UTC). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 23 Nov 2026 (15:45 UTC). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+
+## Last fix before the freeze (23 Nov 2026): published build `83fe4da`
+
+Published revision `83fe4daf773f35b74b93b633db8a77b8f0f1f580`, Vercel deployment `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`, served at `https://bloat-preview.vercel.app` (GitHub run 12). Frozen for review.
+
+| Check | Where | Result |
+|---|---|---|
+| Delete account with kept photos while storage refuses deletes (synthetic photos, disposable account) | Local, published code `62431c7` | **Failed**: answered "deleted"; account gone, photo row and file left in storage |
+| Same, plus no-failure and recovery-during-retries checks (3 API checks) and the screen check | Local, fixed code | **4 of 4 passed**: no failure: photos then account removed; failing: nothing deleted, message shown, founder alert with counts only; after recovery: one tap removes photos and account |
+| The earlier fixes R1 to R3 (recalled offer, export messages, founder double tap) | Local, final code | Passed again |
+| Rule tests / API tests / browser tests | Local, final code | 97 of 97 / 140 of 140 / **251 of 251**, none retried |
+| Type check, lint | Local | 0 errors (5 old warnings) |
+| GitHub run 12 | CI | All checks passed (browser 251 of 251); built `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`; 6 of 6 live checks before and after publishing |
+| Tested = deployed | Vercel | Both addresses on `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`; 209 of 209 listed source files byte-identical to `83fe4da` |
+| Full hosted suite, 7 fresh accounts | Live | **16 of 16 passed** |
+| Export messages; kept photos then deletion | Live | **2 of 2 passed**; 2 synthetic photos stored, then 0 after "Delete my account" |
+| 7 accounts deleted through the app, read-only checks | Live, `bloat-test` | 0 rows anywhere, no marked accounts, photo bucket empty; `bloat-tester` identical before and after |
+| Real phones / real AI provider / founder tools on the preview / the 3 history-dependent screens on the preview / storage and recalled-offer failures on the preview | - | **Not performed** |
 
 ## Final round (23 Nov 2026): published build `62431c7`
 

@@ -46,6 +46,8 @@ Choices made while building, with the reason. "Needs the owner" means: please sa
 
 22. **Publishing the testing preview only after checks (22 Nov 2026).** The owner asked that a successful build alone is never treated as a tested release. `vercel.json` switches off Vercel's automatic Git builds; `.github/workflows/preview.yml` publishes only after the local suites (typecheck, lint, rule, API and browser tests) and six account-free hosted checks on the new, not-yet-public deployment pass, then confirms which deployment the address serves. The signed-in hosted suite stays manual, because it needs owner-approved accounts. The only secret is `VERCEL_TOKEN`, held by GitHub. Trade-off: until the owner adds that secret, nothing new is published (fail closed).
 23. **"Check and finish" after a lost account-deletion reply (22 Nov 2026).** If the session is no longer accepted, the app treats the deletion as done, because only a completed deletion (or a separate sign-out) ends the session at that moment. The person is then signed out and sent to the start page, as after a normal deletion. Rare exception: if the session ended for another reason at that same moment (for example, signing out everywhere from another device), the account may still exist, and signing in again would show it.
+24. **Deleting an account removes kept photos first, and only then the account (23 Nov 2026).** The server holds no storage key (choice 1), so once an account is gone nothing may remove its files. The route therefore removes the photo folder with the person's own sign-in, retries on its own (4 attempts, about 2.5 seconds) and checks the folder is empty before deleting the account. If storage keeps failing, nothing is deleted, the person sees "That didn't work. Nothing was deleted. Try again." and the founder gets a `photo_cleanup_failed` alert (counts only). The plan's background "deletion job" would need a server storage key, a new secret: open item 17.
+
 
 ## Where the plan was unclear and what was built (needs the owner)
 
@@ -66,6 +68,8 @@ Choices made while building, with the reason. "Needs the owner" means: please sa
 15. **"Is it still happening?" comes back after Yes or Not sure.** The answer is not stored (only an anonymous event), so on the next app open the question is asked again while the bloating record has been open 8 hours or more. Built as the plan reads; tested as such. Say if you want a quiet period after an answer (for example, ask again only after another 8 hours).
 
 16. **Founder tools: a change and its audit record are written in two database steps** (the setting, then the audit row). If the second step failed, the change would have no audit record. Found on 23 Nov; not changed. Making them one step needs a new database function, so a new migration applied to `bloat-test`. Say if you want it. (The double tap on these buttons is fixed: one change, one record.)
+17. **Account deletion during a storage outage.** Built: nothing is deleted and the person tries again (engineering choice above). The plan describes a background deletion job; one that removes files after the account is gone needs a Supabase storage key on the server, a new secret. Say if you want that for `bloat-live`.
+18. **Kept photos of a deleted meal, or after switching "Keep my meal photos" off.** They stay in storage until the account is deleted (then they are removed). The plan does not say what these two actions should do with photos already kept. Not changed.
 
 ## Still open in the plan itself
 
