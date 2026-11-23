@@ -315,7 +315,13 @@ const ACTIONS: Action[] = [
     submit: (c) => dialog(c, "Edit times").getByRole("button", { name: "Save changes" }),
     write: { method: "PATCH", path: /\/v1\/episodes\/[^/]+$/ },
     changed: async (c) => (await day(c)).episodes[0]?.start_precision === "approximate",
-    after: async (c) => { await c.page.getByRole("button", { name: "Edit times" }).click(); await expect(dialog(c, "Edit times").getByRole("radiogroup", { name: "Start" }).getByRole("radio", { name: "Roughly" })).toHaveAttribute("aria-checked", "true"); },
+    // Reopened after a refresh: Keep is chosen (since 23 Nov) and the kept start time is shown as approximate.
+    after: async (c) => {
+      await c.page.getByRole("button", { name: "Edit times" }).click();
+      const d = dialog(c, "Edit times");
+      await expect(d.getByRole("radiogroup", { name: "Start" }).getByRole("radio", { name: "Keep" })).toHaveAttribute("aria-checked", "true");
+      await expect(d.getByText(/^Keeps the saved time: about \d/)).toBeVisible();
+    },
   },
   {
     name: "Delete an exercise record (Pro)", role: "pro",
