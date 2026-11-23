@@ -26,6 +26,8 @@ An independent tester checked the preview (`adfe49b`) with the owner's test acco
 | B3 | Patterns showed "23 Nov to 22 Nov" for an account with no finished day | `tests/e2e/empty-states.spec.ts`: Patterns and Your journey both failed; a rule test for the new range helper failed (no helper) | The range runs from the first day to yesterday, so on the first day it starts after it ends. Both screens now say "No finished days yet." in that case; with finished days the range shows as before (checked in US and day-first formats) | `a746eb7` |
 | B4 | A day with a saved meal said "Nothing was logged and there is no review." | Same file: failed on the old code | The day says "No bloating was logged and there is no review." when it has any entry, and keeps "Nothing was logged…" for an empty day | `f58103d` |
 
+Live, on `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` (23 Nov): B1, B2, B3 (Patterns) and B4 passed with an account in Asia/Kolkata and a browser in America/Los_Angeles (`tests/hosted/reported-fixes.spec.ts`). Your journey's range was checked locally only.
+
 One existing check changed with B2: "Edit the times of a bloating record" expected the reopened sheet to show "Roughly" chosen; it now opens on Keep and shows "Keeps the saved time: about …". GitHub run 7 (commit `8d7ae58`) failed on exactly that check and published nothing; the updated check is in `d0d7383`.
 
 ## 5. What is still not verified for every outcome
@@ -120,9 +122,11 @@ Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, no
 
 **This run's 7 accounts** (`run-public`, `run-p1`, `run-diary`, `run-isoa`, `run-isob`, `run-export` at `bloat.test`, and `pro-tester@bloat.test`, marked `2026-11-22`) were created at about 20:25 UTC with only the bcrypt hash of a one-off password sent; the password stayed in a private file. After the hosted suite and the old-token check, each was deleted through the app's own "Delete my account" (`tests/hosted/delete-accounts.ts`; `run-p1` as part of the old-token check). Read-only check afterwards: 0 users (by ID, by email and by marker), 0 sessions, 0 refresh tokens, 0 identities, 0 stored files, 0 rows in all 48 app tables; the app keeps its designed deletion record for each (7 rows holding only a SHA-256 hash of the account ID, so a restored backup cannot bring the account back). No account with any `synthetic_test_run` marker remains. The password, its hash and the session file were then deleted.
 
+**23 Nov, B1 to B4 live check:** one account, `pro-tester@bloat.test` (marked `2026-11-23`, ID `6e37465a-86ac-483c-9476-e1599891d5a8`), created with only a password hash, used for `tests/hosted/reported-fixes.spec.ts`, then deleted through "Delete my account" (answer: deleted; its token refused at once). Read-only check afterwards: 0 users (by ID, email and marker), 0 sessions, refresh tokens, identities and stored files, 0 rows across all 48 app tables; one hash-only deletion record. The owner's `bloat-tester@bloat.test` and the external tester's synthetic meal and bloating record on it were not touched.
+
 ## 9. Which build the addresses serve, and what publishes it
 
-**Served now:** `https://bloat-preview.vercel.app` and the branch address serve deployment `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` (`bloat-1gx9xzdwr-typeshi2.vercel.app`, created by the Vercel CLI from GitHub run 6), checked through Vercel before and after the hosted tests. Before that they served `af950f5` (`dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj`), the last build made by Vercel's own Git builds.
+**Served now (23 Nov):** `https://bloat-preview.vercel.app` and the branch address serve deployment `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` (`bloat-fe4z4x081-typeshi2.vercel.app`), built by GitHub run 9 from commit `0d537d2`, which holds the B1 to B4 fixes. Tied together the same way as for run 6 below: the run's commit, the URL its hosted step tested, the 207 listed source files (all byte-identical to `0d537d2`, including notes that exist only in that commit), and Vercel's answer for both addresses. Before that (22 Nov): `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` from run 6 (`adfe49b`); before that `af950f5` (`dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj`), the last build made by Vercel's own Git builds.
 
 **Tested revision = deployed revision, and how that is known:**
 
@@ -134,7 +138,7 @@ Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, no
 
 **The publishing gate (from commit `4640ac2`):**
 
-- `vercel.json` switches off Vercel's automatic Git builds. Checked: no Git-triggered deployment for any of the 10 pushes since `af950f5` (5 of them without `[skip ci]`); the only deployment since is the one run 6 made.
+- `vercel.json` switches off Vercel's automatic Git builds. Checked: no Git-triggered deployment for any of the 14 pushes since `af950f5` (17 commits); the only deployments since are the two the workflow made (runs 6 and 9).
 - Second layer: the Vercel project's Ignored Build Step, set on 22 Nov about 19:40 UTC to `test -n "$VERCEL_GIT_COMMIT_SHA"`, meant to skip any Git-triggered build (a push, "Redeploy", a deploy hook) even if `vercel.json` changes. **Configured and read back:** run 6 read it through the Vercel API before building and it matched (the step stops the publish if it does not). **Not proven to block a Git build:** no Git build has been attempted since it was set (`vercel.json` already stops them), and proving it needs a test build on a separate branch that the dedicated address is not tied to, which was not done. Still possible by hand: a Vercel team member assigning the address in the dashboard or with their own CLI login (DEPLOYMENT.md lists every path).
 - `.github/workflows/preview.yml` runs on every push. **Blocks publishing:** typecheck, lint, rule tests, the local Supabase stack, the app build, API tests and browser tests on a clean checkout; then a Vercel build that nothing public points at yet; then the six account-free hosted checks against that new build. **Only then** both addresses move to it, and the workflow confirms through Vercel which deployment `bloat-preview.vercel.app` serves. **Afterwards, reporting only:** the same six checks on the public address. **Manual:** the signed-in hosted checks (they need owner-approved accounts).
 - The only secret is `VERCEL_TOKEN`, a GitHub repository secret added by the owner on 22 Nov (after 20:06 UTC), never in the workflow file or the log.
@@ -149,6 +153,9 @@ Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, no
 | 4 | `8877f49` | Cancelled | A newer push started run 5 (the workflow keeps one run per branch) |
 | 5 | `5a78d98` | **Checks passed**; publishing stopped at 20:06 UTC, as designed | The token was not set yet |
 | 6 | `adfe49b` (started by hand) | **Passed, published** (20:13 to 20:26 UTC) | Checks passed; deployment controls read back and matched; Vercel build `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ`; 6 hosted checks passed on it; both addresses moved; served deployment confirmed; 6 hosted checks passed again on the public address |
+| 7 | `8d7ae58` (B1 to B4 fixes) | **Failed, nothing published** (23 Nov) | 209 of 210 browser checks passed; "Edit the times of a bloating record" still expected the old "Roughly" chip when the sheet reopens. The gate did its job; the check was updated in `d0d7383` |
+| 8 | `d0d7383` | **Failed, nothing published** | GitHub's machine could not start the local mail test service ("port 54324 already in use") before any test ran; a machine problem, not the app |
+| 9 | `0d537d2` (started by hand; app code equals `d0d7383`) | **Passed, published** (07:12 to 07:26 UTC, 23 Nov) | Checks passed; controls read back and matched; Vercel build `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K`; 6 hosted checks passed on it; addresses moved; served deployment confirmed; 6 hosted checks passed again on the public address |
 
 ## 10. Limits of this verification
 

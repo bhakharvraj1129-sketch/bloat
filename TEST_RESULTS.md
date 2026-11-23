@@ -1,6 +1,29 @@
 # Test results
 
-Last run: 22 Nov 2026 (evening). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 23 Nov 2026. The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+
+## External report fixes (23 Nov 2026): published build `0d537d2`
+
+An independent tester (cloud Chrome, the owner's test account, build `adfe49b`) reported four defects. Each was reproduced by a new test on the old code, fixed in its own commit, and published through the gate.
+
+Published revision `0d537d27fcbaf4ea047fff6f3b01a1e0b6c0a420` (app code equals `d0d7383`), Vercel deployment `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K`, served at `https://bloat-preview.vercel.app`.
+
+| Check | Where | Result |
+|---|---|---|
+| B1/B2 time edits: 15 checks (phone behind, ahead, same zone; Keep; meal and bloating; midnight; both clock changes) | Local, old code | 14 of 15 failed (B1 and B2 reproduced) |
+| Same 15 checks | Local, fixed code | 15 of 15 passed |
+| B3/B4: 5 checks (Patterns and Journey on a new account; range with finished days; day with only a meal; empty day) | Local, old code / fixed | 3 failed (the defects), 2 controls passed / 5 of 5 passed |
+| Rule tests, incl. the new date-range rule | Local | 97 of 97 |
+| API tests | Local | 135 of 135 |
+| Browser tests, all | Local | 210 of 210, 0 flaky |
+| Type check, lint | Local | 0 errors (5 old warnings) |
+| GitHub run 7 (`8d7ae58`) | CI | Failed on one outdated check; nothing published |
+| GitHub run 8 (`d0d7383`) | CI | Failed: GitHub machine port clash before tests; nothing published |
+| GitHub run 9 (`0d537d2`, started by hand) | CI | All checks passed; controls read back; built, checked live (6 of 6), published, served deployment confirmed, checked again (6 of 6) |
+| B1 to B4 on the published build (account Asia/Kolkata, browser America/Los_Angeles) | Live | Passed |
+| Test account deleted through "Delete my account" and verified | Live and `bloat-test` | 0 rows anywhere; one hash-only deletion record |
+| Full signed-in hosted suite (15) on this build | Live | **Not re-run** (last passed on `adfe49b`) |
+| Real phones | - | **Pending** |
 
 ## Live verification (22 Nov 2026, evening): published build `adfe49b`
 

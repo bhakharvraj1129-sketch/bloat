@@ -8,19 +8,30 @@ and `bloat-test`) are kept apart, and nothing here comes from a real phone. Rebu
 
 ## Results at a glance
 
-**Tested and published revision: `adfe49b803f88c8300a01afe27cca8bb7ff449d4`** (22 Nov 2026), served at `https://bloat-preview.vercel.app` as Vercel deployment **`dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ`**. Its app code is identical to `2f22cc4` (the commits after it changed only tests, notes, the workflow and `docs/ops`). Later commits change only tests and notes and are not published.
+**Tested and published revision: `0d537d27fcbaf4ea047fff6f3b01a1e0b6c0a420`** (23 Nov 2026), served at `https://bloat-preview.vercel.app` as Vercel deployment **`dpl_59A4HADi2dEAD26ivcfdoXVWPf9K`**. It holds the fixes for the four defects of the external report of 23 Nov (section 4, B1 to B4). Its app code equals `d0d7383`; `0d537d2` only added notes.
 
-How tested and deployed are tied together (section 9): GitHub run 6 was started by hand on the branch and reports commit `adfe49b`; it built `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` and ran its hosted checks against exactly that URL before publishing; every source file Vercel listed for that deployment is byte-identical to `adfe49b`; Vercel reports both preview addresses on it.
+How tested and deployed are tied together (section 9): GitHub run 9 was started by hand on the branch and reports commit `0d537d2`; it built `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` and ran its hosted checks against exactly that URL before publishing; every source file Vercel listed for that deployment (207 of 628; its listing is partial) is byte-identical to `0d537d2`; Vercel reports both preview addresses on it. The previous published build was `adfe49b` (`dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ`, 22 Nov).
+
+### Fixes from the external report (23 Nov)
+
+| Defect | Local (old code, then fix) | Live, on `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` |
+|---|---|---|
+| B1: changing only a meal's name failed or moved its time when the phone and account zones differed | Reproduced (14 of 15 new checks failed); all 15 pass | **Passed**: account in Asia/Kolkata, browser in America/Los_Angeles; rename saved, saved time identical |
+| B2: "Keep" had no effect | Reproduced; passes | **Passed**: Keep chosen, kept the time after another time was picked |
+| B3: backwards date range on Patterns (and Your journey) for a new account | Reproduced on both screens; pass | **Passed** on Patterns ("No finished days yet."); Your journey checked locally only |
+| B4: "Nothing was logged" on a day with a meal | Reproduced; passes | **Passed** ("No bloating was logged and there is no review.") |
 
 Words used: **Passed** (the outcome was checked and was right), **Failed**, **Skipped** (left out on purpose, with the reason), **Blocked** (could not run; the reason is given), **Not done**.
 
 ### Local evidence (this workspace: local Supabase in Docker, synthetic accounts, test mode on)
 
+Rule, API and browser tests re-run on 23 Nov on the final code; the crawl, the navigation run and the width check are from 22 Nov (`2f22cc4` app code; the four fixes since change the day screen's edit sheets and two date lines).
+
 | Check | Result |
 |---|---|
-| Rule tests `pnpm test` | **Passed**, 96 of 96 |
+| Rule tests `pnpm test` | **Passed**, 97 of 97 |
 | API tests `pnpm test:api` (real HTTP against the local app), incl. a deleted account's earlier tokens (section 6) | **Passed**, 135 of 135 |
-| Browser tests `tests/e2e`, phone screen (Chromium, Pixel 7 size) | **Passed**, 190 of 190, 0 flaky |
+| Browser tests `tests/e2e`, phone screen (Chromium, Pixel 7 size), incl. 20 new checks for B1 to B4 | **Passed**, 210 of 210, 0 flaky (23 Nov, final code) |
 | &nbsp;&nbsp;of which save and edit outcomes, 51 actions x 3 plus 6 single checks (section 3) | **Passed**, 159 of 159 |
 | Navigation by real clicks, destination and Back, signed-out, Free and Pro, 412px and 1440px (section 2) | **Passed**, 238 clicks: 238 right destination, 238 Back returned |
 | Control crawl (section 1) | 1,292 rows: **834 passed** (74 screen loads, 244 clicked and responded, 516 link targets loaded without clicking), 0 failed, 49 skipped on purpose (20 destructive, each covered by a named test; 29 outside links), 409 excluded (332 hidden at phone width, 32 disabled, 45 fields), 0 blocked |
@@ -31,6 +42,9 @@ Words used: **Passed** (the outcome was checked and was right), **Failed**, **Sk
 
 | Check | Result |
 |---|---|
+| Run 9 (started by hand, commit `0d537d2`): all checks, controls read back, Vercel build, hosted checks before and after publishing | **Passed**, published `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` (07:12 to 07:26 UTC, 23 Nov) |
+| Run 7 (commit `8d7ae58`) | **Failed, nothing published**: one browser check still expected the old "Roughly" chip on reopening (updated in `d0d7383`) |
+| Run 8 (commit `d0d7383`) | **Failed, nothing published**: GitHub's machine could not start the local mail test service (port already in use), before any test ran |
 | Run 6 (started by hand, commit `adfe49b`): typecheck, lint, rule tests, local Supabase, build, API tests, browser tests | **Passed** (20:13 to 20:22 UTC) |
 | Run 6: deployment controls read back before building (`vercel.json` keeps Git builds off; the Vercel project's Ignored Build Step equals `test -n "$VERCEL_GIT_COMMIT_SHA"`) | **Passed** (read back through the Vercel API) |
 | Run 6: Vercel build, then the 6 account-free hosted checks on that new, not yet public deployment | **Passed**, 6 of 6 |
@@ -38,7 +52,11 @@ Words used: **Passed** (the outcome was checked and was right), **Failed**, **Sk
 | Run 6: the 6 checks again on the public address after publishing | **Passed** |
 | Earlier runs 1 to 5 | Runs 1 and 2 **failed** (a workflow setup mistake; the missing PDF tool and a real defect, section 4 row 8), all fixed; runs 3 and 5 passed every check and stopped before publishing because `VERCEL_TOKEN` was not set yet, as designed; run 4 was cancelled by a newer push |
 
-### Hosted evidence (the public preview and the `bloat-test` database), on `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ`
+### Hosted evidence (the public preview and the `bloat-test` database)
+
+On `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` (23 Nov): the 6 account-free checks passed twice inside run 9, the B1 to B4 live check passed with one synthetic account (`pro-tester@bloat.test`, marked `2026-11-23`), and that account was then deleted through "Delete my account" and verified gone (0 rows anywhere; one hash-only deletion record). The full signed-in suite (15 checks) was **not** re-run on this build; it last passed on `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ`, below.
+
+On `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` (`adfe49b`, 22 Nov):
 
 | Check | Result |
 |---|---|
@@ -48,7 +66,7 @@ Words used: **Passed** (the outcome was checked and was right), **Failed**, **Sk
 | The same session: screen (reported separately) | `/history` redirects to Sign in. Not counted as evidence that data is protected |
 | Deleting the 19 temporary accounts from 19 Nov (owner ran the guarded SQL) | **Passed**: read-only check at 20:12 UTC shows 0 users, sessions, refresh tokens, identities, stored files and rows in all 48 app tables; the owner's `bloat-tester@bloat.test` is intact |
 | Deleting the 7 accounts of this run (through the app's own "Delete my account") | **Passed**: 7 of 7 answered "deleted" and their tokens were refused at once; read-only check shows 0 users, sessions, refresh tokens, identities, stored files and app rows; the app kept only its 7 deletion records (a hash of each account ID). No account with a test marker remains |
-| Git builds off through `vercel.json` | **Passed**: no Git-triggered deployment for any of the 10 pushes since `af950f5` |
+| Git builds off through `vercel.json` | **Passed**: no Git-triggered deployment for any of the 14 pushes since `af950f5` (to 23 Nov) |
 | Vercel Ignored Build Step (second layer) | **Configured and read back** (run 6). **Not proven to block a Git build**: that needs a test build on a separate branch, not done (section 9) |
 
 ### Manual device evidence
@@ -56,7 +74,8 @@ Words used: **Passed** (the outcome was checked and was right), **Failed**, **Sk
 | Check | Result |
 |---|---|
 | The owner's own sign-in, setup, refresh and sign-out on the preview (22 Nov, earlier build) | Passed, reported by the owner and confirmed from server records (section 7) |
-| The main journeys on a real phone with `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` | **Not done (pending).** Checklist for the owner in `PROGRESS.md` |
+| The main journeys on a real phone with `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` | **Not done (pending).** Checklist for the owner in `PROGRESS.md` |
+| External tester, 23 Nov, cloud Chrome browser with the owner's test account on `adfe49b` | Their report: four defects (now fixed) and the checks they passed; not a real phone |
 | iOS Safari, Android Chrome, screen reader, 200% zoom | **Not done** |
 
 ### Not claimed
@@ -189,7 +208,7 @@ Result: 159 of 159 passed (51 actions x 3, plus 6 single checks: the rows withou
 Before fix 1 in section 4 (earlier the same day), on the same checks:
 - Delete a meal: a server failure is shown, nothing changes, and the same button then saves: Error: failure message on screen
 
-The other browser tests on the same build: admin.spec.ts 1 of 1, core.spec.ts 11 of 11, email-code.spec.ts 5 of 5, navigation.spec.ts 14 of 14.
+The other browser tests on the same build: admin.spec.ts 1 of 1, core.spec.ts 11 of 11, email-code.spec.ts 5 of 5, empty-states.spec.ts 5 of 5, navigation.spec.ts 14 of 14, time-edits.spec.ts 15 of 15.
 
 Five widths (320, 390, 768, 1024, 1440px): 185 screen and width checks, 0 with sideways scrolling.
 
@@ -209,6 +228,21 @@ Rows 1, 3, 5, 6, 7 and 8 were reproduced by a test on the build before the fix, 
 | 8 | The coverage insight endpoint (`/v1/insights/coverage`, Pro) was never committed. The ignore rule `coverage` in `.gitignore`, meant for test-coverage output, also matched `src/app/v1/insights/coverage/`. Local tests passed because the file was on disk; every Vercel build lacked it. No screen calls it (it is API only) | The first CI run on a clean checkout (run 2): "a Free account gets 403 PLAN_REQUIRED on every Pro endpoint" got 404 for this path; the preview also answers 404 there while its neighbour `/v1/insights/summary` answers 401 | The rule now matches only the top-level `/coverage` folder, and the endpoint is committed unchanged (`2f22cc4`). A clean checkout in CI on every push now catches any file that exists only locally |
 
 The harness was also tightened while closing the gaps: when a sheet is open, the failure message must appear inside that sheet. Before that change, defect 6 passed the looser check because the text existed behind the sheet (`gaps-before-fix.json`).
+
+### External report of 23 Nov 2026 (B1 to B4)
+
+An independent tester checked the preview (`adfe49b`) with the owner's test account and found four defects. Each was reproduced by a new test on the old code before it was fixed, then fixed in its own commit.
+
+| # | Defect (their wording, shortened) | Reproduced before the fix | Fix | Commit |
+|---|---|---|---|---|
+| B1 | Changing only a meal's name failed with "That time is in the future" when the phone's time zone was behind the account's (Asia/Kolkata) | `tests/e2e/time-edits.spec.ts`: 14 of 15 checks failed on the old code. Phone behind: the save was refused. Phone ahead, or even in the same zone: the save went through but silently moved the saved time or dropped its seconds (a meal at 23:50:17.123 New York time became 23:50 Tokyo time). Both clock changes also misread or moved times | The edit sheets showed the saved time in the account's zone but sent it labelled with the phone's zone. Now a name-only change sends no time, so the saved time stays exactly as it is; a new time is entered in the account's zone (the zone the day screen shows), the latest allowed time is now in that zone, and the sheet names the zone when the phone is elsewhere. The meal sheet also asks "which one" when a time happened twice, as the bloating sheet already did | `d863fa7` |
+| B2 | "Keep" had no effect | Same file: Keep was never shown as chosen and could not restore the saved time | Keep is a real choice, chosen when the sheet opens; it sends no time and shows the time being kept ("Keeps the saved time: …"). Leaving Keep starts from the saved time. Saving with nothing changed closes without writing | `d863fa7` |
+| B3 | Patterns showed "23 Nov to 22 Nov" for an account with no finished day | `tests/e2e/empty-states.spec.ts`: Patterns and Your journey both failed; a rule test for the new range helper failed (no helper) | The range runs from the first day to yesterday, so on the first day it starts after it ends. Both screens now say "No finished days yet." in that case; with finished days the range shows as before (checked in US and day-first formats) | `a746eb7` |
+| B4 | A day with a saved meal said "Nothing was logged and there is no review." | Same file: failed on the old code | The day says "No bloating was logged and there is no review." when it has any entry, and keeps "Nothing was logged…" for an empty day | `f58103d` |
+
+Live, on `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` (23 Nov): B1, B2, B3 (Patterns) and B4 passed with an account in Asia/Kolkata and a browser in America/Los_Angeles (`tests/hosted/reported-fixes.spec.ts`). Your journey's range was checked locally only.
+
+One existing check changed with B2: "Edit the times of a bloating record" expected the reopened sheet to show "Roughly" chosen; it now opens on Keep and shows "Keeps the saved time: about …". GitHub run 7 (commit `8d7ae58`) failed on exactly that check and published nothing; the updated check is in `d0d7383`.
 
 ## 5. What is still not verified for every outcome
 
@@ -302,9 +336,11 @@ Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, no
 
 **This run's 7 accounts** (`run-public`, `run-p1`, `run-diary`, `run-isoa`, `run-isob`, `run-export` at `bloat.test`, and `pro-tester@bloat.test`, marked `2026-11-22`) were created at about 20:25 UTC with only the bcrypt hash of a one-off password sent; the password stayed in a private file. After the hosted suite and the old-token check, each was deleted through the app's own "Delete my account" (`tests/hosted/delete-accounts.ts`; `run-p1` as part of the old-token check). Read-only check afterwards: 0 users (by ID, by email and by marker), 0 sessions, 0 refresh tokens, 0 identities, 0 stored files, 0 rows in all 48 app tables; the app keeps its designed deletion record for each (7 rows holding only a SHA-256 hash of the account ID, so a restored backup cannot bring the account back). No account with any `synthetic_test_run` marker remains. The password, its hash and the session file were then deleted.
 
+**23 Nov, B1 to B4 live check:** one account, `pro-tester@bloat.test` (marked `2026-11-23`, ID `6e37465a-86ac-483c-9476-e1599891d5a8`), created with only a password hash, used for `tests/hosted/reported-fixes.spec.ts`, then deleted through "Delete my account" (answer: deleted; its token refused at once). Read-only check afterwards: 0 users (by ID, email and marker), 0 sessions, refresh tokens, identities and stored files, 0 rows across all 48 app tables; one hash-only deletion record. The owner's `bloat-tester@bloat.test` and the external tester's synthetic meal and bloating record on it were not touched.
+
 ## 9. Which build the addresses serve, and what publishes it
 
-**Served now:** `https://bloat-preview.vercel.app` and the branch address serve deployment `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` (`bloat-1gx9xzdwr-typeshi2.vercel.app`, created by the Vercel CLI from GitHub run 6), checked through Vercel before and after the hosted tests. Before that they served `af950f5` (`dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj`), the last build made by Vercel's own Git builds.
+**Served now (23 Nov):** `https://bloat-preview.vercel.app` and the branch address serve deployment `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K` (`bloat-fe4z4x081-typeshi2.vercel.app`), built by GitHub run 9 from commit `0d537d2`, which holds the B1 to B4 fixes. Tied together the same way as for run 6 below: the run's commit, the URL its hosted step tested, the 207 listed source files (all byte-identical to `0d537d2`, including notes that exist only in that commit), and Vercel's answer for both addresses. Before that (22 Nov): `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` from run 6 (`adfe49b`); before that `af950f5` (`dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj`), the last build made by Vercel's own Git builds.
 
 **Tested revision = deployed revision, and how that is known:**
 
@@ -316,7 +352,7 @@ Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, no
 
 **The publishing gate (from commit `4640ac2`):**
 
-- `vercel.json` switches off Vercel's automatic Git builds. Checked: no Git-triggered deployment for any of the 10 pushes since `af950f5` (5 of them without `[skip ci]`); the only deployment since is the one run 6 made.
+- `vercel.json` switches off Vercel's automatic Git builds. Checked: no Git-triggered deployment for any of the 14 pushes since `af950f5` (17 commits); the only deployments since are the two the workflow made (runs 6 and 9).
 - Second layer: the Vercel project's Ignored Build Step, set on 22 Nov about 19:40 UTC to `test -n "$VERCEL_GIT_COMMIT_SHA"`, meant to skip any Git-triggered build (a push, "Redeploy", a deploy hook) even if `vercel.json` changes. **Configured and read back:** run 6 read it through the Vercel API before building and it matched (the step stops the publish if it does not). **Not proven to block a Git build:** no Git build has been attempted since it was set (`vercel.json` already stops them), and proving it needs a test build on a separate branch that the dedicated address is not tied to, which was not done. Still possible by hand: a Vercel team member assigning the address in the dashboard or with their own CLI login (DEPLOYMENT.md lists every path).
 - `.github/workflows/preview.yml` runs on every push. **Blocks publishing:** typecheck, lint, rule tests, the local Supabase stack, the app build, API tests and browser tests on a clean checkout; then a Vercel build that nothing public points at yet; then the six account-free hosted checks against that new build. **Only then** both addresses move to it, and the workflow confirms through Vercel which deployment `bloat-preview.vercel.app` serves. **Afterwards, reporting only:** the same six checks on the public address. **Manual:** the signed-in hosted checks (they need owner-approved accounts).
 - The only secret is `VERCEL_TOKEN`, a GitHub repository secret added by the owner on 22 Nov (after 20:06 UTC), never in the workflow file or the log.
@@ -331,6 +367,9 @@ Together they hold 12 meals, 4 bloating records, 3 reports and 3 share links, no
 | 4 | `8877f49` | Cancelled | A newer push started run 5 (the workflow keeps one run per branch) |
 | 5 | `5a78d98` | **Checks passed**; publishing stopped at 20:06 UTC, as designed | The token was not set yet |
 | 6 | `adfe49b` (started by hand) | **Passed, published** (20:13 to 20:26 UTC) | Checks passed; deployment controls read back and matched; Vercel build `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ`; 6 hosted checks passed on it; both addresses moved; served deployment confirmed; 6 hosted checks passed again on the public address |
+| 7 | `8d7ae58` (B1 to B4 fixes) | **Failed, nothing published** (23 Nov) | 209 of 210 browser checks passed; "Edit the times of a bloating record" still expected the old "Roughly" chip when the sheet reopens. The gate did its job; the check was updated in `d0d7383` |
+| 8 | `d0d7383` | **Failed, nothing published** | GitHub's machine could not start the local mail test service ("port 54324 already in use") before any test ran; a machine problem, not the app |
+| 9 | `0d537d2` (started by hand; app code equals `d0d7383`) | **Passed, published** (07:12 to 07:26 UTC, 23 Nov) | Checks passed; controls read back and matched; Vercel build `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K`; 6 hosted checks passed on it; addresses moved; served deployment confirmed; 6 hosted checks passed again on the public address |
 
 ## 10. Limits of this verification
 

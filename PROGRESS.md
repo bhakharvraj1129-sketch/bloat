@@ -6,9 +6,9 @@ Last updated: 22 Nov 2026. Branch: `claude/bloat-software-build-uxzoru`.
 
 The app is built end to end and runs as a public testing preview on Vercel against the hosted `bloat-test` database, with synthetic data, a labelled mock AI and mock billing. No production site, no real payments, no real AI calls.
 
-- Testing preview: `https://bloat-preview.vercel.app`, serving commit `adfe49b` as deployment `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ`, published on 22 Nov by the Preview workflow after its checks passed. All 15 hosted checks passed on it, including the signed-in ones.
+- Testing preview: `https://bloat-preview.vercel.app`, serving commit `0d537d2` as deployment `dpl_59A4HADi2dEAD26ivcfdoXVWPf9K`, published on 23 Nov by the Preview workflow (run 9) after its checks passed. It fixes the four defects of the external report of 23 Nov (time edits across time zones, "Keep", a backwards date range, and "Nothing was logged" on a day with a meal); all four were re-checked on it. The full signed-in hosted suite last ran on the previous build (15 of 15).
 - Sign-in: email and password, for owner-provisioned test accounts only. Sign-ups are off in Supabase itself. Test mode is off on the preview (`BLOAT_TEST_LOGIN=0`).
-- No temporary test accounts remain (both sets deleted and verified).
+- No temporary test accounts remain (all sets deleted and verified, last on 23 Nov).
 - Still open:
   1. The real-phone checks below (pending).
   2. Whether Vercel's Ignored Build Step really skips a Git build: configured and read back, not proven. Proving it needs a test push to a separate branch, with your OK.
