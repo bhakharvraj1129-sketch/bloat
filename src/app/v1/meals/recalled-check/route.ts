@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { ApiError, ok, route } from "@/server/http";
 import { loadUser } from "@/server/userdata";
-import { tx } from "@/server/db";
 import { thresholds } from "@/lib/registry";
 import { addDays, dayStartUtc } from "@/lib/time";
 
@@ -16,7 +15,10 @@ export const GET = route({ feature: "recalled_meal_check" }, async (ctx) => {
 
 export const POST = route({ capability: "recording", body: z.strictObject({ answer: z.enum(["yes_go_through_them", "not_now"]) }), mutation: true, feature: "recalled_meal_check" }, async (ctx) => {
   if (ctx.entitlement?.recalled_check_offered_at) throw new ApiError(409, "ALREADY_OFFERED", "This was already offered once.");
-  // The entitlement row is server-owned; mark the one-time offer as used.
-  await tx(ctx.userId, [{ op: "update", table: "entitlements", match: { user_id: ctx.userId }, set: { recalled_check_offered_at: new Date(ctx.now).toISOString() } }]);
-  return ctx.commit([{ op: "insert", table: "product_events", row: { name: "recalled_check_answered", props: { accepted: ctx.body.answer === "yes_go_through_them" } } }], 200, { answer: ctx.body.answer });
+  // One transaction: marking the one-time offer as used (the entitlement row is server-owned), the
+  // answer and the duplicate-tap record land together or not at all, so a failure never uses up the offer.
+  return ctx.commit([
+    { op: "update", table: "entitlements", match: { user_id: ctx.userId }, set: { recalled_check_offered_at: new Date(ctx.now).toISOString() }, require: true },
+    { op: "insert", table: "product_events", row: { name: "recalled_check_answered", props: { accepted: ctx.body.answer === "yes_go_through_them" } } },
+  ], 200, { answer: ctx.body.answer });
 });
