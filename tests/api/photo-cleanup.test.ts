@@ -49,6 +49,15 @@ function storageRefusesDeletes(userId: string): () => void {
   return () => sql(`drop trigger if exists ${name} on storage.objects; drop function if exists private.${name}();`);
 }
 
+/** Make the storage service silently keep one file (no error): the delete succeeds for the others. */
+function storageSilentlyKeeps(fileName: string): () => void {
+  const name = `test_keep_${randomUUID().replace(/-/g, "")}`;
+  sql(`create function private.${name}() returns trigger language plpgsql as $$ begin
+         if old.name = '${fileName}' then return null; end if; return old; end $$;
+       create trigger ${name} before delete on storage.objects for each row execute function private.${name}();`);
+  return () => sql(`drop trigger if exists ${name} on storage.objects; drop function if exists private.${name}();`);
+}
+
 const remove = (u: User) => call(u, "POST", "/v1/account/delete", { confirm: "DELETE" });
 
 describe("Delete account: kept meal photos", () => {
@@ -97,6 +106,31 @@ describe("Delete account: kept meal photos", () => {
     const r = await remove(u);
     await recovering;
     expect(r.status, JSON.stringify(r.body)).toBe(200);
+    expect([rows(u.id), filesOnDisk(u.id), accounts(u.id)]).toEqual([0, 0, 0]);
+  });
+
+  it("partial removal: storage removes 2 of 3 photos and silently keeps one; nothing else is deleted, the person is told, and the retry removes the last photo and the account", async () => {
+    const u = await accountWithPhotos(3);
+    const kept = sql(`select name from storage.objects where bucket_id = 'meal-photos' and name like '${u.id}/%' order by name limit 1`);
+    const before = (await alerts()).length;
+    const restore = storageSilentlyKeeps(kept);
+    try {
+      const r = await remove(u);
+      // Storage said yes but one photo is still there: the route checks the folder, so it is not fooled.
+      expect(r.status).toBe(503);
+      expect(r.body.error.code).toBe("PHOTOS_NOT_REMOVED");
+      expect([accounts(u.id), rows(u.id), filesOnDisk(u.id)]).toEqual([1, 1, 1]); // 2 of 3 removed; the account and its records stay
+      expect(Number(sql(`select count(*) from public.profiles where user_id = '${u.id}'`))).toBe(1);
+      expect(sql(`select count(*) from storage.objects where name = '${kept}'`)).toBe("1");
+      const now = await alerts();
+      expect(now.length).toBe(before + 1);
+      expect(now[0]!.detail).toMatchObject({ files_left: 1, reason: "not_removed" });
+      expect((await call(u, "GET", "/v1/me/state")).status).toBe(200); // still signed in, can try again
+    } finally {
+      restore();
+    }
+    const ok = await remove(u);
+    expect(ok.status, JSON.stringify(ok.body)).toBe(200);
     expect([rows(u.id), filesOnDisk(u.id), accounts(u.id)]).toEqual([0, 0, 0]);
   });
 });

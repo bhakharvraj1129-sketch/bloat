@@ -1,6 +1,21 @@
 # Test results
 
-Last run: 23 Nov 2026 (15:45 UTC). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 23 Nov 2026 (during the freeze). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+
+## During the freeze (23 Nov 2026): local checks on the frozen code `83fe4da`
+
+Nothing was published; the preview still serves `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`. Local stack, synthetic disposable accounts, local fault injection (temporary database triggers). `bloat-tester` was not used.
+
+| Check | Result |
+|---|---|
+| Account deletion with kept photos: no failure; storage failing then recovering; failure clearing during the automatic retries; **partial removal** (storage removes 2 of 3 photos and silently keeps one) | **4 of 4 passed**. Partial removal: the route notices the photo left behind, answers "nothing was deleted", keeps the account and its records, alerts the founder (`files_left: 1`), and the retry removes the last photo and the account |
+| Recalled-meals offer: the database refuses the answer, then (second check) the duplicate-tap record | **2 of 2 passed**: everything rolled back (offer not used up, no answer, no record); the same request then saves exactly once and a repeat writes nothing |
+| Keyboard only (Tab, Shift+Tab, Enter, Space, Escape): sign in, log bloating, Escape, add, edit and delete a meal, units, export, sign out; desktop at 100% and at 200% zoom; both sign-in modes | **Passed**. Visible focus ring on every checked control; focus returns after Escape and after adding or editing a meal |
+| Focus after a save that removes the opening button | **Failed: defect K1** (saving Log bloating, ending bloating, confirming Delete for a meal or a bloating record). Recorded as an expected-to-fail check; not fixed while frozen |
+| 200% browser zoom (1280 x 800 window), 11 main screens | **Passed**: no sideways scrolling, no control off screen, no clipped text, nothing hidden under the tab bar |
+| 200% zoom, sheets: Log bloating, Add meal, Edit meal | **Passed**: the sheet scrolls, Save is reachable and saves |
+| Rule / API / browser suites | 97 of 97 / 141 of 141 / 256 of 256 (the K1 check counts as an expected failure) |
+| Screen reader | **Not performed** (none available here; accessibility-tree checks are not counted) |
 
 ## Last fix before the freeze (23 Nov 2026): published build `83fe4da`
 

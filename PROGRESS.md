@@ -23,9 +23,7 @@ This file has four parts: **current status** (what is true now, with the evidenc
 
 ### Your decisions
 
-1. `DECISIONS.md`, "Where the plan was unclear" items 1 to 18. The newest: 15 ("Is it still happening?" asks again), 16 (a founder change and its audit record are two database steps), 17 (a background deletion job would need a server storage key), 18 (kept photos of a deleted meal stay until the account is deleted).
-2. `DECISIONS.md`, engineering choices marked "needs the owner": 10 (AI failure alert threshold), 13 (seven card wording corrections), 14 (medicine "sensitivity view").
-3. Company name and a monitored support address for the About and Contact pages.
+All in one table: `DECISIONS.md`, "Open decisions" (D1 to D19), each with what is built now, a recommended default and when it is needed. One affects your own testing: D1 ("Is it still happening?" asks again on every app open). Eleven are needed before an outside beta (D2 to D12; D6 does not block anything) and seven before a paid launch (D13 to D19). Settled questions, including the light-only design, are listed under "Settled" and are not reopened.
 
 ### Launch requirements (before anyone outside is invited)
 
@@ -38,15 +36,19 @@ This file has four parts: **current status** (what is true now, with the evidenc
 
 ### Tests not yet performed
 
-1. Real phones (iOS Safari, Android Chrome), a screen reader, 200% zoom. Your checklist is below.
+1. Real phones (iOS Safari, Android Chrome), and any screen reader (VoiceOver, TalkBack, NVDA): none performed. (200% browser zoom and keyboard-only journeys were tested locally on 23 Nov; see below.)
 2. A real AI provider (photo and typed dish).
 3. Founder tools on the hosted preview (no staff account there, by design).
 4. On the hosted preview: the doctor reminder in History, the experiment answer on Today and "Not useful" on Today (they need several days of records; checked locally and by the workflow).
-5. On the hosted preview, the failure cases that can only be forced on the local database: a storage outage during account deletion and a refused write in the recalled-meals offer.
+5. On the hosted preview, the failure cases that can only be forced on a local database: a storage outage during account deletion and a refused write in the recalled-meals offer. Both pass locally, including a partial photo removal.
 6. The control crawl, the link-by-link navigation run and the five-width check on the final build (last run on 22 Nov, app code `2f22cc4`).
 7. Whether Vercel's Ignored Build Step really blocks a Git build (configured and read back by every run; not proven).
 8. A real backup restore on `bloat-test` (re-applying deletions after a restore is checked locally only).
 9. The 19 screens without approved designs have not been compared with designs (only the 20 Slice A screens have them).
+
+### Found during the freeze, not fixed
+
+**K1, keyboard focus lost (found 23 Nov, not fixed: the preview is frozen).** When a save removes the button that opened a sheet, focus falls back to the page itself: after saving "Log bloating", after ending bloating, and after confirming "Delete" for a meal or a bloating record. Reproduction: `tests/e2e/accessibility.spec.ts`, check "known defect K1" (marked as expected to fail). Impact: a keyboard or screen-reader user loses their place, and the next Tab starts again from the top of the page; nothing is lost or saved wrongly. Proposed focused fix (one shared function, `returnFocus` in `src/lib/client/nav.ts`): if the button that opened the sheet is gone, move focus to the control that replaced it (for example "Bloating ongoing") or else to the screen's main heading. The K1 check then passes and becomes a normal check. Waiting for your go-ahead.
 
 ## Owner checklist: the main journeys on your phone
 
@@ -88,6 +90,7 @@ These entries record what was done and true **on that date**. Later work may hav
 
 ### 23 Nov 2026
 
+- During the freeze (local only, no publish): the two failure tests (storage failure during account deletion, now including a partial removal; a failure midway through the recalled-meals offer, with rollback and a duplicate-free retry) pass on the frozen code. Keyboard-only journeys and 200% browser zoom tested; one defect found (K1, above). The open owner questions became one table in `DECISIONS.md`.
 - Fixed the four defects of the external report (B1 to B4), published as `0d537d2` (run 9) and re-checked live.
 - Ran the full signed-in hosted suite on that build with 7 synthetic accounts: 16 of 16; the accounts were deleted and checked gone.
 - Checked the 12 remaining actions of report section 5 on the screen. Three buttons showed nothing when their save failed; fixed in `7713098` (run 10).

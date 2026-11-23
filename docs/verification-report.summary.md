@@ -39,23 +39,38 @@ Two timing races in the checks themselves, not the app, were also fixed: the loc
 
 ### Launch blockers that remain
 
-1. **Real devices.** No iOS Safari or Android Chrome phone has been used, and no screen reader or 200% zoom check has been run.
+1. **Real devices.** No iOS Safari or Android Chrome phone has been used, and no screen reader has been used. Defect K1 (keyboard focus, below) should be fixed before an outside beta.
 2. **A real AI provider.** The photo and dish ingredient check has only run against the labelled mock. It needs your approval of a key and a spending limit, then an evaluation.
 3. **Email sign-in.** The preview uses email-and-password for owner-made test accounts, marked temporary while email delivery is limited (`BLOAT_SIGN_IN_METHOD`). Real users need the email-code sign-in with working email delivery.
 4. **Plan gates still open:** business entity and payment provider (Gate 2; payments stay off), legal text (Gate 1), the live project `bloat-live`.
-5. **Account deletion during a storage outage:** now safe (nothing is deleted, the person tries again), but the plan describes a background deletion job. A background job that removes files after the account is gone needs a server storage key, a new secret: your decision for `bloat-live`.
-6. **Founder audit record:** a founder change and its audit record are written in two steps (DECISIONS, open item 16); fixing it needs a new migration: your decision.
+5. **Account deletion during a storage outage:** now safe (nothing is deleted, the person tries again), but the plan describes a background deletion job. A background job that removes files after the account is gone needs a server storage key, a new secret: your decision for `bloat-live` (DECISIONS, D18).
+6. **Founder audit record:** a founder change and its audit record are written in two steps (DECISIONS, D10); fixing it needs a new migration: your decision.
 
 ### Tests still not performed
 
-1. Real phones (iOS Safari, Android Chrome), a screen reader, 200% zoom.
+1. Real phones (iOS Safari, Android Chrome) and any screen reader: none performed. (200% browser zoom and keyboard-only journeys: tested locally during the freeze, below.)
 2. Real-provider AI evaluation (photo and typed dish).
 3. Founder tools on the hosted preview (no staff account there, by design).
 4. The three history-dependent checks on the hosted preview: the doctor reminder in History, the experiment answer on Today, "Not useful" on Today (checked locally and by the gate).
-5. On the hosted preview, the failure paths that can only be forced on the local database: a refused second write in the recalled-meals offer (R1) and a storage failure during account deletion (P1).
+5. On the hosted preview, the failure paths that can only be forced on the local database: a refused second write in the recalled-meals offer (R1) and a storage failure during account deletion (P1). Both pass locally, including a partial photo removal (below).
 6. The control crawl, the click-through navigation run and the five-width check on the final code (last run on 22 Nov, app code `2f22cc4`; sections 1 and 2).
 7. Whether Vercel's Ignored Build Step really blocks a Git build (configured and read back only).
 8. A real backup restore on `bloat-test` (plan Q33): re-applying deletions after a restore is checked locally only.
+
+### During the freeze (23 Nov): local checks on the frozen code `83fe4da`
+
+Nothing was published. Local stack, synthetic disposable accounts, local fault injection; `bloat-tester` not used. Evidence: `test-evidence/ledger/failure-tests-83fe4da.txt`, `a11y-83fe4da.txt`.
+
+| Check | Result |
+|---|---|
+| Storage failure during account deletion: total failure with recovery, failure clearing during retries, and **partial removal** (2 of 3 photos removed, one silently kept) | **4 of 4 passed**: nothing else deleted, the person told, founder alert with counts only, the retry finishes |
+| Failure midway through the recalled-meals offer (answer refused; duplicate-tap record refused) | **2 of 2 passed**: full rollback; the same request then saves once; a repeat writes nothing |
+| Keyboard-only main journeys, desktop at 100% and at 200% zoom, both sign-in modes | **Passed**, except defect K1 |
+| 200% browser zoom: 11 main screens and 3 sheets | **Passed** |
+| Screen reader | **Not performed** |
+| Suites | Rule 97 of 97, API 141 of 141, browser 256 of 256 |
+
+**K1, keyboard focus lost (found 23 Nov, not fixed: the preview is frozen).** When a save removes the button that opened a sheet, focus falls back to the page itself: after saving "Log bloating", after ending bloating, and after confirming "Delete" for a meal or a bloating record. Reproduction: `tests/e2e/accessibility.spec.ts`, check "known defect K1" (marked as expected to fail). Impact: a keyboard or screen-reader user loses their place, and the next Tab starts again from the top of the page; nothing is lost or saved wrongly. Proposed focused fix (one shared function, `returnFocus` in `src/lib/client/nav.ts`): if the button that opened the sheet is gone, move focus to the control that replaced it (for example "Bloating ongoing") or else to the screen's main heading. The K1 check then passes and becomes a normal check. Waiting for your go-ahead.
 
 ### Section 5 actions on the screen (23 Nov, earlier the same day)
 

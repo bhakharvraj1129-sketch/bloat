@@ -67,15 +67,25 @@ describe("Saves are all or nothing", () => {
     const u = await onboarded();
     expect((await call(u, "POST", "/v1/meals", { save_key: randomUUID(), dish_text: "atomic soup", eaten: { mode: "now" } })).status).toBe(201);
     await makePro(u);
+    const key = randomUUID();
+    const state = () => ({
+      offered: sql(`select recalled_check_offered_at is not null from public.entitlements where user_id = '${u.id}'`),
+      answers: Number(sql(`select count(*) from public.product_events where user_id = '${u.id}' and name = 'recalled_check_answered'`)),
+      saves: Number(sql(`select count(*) from public.command_log where user_id = '${u.id}' and key = '${key}'`)),
+    });
     const restore = refuseInserts("command_log", u.id, "new.route like '%recalled-check%'");
     try {
-      expect((await call(u, "POST", "/v1/meals/recalled-check", { answer: "yes_go_through_them" })).status).toBe(500);
-      expect(sql(`select coalesce(recalled_check_offered_at::text, 'null') from public.entitlements where user_id = '${u.id}'`)).toBe("null");
-      expect(sql(`select count(*) from public.product_events where user_id = '${u.id}' and name = 'recalled_check_answered'`)).toBe("0");
+      expect((await call(u, "POST", "/v1/meals/recalled-check", { answer: "yes_go_through_them" }, { key })).status).toBe(500);
+      // The offer mark and the answer were written before the refused record: both were rolled back.
+      expect(state()).toEqual({ offered: "f", answers: 0, saves: 0 });
     } finally {
       restore();
     }
-    expect((await call(u, "POST", "/v1/meals/recalled-check", { answer: "yes_go_through_them" })).status).toBe(200);
+    // The same request again saves once; repeating it writes nothing new.
+    expect((await call(u, "POST", "/v1/meals/recalled-check", { answer: "yes_go_through_them" }, { key })).status).toBe(200);
+    expect(state()).toEqual({ offered: "t", answers: 1, saves: 1 });
+    expect((await call(u, "POST", "/v1/meals/recalled-check", { answer: "yes_go_through_them" }, { key })).status).toBe(200);
+    expect(state()).toEqual({ offered: "t", answers: 1, saves: 1 });
     expect((await call(u, "GET", "/v1/meals/recalled-check")).body.offered).toBe(true);
   });
 });
