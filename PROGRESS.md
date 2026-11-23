@@ -1,24 +1,52 @@
 # Progress
 
-Last updated: 23 Nov 2026 (evening). Branch: `claude/bloat-software-build-uxzoru`.
+Last updated: 23 Nov 2026 (documentation cleanup). Branch: `claude/bloat-software-build-uxzoru`.
 
-## Where things stand
+This file has four parts: **current status** (what is true now, with the evidence), **what remains** (your decisions, launch requirements, tests not yet performed), **your phone checklist**, and **history** (completed work by date, kept as it was then). How the preview is published and run is in `DEPLOYMENT.md`; what was tested, where and on which build is in `docs/verification-report.md`.
 
-The app is built end to end and runs as a public testing preview on Vercel against the hosted `bloat-test` database, with synthetic data, a labelled mock AI and mock billing. No production site, no real payments, no real AI calls.
+## Current status (verified 23 Nov 2026)
 
-- Testing preview: `https://bloat-preview.vercel.app`, serving commit `83fe4da` as deployment `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`, published on 23 Nov at 15:36 UTC by the Preview workflow (run 12) after its checks passed. The full signed-in hosted suite passed 16 of 16 on it.
-- **Frozen for your feature-by-feature review (from 23 Nov, evening).** No features, redesigns or fixes are published until you send a reproducible issue. Notes-only commits use `[skip ci]` and do not publish. A fix you ask for goes through the same gate and gets its own entry in the report.
-- Sign-in: email and password, for owner-provisioned test accounts only. Sign-ups are off in Supabase itself. Test mode is off on the preview (`BLOAT_TEST_LOGIN=0`).
-- No temporary test accounts remain (all sets deleted and verified, last on 23 Nov).
-- Still open: `docs/verification-report.md`, top: "Launch blockers that remain" and "Tests still not performed". In short:
-  1. Real phones, a screen reader and 200% zoom: not done.
-  2. A real AI provider (photo and dish check): not connected; needs your approval of a key and a spending limit.
-  3. Email-code sign-in with working email for real users (the preview uses password sign-in for test accounts, marked temporary).
-  4. Plan gates: business entity and payments (Gate 2, payments off), legal text (Gate 1), `bloat-live`.
-  5. Your decisions: DECISIONS open items 15 to 18 (re-asking "Is it still happening?", the founder audit step, a background deletion job, kept photos of deleted meals).
-  6. Not run on the preview: founder tools, the three checks that need several days of records, and the failure cases that can only be forced locally.
+| What | State | How it was verified |
+|---|---|---|
+| Testing preview | `https://bloat-preview.vercel.app` and the branch address serve commit `83fe4da`, Vercel deployment `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` | Published by the Preview workflow, run 12 (23 Nov, 15:36 UTC), after all its checks passed. Vercel reports both addresses on this deployment, and all 209 source files Vercel lists for it match the commit |
+| **Freeze** | **Frozen for your feature-by-feature review.** Nothing is published unless you send a reproducible issue; a fix then goes through the same workflow and gets its own entry in the report. Notes-only commits carry `[skip ci]` and cannot publish | No workflow run and no new deployment since run 12 |
+| Tests on this build | Local: rule 97 of 97, API 140 of 140, browser 251 of 251. CI (run 12): all checks passed. Live: full hosted suite 16 of 16 with 7 fresh synthetic accounts, plus a live check of export messages and of kept photos being removed with the account | `docs/verification-report.md`, top, and `TEST_RESULTS.md` |
+| Sign-in | Email and password, for accounts you make in Supabase. Sign-ups are off in Supabase itself. Test mode is off (`BLOAT_TEST_LOGIN=0`) | Hosted check "nobody can create an account" passed on this build; Vercel variables read on 23 Nov |
+| Your test account | `bloat-tester@bloat.test` exists, with its sample meal, bloating record and report; Pro without a purchase; not staff | Read-only fingerprint identical before and after every hosted run on 23 Nov |
+| Synthetic test accounts | None remain. Every set made for a hosted run was deleted through the app and checked gone | Read-only check after the last run (23 Nov): 0 accounts with a test marker |
+| Publishing | Only the Preview workflow moves the preview, after its checks pass. Its `VERCEL_TOKEN` secret is in place (since 22 Nov) | Runs 6, 9, 10, 11 and 12 published; Vercel lists no other deployment since `af950f5` |
+| Real AI, payments, email delivery | Off: labelled mock AI (no AI key in the project), mock billing, no custom email sender | Vercel variables read on 23 Nov |
 
-Read next: `docs/verification-report.md` (what was checked, where, and on which build), `TEST_RESULTS.md`, `DEPLOYMENT.md`, `DECISIONS.md`.
+**What happens next:** you review the preview feature by feature and send reproducible issues. Each one is reproduced by a test, fixed in a focused commit and published through the workflow.
+
+## What remains
+
+### Your decisions
+
+1. `DECISIONS.md`, "Where the plan was unclear" items 1 to 18. The newest: 15 ("Is it still happening?" asks again), 16 (a founder change and its audit record are two database steps), 17 (a background deletion job would need a server storage key), 18 (kept photos of a deleted meal stay until the account is deleted).
+2. `DECISIONS.md`, engineering choices marked "needs the owner": 10 (AI failure alert threshold), 13 (seven card wording corrections), 14 (medicine "sensitivity view").
+3. Company name and a monitored support address for the About and Contact pages.
+
+### Launch requirements (before anyone outside is invited)
+
+1. Email-code sign-in with a working email sender (`DEPLOYMENT.md`, "Before inviting anyone outside"). The password sign-in is for testing only.
+2. A real AI provider: your approval of a key and a spending limit, then the accuracy test (reference sets: 0 of 300 dishes, 0 of 100 photos so far).
+3. Plan gates: legal text (Gate 1); business entity, payment provider and real payments (Gate 2; payments stay off until then); the live project `bloat-live`.
+4. Founder tools on a hosted site need a staff address in `BLOAT_STAFF_EMAILS` and an authenticator app.
+5. Founder alert emails (Resend) and error monitoring (Sentry): not connected.
+6. Google sign-in: off in Supabase, so not exercised (the button is hidden while it is off).
+
+### Tests not yet performed
+
+1. Real phones (iOS Safari, Android Chrome), a screen reader, 200% zoom. Your checklist is below.
+2. A real AI provider (photo and typed dish).
+3. Founder tools on the hosted preview (no staff account there, by design).
+4. On the hosted preview: the doctor reminder in History, the experiment answer on Today and "Not useful" on Today (they need several days of records; checked locally and by the workflow).
+5. On the hosted preview, the failure cases that can only be forced on the local database: a storage outage during account deletion and a refused write in the recalled-meals offer.
+6. The control crawl, the link-by-link navigation run and the five-width check on the final build (last run on 22 Nov, app code `2f22cc4`).
+7. Whether Vercel's Ignored Build Step really blocks a Git build (configured and read back by every run; not proven).
+8. A real backup restore on `bloat-test` (re-applying deletions after a restore is checked locally only).
+9. The 19 screens without approved designs have not been compared with designs (only the 20 Slice A screens have them).
 
 ## Owner checklist: the main journeys on your phone
 
@@ -38,101 +66,7 @@ Use `https://bloat-preview.vercel.app` and your test account `bloat-tester@bloat
 12. Turn on flight mode, try to save a meal. → A clear message and your text is kept. Turn flight mode off, tap Save again. → It saves once (one entry, not two).
 13. Sign out, then press Back. → You see Sign in, not your entries.
 
-Do not use "Delete my account" on `bloat-tester@bloat.test`: it removes your test account and you would need to make it again in the Supabase dashboard.
-
-## Done on 23 Nov
-
-- Fixed the four defects of the external report (B1 to B4), published as `0d537d2` (run 9) and re-checked live.
-- Ran the full signed-in hosted suite on that build with 7 separate synthetic accounts: 16 of 16 passed (the 15 checks plus Your journey with no finished day). The 7 accounts were deleted through the app and checked gone; `bloat-tester` was not touched.
-- Checked the 12 remaining actions of report section 5 on the screen (saves and persists, failure shown, double tap), plus 4 single checks. Three buttons showed nothing when their save failed; fixed in `7713098` and published by run 10. Details: report sections 4 (S1 to S3) and 5.
-- Last fix before the freeze: deleting an account could leave kept photos in storage if storage failed. Photos are now removed first, with retries, and the account is deleted only when they are gone; otherwise nothing is deleted and the person is told to try again. Published as `83fe4da` (run 12); hosted suite 16 of 16 on it; a live check kept 2 synthetic photos and saw them removed with the account.
-- Final round: reconciled every test count with the raw results; found and fixed three more defects (the recalled-meals offer could be left half-saved, export said "check your connection" for a server error, founder tools sent two changes on a double tap and showed nothing on a lost connection); published as `62431c7` (run 11); full hosted suite 16 of 16 on it with fresh accounts, all deleted afterwards; `bloat-tester` untouched.
-
-## Done on 22 Nov (afternoon): closing the gaps, publishing gate
-
-Application commit `2f22cc4`. The preview serves `af950f5` (deployment `dpl_FDVnqFxAx4MHaGhq9g9HLiim7Tzj`) until the publishing gate can run.
-1. The open actions from the morning are now checked on the screen, three ways each (saves and persists, failure
-   shown with retry, double tap saves once): "Is it still happening?", deleting bloating and bowel records,
-   experiment daily answer, End early, weekly check, add back, resume, Learn "Un-hide", meal with ingredient check,
-   share link create and revoke, account deletion. 51 actions in all, 159 of 159 passed.
-2. Four defects found and fixed: no retry for a failed ingredient check; an experiment's End error hidden behind
-   its sheet; account deletion with a lost reply ending at Sign in; and the Pro coverage endpoint, which `.gitignore`
-   had kept out of every commit (found by the first CI run on a clean checkout).
-3. What a deleted account's earlier tokens can still do was measured locally (report, section 6).
-4. Publishing gate: Vercel's automatic builds are off; the Preview workflow publishes only after the checks pass.
-   Needs the owner's `VERCEL_TOKEN` secret.
-5. Blocked: the signed-in hosted checks and both account clean-ups need database approval (see "Where things stand").
-
-## Done on 22 Nov: verification round 1
-
-See `docs/verification-report.md`. Outcomes are now checked, not just clicks: 37 save and edit actions (data change,
-refresh, failure with retry, double tap), and 238 link clicks (destination and Back) at phone and desktop width.
-Four defects found and fixed (hidden delete failure, experiments offered before they could start, two Back cases,
-sign-in steps left in history). The owner switched Supabase sign-ups off and made `bloat-tester@bloat.test`; the
-sign-up check passes and the owner's own sign-in journey is confirmed from server records.
-
-Still open: deleting the 19 temporary accounts (the connector's approval prompt timed out; see the report, section 7),
-and the actions listed in the report's section 5, which are verified only partly or at server level.
-
-## Done on 19 Nov (afternoon): Bloat / Silver design applied
-
-The owner attached the design package; it is now in `docs/design/silver/`. Applied to the whole app:
-1. Tokens: white, silver grey and black (`src/app/globals.css`, `docs/design/tokens.json` v2), system fonts,
-   12px controls, 20px cards, 3px ink focus ring, light theme only (DECISIONS.md, Engineering choice 21).
-2. Shared parts restyled once: buttons, options (selected = black with a tick), strength scale, score marks,
-   cards, inputs, warning-sign advice (red kept, with an icon), sheets (bottom sheet on phones, centred dialog
-   from tablet width).
-3. New frames: signed-in sidebar from 768px and four bottom tabs on phones (Today, History, Patterns, You), with
-   one ownership rule for the active tab; public header with a phone menu listing every public page; footer.
-4. Screens: homepage (real Today screenshot with sample entries; "Sign in" while sign-ups are closed), new About
-   page, Privacy, Terms, Contact and How Bloat works as reading pages, sign-in and country screens as a centred
-   card, setup, Today as a two-column dashboard on desktop, page labels on History, Patterns and You screens.
-5. Defect found and fixed: filled link buttons had text in the same colour as their fill on the live site
-   ("Get started" measured rgb(30, 94, 84) on rgb(30, 94, 84)). A browser test now checks every filled control.
-6. A dedicated address for the testing preview: `https://bloat-preview.vercel.app` (always the latest build of
-   this branch). The production address `bloat-olive.vercel.app` stays unused: no production site.
-
-## Done on 19 Nov: navigation and action repairs
-
-The request had two parts: (1) apply the "Bloat / Silver" design package, (2) repair navigation and actions.
-
-**(1) Design package: not started, blocked.** The package (Preview.html, Design-and-UX-Spec.md, tokens.css,
-source-control-inventory.csv) was shared only as a ChatGPT library link. This environment cannot open
-chatgpt.com (blocked by the network rules, and the link needs the owner's own login). It is not in the
-owner's Google Drive, not on any branch of the repository, and Gmail needs the owner to sign in again.
-No colours, layout or wording were invented in its place. Owner action: add the four files to
-`docs/design/silver/` on this branch (or upload them into the chat).
-
-**(2) Navigation and actions: done locally, deployed.** See `docs/control-ledger.md`.
-1. Control ledger: a crawler lists and presses every control on 30 screens for signed-out, Free and Pro
-   visitors (740 rows). Fixed build: 620 pass, 0 fail, 49 checked by named tests, 71 listed (fields, disabled,
-   inside sheets). Earlier build with the same crawler: 19 fail.
-2. 14 defects reproduced first on the earlier build, then repaired (each test fails before, passes after):
-   contextual Back with a safe parent; phone Back closes sheets; focus returns to the opener; setup steps
-   in history; "close without saving?" and "leave without saving?"; honest "Check save status"; health
-   background no longer hides failures; recall screen asks before turning on the AI check; confirm before
-   withdraw and remove; single export on double tap; return to the same screen after an expired session;
-   inline form messages; Help page Back on a direct link; profile switches that stay put while saving.
-3. Every save button found calling the server directly now uses the shared save hook: "Saving…", locked
-   against double taps, clear error, and "Check save status" after a lost reply, keeping the same key.
-4. Five widths (320, 390, 768, 1024, 1440): no sideways scrolling on any of 23 screens, in either build.
-
-## Done on 18 Nov (afternoon): email-and-password sign-in
-
-1. `BLOAT_SIGN_IN_METHOD` switch: `password` on the preview, `email_code` (default) everywhere else. Only one sign-in is ever shown.
-2. New sign-in form: email and password, accessible field errors, one generic "Email or password is incorrect." message, loading state, password cleared after each try, no way for the password to land in a URL.
-3. No sign-up in the app; signed-in visitors are sent on; the 18+ confirmation is kept before setup.
-4. Hosted test suite now signs in through the real form and checks wrong details, refresh, sign-out (including that an older session's token stops working) and that nobody can create an account.
-5. Checked hosted Supabase settings: Site URL and redirect are the preview's `/auth/callback`; custom SMTP is off; sign-ups are still on.
-
-## Done in the 18 Nov round
-
-1. Doctor report privacy: switched-off sections appear nowhere (summary, preview, PDF, shared page, old stored reports).
-2. Exports: never partial, stable paging, clear retry, row counts.
-3. Content: "Adapted from NHS, Bloating" everywhere; kiwifruit experiment paused and card kept as a draft; proposed source-backed corrections written for review.
-4. Email sign-in screens: real failures shown, resend with the right cooldown, no account enumeration; Google button only when Google is on. Hosted delivery still blocked (above).
-5. Public preview: test mode off, designated Pro test accounts, deployment protection removed, verified in a fresh browser.
-6. Signed-in users can no longer call the 14 server functions; duplicate Vercel project's builds skipped; migration history reconciled.
+Do not use "Delete my account" on `bloat-tester@bloat.test`: it removes the account and its sample records for good. To change its password, use `DEPLOYMENT.md`, "Change the test account's password": that keeps the account and every record.
 
 ## Built and tested
 
@@ -146,26 +80,67 @@ No colours, layout or wording were invented in its place. Owner action: add the 
 | E Experiments and learning | 7 habit and 5 swap experiments with safety and wellbeing checks, daily cards, Learn library, What helps you | `tests/api/slice-ef.test.ts`, `tests/unit/cards.test.ts` |
 | F Account and subscriptions | Mock billing with idempotent, ordered webhook; pause, resume, cancel; privacy-safe events; founder tools | `tests/api/slice-ef.test.ts` |
 
-Screens: 39 of the plan's 39 have a working screen. The approved designs exist only for the 20 Slice A screens; the other 19 follow the same tokens and rules and **have not been checked against approved designs** (they were never copied out of the "Bloat App Screens" artifact).
+Screens: 39 of the plan's 39 have a working screen. The approved designs exist only for the 20 Slice A screens; the other 19 follow the same tokens and rules and have not been checked against approved designs.
 
-## Not done
+## History: completed work by date
 
-0. **Hosted proof of the password sign-in with a signed-in account** (correct sign-in, refresh, sign-out, isolation) and "nobody can create an account": waiting on the two owner steps and the connector confirmation (see Next steps).
-1. **Email sign-in for real users** (replaced by password sign-in for testing on 18 Nov). Custom SMTP was switched off; the built-in mailer only reaches project-team addresses, 2 an hour. Must be restored and proven end to end before anyone outside is invited (DEPLOYMENT.md, "Before inviting anyone outside").
-2. **Google sign-in**: switched off in Supabase, so not exercised. The button is hidden while it is off.
-3. **Founder MFA on the hosted app**: built and tested locally; needs the staff email address to set `BLOAT_STAFF_EMAILS` on the preview.
-4. **Real AI** and the **AI accuracy test**: the harness uses the app's own code path. Reference examples: 0 of 300 dishes, 0 of 100 photos (25 of them meant to be unclear). Paid calls need the owner's yes on the key and spending limit.
-5. Owner decisions in `DECISIONS.md`: kiwifruit correction, seven card wording corrections, AI failure alert threshold, country pause wording, medicine sensitivity view, help page version.
-6. The 19 later screens have not been compared with approved designs (they are not in `docs/design/screens/`).
-7. Founder alert emails (Resend), error monitoring (Sentry), real payments (Gate 2).
+These entries record what was done and true **on that date**. Later work may have changed them; where an entry said something was still pending, a note in brackets says how it ended. For what is true now, use "Current status" above.
 
-## Next steps, in order
+### 23 Nov 2026
 
-1. Owner: company name and a monitored support address for About and Contact. (Light-only design confirmed 22 Nov; no dark mode.)
-2. Done 22 Nov: sign-ups are off and `bloat-tester@bloat.test` exists (verified).
-3. Owner: approve deleting the 19 temporary accounts (listed in `docs/verification-report.md`, section 7), in the Supabase connector or the dashboard. Then re-run the signed-in hosted checks on the newest commit with fresh accounts and delete those too.
-4. Before inviting anyone outside: restore email sign-in (DEPLOYMENT.md, "Before inviting anyone outside").
-5. Owner: staff email for founder tools; open decisions in DECISIONS.md; AI key and spending limit when ready.
+- Fixed the four defects of the external report (B1 to B4), published as `0d537d2` (run 9) and re-checked live.
+- Ran the full signed-in hosted suite on that build with 7 synthetic accounts: 16 of 16; the accounts were deleted and checked gone.
+- Checked the 12 remaining actions of report section 5 on the screen. Three buttons showed nothing when their save failed; fixed in `7713098` (run 10).
+- Reconciled every test count with the raw results. Fixed three more defects: the recalled-meals offer could be left half-saved, export said "check your connection" for a server error, founder tools sent two changes on a double tap. Published as `62431c7` (run 11); hosted suite 16 of 16.
+- Deleting an account could leave kept photos in storage if storage failed. Photos are now removed first, with retries, and the account is deleted only when they are gone. Published as `83fe4da` (run 12); hosted suite 16 of 16; a live check kept 2 synthetic photos and saw them removed with the account. The preview was then frozen.
+
+### 22 Nov 2026 (afternoon and evening): closing the gaps, publishing gate
+
+Application commit `2f22cc4`.
+1. The open actions from the morning were checked on the screen, three ways each (saves and persists, failure shown with retry, double tap saves once): "Is it still happening?", deleting bloating and bowel records, experiment daily answer, End early, weekly check, add back, resume, Learn "Un-hide", meal with ingredient check, share link create and revoke, account deletion. 51 actions in all, 159 of 159 passed.
+2. Four defects found and fixed: no retry for a failed ingredient check; an experiment's End error hidden behind its sheet; account deletion with a lost reply ending at Sign in; and the Pro coverage endpoint, which `.gitignore` had kept out of every commit (found by the first CI run on a clean checkout).
+3. What a deleted account's earlier tokens can still do was measured locally (report, section 6).
+4. Publishing gate: Vercel's automatic builds off; the Preview workflow publishes only after the checks pass. (Its `VERCEL_TOKEN` secret was added by the owner the same evening; run 6 was the first publish.)
+5. (The signed-in hosted checks and the clean-up of the 19 earlier temporary accounts were completed the same evening: the owner ran the guarded deletion, verified with read-only queries; hosted suite 15 of 15 on `adfe49b`.)
+
+### 22 Nov 2026 (morning): verification round 1
+
+See `docs/verification-report.md`. Outcomes checked, not just clicks: 37 save and edit actions (data change, refresh, failure with retry, double tap), and 238 link clicks (destination and Back) at phone and desktop width. Four defects found and fixed (hidden delete failure, experiments offered before they could start, two Back cases, sign-in steps left in history). The owner switched Supabase sign-ups off and made `bloat-tester@bloat.test`; the sign-up check passes and the owner's own sign-in journey was confirmed from server records.
+
+### 19 Nov 2026 (afternoon): Bloat / Silver design applied
+
+The owner attached the design package; it is in `docs/design/silver/`. Applied to the whole app:
+1. Tokens: white, silver grey and black (`src/app/globals.css`, `docs/design/tokens.json` v2), system fonts, 12px controls, 20px cards, 3px ink focus ring, light theme only (DECISIONS.md, engineering choice 21).
+2. Shared parts restyled once: buttons, options (selected = black with a tick), strength scale, score marks, cards, inputs, warning-sign advice (red kept, with an icon), sheets (bottom sheet on phones, centred dialog from tablet width).
+3. New frames: signed-in sidebar from 768px and four bottom tabs on phones (Today, History, Patterns, You); public header with a phone menu listing every public page; footer.
+4. Screens: homepage ("Sign in" while sign-ups are closed), new About page, Privacy, Terms, Contact and How Bloat works as reading pages, sign-in and country screens as a centred card, setup, Today as a two-column dashboard on desktop.
+5. Defect found and fixed: filled link buttons had text in the same colour as their fill on the live site. A browser test now checks every filled control.
+6. A dedicated address for the testing preview: `https://bloat-preview.vercel.app`. The production address `bloat-olive.vercel.app` stays unused: no production site.
+
+### 19 Nov 2026 (morning): navigation and action repairs
+
+1. Control ledger: a crawler lists and presses every control on 30 screens for signed-out, Free and Pro visitors (740 rows). Fixed build: 620 pass, 0 fail, 49 checked by named tests, 71 listed. Earlier build with the same crawler: 19 fail. See `docs/control-ledger.md`.
+2. 14 defects reproduced first, then repaired: contextual Back with a safe parent; phone Back closes sheets; focus returns to the opener; setup steps in history; "close without saving?" and "leave without saving?"; honest "Check save status"; health background no longer hides failures; recall screen asks before turning on the AI check; confirm before withdraw and remove; single export on double tap; return to the same screen after an expired session; inline form messages; Help page Back on a direct link; profile switches that stay put while saving.
+3. Every save button now uses the shared save hook: "Saving…", locked against double taps, clear error, and "Check save status" after a lost reply.
+4. Five widths (320, 390, 768, 1024, 1440): no sideways scrolling on any of 23 screens.
+(The design package could not be opened that morning; the owner attached it the same afternoon and it was applied, above.)
+
+### 18 Nov 2026 (afternoon): email-and-password sign-in
+
+1. `BLOAT_SIGN_IN_METHOD` switch: `password` on the preview, `email_code` (default) everywhere else. Only one sign-in is ever shown.
+2. Sign-in form: email and password, accessible field errors, one generic "Email or password is incorrect." message, loading state, password cleared after each try, no way for the password to land in a URL.
+3. No sign-up in the app; signed-in visitors are sent on; the 18+ confirmation is kept before setup.
+4. The hosted test suite signs in through the real form and checks wrong details, refresh, sign-out (including that an older session's token stops working) and that nobody can create an account.
+5. Hosted Supabase settings checked: Site URL and redirect are the preview's `/auth/callback`; custom SMTP is off. (Sign-ups were still on at the time; the owner switched them off on 22 Nov.)
+
+### 18 Nov 2026 (morning)
+
+1. Doctor report privacy: switched-off sections appear nowhere (summary, preview, PDF, shared page, old stored reports).
+2. Exports: never partial, stable paging, clear retry, row counts.
+3. Content: "Adapted from NHS, Bloating" everywhere; kiwifruit experiment paused and card kept as a draft; proposed source-backed corrections written for review.
+4. Email sign-in screens: real failures shown, resend with the right cooldown, no account enumeration; Google button only when Google is on.
+5. Public preview: test mode off, designated Pro test accounts, deployment protection removed, verified in a fresh browser.
+6. Signed-in users can no longer call the 14 server functions; duplicate Vercel project's builds skipped; migration history reconciled.
 
 ## Later (ideas not in the plan, so not built)
 
