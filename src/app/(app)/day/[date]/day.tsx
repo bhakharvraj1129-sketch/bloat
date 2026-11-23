@@ -60,7 +60,7 @@ export function DayDetail({ date }: { date: string }) {
             {data.status === "CONFLICT" && (data.conflict_reason === "zero_after_episode" ? "The review says no bloating, but bloating was logged this day. Correct whichever is wrong." : "The review is lower than a strength logged this day. Correct whichever is wrong.")}
             {data.status === "PROVISIONAL" && "Not confirmed by a whole-day review yet."}
             {data.status === "LATE" && "Reviewed after the window. Kept in history and the 7-day average; left out of comparisons."}
-            {data.status === "UNKNOWN" && "Nothing was logged and there is no review."}
+            {data.status === "UNKNOWN" && (empty ? "Nothing was logged and there is no review." : "No bloating was logged and there is no review.")}
             {data.status === "CONFIRMED" && (data.episodes.length ? `Time bloated: ${formatDuration(data.duration_ms)}${data.duration_partial ? " (partial: an end time is unknown)" : ""}` : "Confirmed by your review.")}
           </Caption>
         </div>

@@ -68,3 +68,19 @@ test("B3: once there are finished days, Patterns shows the range as before", asy
   await expect(page.getByText(/No finished days yet\./)).toHaveCount(0);
   expect(backwardsRanges(await page.locator("main").innerText())).toEqual([]);
 });
+
+test("B4: a day with a meal but no bloating says no bloating was logged, not that nothing was logged", async ({ context }) => {
+  const { page, api, today } = await account(context, false);
+  expect((await api("POST", "/v1/meals", { save_key: crypto.randomUUID(), dish_text: "es toast", eaten: { mode: "now" } })).status).toBe(201);
+  await page.goto(`/day/${today}`);
+  await expect(page.getByText("es toast")).toBeVisible();
+  await expect(page.getByText("No bloating was logged and there is no review.")).toBeVisible();
+  await expect(page.getByText("Nothing was logged and there is no review.")).toHaveCount(0);
+});
+
+test("B4: a day with nothing at all still says nothing was logged", async ({ context }) => {
+  const { page, today } = await account(context, false);
+  await page.goto(`/day/${today}`);
+  await expect(page.getByText("Nothing was logged and there is no review.")).toBeVisible();
+  await expect(page.getByText("Nothing logged this day")).toBeVisible();
+});
