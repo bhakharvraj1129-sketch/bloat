@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { browserSupabase } from "@/lib/client/supabase";
 import { Button, Caption, Card, Field, Label, inputClass } from "@/components/ui";
 
@@ -51,11 +51,23 @@ export function Admin() {
     if (error) { setMsg("That code didn't work. Check the app and try again."); return; }
     await load();
   };
+  // One change at a time: while a change and the reload after it are on their way, the buttons wait,
+  // so a double tap sends one request (one change, one audit record).
+  const posting = useRef(false);
+  const [saving, setSaving] = useState(false);
   const post = async (body: unknown) => {
-    const res = await fetch("/v1/admin", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-    await res.text().catch(() => "");
-    setMsg(res.ok ? "Saved." : "That change was refused.");
-    await load();
+    if (posting.current) return;
+    posting.current = true; setSaving(true); setMsg("");
+    try {
+      const res = await fetch("/v1/admin", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+      await res.text().catch(() => "");
+      setMsg(res.ok ? "Saved." : "That change was refused.");
+      await load();
+    } catch {
+      setMsg("That didn't work. Check your connection and try again.");
+    } finally {
+      posting.current = false; setSaving(false);
+    }
   };
   const ai = data?.flags.find((f) => f.key === "ai_enabled")?.enabled;
   return (
@@ -91,8 +103,8 @@ export function Admin() {
             <p className="t-title tabular">{usd(data.month_spent_micros)} of {usd(data.ai_settings.monthly_limit_micros)}</p>
             <Caption>{data.ai_calls_24h} checks in the last 24 hours, {data.ai_failures_24h} failed. When the limit is reached, the ingredient check pauses for everyone and meals still save.</Caption>
             <Field label="Monthly limit in US dollars"><input className={inputClass} inputMode="decimal" value={limit} onChange={(e) => setLimit(e.target.value.replace(/[^0-9.]/g, ""))} /></Field>
-            <Button variant="secondary" disabled={!limit} onClick={() => post({ what: "monthly_limit_usd", value: Number(limit) })}>Set limit</Button>
-            <Button variant={ai ? "danger" : "secondary"} onClick={() => post({ what: "flag", key: "ai_enabled", enabled: !ai })}>{ai ? "Turn all AI off now (kill switch)" : "Turn AI back on"}</Button>
+            <Button variant="secondary" disabled={!limit || saving} onClick={() => post({ what: "monthly_limit_usd", value: Number(limit) })}>Set limit</Button>
+            <Button variant={ai ? "danger" : "secondary"} disabled={saving} onClick={() => post({ what: "flag", key: "ai_enabled", enabled: !ai })}>{ai ? "Turn all AI off now (kill switch)" : "Turn AI back on"}</Button>
           </Card>
           <Card><Label>Alerts</Label>{data.alerts.length ? <ul className="mt-2">{data.alerts.map((a) => <li key={a.id} className="border-b border-line py-2 last:border-0"><span className="font-semibold">{a.kind}</span> <span className="t-caption">{a.created_at.slice(0, 16).replace("T", " ")} · {JSON.stringify(a.detail)}</span></li>)}</ul> : <Caption className="mt-2">No alerts.</Caption>}</Card>
           <Card><Label>Safety review queue</Label><Caption className="mt-1">Worse card taps, &quot;I felt worse&quot; endings and wellbeing pauses. Review within 7 days.</Caption>{data.review_queue.length ? <ul className="mt-2">{data.review_queue.map((r) => <li key={r.id} className="border-b border-line py-2 last:border-0">{r.kind} · {r.ref} <span className="t-caption">{r.created_at.slice(0, 10)}</span></li>)}</ul> : <Caption className="mt-2">Nothing waiting.</Caption>}</Card>
