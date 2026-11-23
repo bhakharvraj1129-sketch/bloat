@@ -8,6 +8,10 @@ Choices made while building, with the reason. "Needs the owner" means: please sa
 - Kept or brought back, and why: the two PDFs (they are the source, and no other copy was attached); the three JSON files (extracted again from the PDF with `pdfdetach`, identical by hash); `docs/design/` (tokens, design rules and the 20 approved Slice A screens, because the mission says to use existing design assets). **Needs the owner:** say if you wanted `docs/design/` gone too.
 - Carried over from the earlier decisions file, because they were your answers: no streak display; Lucide outline icons with a word; the two fixed closing lines; "cause" only inside the fixed sentences; brand name stays "Bloat"; the progress counter needs 14 confirmed days (2 × 7).
 
+## The owner's decisions since
+
+- **24 Nov 2026.** `main` holds the app (fast-forwarded to the build branch), and the project's main Vercel addresses (`bloat-olive.vercel.app` and two others) show the same frozen test build as `bloat-preview.vercel.app`. This is not a launch: same test database, still hidden from search engines, sign-ups still off. The duplicate Vercel project `bloat-zlrr` goes. Details: `DEPLOYMENT.md`.
+
 ## Engineering choices
 
 1. **All writes go through one server-only database function (`srv_tx`).** Browsers hold a sign-in token, so anyone could call the database directly. To stop that from skipping Pro checks, safety checks or validation, signed-in users can only read their own rows; every write needs a server secret. This also makes each save one transaction. No Supabase service key is used or needed.
