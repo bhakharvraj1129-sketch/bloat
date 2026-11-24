@@ -50,34 +50,52 @@ Choices made while building, with the reason. Everything still waiting for the o
 
 22. **Publishing the testing preview only after checks (22 Nov 2026).** The owner asked that a successful build alone is never treated as a tested release. `vercel.json` switches off Vercel's automatic Git builds; `.github/workflows/preview.yml` publishes only after the local suites (typecheck, lint, rule, API and browser tests) and six account-free hosted checks on the new, not-yet-public deployment pass, then confirms which deployment the address serves. The signed-in hosted suite stays manual, because it needs owner-approved accounts. The only secret is `VERCEL_TOKEN`, held by GitHub (added by the owner on 22 Nov); without it nothing is published (fail closed).
 23. **"Check and finish" after a lost account-deletion reply (22 Nov 2026).** If the session is no longer accepted, the app treats the deletion as done, because only a completed deletion (or a separate sign-out) ends the session at that moment. The person is then signed out and sent to the start page, as after a normal deletion. Rare exception: if the session ended for another reason at that same moment (for example, signing out everywhere from another device), the account may still exist, and signing in again would show it.
-24. **Deleting an account removes kept photos first, and only then the account (23 Nov 2026).** The server holds no storage key (choice 1), so once an account is gone nothing may remove its files. The route therefore removes the photo folder with the person's own sign-in, retries on its own (4 attempts, about 2.5 seconds) and checks the folder is empty before deleting the account. If storage keeps failing, nothing is deleted, the person sees "That didn't work. Nothing was deleted. Try again." and the founder gets a `photo_cleanup_failed` alert (counts only). The plan's background "deletion job" would need a server storage key, a new secret: decision D18.
+24. **Deleting an account removes kept photos first, and only then the account (23 Nov 2026).** The server holds no storage key (choice 1), so once an account is gone nothing may remove its files. The route therefore removes the photo folder with the person's own sign-in, retries on its own (4 attempts, about 2.5 seconds) and checks the folder is empty before deleting the account. If storage keeps failing, the account and diary are not deleted, but photos already removed before the failure stay removed; the person sees "That didn't work. Nothing was deleted. Try again." (not exact in that case: decision D20) and the founder gets a `photo_cleanup_failed` alert (counts only). The plan's background "deletion job" would need a server storage key, a new secret: decision D18.
 
 
 ## Open decisions
 
-Only questions still waiting for the owner. "Needed for": **owner testing** (you will meet it while reviewing the preview), **outside beta** (before anyone outside is invited), **paid launch** (before real payments or `bloat-live`). Until a decision is made, the app keeps the "built now" behaviour, which is safe to test with.
+Only questions still waiting for the owner, grouped by **who can use the affected feature on the preview today** (not by price). Anything in the first three groups is already in front of testers, and anyone who opens the preview addresses can see the public pages; decide those before more people use them. The last group is switched off, paused or not built; decide those before switching the feature on. Until a decision is made, the app keeps the "built now" behaviour.
 
-| # | Decision | Built now | Recommended default, and why | Needed for |
-|---|---|---|---|---|
-| D1 | "Is it still happening?" after an answer of Yes or Not sure | Asked again on every app open while the record has been open 8 hours or more | Ask again only after another 8 hours: fewer repeat prompts; the open record and its safety wording are unchanged | Owner testing |
-| D2 | Countries not yet reviewed (`not_reviewed`), and the two "paused" sentences | Not blocked; the sentences are new wording | Block them on the live site until marked ready (fail closed); keep the preview open. Approve the sentences or edit them | Outside beta |
-| D3 | AI failure alert threshold (test Q183) | Failures counted, no alert | Alert when 20% or more of at least 10 checks fail within an hour: catches an outage, ignores a single failure | Outside beta, before real AI is on |
-| D4 | Seven card wording corrections | Old wording; proposals in `docs/content/proposed-corrections-2026-11-18.md` | Approve the proposals: each is closer to its source; a person opens the CDC page first | Outside beta |
-| D5 | Kiwifruit experiment and card | Paused, card unpublished | Keep paused unless you approve the BDA 2025 correction (2 to 3 peeled kiwifruit a day, 28 days): paused is the safe state | Outside beta (only if it should be offered) |
-| D6 | Two cards with no linkable source ("Gentle stretch", "Wind down for sleep") | Unpublished drafts | Leave unpublished until you supply a source | Not blocking |
-| D7 | Who checks every card source link | Checked automatically only | You or a clinician open each link once: automated checks cannot judge the content | Outside beta (Gate 1) |
-| D8 | "English only" note on the help page (test Q70) | Not shown | Approve one plain sentence saying the page is in English only: honest for Canada and India | Outside beta |
-| D9 | Kept photos of a deleted meal, and after switching "Keep my meal photos" off | They stay until the account is deleted | Remove a meal's kept photo with the meal, and remove kept photos when the switch goes off: keep only what the person chose to keep | Outside beta (real photos) |
-| D10 | A founder change and its audit record are two database steps | Two steps; double taps fixed | Make them one transaction (one small new migration): every change then has its record | Outside beta (when founder tools are on) |
-| D11 | Company name and a monitored support address (About, Contact) | Left out | No default possible: needed for Contact to be real | Outside beta |
-| D12 | Legal text: template service for Terms and Privacy (Gate 1) | Honest stub pages | Choose a template service; replace the stubs before outside users | Outside beta |
-| D13 | "Worth watching" when bloating is lower with an item | Both directions count; text states the two averages, never "protective" | Keep as built: neutral, and it follows the data either way | Paid launch |
-| D14 | One conflicting day pauses all comparisons | Strict, as the plan's first comparison state | Keep the plan's rule for beta; revisit with beta feedback | Paid launch |
-| D15 | Medicine "sensitivity view" (test Q21) | Shading and the 14 days before and after, no second comparison | Add one line repeating the comparison without the 14 days after any medicine change, with the number of days left out | Paid launch |
-| D16 | Learn articles | Outlines only, as in the plan | Keep outlines until you supply sources and approve the wording: no new health text without them | Paid launch |
-| D17 | Custom habits (plan A13: logged, not compared) | Not built | Leave out for beta; add if testers ask | Paid launch |
-| D18 | Account deletion during a storage outage | Photos first, then the account; on failure nothing is deleted and the person tries again | Keep for beta. For `bloat-live`, add a background deletion job with a server storage key (a new secret), as the plan describes | Paid launch |
-| D19 | Business entity and payment provider (Gate 2) | Payments off; mock billing on the preview | No default: needed before any real payment | Paid launch |
+**On now for every signed-in tester**
+
+| # | Decision | Built now | Recommended default, and why |
+|---|---|---|---|
+| D1 | "Is it still happening?" after an answer of Yes or Not sure | Asked again on every app open while the record has been open 8 hours or more | Ask again only after another 8 hours: fewer repeat prompts; the open record and its safety wording are unchanged |
+| D2 | Countries not yet reviewed (`not_reviewed`), and the two "paused" sentences | Not blocked; the sentences are new wording | Block them on a live site until marked ready (fail closed); keep the preview open. Approve the sentences or edit them |
+| D18 | Account deletion during a storage outage | Photos first, then the account; on failure the account and diary stay and the person tries again | Keep for now. For `bloat-live`, add a background deletion job with a server storage key (a new secret), as the plan describes |
+
+**On now for everyone, signed out too (public pages)**
+
+| # | Decision | Built now | Recommended default, and why |
+|---|---|---|---|
+| D8 | "English only" note on the help page (test Q70) | Not shown | Approve one plain sentence saying the page is in English only: honest for Canada and India |
+| D11 | Company name and a monitored support address (About, Contact) | Left out | No default possible: needed for Contact to be real |
+| D12 | Legal text: template service for Terms and Privacy (Gate 1) | Honest stub pages saying this is a preview | Choose a template service and replace the stubs before people outside use the app |
+
+**On now for Pro testers** (the designated Pro test accounts; no purchase is possible on the preview)
+
+| # | Decision | Built now | Recommended default, and why |
+|---|---|---|---|
+| D4 | Seven card wording corrections | Old wording; proposals in `docs/content/proposed-corrections-2026-11-18.md` | Approve the proposals: each is closer to its source; a person opens the CDC page first |
+| D7 | Who checks every card source link | Checked automatically only | You or a clinician open each link once: automated checks cannot judge the content |
+| D9 | Kept photos of a deleted meal, and after switching "Keep my meal photos" off | They stay until the account is deleted | Remove a meal's kept photo with the meal, and remove kept photos when the switch goes off: keep only what the person chose to keep |
+| D13 | "Worth watching" when bloating is lower with an item | Both directions count; text states the two averages, never "protective" | Keep as built: neutral, and it follows the data either way |
+| D14 | One conflicting day pauses all comparisons | Strict, as the plan's first comparison state | Keep the plan's rule for now; revisit with tester feedback |
+| D15 | Medicine "sensitivity view" (test Q21) | Shading and the 14 days before and after, no second comparison | Add one line repeating the comparison without the 14 days after any medicine change, with the number of days left out |
+| D16 | Learn articles | Outlines only, as in the plan | Keep outlines until you supply sources and approve the wording: no new health text without them |
+| D20 | The message after a failed account deletion, when some kept photos were already removed | "That didn't work. Nothing was deleted. Try again." The account and diary are intact, but photos removed before the failure stay removed | Say instead that the account and diary were not deleted and some kept photos may already be gone (new wording, needs your yes) |
+
+**Not on for anyone** (off, paused, hidden or not built)
+
+| # | Decision | Built now | Recommended default, and why |
+|---|---|---|---|
+| D3 | AI failure alert threshold (test Q183) | Failures counted, no alert; the preview uses the labelled mock, real AI is off | Alert when 20% or more of at least 10 checks fail within an hour: catches an outage, ignores a single failure. Decide before real AI is switched on |
+| D5 | Kiwifruit experiment and card | Paused, card unpublished | Keep paused unless you approve the BDA 2025 correction (2 to 3 peeled kiwifruit a day, 28 days) |
+| D6 | Two cards with no linkable source ("Gentle stretch", "Wind down for sleep") | Unpublished drafts | Leave unpublished until you supply a source |
+| D10 | A founder change and its audit record are two database steps | Founder tools are off on the preview (no staff address); double taps fixed | Make them one transaction (one small new migration) before founder tools are switched on |
+| D17 | Custom habits (plan A13: logged, not compared) | Not built | Leave out; add if testers ask |
+| D19 | Business entity and payment provider (Gate 2) | Payments off; mock billing on the preview | No default: needed before any real payment |
 
 ## Settled (kept for the record, not reopened)
 

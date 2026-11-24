@@ -1,22 +1,22 @@
 # Progress
 
-Last updated: 23 Nov 2026 (documentation cleanup). Branch: `claude/bloat-software-build-uxzoru`.
+Last updated: 24 Nov 2026 (K1 keyboard-focus fix published, preview frozen again). Branch: `claude/bloat-software-build-uxzoru`.
 
 This file has four parts: **current status** (what is true now, with the evidence), **what remains** (your decisions, launch requirements, tests not yet performed), **your phone checklist**, and **history** (completed work by date, kept as it was then). How the preview is published and run is in `DEPLOYMENT.md`; what was tested, where and on which build is in `docs/verification-report.md`.
 
-## Current status (verified 23 Nov 2026)
+## Current status (verified 24 Nov 2026)
 
 | What | State | How it was verified |
 |---|---|---|
-| Testing preview | `https://bloat-preview.vercel.app` and the branch address serve commit `83fe4da`, Vercel deployment `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` | Published by the Preview workflow, run 12 (23 Nov, 15:36 UTC), after all its checks passed. Vercel reports both addresses on this deployment, and all 209 source files Vercel lists for it match the commit |
-| Main addresses | `bloat-olive.vercel.app`, `bloat-typeshi2.vercel.app` and `bloat-git-main-typeshi2.vercel.app` show the same frozen deployment since 24 Nov (your decision; not a launch). `main` was fast-forwarded to the build branch the same day | Vercel reports `bloat-olive.vercel.app` on `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (read 24 Nov) |
-| **Freeze** | **Frozen for your feature-by-feature review.** Nothing is published unless you send a reproducible issue; a fix then goes through the same workflow and gets its own entry in the report. Notes-only commits carry `[skip ci]` and cannot publish | No workflow run and no new deployment since run 12 |
-| Tests on this build | Local: rule 97 of 97, API 140 of 140, browser 251 of 251. CI (run 12): all checks passed. Live: full hosted suite 16 of 16 with 7 fresh synthetic accounts, plus a live check of export messages and of kept photos being removed with the account | `docs/verification-report.md`, top, and `TEST_RESULTS.md` |
-| Sign-in | Email and password, for accounts you make in Supabase. Sign-ups are off in Supabase itself. Test mode is off (`BLOAT_TEST_LOGIN=0`) | Hosted check "nobody can create an account" passed on this build; Vercel variables read on 23 Nov |
-| Your test account | `bloat-tester@bloat.test` exists, with its sample meal, bloating record and report; Pro without a purchase; not staff | Read-only fingerprint identical before and after every hosted run on 23 Nov |
-| Synthetic test accounts | None remain. Every set made for a hosted run was deleted through the app and checked gone | Read-only check after the last run (23 Nov): 0 accounts with a test marker |
-| Publishing | Only the Preview workflow moves the preview, after its checks pass. Its `VERCEL_TOKEN` secret is in place (since 22 Nov) | Runs 6, 9, 10, 11 and 12 published; Vercel lists no other deployment since `af950f5` |
-| Real AI, payments, email delivery | Off: labelled mock AI (no AI key in the project), mock billing, no custom email sender | Vercel variables read on 23 Nov |
+| Testing preview | `https://bloat-preview.vercel.app` and the branch address serve commit `9c6ed14`, Vercel deployment `dpl_55jDsCf3AbLK5mYRCEBEnKqtN9Jc`. It adds one fix to the previous build: keyboard focus after a sheet closes (K1) | Published by the Preview workflow, run 13 (24 Nov, 09:09 UTC), after all its checks passed. Vercel reports both addresses on this deployment, and all 210 source files Vercel lists for it match the commit |
+| Main addresses | `bloat-olive.vercel.app`, `bloat-typeshi2.vercel.app` and `bloat-git-main-typeshi2.vercel.app` still show the **previous** build, `83fe4da` (`dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`), **without the K1 fix**. They were pointed there by hand on 24 Nov (your decision; not a launch). The workflow moves only the two preview addresses, so they stay there until you ask for them to be moved. Same settings as the preview: `bloat-test`, mock AI, mock billing, test mode off | Vercel address list read before and after run 13 (`test-evidence/ledger/addresses-before-publish.txt`) |
+| **Freeze** | **Frozen again for your feature-by-feature review.** Nothing is published unless you send a reproducible issue; a fix then goes through the same workflow and gets its own entry in the report. Notes-only commits carry `[skip ci]` and cannot publish | No workflow run and no new deployment since run 13 |
+| Tests on this build | Local: rule 97 passed, API 141 passed, browser 260 passed; 0 expected failures, 0 skipped, 0 failed. CI (run 13): all checks passed. Live: full hosted suite 16 passed, 0 skipped, with 7 fresh synthetic accounts, plus the live keyboard-focus check (1 passed). Tests not performed are listed below, never counted as passed | `docs/verification-report.md`, top, and `TEST_RESULTS.md` |
+| Sign-in | Email and password, for accounts you make in Supabase. Sign-ups are off in Supabase itself. Test mode is off (`BLOAT_TEST_LOGIN=0`) | Hosted check "nobody can create an account" passed on this build; Vercel variables read on 24 Nov |
+| Your test account | `bloat-tester@bloat.test` exists, with its sample meal, bloating record and report; Pro without a purchase; not staff | Read-only fingerprint identical before and after the hosted run on 24 Nov |
+| Synthetic test accounts | None remain. The 8 made for the 24 Nov run were deleted through the app and checked gone | Read-only check after the run (24 Nov): 0 accounts with a test marker, photo bucket empty |
+| Publishing | Only the Preview workflow moves the preview, after its checks pass. Its `VERCEL_TOKEN` secret is in place (since 22 Nov) | Runs 6, 9, 10, 11, 12 and 13 published; Vercel lists no other deployment since `af950f5` |
+| Real AI, payments, email delivery, sign-ups | Off: labelled mock AI (no AI key in the project), mock billing, no custom email sender, sign-ups off | Vercel variables read on 24 Nov; no Production variables exist |
 
 **What happens next:** you review the preview feature by feature and send reproducible issues. Each one is reproduced by a test, fixed in a focused commit and published through the workflow.
 
@@ -24,7 +24,14 @@ This file has four parts: **current status** (what is true now, with the evidenc
 
 ### Your decisions
 
-All in one table: `DECISIONS.md`, "Open decisions" (D1 to D19), each with what is built now, a recommended default and when it is needed. One affects your own testing: D1 ("Is it still happening?" asks again on every app open). Eleven are needed before an outside beta (D2 to D12; D6 does not block anything) and seven before a paid launch (D13 to D19). Settled questions, including the light-only design, are listed under "Settled" and are not reopened.
+All in one table: `DECISIONS.md`, "Open decisions" (D1 to D20), each with what is built now and a recommended default. They are grouped by **who can use the affected feature on the preview today**, not by whether people pay:
+
+- **On now for every signed-in tester (3):** D1 ("Is it still happening?" asks again on every app open), D2 (countries not yet reviewed), D18 (account deletion during a storage outage).
+- **On now for everyone, signed out too, on the public pages (3):** D8 ("English only" note), D11 (company name and support address), D12 (legal text).
+- **On now for Pro testers (8):** D4, D7, D9, D13, D14, D15, D16 and the new D20 (the message after a failed account deletion when some kept photos were already removed).
+- **Not on for anyone (6):** D3, D5, D6, D10, D17, D19 (off, paused, hidden or not built).
+
+Settled questions, including the light-only design, are listed under "Settled" and are not reopened. None of D1 to D20 has been built yet.
 
 ### Launch requirements (before anyone outside is invited)
 
@@ -37,7 +44,7 @@ All in one table: `DECISIONS.md`, "Open decisions" (D1 to D19), each with what i
 
 ### Tests not yet performed
 
-1. Real phones (iOS Safari, Android Chrome), and any screen reader (VoiceOver, TalkBack, NVDA): none performed. (200% browser zoom and keyboard-only journeys were tested locally on 23 Nov; see below.)
+1. Real phones (iOS Safari, Android Chrome), and any screen reader (VoiceOver, TalkBack, NVDA): none performed. (200% browser zoom and keyboard-only journeys pass in desktop Chromium, locally; keyboard focus after a sheet closes also passes live.)
 2. A real AI provider (photo and typed dish).
 3. Founder tools on the hosted preview (no staff account there, by design).
 4. On the hosted preview: the doctor reminder in History, the experiment answer on Today and "Not useful" on Today (they need several days of records; checked locally and by the workflow).
@@ -46,10 +53,11 @@ All in one table: `DECISIONS.md`, "Open decisions" (D1 to D19), each with what i
 7. Whether Vercel's Ignored Build Step really blocks a Git build (configured and read back by every run; not proven).
 8. A real backup restore on `bloat-test` (re-applying deletions after a restore is checked locally only).
 9. The 19 screens without approved designs have not been compared with designs (only the 20 Slice A screens have them).
+10. Any check on the three main addresses after 23 Nov (they serve `83fe4da`, which was tested on 23 Nov).
 
-### Found during the freeze, not fixed
+### A known limit of account deletion
 
-**K1, keyboard focus lost (found 23 Nov, not fixed: the preview is frozen).** When a save removes the button that opened a sheet, focus falls back to the page itself: after saving "Log bloating", after ending bloating, and after confirming "Delete" for a meal or a bloating record. Reproduction: `tests/e2e/accessibility.spec.ts`, check "known defect K1" (marked as expected to fail). Impact: a keyboard or screen-reader user loses their place, and the next Tab starts again from the top of the page; nothing is lost or saved wrongly. Proposed focused fix (one shared function, `returnFocus` in `src/lib/client/nav.ts`): if the button that opened the sheet is gone, move focus to the control that replaced it (for example "Bloating ongoing") or else to the screen's main heading. The K1 check then passes and becomes a normal check. Waiting for your go-ahead.
+If storage fails while an account is being deleted, the account and the diary are **not** deleted and the person can try again. But photos are removed first, so kept photos removed before the failure stay removed. The screen still says "Nothing was deleted", which is not exact in that case (decision D20). Only Pro accounts can keep photos.
 
 ## Owner checklist: the main journeys on your phone
 
@@ -89,9 +97,14 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 
 These entries record what was done and true **on that date**. Later work may have changed them; where an entry said something was still pending, a note in brackets says how it ended. For what is true now, use "Current status" above.
 
+### 24 Nov 2026
+
+- Fixed K1, found during the freeze: when a save removed the button that opened a sheet, keyboard focus fell back to the page. Focus now goes to the same button, else its replacement ("I feel bloated" and "Bloating ongoing" swap), else the section heading, else the screen title, and never takes focus back once the person moves on. The expected-failure check became 5 ordinary checks that also press Tab once. Published as `9c6ed14` (run 13); hosted suite 16 of 16 and a live keyboard-focus check passed; the 8 synthetic accounts were deleted and checked gone; `bloat-tester` untouched. The three main addresses were not moved (still `83fe4da`). The preview was then frozen again.
+- Reporting corrected: the freeze-time browser count "256 of 256" counted the K1 expected failure as a pass (it was 255 passed and 1 expected failure); results now list passed, expected failure, skipped and not performed separately. The decisions table is grouped by who can use each feature now.
+
 ### 23 Nov 2026
 
-- During the freeze (local only, no publish): the two failure tests (storage failure during account deletion, now including a partial removal; a failure midway through the recalled-meals offer, with rollback and a duplicate-free retry) pass on the frozen code. Keyboard-only journeys and 200% browser zoom tested; one defect found (K1, above). The open owner questions became one table in `DECISIONS.md`.
+- During the freeze (local only, no publish): the two failure tests (storage failure during account deletion, now including a partial removal; a failure midway through the recalled-meals offer, with rollback and a duplicate-free retry) pass on the frozen code. Keyboard-only journeys and 200% browser zoom tested; one defect found (K1; fixed on 24 Nov). The open owner questions became one table in `DECISIONS.md`.
 - Fixed the four defects of the external report (B1 to B4), published as `0d537d2` (run 9) and re-checked live.
 - Ran the full signed-in hosted suite on that build with 7 synthetic accounts: 16 of 16; the accounts were deleted and checked gone.
 - Checked the 12 remaining actions of report section 5 on the screen. Three buttons showed nothing when their save failed; fixed in `7713098` (run 10).

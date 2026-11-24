@@ -20,7 +20,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "test-evidence", "ledger")
 # Which app code each raw result file was produced on (kept by hand, checked against the run logs).
 CRAWL_CODE = "2f22cc4"  # ledger-after.json, navigate.json, widths-after.json: 22 Nov
-FINAL_CODE = "83fe4da"  # e2e-results.json: 23 Nov, the published build
+FINAL_CODE = "9c6ed14"  # e2e-results.json: 24 Nov, the published build
 OUT = os.path.join(ROOT, "docs", "verification-report.md")
 
 

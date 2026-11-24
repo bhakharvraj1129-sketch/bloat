@@ -1,25 +1,49 @@
 # Test results
 
-Last run: 23 Nov 2026 (during the freeze). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 24 Nov 2026 (K1 fix, then frozen again). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+
+Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
+
+## K1 fix (24 Nov 2026): published build `9c6ed14`, frozen again
+
+Published revision `9c6ed1428320a6ea316f7ed5d2efdf8d32f64d4f`, Vercel deployment `dpl_55jDsCf3AbLK5mYRCEBEnKqtN9Jc`, served at `https://bloat-preview.vercel.app` and the branch address (GitHub run 13). The three main addresses still serve `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (`83fe4da`, without this fix); the workflow does not move them.
+
+| Check | Where | Passed | Expected failure | Skipped | Failed |
+|---|---|---|---|---|---|
+| Focus after a save removes the opening button (5 checks: Log bloating, ending bloating, deleting one of two meals, deleting the only bloating record, normal return kept and focus never taken back), each case followed by one Tab | Local, frozen code `83fe4da` (before the fix) | 1 | 0 | 0 | 4 (defect shown: focus on the page body) |
+| Same 5 checks, now ordinary checks | Local, fixed code `9c6ed14` | 5 | 0 | 0 | 0 |
+| Rule tests | Local, `9c6ed14` | 97 | 0 | 0 | 0 |
+| API tests | Local, `9c6ed14` | 141 | 0 | 0 | 0 |
+| Browser tests (phone screen, plus keyboard and 200% zoom) | Local, `9c6ed14` | 260 (none retried) | 0 | 0 | 0 |
+| Type check, lint | Local | 0 errors (5 old warnings) | | | |
+| GitHub run 13: all checks on a clean checkout (browser 260 passed), controls read back, Vercel build, 6 live checks before and after publishing | CI | all | 0 | 0 | 0 |
+| Tested = deployed: both preview addresses on `dpl_55jDsCf3AbLK5mYRCEBEnKqtN9Jc`; 210 of 210 listed source files byte-identical to `9c6ed14` | Vercel | yes | | | |
+| Full hosted suite, 7 fresh accounts marked `2026-11-24` | Live | 16 | 0 | 0 | 0 |
+| Keyboard focus after the four sheet saves, and the next Tab from each, own account | Live | 1 | 0 | 0 | 0 |
+| 8 accounts deleted through the app, then read-only checks | Live, `bloat-test` | 0 rows anywhere, no marked accounts, photo bucket empty; `bloat-tester` identical before and after | | | |
+
+**Not performed** (not counted above): real phones; any screen reader; a real AI provider; founder tools on the preview; the 3 history-dependent screens on the preview; storage and recalled-offer failures on the preview (local only); the control crawl, link-by-link run and five-width check on the final code; any check on the three main addresses after 23 Nov.
+
+**About account deletion when storage fails:** the account and diary are not deleted and the person can try again, but kept photos removed before the failure stay removed (local partial-removal check). The message "Nothing was deleted" is not exact in that case (decision D20).
 
 ## During the freeze (23 Nov 2026): local checks on the frozen code `83fe4da`
 
-Nothing was published; the preview still serves `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`. Local stack, synthetic disposable accounts, local fault injection (temporary database triggers). `bloat-tester` was not used.
+Nothing was published then; the preview served `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`. Local stack, synthetic disposable accounts, local fault injection (temporary database triggers). `bloat-tester` was not used.
 
 | Check | Result |
 |---|---|
-| Account deletion with kept photos: no failure; storage failing then recovering; failure clearing during the automatic retries; **partial removal** (storage removes 2 of 3 photos and silently keeps one) | **4 of 4 passed**. Partial removal: the route notices the photo left behind, answers "nothing was deleted", keeps the account and its records, alerts the founder (`files_left: 1`), and the retry removes the last photo and the account |
+| Account deletion with kept photos: no failure; storage failing then recovering; failure clearing during the automatic retries; **partial removal** (storage removes 2 of 3 photos and silently keeps one) | **4 of 4 passed**. Partial removal: the route notices the photo left behind and does not delete the account; the account and diary stay, but the 2 photos already removed stay removed, although the screen says "Nothing was deleted" (decision D20); it alerts the founder (`files_left: 1`), and the retry removes the last photo and the account |
 | Recalled-meals offer: the database refuses the answer, then (second check) the duplicate-tap record | **2 of 2 passed**: everything rolled back (offer not used up, no answer, no record); the same request then saves exactly once and a repeat writes nothing |
 | Keyboard only (Tab, Shift+Tab, Enter, Space, Escape): sign in, log bloating, Escape, add, edit and delete a meal, units, export, sign out; desktop at 100% and at 200% zoom; both sign-in modes | **Passed**. Visible focus ring on every checked control; focus returns after Escape and after adding or editing a meal |
-| Focus after a save that removes the opening button | **Failed: defect K1** (saving Log bloating, ending bloating, confirming Delete for a meal or a bloating record). Recorded as an expected-to-fail check; not fixed while frozen |
+| Focus after a save that removes the opening button | **Failed: defect K1** (saving Log bloating, ending bloating, confirming Delete for a meal or a bloating record). Recorded as an expected-to-fail check; not fixed while frozen (fixed on 24 Nov, above) |
 | 200% browser zoom (1280 x 800 window), 11 main screens | **Passed**: no sideways scrolling, no control off screen, no clipped text, nothing hidden under the tab bar |
 | 200% zoom, sheets: Log bloating, Add meal, Edit meal | **Passed**: the sheet scrolls, Save is reachable and saves |
-| Rule / API / browser suites | 97 of 97 / 141 of 141 / 256 of 256 (the K1 check counts as an expected failure) |
+| Rule / API / browser suites | Rule 97 passed; API 141 passed; browser 256 run: **255 passed, 1 expected failure** (the K1 check, marked to fail until fixed), 0 skipped. (Corrected on 24 Nov: this row first said "256 of 256", which counted the expected failure as a pass.) |
 | Screen reader | **Not performed** (none available here; accessibility-tree checks are not counted) |
 
 ## Last fix before the freeze (23 Nov 2026): published build `83fe4da`
 
-Published revision `83fe4daf773f35b74b93b633db8a77b8f0f1f580`, Vercel deployment `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`, served at `https://bloat-preview.vercel.app` (GitHub run 12). Frozen for review.
+Published revision `83fe4daf773f35b74b93b633db8a77b8f0f1f580`, Vercel deployment `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`, served at `https://bloat-preview.vercel.app` (GitHub run 12). Frozen for review until the K1 fix on 24 Nov.
 
 | Check | Where | Result |
 |---|---|---|
