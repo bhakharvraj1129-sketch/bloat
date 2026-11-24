@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 24 Nov 2026 (K1 keyboard-focus fix published, preview frozen again). Branch: `claude/bloat-software-build-uxzoru`.
+Last updated: 24 Nov 2026 (K1 focus fix and P2 deletion-message fix published, preview frozen again). Branch: `claude/bloat-software-build-uxzoru`.
 
 This file has four parts: **current status** (what is true now, with the evidence), **what remains** (your decisions, launch requirements, tests not yet performed), **your phone checklist**, and **history** (completed work by date, kept as it was then). How the preview is published and run is in `DEPLOYMENT.md`; what was tested, where and on which build is in `docs/verification-report.md`.
 
@@ -8,14 +8,14 @@ This file has four parts: **current status** (what is true now, with the evidenc
 
 | What | State | How it was verified |
 |---|---|---|
-| Testing preview | `https://bloat-preview.vercel.app` and the branch address serve commit `9c6ed14`, Vercel deployment `dpl_55jDsCf3AbLK5mYRCEBEnKqtN9Jc`. It adds one fix to the previous build: keyboard focus after a sheet closes (K1) | Published by the Preview workflow, run 13 (24 Nov, 09:09 UTC), after all its checks passed. Vercel reports both addresses on this deployment, and all 210 source files Vercel lists for it match the commit |
-| Main addresses | `bloat-olive.vercel.app`, `bloat-typeshi2.vercel.app` and `bloat-git-main-typeshi2.vercel.app` still show the **previous** build, `83fe4da` (`dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`), **without the K1 fix**. They were pointed there by hand on 24 Nov (your decision; not a launch). The workflow moves only the two preview addresses, so they stay there until you ask for them to be moved. Same settings as the preview: `bloat-test`, mock AI, mock billing, test mode off | Vercel address list read before and after run 13 (`test-evidence/ledger/addresses-before-publish.txt`) |
-| **Freeze** | **Frozen again for your feature-by-feature review.** Nothing is published unless you send a reproducible issue; a fix then goes through the same workflow and gets its own entry in the report. Notes-only commits carry `[skip ci]` and cannot publish | No workflow run and no new deployment since run 13 |
-| Tests on this build | Local: rule 97 passed, API 141 passed, browser 260 passed; 0 expected failures, 0 skipped, 0 failed. CI (run 13): all checks passed. Live: full hosted suite 16 passed, 0 skipped, with 7 fresh synthetic accounts, plus the live keyboard-focus check (1 passed). Tests not performed are listed below, never counted as passed | `docs/verification-report.md`, top, and `TEST_RESULTS.md` |
+| Testing preview | `https://bloat-preview.vercel.app` and the branch address serve commit `f8fcd9d`, Vercel deployment `dpl_7N1RRQjq8qFDNmw9x3ihfcxk9iBD`. Today's two fixes are in it: keyboard focus after a sheet closes (K1) and the message after a failed account deletion (P2) | Published by the Preview workflow, run 14 (24 Nov, 09:56 UTC), after all its checks passed. Vercel reports both addresses on this deployment; all 210 source files Vercel lists for it match the commit, and the two changed files it does not list were found in it by content fingerprint |
+| Main addresses | `bloat-olive.vercel.app`, `bloat-typeshi2.vercel.app` and `bloat-git-main-typeshi2.vercel.app` still show an **older** build, `83fe4da` (`dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`), **without the K1 and P2 fixes**. They were pointed there by hand on 24 Nov (your decision; not a launch). The workflow moves only the two preview addresses, so they stay there until you ask for them to be moved. Same settings as the preview: `bloat-test`, mock AI, mock billing, test mode off | Vercel address list read before run 13 and after runs 13 and 14 (`test-evidence/ledger/deploy-7N1R.txt`) |
+| **Freeze** | **Frozen again for your feature-by-feature review.** Nothing is published unless you send a reproducible issue; a fix then goes through the same workflow and gets its own entry in the report. Notes-only commits carry `[skip ci]` and cannot publish | No workflow run and no new deployment since run 14 |
+| Tests on this build | Local on `f8fcd9d`: rule 97 passed, API 141 passed, browser 261 passed; 0 expected failures, 0 skipped, 0 failed. CI (run 14): all checks passed, incl. 6 live checks before and after publishing. Live signed-in checks ran on the build before (`9c6ed14`, which differs only in the deletion message): full hosted suite 16 passed, 0 skipped, and the keyboard-focus check 1 passed. Tests not performed are listed below, never counted as passed | `docs/verification-report.md`, top, and `TEST_RESULTS.md` |
 | Sign-in | Email and password, for accounts you make in Supabase. Sign-ups are off in Supabase itself. Test mode is off (`BLOAT_TEST_LOGIN=0`) | Hosted check "nobody can create an account" passed on this build; Vercel variables read on 24 Nov |
-| Your test account | `bloat-tester@bloat.test` exists, with its sample meal, bloating record and report; Pro without a purchase; not staff | Read-only fingerprint identical before and after the hosted run on 24 Nov |
+| Your test account | `bloat-tester@bloat.test` exists, with its sample meal, bloating record and report; Pro without a purchase; not staff | Read-only fingerprint identical before and after the hosted run and before and after run 14, 24 Nov |
 | Synthetic test accounts | None remain. The 8 made for the 24 Nov run were deleted through the app and checked gone | Read-only check after the run (24 Nov): 0 accounts with a test marker, photo bucket empty |
-| Publishing | Only the Preview workflow moves the preview, after its checks pass. Its `VERCEL_TOKEN` secret is in place (since 22 Nov) | Runs 6, 9, 10, 11, 12 and 13 published; Vercel lists no other deployment since `af950f5` |
+| Publishing | Only the Preview workflow moves the preview, after its checks pass. Its `VERCEL_TOKEN` secret is in place (since 22 Nov) | Runs 6, 9, 10, 11, 12, 13 and 14 published; Vercel lists no other deployment since `af950f5` |
 | Real AI, payments, email delivery, sign-ups | Off: labelled mock AI (no AI key in the project), mock billing, no custom email sender, sign-ups off | Vercel variables read on 24 Nov; no Production variables exist |
 
 **What happens next:** you review the preview feature by feature and send reproducible issues. Each one is reproduced by a test, fixed in a focused commit and published through the workflow.
@@ -56,6 +56,7 @@ Settled questions, including the light-only design, are listed under "Settled" a
 8. A real backup restore on `bloat-test` (re-applying deletions after a restore is checked locally only).
 9. The 19 screens without approved designs have not been compared with designs (only the 20 Slice A screens have them).
 10. Any check on the three main addresses after 23 Nov (they serve `83fe4da`, which was tested on 23 Nov).
+11. The signed-in hosted suite on the final build `f8fcd9d` (it ran on `9c6ed14`), and the new deletion message on the live preview (it needs a storage failure, which can only be caused locally).
 
 ### Account deletion when storage fails (message fixed, P2)
 
@@ -101,6 +102,7 @@ These entries record what was done and true **on that date**. Later work may hav
 
 ### 24 Nov 2026
 
+- Fixed P2 (formerly decision D20): after a failed account deletion the sheet said "Nothing was deleted", though kept photos removed before the failure stay removed. It now shows your wording on any server failure; a refusal before anything is removed still says nothing was deleted. Deletion itself is unchanged. The storage-down and partial-removal checks (API and screen) now check the message and the successful retry; they failed on the build before. Published as `f8fcd9d` (run 14); deployed source checked against the commit; `bloat-tester` untouched; the main addresses not moved. Stale notes corrected (K1 fixed; 200% zoom tested in desktop Chromium only; `CLAUDE.md` tells the preview apart from the main addresses). Frozen again.
 - Fixed K1, found during the freeze: when a save removed the button that opened a sheet, keyboard focus fell back to the page. Focus now goes to the same button, else its replacement ("I feel bloated" and "Bloating ongoing" swap), else the section heading, else the screen title, and never takes focus back once the person moves on. The expected-failure check became 5 ordinary checks that also press Tab once. Published as `9c6ed14` (run 13); hosted suite 16 of 16 and a live keyboard-focus check passed; the 8 synthetic accounts were deleted and checked gone; `bloat-tester` untouched. The three main addresses were not moved (still `83fe4da`). The preview was then frozen again.
 - Reporting corrected: the freeze-time browser count "256 of 256" counted the K1 expected failure as a pass (it was 255 passed and 1 expected failure); results now list passed, expected failure, skipped and not performed separately. The decisions table is grouped by who can use each feature now.
 

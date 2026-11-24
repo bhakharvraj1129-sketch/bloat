@@ -1,8 +1,28 @@
 # Test results
 
-Last run: 24 Nov 2026 (K1 fix, then frozen again). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 24 Nov 2026 (K1 and P2 fixes, then frozen again). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
+
+## P2 fix (24 Nov 2026): published build `f8fcd9d`, frozen again
+
+Published revision `f8fcd9d4045ddf456d38bfd2e35283ec05d86f0d`, Vercel deployment `dpl_7N1RRQjq8qFDNmw9x3ihfcxk9iBD`, served at `https://bloat-preview.vercel.app` and the branch address (GitHub run 14). The fix: after a failed account deletion the sheet said "Nothing was deleted", though kept photos removed before the failure stay removed (formerly decision D20). The three main addresses still serve `83fe4da`.
+
+| Check | Where | Passed | Expected failure | Skipped | Failed |
+|---|---|---|---|---|---|
+| Updated deletion checks: API storage down, API partial removal, screen storage down, screen partial removal, screen general server failure | Local, build before the fix (`9c6ed14`) | 0 | 0 | 0 | 5 (the old wording; the partial screen case failed exactly at the new sentence) |
+| The same checks | Local, `f8fcd9d` | 5 (plus the 2 unchanged deletion API checks) | 0 | 0 | 0 |
+| Rule tests | Local, `f8fcd9d` | 97 | 0 | 0 | 0 |
+| API tests | Local, `f8fcd9d` | 141 | 0 | 0 | 0 |
+| Browser tests (phone screen, plus keyboard and 200% zoom) | Local, `f8fcd9d` | 261 (none retried) | 0 | 0 | 0 |
+| Type check, lint | Local | 0 errors (5 old warnings) | | | |
+| GitHub run 14: all checks on a clean checkout, controls read back, Vercel build, 6 live checks before and after publishing | CI and live | all | 0 | 0 | 0 |
+| Tested = deployed: both preview addresses on `dpl_7N1RRQjq8qFDNmw9x3ihfcxk9iBD`; 210 of 210 listed source files byte-identical to `f8fcd9d`; the changed route and screen found in it by content fingerprint | Vercel | yes | | | |
+| `bloat-tester` fingerprint before and after run 14 | `bloat-test` | identical | | | |
+
+**Not performed** (not counted above): the signed-in hosted suite on `f8fcd9d` (16 of 16 passed on `9c6ed14`, which differs only in this message); the new message on the live preview (it needs a storage failure); real phones; any screen reader; everything else listed under the K1 section below.
+
+What each case shows now: storage down or partial removal (503), or a failure after the photos are gone (500): "We couldn't finish deleting your account. Your account and diary are still available, but some saved meal photos may already have been deleted. Try again to finish." A refusal before anything is removed (below 500): "That didn't work. Nothing was deleted. Try again." A lost reply: unchanged ("Connection lost..." with "Check and finish"). Inexact either way: a time-out reported by Vercel itself, with no answer from the app.
 
 ## K1 fix (24 Nov 2026): published build `9c6ed14`, frozen again
 

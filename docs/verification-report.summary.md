@@ -1,10 +1,10 @@
 ## Results at a glance
 
-**Tested and published: commit `9c6ed1428320a6ea316f7ed5d2efdf8d32f64d4f`, Vercel deployment `dpl_55jDsCf3AbLK5mYRCEBEnKqtN9Jc`** (`bloat-10n5eeo9n-typeshi2.vercel.app`), published on 24 Nov 2026 at 09:09 UTC by GitHub run 13 and served at `https://bloat-preview.vercel.app` and the branch address. It adds one fix to the previous build: keyboard focus after a sheet closes (K1). **The preview is frozen again for feature-by-feature review.**
+**Tested and published: commit `f8fcd9d4045ddf456d38bfd2e35283ec05d86f0d`, Vercel deployment `dpl_7N1RRQjq8qFDNmw9x3ihfcxk9iBD`** (`bloat-ltxp1icea-typeshi2.vercel.app`), published on 24 Nov 2026 at 09:56 UTC by GitHub run 14 and served at `https://bloat-preview.vercel.app` and the branch address. It changes one thing from the build before (`9c6ed14`, K1): the message after a failed account deletion (P2, formerly decision D20). **The preview is frozen again for feature-by-feature review.**
 
-How tested and deployed are tied together (section 9): run 13 started on the push of `9c6ed14` and reports that commit; its hosted checks ran against exactly `https://bloat-10n5eeo9n-typeshi2.vercel.app` before publishing; its publish step confirmed that `bloat-preview.vercel.app` serves that build; Vercel listed 490 of the deployment's 635 files (the listing is partial) and all 210 source files among them are byte-identical to `9c6ed14`, including the two changed shared files (`src/lib/client/nav.ts`, `src/components/ui.tsx`); the changed day and Today screens are in folders the listing left out, and the live focus check exercised both; Vercel reports both addresses on it, and it is the only deployment since run 12.
+How tested and deployed are tied together (section 9): run 14 started on the push of `f8fcd9d` and reports that commit; its hosted checks ran against the new build before publishing; its publish step confirmed that `bloat-preview.vercel.app` serves that build; Vercel listed 490 of the deployment's 635 files (the listing is partial) and all 210 source files among them are byte-identical to `f8fcd9d`, including the changed `src/lib/wording.ts`; the two other changed files are in folders the listing left out, so they were fetched from the deployment by content fingerprint: the `f8fcd9d` versions of the delete route and the You screen are there, and the earlier route is not (`test-evidence/ledger/deploy-7N1R.txt`); Vercel reports both addresses on it, and it is the only deployment since run 13. The screen's own code was not fetched live: `/me` sends signed-out visitors to Sign in, and no account was made for this.
 
-**Addresses the workflow does not move (still on the previous build).** `bloat-olive.vercel.app`, `bloat-typeshi2.vercel.app` and `bloat-git-main-typeshi2.vercel.app` were pointed by hand at `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (`83fe4da`) on 24 Nov by another session, at the owner's request. The workflow moves only `bloat-preview.vercel.app` and the branch address, so these three still serve `83fe4da`, which does **not** have the K1 fix. They were not moved in this work (no extra domain changes). Their configuration is the same as the preview's: a Preview-target deployment built with the Preview variables only (`bloat-test` database, labelled mock AI, mock billing, `BLOAT_TEST_LOGIN=0`, password sign-in); the project has no Production variables. `bloat-olive.vercel.app` also carries a temporary shareable-link protection bypass created on 24 Nov (not by this work).
+**Addresses the workflow does not move (still on the previous build).** `bloat-olive.vercel.app`, `bloat-typeshi2.vercel.app` and `bloat-git-main-typeshi2.vercel.app` were pointed by hand at `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (`83fe4da`) on 24 Nov by another session, at the owner's request. The workflow moves only `bloat-preview.vercel.app` and the branch address, so these three still serve `83fe4da`, which has **neither** the K1 fix **nor** the P2 message fix. They were not moved in this work (no extra domain changes). Their configuration is the same as the preview's: a Preview-target deployment built with the Preview variables only (`bloat-test` database, labelled mock AI, mock billing, `BLOAT_TEST_LOGIN=0`, password sign-in); the project has no Production variables. `bloat-olive.vercel.app` also carries a temporary shareable-link protection bypass created on 24 Nov (not by this work).
 
 ### How results are counted
 
@@ -26,33 +26,35 @@ Each was shown by a check on the build before its fix, fixed in its own commit, 
 | R1 | Recalled-meals offer could be left half-saved (offer used, no answer) | 2 checks failed (`7713098`) | `61a9c93` | 2 of 2 | Cannot be caused live |
 | R2 | Export said "Check your connection" for a server error | Failed (`7713098`) | `2f3cb25` | Passed | Passed (`62431c7` and `83fe4da`) |
 | R3 | Founder tools: a double tap sent 2 changes and 2 audit records; a lost connection showed nothing | Measured (`7713098`) | `b3c1212` | Passed: 1 request, 1 change, 1 change record, 1 reload record | Not run (no staff account on the preview) |
+| P2 | After a failed account deletion the sheet said "Nothing was deleted", though kept photos removed before the failure stay removed (formerly decision D20) | 5 checks failed (`9c6ed14`): 2 API, 3 screen | `f8fcd9d` | 4 of 4 API and 3 of 3 screen checks: the owner's sentence on a server failure, "Nothing was deleted" only on a refusal, and the retry deletes the rest | Cannot be caused live (needs a storage failure); deployed source checked |
 | K1 | Keyboard focus lost when a save removed the button that opened a sheet: after saving Log bloating, ending bloating, deleting a meal, deleting a bloating record | 4 checks failed (`83fe4da`) | `9c6ed14` | 4 of 4, plus normal return kept and focus never taken back (5 checks) | Passed (`9c6ed14`): the 4 cases and the next Tab, by keyboard on the public preview |
 | P1 | Deleting an account ignored storage errors and could leave kept photos with no owner | 2 checks failed: account gone, photo row and file left (`62431c7`) | `83fe4da` | 3 of 3 API checks and 1 screen check: simulated storage failure, then recovery | Normal path passed (`83fe4da`): 2 synthetic photos kept, then removed with the account |
 
 Two timing races in the checks themselves, not the app, were also fixed: the local delete-account check (`62431c7`) and the hosted diary check (`114f2a1`).
 
-### Results on the final build (`9c6ed14`)
+### Results on the final build (`f8fcd9d`)
 
-| Check | Where | Passed | Expected failure | Skipped | Failed |
-|---|---|---|---|---|---|
-| Rule tests | Local | 97 | 0 | 0 | 0 |
-| API tests (real HTTP against the local app) | Local | 141 | 0 | 0 | 0 |
-| Browser tests on a phone screen, incl. keyboard and 200% zoom | Local | 260 (none retried) | 0 | 0 | 0 |
-| Run 13: type check, lint, rule, API and browser tests on a clean checkout (browser 260 passed), controls read back, Vercel build, 6 account-free checks before and after publishing | CI | all | 0 | 0 | 0 |
-| Full hosted suite, 7 synthetic accounts (marked `2026-11-24`), 24 Nov | Live | 16 | 0 | 0 | 0 |
-| Keyboard focus after the four sheet saves, own synthetic account | Live | 1 | 0 | 0 | 0 |
-| The 8 accounts deleted through the app, then read-only checks | Live and `bloat-test` | Passed: 0 rows anywhere, no marked account, photo bucket empty; `bloat-tester` and its meal, bloating record and report identical before and after | | | |
+| Check | Where | Build | Passed | Expected failure | Skipped | Failed |
+|---|---|---|---|---|---|---|
+| Rule tests | Local | `f8fcd9d` | 97 | 0 | 0 | 0 |
+| API tests (real HTTP against the local app) | Local | `f8fcd9d` | 141 | 0 | 0 | 0 |
+| Browser tests on a phone screen, incl. keyboard and 200% zoom | Local | `f8fcd9d` | 261 (none retried) | 0 | 0 | 0 |
+| Run 14: type check, lint, rule, API and browser tests on a clean checkout, controls read back, Vercel build, 6 account-free checks before and after publishing | CI and live | `f8fcd9d` | all | 0 | 0 | 0 |
+| Full hosted suite, 7 synthetic accounts (marked `2026-11-24`) | Live | `9c6ed14` (not re-run on `f8fcd9d`, which changes only the failed-deletion message) | 16 | 0 | 0 | 0 |
+| Keyboard focus after the four sheet saves, own synthetic account | Live | `9c6ed14` | 1 | 0 | 0 | 0 |
+| The 8 accounts deleted through the app, then read-only checks | Live and `bloat-test` | `9c6ed14` | Passed: 0 rows anywhere, no marked account, photo bucket empty | | | |
+| `bloat-tester` and its meal, bloating record, report, profile, plan and sign-in | `bloat-test` | before and after run 14 | Identical | | | |
 
 Type check and lint: 0 errors (5 old warnings).
 
 ### Launch blockers that remain
 
-1. **Real devices and assistive technology.** No iOS Safari or Android Chrome phone and no screen reader have been used. (Keyboard-only journeys and 200% zoom pass, locally and, for focus, live.)
+1. **Real devices and assistive technology.** No iOS Safari or Android Chrome phone and no screen reader have been used. (Keyboard-only journeys and 200% zoom pass in desktop Chromium, locally; keyboard focus also passed live.)
 2. **A real AI provider.** The photo and dish ingredient check has only run against the labelled mock. It needs your approval of a key and a spending limit, then an evaluation.
 3. **Email sign-in.** The preview uses email-and-password for owner-made test accounts, marked temporary while email delivery is limited (`BLOAT_SIGN_IN_METHOD`). Real users need the email-code sign-in with working email delivery.
 4. **Plan gates still open:** business entity and payment provider (Gate 2; payments stay off), legal text (Gate 1), the live project `bloat-live`.
 5. **A failed account deletion can already have removed some kept photos.** Photos are removed first; if storage fails partway, the account and the diary stay and the person can try again, but photos removed before the failure stay removed. The screen now says exactly that (P2, fixed). A background deletion job for `bloat-live` needs a new secret (D18).
-6. **The three main addresses serve the previous build** (`83fe4da`, without the K1 fix) until the owner asks for them to be moved.
+6. **The three main addresses serve an older build** (`83fe4da`, without the K1 and P2 fixes) until the owner asks for them to be moved.
 7. **Open decisions:** `DECISIONS.md`, "Open decisions", grouped by who can use each feature now.
 
 ### Tests still not performed
@@ -61,11 +63,12 @@ Type check and lint: 0 errors (5 old warnings).
 2. Real-provider AI evaluation (photo and typed dish).
 3. Founder tools on the hosted preview (no staff account there, by design).
 4. The three history-dependent checks on the hosted preview: the doctor reminder in History, the experiment answer on Today, "Not useful" on Today (checked locally and by the gate).
-5. On the hosted preview, the failure paths that can only be forced on a local database: a refused write in the recalled-meals offer (R1) and a storage failure during account deletion, including a partial removal (P1). Both pass locally.
+5. On the hosted preview, the failure paths that can only be forced on a local database: a refused write in the recalled-meals offer (R1) and a storage failure during account deletion, including a partial removal, and the message it shows (P1, P2). All pass locally.
 6. The control crawl, the click-through navigation run and the five-width check on the final code (last run on 22 Nov, app code `2f22cc4`; sections 1 and 2).
 7. Whether Vercel's Ignored Build Step really blocks a Git build (configured and read back only).
 8. A real backup restore on `bloat-test` (plan Q33): re-applying deletions after a restore is checked locally only.
 9. Any check against the three main addresses after 23 Nov (they serve `83fe4da`, tested on 23 Nov).
+10. The full hosted suite and the live focus check on `f8fcd9d` itself (they ran on `9c6ed14`; `f8fcd9d` differs only in the failed-deletion message).
 
 ### During the freeze (23 Nov): local checks on the frozen code `83fe4da`
 
@@ -103,14 +106,14 @@ Words used: **Passed** (the outcome was checked and was right), **Failed**, **Sk
 
 ### Local evidence (this workspace: local Supabase in Docker, synthetic accounts, test mode on)
 
-Results by build. The final build's rule, API and browser results are in the table above (`9c6ed14`: 97, 141 and 260 passed). The rows below with counts 137 and 250 ran on `62431c7`; the crawl, the navigation run and the width check ran on 22 Nov on app code `2f22cc4`.
+Results by build. The final build's rule, API and browser results are in the table above (`f8fcd9d`: 97, 141 and 261 passed). The rows below with counts 137 and 250 ran on `62431c7`; the crawl, the navigation run and the width check ran on 22 Nov on app code `2f22cc4`.
 
 | Check | Result |
 |---|---|
 | Rule tests `pnpm test` | **Passed**, 97 of 97 |
-| API tests `pnpm test:api` on `62431c7`, incl. a deleted account's earlier tokens (section 6) and the two all-or-nothing checks (R1) | **Passed**, 137 of 137 (140 of 140 on `83fe4da`, 141 of 141 on `9c6ed14`) |
-| Browser tests `tests/e2e` on `62431c7`, phone screen (Chromium, Pixel 7 size), incl. 20 checks for B1 to B4 and 40 for section 5 | **Passed**, 250 of 250, 0 retried (251 of 251 on `83fe4da`; 260 passed, 0 expected failures, 0 skipped on `9c6ed14`). One earlier full run on the same app code had 1 failure, a timing race in the delete-account check, since fixed in the check (section 4) |
-| &nbsp;&nbsp;of which save and edit outcomes on `62431c7`, 63 actions x 3 plus 9 single checks (sections 3 and 5) | **Passed**, 198 of 198 (199 of 199 on `83fe4da` and on `9c6ed14`) |
+| API tests `pnpm test:api` on `62431c7`, incl. a deleted account's earlier tokens (section 6) and the two all-or-nothing checks (R1) | **Passed**, 137 of 137 (140 of 140 on `83fe4da`, 141 of 141 on `9c6ed14` and on `f8fcd9d`) |
+| Browser tests `tests/e2e` on `62431c7`, phone screen (Chromium, Pixel 7 size), incl. 20 checks for B1 to B4 and 40 for section 5 | **Passed**, 250 of 250, 0 retried (251 of 251 on `83fe4da`; 260 passed on `9c6ed14`; 261 passed, 0 expected failures, 0 skipped on `f8fcd9d`). One earlier full run on the same app code had 1 failure, a timing race in the delete-account check, since fixed in the check (section 4) |
+| &nbsp;&nbsp;of which save and edit outcomes on `62431c7`, 63 actions x 3 plus 9 single checks (sections 3 and 5) | **Passed**, 198 of 198 (199 of 199 on `83fe4da` and on `9c6ed14`; 200 of 200 on `f8fcd9d`, where the storage-failure screen check became two cases) |
 | Navigation by real clicks, destination and Back, signed-out, Free and Pro, 412px and 1440px (section 2) | **Passed**, 238 clicks: 238 right destination, 238 Back returned |
 | Control crawl (section 1) | 1,292 rows: **834 passed** (74 screen loads, 244 clicked and responded, 516 link targets loaded without clicking), 0 failed, 49 skipped on purpose (20 destructive, each covered by a named test; 29 outside links), 409 excluded (332 hidden at phone width, 32 disabled, 45 fields), 0 blocked |
 | Five widths, 320 to 1440px | **Passed**, 0 of 185 with sideways scrolling |
@@ -120,6 +123,7 @@ Results by build. The final build's rule, API and browser results are in the tab
 
 | Check | Result |
 |---|---|
+| Run 14 (push of `f8fcd9d`): all checks (API 141, browser 261 passed), controls read back, Vercel build, 6 hosted checks before and after publishing | **Passed**, published `dpl_7N1RRQjq8qFDNmw9x3ihfcxk9iBD` (09:43 to 09:57 UTC, 24 Nov) |
 | Run 13 (push of `9c6ed14`): all checks (API 141, browser 260 passed), controls read back, Vercel build, 6 hosted checks before and after publishing | **Passed**, published `dpl_55jDsCf3AbLK5mYRCEBEnKqtN9Jc` (08:55 to 09:10 UTC, 24 Nov) |
 | Run 12 (push of `83fe4da`): all checks (API 140, browser 251 of 251), controls read back, Vercel build, 6 hosted checks before and after publishing | **Passed**, published `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (15:20 to 15:37 UTC, 23 Nov) |
 | Run 11 (push of `62431c7`): all checks (API 137, browser 250 of 250), controls read back, Vercel build, 6 hosted checks before and after publishing | **Passed**, published `dpl_AvmuUC34HMhQpEj34UsAk6ekV2Lm` (12:05 to 12:20 UTC, 23 Nov) |
@@ -136,7 +140,15 @@ Results by build. The final build's rule, API and browser results are in the tab
 
 ### Hosted evidence (the public preview and the `bloat-test` database)
 
-On `dpl_55jDsCf3AbLK5mYRCEBEnKqtN9Jc` (`9c6ed14`, final, 24 Nov):
+On `dpl_7N1RRQjq8qFDNmw9x3ihfcxk9iBD` (`f8fcd9d`, final, 24 Nov):
+
+| Check | Result |
+|---|---|
+| 6 account-free checks, twice inside run 14 | **Passed** |
+| Deployed source against `f8fcd9d` (`deploy-7N1R.txt`) | **Matches**: 210 of 210 listed files; the changed route and screen found by content fingerprint |
+| `bloat-tester` fingerprint before and after (`bloat-tester-before-p2.txt`) | **Identical** |
+
+On `dpl_55jDsCf3AbLK5mYRCEBEnKqtN9Jc` (`9c6ed14`, the build before, 24 Nov):
 
 | Check | Result |
 |---|---|
@@ -186,7 +198,7 @@ On `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` (`adfe49b`, 22 Nov):
 | The same session: screen (reported separately) | `/history` redirects to Sign in. Not counted as evidence that data is protected |
 | Deleting the 19 temporary accounts from 19 Nov (owner ran the guarded SQL) | **Passed**: read-only check at 20:12 UTC shows 0 users, sessions, refresh tokens, identities, stored files and rows in all 48 app tables; the owner's `bloat-tester@bloat.test` is intact |
 | Deleting the 7 accounts of this run (through the app's own "Delete my account") | **Passed**: 7 of 7 answered "deleted" and their tokens were refused at once; read-only check shows 0 users, sessions, refresh tokens, identities, stored files and app rows; the app kept only its 7 deletion records (a hash of each account ID). No account with a test marker remains |
-| Git builds off through `vercel.json` | **Passed**: no Git-triggered deployment for any push since `af950f5`; Vercel lists only the six deployments the workflow made (runs 6, 9, 10, 11, 12 and 13) |
+| Git builds off through `vercel.json` | **Passed**: no Git-triggered deployment for any push since `af950f5`; Vercel lists only the seven deployments the workflow made (runs 6, 9, 10, 11, 12, 13 and 14) |
 | Vercel Ignored Build Step (second layer) | **Configured and read back** (run 6). **Not proven to block a Git build**: that needs a test build on a separate branch, not done (section 9) |
 
 ### Manual device evidence
@@ -194,7 +206,7 @@ On `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` (`adfe49b`, 22 Nov):
 | Check | Result |
 |---|---|
 | The owner's own sign-in, setup, refresh and sign-out on the preview (22 Nov, earlier build) | Passed, reported by the owner and confirmed from server records (section 7) |
-| The main journeys on a real phone with `dpl_55jDsCf3AbLK5mYRCEBEnKqtN9Jc` | **Not done (pending).** Checklist for the owner in `PROGRESS.md` |
+| The main journeys on a real phone with `dpl_7N1RRQjq8qFDNmw9x3ihfcxk9iBD` | **Not done (pending).** Checklist for the owner in `PROGRESS.md` |
 | External tester, 23 Nov, cloud Chrome browser with the owner's test account on `adfe49b` | Their report: four defects (now fixed) and the checks they passed; not a real phone |
 | iOS Safari, Android Chrome, any screen reader | **Not done** (200% zoom and keyboard-only use were tested in desktop Chromium only: section "During the freeze" and section 4, K1) |
 
