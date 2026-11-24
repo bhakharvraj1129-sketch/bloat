@@ -51,7 +51,7 @@ Type check and lint: 0 errors (5 old warnings).
 2. **A real AI provider.** The photo and dish ingredient check has only run against the labelled mock. It needs your approval of a key and a spending limit, then an evaluation.
 3. **Email sign-in.** The preview uses email-and-password for owner-made test accounts, marked temporary while email delivery is limited (`BLOAT_SIGN_IN_METHOD`). Real users need the email-code sign-in with working email delivery.
 4. **Plan gates still open:** business entity and payment provider (Gate 2; payments stay off), legal text (Gate 1), the live project `bloat-live`.
-5. **A failed account deletion can already have removed some kept photos.** Photos are removed first; if storage fails partway, the account and the diary stay (nothing else is deleted and the person can try again), but photos removed before the failure stay removed, while the screen says "Nothing was deleted" (decision D20). A background deletion job for `bloat-live` needs a new secret (D18).
+5. **A failed account deletion can already have removed some kept photos.** Photos are removed first; if storage fails partway, the account and the diary stay and the person can try again, but photos removed before the failure stay removed. The screen now says exactly that (P2, fixed). A background deletion job for `bloat-live` needs a new secret (D18).
 6. **The three main addresses serve the previous build** (`83fe4da`, without the K1 fix) until the owner asks for them to be moved.
 7. **Open decisions:** `DECISIONS.md`, "Open decisions", grouped by who can use each feature now.
 
@@ -75,12 +75,12 @@ Nothing was published. Local stack, synthetic disposable accounts, local fault i
 |---|---|
 | Storage failure during account deletion: total failure with recovery, failure clearing during retries, and **partial removal** (2 of 3 photos removed, one silently kept) | **4 of 4 passed**: the account and the diary are not deleted, but any kept photos removed before the failure stay removed (2 of 3 in the partial-removal check); the person is told to try again, the founder gets an alert with counts only, and the retry finishes |
 | Failure midway through the recalled-meals offer (answer refused; duplicate-tap record refused) | **2 of 2 passed**: full rollback; the same request then saves once; a repeat writes nothing |
-| Keyboard-only main journeys, desktop at 100% and at 200% zoom, both sign-in modes | **Passed**, except defect K1 |
+| Keyboard-only main journeys, desktop at 100% and at 200% zoom, both sign-in modes | **Passed**, except defect K1 (fixed on 24 Nov in `9c6ed14`) |
 | 200% browser zoom: 11 main screens and 3 sheets | **Passed** |
 | Screen reader | **Not performed** |
 | Suites | Rule 97 passed; API 141 passed; browser 256 run: 255 passed, 1 expected failure (K1, then unfixed), 0 skipped. (Corrected on 24 Nov: first reported as "256 of 256".) |
 
-**K1, keyboard focus lost (found 23 Nov; fixed on 24 Nov in `9c6ed14`, see the table at the top).** When a save removes the button that opened a sheet, focus falls back to the page itself: after saving "Log bloating", after ending bloating, and after confirming "Delete" for a meal or a bloating record. Reproduction: `tests/e2e/accessibility.spec.ts`, check "known defect K1" (marked as expected to fail). Impact: a keyboard or screen-reader user loses their place, and the next Tab starts again from the top of the page; nothing is lost or saved wrongly. Proposed focused fix (one shared function, `returnFocus` in `src/lib/client/nav.ts`): if the button that opened the sheet is gone, move focus to the control that replaced it (for example "Bloating ongoing") or else to the screen's main heading. The K1 check then passes and becomes a normal check. Waiting for your go-ahead.
+**K1, keyboard focus lost: found 23 Nov, fixed 24 Nov in `9c6ed14` (approved by the owner; details in section 4).** When a save removed the button that opened a sheet, focus fell back to the page itself: after saving "Log bloating", after ending bloating, and after confirming "Delete" for a meal or a bloating record. Impact before the fix: a keyboard or screen-reader user lost their place and the next Tab started again from the top; nothing was lost or saved wrongly. Fixed: focus now goes to the same button, else the button that replaced it, else the section heading, else the screen title. The check that was marked as expected to fail is now 5 ordinary checks that pass locally; a separate keyboard-only check of the four cases passed on the live preview.
 
 ### Section 5 actions on the screen (23 Nov, earlier the same day)
 
@@ -196,7 +196,7 @@ On `dpl_GYCc4U8LgKQJWhKBizXioK2fw2FQ` (`adfe49b`, 22 Nov):
 | The owner's own sign-in, setup, refresh and sign-out on the preview (22 Nov, earlier build) | Passed, reported by the owner and confirmed from server records (section 7) |
 | The main journeys on a real phone with `dpl_55jDsCf3AbLK5mYRCEBEnKqtN9Jc` | **Not done (pending).** Checklist for the owner in `PROGRESS.md` |
 | External tester, 23 Nov, cloud Chrome browser with the owner's test account on `adfe49b` | Their report: four defects (now fixed) and the checks they passed; not a real phone |
-| iOS Safari, Android Chrome, screen reader, 200% zoom | **Not done** |
+| iOS Safari, Android Chrome, any screen reader | **Not done** (200% zoom and keyboard-only use were tested in desktop Chromium only: section "During the freeze" and section 4, K1) |
 
 ### Not claimed
 

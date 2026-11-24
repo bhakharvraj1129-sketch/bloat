@@ -24,14 +24,16 @@ This file has four parts: **current status** (what is true now, with the evidenc
 
 ### Your decisions
 
-All in one table: `DECISIONS.md`, "Open decisions" (D1 to D20), each with what is built now and a recommended default. They are grouped by **who can use the affected feature on the preview today**, not by whether people pay:
+All in one table: `DECISIONS.md`, "Open decisions" (D1 to D19), each with what is built now and a recommended default. They are grouped by **who can use the affected feature on the preview today**, not by whether people pay:
 
 - **On now for every signed-in tester (3):** D1 ("Is it still happening?" asks again on every app open), D2 (countries not yet reviewed), D18 (account deletion during a storage outage).
 - **On now for everyone, signed out too, on the public pages (3):** D8 ("English only" note), D11 (company name and support address), D12 (legal text).
-- **On now for Pro testers (8):** D4, D7, D9, D13, D14, D15, D16 and the new D20 (the message after a failed account deletion when some kept photos were already removed).
+- **On now for Pro testers (7):** D4, D7, D9, D13, D14, D15, D16.
+
+The former D20 (the message after a failed account deletion) was a wrong message, not a product question: it is fixed (defect P2, below).
 - **Not on for anyone (6):** D3, D5, D6, D10, D17, D19 (off, paused, hidden or not built).
 
-Settled questions, including the light-only design, are listed under "Settled" and are not reopened. None of D1 to D20 has been built yet.
+Settled questions, including the light-only design, are listed under "Settled" and are not reopened. None of D1 to D19 has been built yet.
 
 ### Launch requirements (before anyone outside is invited)
 
@@ -55,9 +57,9 @@ Settled questions, including the light-only design, are listed under "Settled" a
 9. The 19 screens without approved designs have not been compared with designs (only the 20 Slice A screens have them).
 10. Any check on the three main addresses after 23 Nov (they serve `83fe4da`, which was tested on 23 Nov).
 
-### A known limit of account deletion
+### Account deletion when storage fails (message fixed, P2)
 
-If storage fails while an account is being deleted, the account and the diary are **not** deleted and the person can try again. But photos are removed first, so kept photos removed before the failure stay removed. The screen still says "Nothing was deleted", which is not exact in that case (decision D20). Only Pro accounts can keep photos.
+If storage fails while an account is being deleted, the account and the diary are **not** deleted and the person can try again. Photos are removed first, so kept photos removed before the failure stay removed. The sheet used to say "Nothing was deleted", which was wrong in that case. It now says: "We couldn't finish deleting your account. Your account and diary are still available, but some saved meal photos may already have been deleted. Try again to finish." (your wording). How deletion works did not change. Only Pro accounts can keep photos.
 
 ## Owner checklist: the main journeys on your phone
 

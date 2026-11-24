@@ -29,7 +29,7 @@ Bloat is an installable mobile-web bloating tracker. It is a general wellness tr
 - No health data in logs, analytics events or error reports. Secrets only in environment variables.
 - User-facing text: sentence case, plain "and", no emoji, none of the banned words (`BANNED_PHRASES` in `src/lib/wording.ts`). Medical-help text is the fixed copy adapted from the NHS bloating page, labelled "Adapted from NHS, Bloating"; never rewrite it, never call it word for word.
 - UI uses the design tokens only (`src/app/globals.css`). No shadows, no new colours.
-- No production build, no payments, no real health data. The branch preview is public by the owner's decision (18 Nov 2026) and must keep `BLOAT_TEST_LOGIN=0`; since 24 Nov 2026 the main Vercel addresses show that same test build (the owner's decision), which is not a launch. Supabase: only the `bloat-test` project (`qntazirusbuwfmnmihzu`). Never touch the owner's other projects.
+- No production build, no payments, no real health data. The branch preview (`bloat-preview.vercel.app` and the branch address) is public by the owner's decision (18 Nov 2026), shows the current test build and must keep `BLOAT_TEST_LOGIN=0`; only the Preview workflow moves those two addresses. Since 24 Nov 2026 the main Vercel addresses (`bloat-olive`, `bloat-typeshi2`, `bloat-git-main-typeshi2`) show an older test build, `83fe4da`, set by hand at the owner's decision; the workflow does not move them, and this is not a launch. Supabase: only the `bloat-test` project (`qntazirusbuwfmnmihzu`). Never touch the owner's other projects.
 
 ## Commands
 

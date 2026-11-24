@@ -24,7 +24,7 @@ Published revision `9c6ed1428320a6ea316f7ed5d2efdf8d32f64d4f`, Vercel deployment
 
 **Not performed** (not counted above): real phones; any screen reader; a real AI provider; founder tools on the preview; the 3 history-dependent screens on the preview; storage and recalled-offer failures on the preview (local only); the control crawl, link-by-link run and five-width check on the final code; any check on the three main addresses after 23 Nov.
 
-**About account deletion when storage fails:** the account and diary are not deleted and the person can try again, but kept photos removed before the failure stay removed (local partial-removal check). The message "Nothing was deleted" is not exact in that case (decision D20).
+**About account deletion when storage fails:** the account and diary are not deleted and the person can try again, but kept photos removed before the failure stay removed (local partial-removal check). At the time the message said "Nothing was deleted", which was wrong in that case; fixed later the same day (P2, above).
 
 ## During the freeze (23 Nov 2026): local checks on the frozen code `83fe4da`
 
@@ -241,7 +241,7 @@ always refused; Back skipped the Sign in and offline screens; email-code sign-in
 | Live site before this round: text colour of the "Get started" button | rgb(30, 94, 84) on rgb(30, 94, 84): invisible. Fixed; covered by the readable-text check |
 | Type check, lint | 0 errors (5 old warnings) |
 
-Not tested: real phones, 200% browser zoom (only the phone's text-size path via rem), screen readers.
+Not tested then: real phones, 200% browser zoom (only the phone's text-size path via rem), screen readers. (200% zoom and keyboard-only use were tested later, in desktop Chromium, on 23 and 24 Nov; real phones and screen readers are still not tested.)
 
 ### Hosted preview
 
