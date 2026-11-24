@@ -75,7 +75,7 @@ export function DayDetail({ date }: { date: string }) {
 
       {data.episodes.length > 0 && (
         <section className="flex flex-col gap-2" aria-labelledby="eps">
-          <Label id="eps">Bloating</Label>
+          <Label id="eps" heading>Bloating</Label>
           {data.episodes.map((e) => {
             const strongest = e.samples.length ? Math.max(...e.samples.map((s) => s.strength)) : null;
             return (
@@ -102,7 +102,7 @@ export function DayDetail({ date }: { date: string }) {
 
       {data.meals.length > 0 && (
         <section className="flex flex-col gap-2" aria-labelledby="meals">
-          <Label id="meals">Meals</Label>
+          <Label id="meals" heading>Meals</Label>
           {data.meals.map((m) => (
             <Card key={m.id} className="flex flex-col gap-3">
               <div>
@@ -125,7 +125,7 @@ export function DayDetail({ date }: { date: string }) {
 
       {data.activities.length > 0 && (
         <section className="flex flex-col gap-2" aria-labelledby="acts">
-          <Label id="acts">Habits</Label>
+          <Label id="acts" heading>Habits</Label>
           <Card className="px-4 py-1"><ul>
             {data.activities.map((a) => (
               <li key={a.id} className="flex items-center justify-between gap-3 border-b border-line py-3 last:border-0">
@@ -138,7 +138,7 @@ export function DayDetail({ date }: { date: string }) {
 
       {(data.bowel.length > 0 || data.exercise.length > 0) && (
         <section className="flex flex-col gap-2" aria-labelledby="other">
-          <Label id="other">Bowel and exercise</Label>
+          <Label id="other" heading>Bowel and exercise</Label>
           <Card className="px-4 py-1"><ul>
             {data.bowel.map((b) => (
               <li key={b.id} className="flex items-center justify-between gap-3 border-b border-line py-2 last:border-0">
@@ -158,7 +158,7 @@ export function DayDetail({ date }: { date: string }) {
 
       {data.review && (
         <section className="flex flex-col gap-2" aria-labelledby="rev">
-          <Label id="rev">Review answers</Label>
+          <Label id="rev" heading>Review answers</Label>
           <Card>
             <p>Strongest bloating: <strong>{data.review.cannot_remember ? "I can't remember" : data.review.worst}</strong></p>
             <p>Covers the whole day: <strong>{data.review.whole_day ? optionLabel("DY-02", data.review.whole_day) : "Not answered"}</strong></p>

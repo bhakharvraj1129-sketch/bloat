@@ -62,12 +62,12 @@ export function Today() {
           </div>
           <div className="flex flex-col gap-3 border-t border-line pt-6">
             {ep ? (
-              <button type="button" onClick={() => setSheet("ongoing")} className="flex min-h-16 items-center justify-between gap-3 rounded-sm bg-brand px-5 text-left text-on-brand hover:opacity-90">
+              <button type="button" data-focus-key="today-bloating" onClick={() => setSheet("ongoing")} className="flex min-h-16 items-center justify-between gap-3 rounded-sm bg-brand px-5 text-left text-on-brand hover:opacity-90">
                 <span className="flex flex-col"><span className="text-lg font-semibold">Bloating ongoing</span><span className="text-[0.8125rem]">Since {formatClock(Date.parse(ep.started_at), profile.time_zone, profile.units)} · strength {ep.current_strength}</span></span>
                 <ChevronRight size={20} strokeWidth={1.75} aria-hidden />
               </button>
             ) : (
-              <Button size="lg" onClick={() => setSheet("log")}>I feel bloated</Button>
+              <Button size="lg" data-focus-key="today-bloating" onClick={() => setSheet("log")}>I feel bloated</Button>
             )}
             {!ep && today.episodes === 0 && !today.provisional_zero && (
               <>

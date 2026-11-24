@@ -5,7 +5,7 @@ import { TriangleAlert, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentProps, type ReactNode } from "react";
 import type { ApiFailure } from "@/lib/client/api";
 import type { SaveState } from "@/lib/client/hooks";
-import { currentOpener, openSheet, returnFocus, useUnsavedGuard } from "@/lib/client/nav";
+import { openSheet, rememberOpener, returnFocus, useUnsavedGuard } from "@/lib/client/nav";
 import { BackLink } from "./nav";
 
 const cx = (...c: Array<string | false | null | undefined>) => c.filter(Boolean).join(" ");
@@ -54,8 +54,9 @@ export function Card({ children, className, as: Tag = "div" }: { children: React
   return <Tag className={cx("rounded-lg border border-line bg-surface p-5 md:p-6", className)}>{children}</Tag>;
 }
 
-export function Label({ children, className, id }: { children: ReactNode; className?: string; id?: string }) {
-  return <p id={id} className={cx("t-label", className)}>{children}</p>;
+export function Label({ children, className, id, heading = false }: { children: ReactNode; className?: string; id?: string; heading?: boolean }) {
+  // heading: the label names a section of the screen, so it is a real heading (same look).
+  return heading ? <h2 id={id} className={cx("t-label", className)}>{children}</h2> : <p id={id} className={cx("t-label", className)}>{children}</p>;
 }
 
 export function Caption({ children, className }: { children: ReactNode; className?: string }) {
@@ -157,8 +158,8 @@ export function Sheet({ open, onOpenChange, title, children, description, dirty 
   // return focus there when it closes or unmounts.
   useLayoutEffect(() => {
     if (!open) return;
-    const opener = currentOpener();
-    return () => returnFocus(opener);
+    const back = rememberOpener();
+    return () => returnFocus(back);
   }, [open]);
   useUnsavedGuard(open && dirty);
 

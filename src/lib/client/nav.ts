@@ -119,13 +119,84 @@ export function currentOpener(): HTMLElement | null {
   return el;
 }
 
-/** After a sheet closes, put focus back on the control that opened it, unless something else already has it. */
-export function returnFocus(el: HTMLElement | null) {
-  if (!el) return;
-  setTimeout(() => {
-    const a = document.activeElement;
-    if (el.isConnected && (!a || a === document.body || !a.isConnected)) el.focus({ preventScroll: true });
-  }, 40);
+/**
+ * Where focus goes when a sheet closes, taken when it opens:
+ * - `el`: the control that opened it;
+ * - `outer`: for a control inside another sheet (for example "Bloating gone"), what opened that sheet;
+ * - `key`: a `data-focus-key` shared by a control and the one that replaces it after a save (for
+ *   example "I feel bloated" and "Bloating ongoing");
+ * - `section`: the id of the heading of the screen section the control was in.
+ */
+export type FocusReturn = { el: HTMLElement | null; outer: HTMLElement | null; key: string | null; section: string | null };
+
+const keyOf = (el: Element | null) => el?.closest("[data-focus-key]")?.getAttribute("data-focus-key") ?? null;
+
+export function rememberOpener(): FocusReturn {
+  const el = currentOpener();
+  const outer = el?.closest("[role=dialog]") ? lastOuterOpener : el;
+  const anchor = outer ?? el;
+  return { el, outer, key: keyOf(el) ?? keyOf(outer), section: anchor?.closest("section[aria-labelledby]")?.getAttribute("aria-labelledby") ?? null };
+}
+
+// Whether the person last used the keyboard (then a heading that takes focus is also scrolled into view).
+let lastInputKeyboard = false;
+if (typeof window !== "undefined") {
+  addEventListener("keydown", () => { lastInputKeyboard = true; }, true);
+  addEventListener("pointerdown", () => { lastInputKeyboard = false; }, true);
+}
+
+/**
+ * After a sheet closes, put focus back on the control that opened it. If a save has removed that
+ * control, use the control that replaced it, or else the heading of its section, or else the screen's
+ * title (made focusable from code only, so Tab order does not change). The screen may reload a moment
+ * after the sheet closes, so this keeps watching for 5 seconds. It never takes focus away from
+ * something the person has moved to, and never moves focus behind a sheet that is open.
+ */
+export function returnFocus(from: FocusReturn | null) {
+  if (!from) return;
+  const back: FocusReturn = from;
+  let placed: HTMLElement | null = null;
+  let stopped = false;
+  const usable = (el: Element | null | undefined): el is HTMLElement =>
+    el instanceof HTMLElement && el.isConnected && !(el as HTMLButtonElement).disabled && el.getClientRects().length > 0;
+  const heading = (): HTMLElement | null => {
+    const h = (back.section && document.getElementById(back.section)) || document.querySelector("main h1") || document.querySelector("h1");
+    if (!(h instanceof HTMLElement) || !h.isConnected) return null;
+    if (!h.hasAttribute("tabindex")) h.setAttribute("tabindex", "-1");
+    return h;
+  };
+  // waitForReplacement: a replacement is expected but may not be on the screen yet.
+  const target = (waitForReplacement: boolean): HTMLElement | null => {
+    if (usable(back.el)) return back.el;
+    if (usable(back.outer)) return back.outer;
+    if (back.key) {
+      const r = document.querySelector(`[data-focus-key="${CSS.escape(back.key)}"]`);
+      if (usable(r)) return r;
+      if (waitForReplacement) return null;
+    }
+    return heading();
+  };
+  const observer = typeof MutationObserver === "undefined" ? null : new MutationObserver(() => queueMicrotask(() => step(true)));
+  const timers: ReturnType<typeof setTimeout>[] = [];
+  function stop() { stopped = true; observer?.disconnect(); timers.forEach(clearTimeout); }
+  function step(waitForReplacement: boolean) {
+    if (stopped) return;
+    const a = document.activeElement as HTMLElement | null;
+    const onPage = !!a && a !== document.body;
+    // Focus already back on the opener (the dialog itself may do that) or where this put it: keep
+    // watching in case a reload removes it. Anywhere else: the person has moved on, so stop.
+    if (onPage && (a === placed || a === back.el || a === back.outer)) { placed = a; return; }
+    if (onPage) return stop();
+    if (document.querySelector("[role=dialog]")) return; // another sheet is open and owns focus
+    const t = target(waitForReplacement);
+    if (!t) return;
+    const restoring = t === back.el || t === back.outer;
+    t.focus({ preventScroll: restoring || !lastInputKeyboard });
+    placed = t;
+  }
+  timers.push(setTimeout(() => { step(true); observer?.observe(document.body, { childList: true, subtree: true }); }, 40));
+  timers.push(setTimeout(() => step(false), 2000)); // the replacement never came: use the heading
+  timers.push(setTimeout(stop, 5000));
 }
 
 type Entry = { close: () => void };
