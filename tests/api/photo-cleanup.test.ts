@@ -59,6 +59,8 @@ function storageSilentlyKeeps(fileName: string): () => void {
 }
 
 const remove = (u: User) => call(u, "POST", "/v1/account/delete", { confirm: "DELETE" });
+// The owner's wording (24 Nov 2026): photos are removed first, so after this failure some may be gone.
+const UNFINISHED = "We couldn't finish deleting your account. Your account and diary are still available, but some saved meal photos may already have been deleted. Try again to finish.";
 
 describe("Delete account: kept meal photos", () => {
   it("with no failure: every kept photo is removed from storage, then the account is deleted", async () => {
@@ -69,7 +71,7 @@ describe("Delete account: kept meal photos", () => {
     expect([rows(u.id), filesOnDisk(u.id), accounts(u.id)]).toEqual([0, 0, 0]);
   });
 
-  it("when storage fails, nothing is deleted, the person is told, the founder sees an alert; once storage works, trying again deletes the photos and the account", async () => {
+  it("when storage fails, the account and diary stay, the person is told so, the founder sees an alert; once storage works, trying again deletes the photos and the account", async () => {
     const u = await accountWithPhotos(2);
     const before = (await alerts()).length;
     const restore = storageRefusesDeletes(u.id);
@@ -77,7 +79,8 @@ describe("Delete account: kept meal photos", () => {
       const failed = await remove(u);
       expect(failed.status).toBe(503);
       expect(failed.body.error.code).toBe("PHOTOS_NOT_REMOVED");
-      // Nothing was deleted: the account and both photos are still there, and the person can try again.
+      expect(failed.body.error.message).toBe(UNFINISHED);
+      // Storage refused every delete: the account and both photos are still there, and the person can try again.
       expect([accounts(u.id), rows(u.id), filesOnDisk(u.id)]).toEqual([1, 2, 2]);
       expect((await call(u, "GET", "/v1/me/state")).status).toBe(200);
       // The founder sees it, with counts only: no account ID, no file name.
@@ -85,8 +88,9 @@ describe("Delete account: kept meal photos", () => {
       expect(now.length).toBe(before + 1);
       expect(now[0]!.detail).toMatchObject({ files_left: 2 });
       expect(JSON.stringify(now[0]!.detail)).not.toContain(u.id);
-      // Trying again while storage is still failing changes nothing either.
-      expect((await remove(u)).status).toBe(503);
+      // Trying again while storage is still failing changes nothing either, and says the same.
+      const again = await remove(u);
+      expect([again.status, again.body.error.code, again.body.error.message]).toEqual([503, "PHOTOS_NOT_REMOVED", UNFINISHED]);
       expect([accounts(u.id), rows(u.id), filesOnDisk(u.id)]).toEqual([1, 2, 2]);
     } finally {
       restore();
@@ -94,6 +98,7 @@ describe("Delete account: kept meal photos", () => {
     // Storage works again: the same button deletes the photos (rows and files) and then the account.
     const ok = await remove(u);
     expect(ok.status, JSON.stringify(ok.body)).toBe(200);
+    expect(ok.body).toEqual({ deleted: true });
     expect([rows(u.id), filesOnDisk(u.id), accounts(u.id)]).toEqual([0, 0, 0]);
     expect(Number(sql(`select count(*) from public.meal_photos where user_id = '${u.id}'`))).toBe(0);
   });
@@ -109,7 +114,7 @@ describe("Delete account: kept meal photos", () => {
     expect([rows(u.id), filesOnDisk(u.id), accounts(u.id)]).toEqual([0, 0, 0]);
   });
 
-  it("partial removal: storage removes 2 of 3 photos and silently keeps one; nothing else is deleted, the person is told, and the retry removes the last photo and the account", async () => {
+  it("partial removal: storage removes 2 of 3 photos and silently keeps one; the account and diary stay, the person is told some photos may be gone, and the retry removes the last photo and the account", async () => {
     const u = await accountWithPhotos(3);
     const kept = sql(`select name from storage.objects where bucket_id = 'meal-photos' and name like '${u.id}/%' order by name limit 1`);
     const before = (await alerts()).length;
@@ -119,6 +124,7 @@ describe("Delete account: kept meal photos", () => {
       // Storage said yes but one photo is still there: the route checks the folder, so it is not fooled.
       expect(r.status).toBe(503);
       expect(r.body.error.code).toBe("PHOTOS_NOT_REMOVED");
+      expect(r.body.error.message).toBe(UNFINISHED); // true here: 2 of the 3 photos are already gone
       expect([accounts(u.id), rows(u.id), filesOnDisk(u.id)]).toEqual([1, 1, 1]); // 2 of 3 removed; the account and its records stay
       expect(Number(sql(`select count(*) from public.profiles where user_id = '${u.id}'`))).toBe(1);
       expect(sql(`select count(*) from storage.objects where name = '${kept}'`)).toBe("1");
@@ -131,6 +137,8 @@ describe("Delete account: kept meal photos", () => {
     }
     const ok = await remove(u);
     expect(ok.status, JSON.stringify(ok.body)).toBe(200);
+    expect(ok.body).toEqual({ deleted: true });
     expect([rows(u.id), filesOnDisk(u.id), accounts(u.id)]).toEqual([0, 0, 0]);
+    expect((await call(u, "GET", "/v1/me/state")).status).toBe(401); // the account is really gone
   });
 });

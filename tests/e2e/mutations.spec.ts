@@ -147,10 +147,13 @@ async function unfollowedHabitOn6Days(c: Ctx) {
 }
 const todayExperiment = (c: Ctx) => c.page.locator("div", { has: c.page.getByText(/^Experiment · /) }).filter({ has: c.page.getByRole("link", { name: "Open experiment" }) }).last();
 /** A small synthetic photo (plain colour), made on the spot. */
-async function photo(): Promise<Buffer> {
+async function photo(red = 200): Promise<Buffer> {
   const sharp = (await import("sharp")).default;
-  return sharp({ create: { width: 64, height: 64, channels: 3, background: { r: 200, g: 140, b: 80 } } }).jpeg().toBuffer();
+  return sharp({ create: { width: 64, height: 64, channels: 3, background: { r: red, g: 140, b: 80 } } }).jpeg().toBuffer();
 }
+// Delete account: after a failure from the photo step on (500 or more), photos may already be gone.
+const DELETE_UNFINISHED = "We couldn't finish deleting your account. Your account and diary are still available, but some saved meal photos may already have been deleted. Try again to finish.";
+const DELETE_REFUSED = "That didn't work. Nothing was deleted. Try again.";
 
 const ACTIONS: Action[] = [
   {
@@ -506,7 +509,7 @@ const ACTIONS: Action[] = [
     after: async (c) => { expect(shares(c, "revoked_at is null")).toBe(0); },
   },
   {
-    name: "Delete my account", role: "free", failText: "That didn't work. Nothing was deleted. Try again.",
+    name: "Delete my account", role: "free", failText: DELETE_UNFINISHED, // the check's failure is a 500
     open: async (c) => { await c.page.goto("/me"); await c.page.getByRole("button", { name: "Delete account" }).click(); await dialog(c, "Delete account").getByLabel("Type DELETE to confirm").fill("DELETE"); },
     submit: (c) => dialog(c, "Delete account").getByRole("button", { name: "Delete my account" }),
     write: { method: "POST", path: /\/v1\/account\/delete$/ },
@@ -1097,37 +1100,67 @@ test("export: a server failure and a lost connection get different messages, for
   expect(downloads).toBe(1);
 });
 
-test("delete account with kept photos while storage fails: the sheet says nothing was deleted; after storage recovers the same button deletes photos and account", async ({ context }) => {
-  const c = await account(context, "pro");
-  expect((await c.api("POST", "/v1/consents", { type: "ai_meal" })).status).toBeLessThan(300);
-  expect((await c.api("PATCH", "/v1/me/profile", { keep_meal_photos: true })).status).toBe(200);
-  const bytes = Array.from(await photo());
-  const kept = await c.page.evaluate(async (b) => {
-    const form = new FormData();
-    form.set("photo", new Blob([new Uint8Array(b)], { type: "image/jpeg" }), "synthetic.jpg");
-    form.set("save_key", crypto.randomUUID());
-    return (await (await fetch("/v1/meal-photos", { method: "POST", body: form })).json()).kept;
-  }, bytes);
-  expect(kept).toBe(true);
-  const uid = userId(c);
-  const stored = () => Number(sql(`select count(*) from storage.objects where bucket_id = 'meal-photos' and name like '${uid}/%'`));
-  expect(stored()).toBe(1);
-  const name = `test_storage_${Date.now()}`;
-  sql(`create function private.${name}() returns trigger language plpgsql as $$ begin if old.name like '${uid}/%' then raise exception 'TEST_STORAGE_DOWN'; end if; return old; end $$; create trigger ${name} before delete on storage.objects for each row execute function private.${name}();`);
-  try {
+for (const failure of ["storage refuses every delete", "partial removal: storage silently keeps 1 of 2 photos"] as const) {
+  test(`delete account with kept photos, ${failure}: the sheet says the account and diary are still there and some photos may be gone; after storage recovers the same button deletes the photos and the account`, async ({ context }) => {
+    const partial = failure.startsWith("partial");
+    const c = await account(context, "pro");
+    expect((await c.api("POST", "/v1/consents", { type: "ai_meal" })).status).toBeLessThan(300);
+    expect((await c.api("PATCH", "/v1/me/profile", { keep_meal_photos: true })).status).toBe(200);
+    for (const red of partial ? [200, 60] : [200]) {
+      const bytes = Array.from(await photo(red));
+      const kept = await c.page.evaluate(async (b) => {
+        const form = new FormData();
+        form.set("photo", new Blob([new Uint8Array(b)], { type: "image/jpeg" }), "synthetic.jpg");
+        form.set("save_key", crypto.randomUUID());
+        return (await (await fetch("/v1/meal-photos", { method: "POST", body: form })).json()).kept;
+      }, bytes);
+      expect(kept).toBe(true);
+    }
+    const uid = userId(c);
+    const stored = () => Number(sql(`select count(*) from storage.objects where bucket_id = 'meal-photos' and name like '${uid}/%'`));
+    const records = () => Number(sql(`select count(*) from public.profiles where user_id = '${uid}'`));
+    expect(stored()).toBe(partial ? 2 : 1);
+    const keepName = sql(`select name from storage.objects where bucket_id = 'meal-photos' and name like '${uid}/%' order by name limit 1`);
+
     await c.page.goto("/me");
     await c.page.getByRole("button", { name: "Delete account" }).click();
     const d = dialog(c, "Delete account");
     await d.getByLabel("Type DELETE to confirm").fill("DELETE");
+
+    // A refusal before anything is removed (an answer below 500) still says nothing was deleted.
+    await c.page.route("**/v1/account/delete", (route) => route.fulfill({ status: 422, contentType: "application/json", body: JSON.stringify({ error: { code: "CONFIRM_REQUIRED", message: "Type DELETE to confirm." } }) }));
     await d.getByRole("button", { name: "Delete my account" }).click();
-    await expect(d.getByText("That didn't work. Nothing was deleted. Try again.")).toBeVisible({ timeout: 20000 });
-    expect(sql(`select count(*) from auth.users where id = '${uid}'`)).toBe("1");
-    expect(stored()).toBe(1);
-  } finally {
-    sql(`drop trigger if exists ${name} on storage.objects; drop function if exists private.${name}();`);
-  }
-  await dialog(c, "Delete account").getByRole("button", { name: "Delete my account" }).click();
-  await expect(c.page).toHaveURL(/127\.0\.0\.1:\d+\/$/, { timeout: 20000 });
-  expect(sql(`select count(*) from auth.users where id = '${uid}'`)).toBe("0");
-  expect(stored()).toBe(0);
-});
+    await expect(d.getByText(DELETE_REFUSED)).toBeVisible({ timeout: 20000 });
+    await c.page.unroute("**/v1/account/delete");
+    expect(stored()).toBe(partial ? 2 : 1);
+
+    const name = `test_storage_${Date.now()}`;
+    sql(partial
+      ? `create function private.${name}() returns trigger language plpgsql as $$ begin if old.name = '${keepName}' then return null; end if; return old; end $$; create trigger ${name} before delete on storage.objects for each row execute function private.${name}();`
+      : `create function private.${name}() returns trigger language plpgsql as $$ begin if old.name like '${uid}/%' then raise exception 'TEST_STORAGE_DOWN'; end if; return old; end $$; create trigger ${name} before delete on storage.objects for each row execute function private.${name}();`);
+    try {
+      const reply = c.page.waitForResponse((r) => r.url().endsWith("/v1/account/delete") && r.request().method() === "POST");
+      await d.getByRole("button", { name: "Delete my account" }).click();
+      expect((await reply).status()).toBe(503);
+      await expect(d.getByText(DELETE_UNFINISHED)).toBeVisible({ timeout: 20000 });
+      await expect(d.getByText("Nothing was deleted", { exact: false })).toHaveCount(0);
+      // What the sentence says is true: the account and diary are still there; with a partial
+      // removal one photo is already gone.
+      expect(sql(`select count(*) from auth.users where id = '${uid}'`)).toBe("1");
+      expect(records()).toBe(1);
+      expect(stored()).toBe(1);
+      expect((await c.api("GET", "/v1/me/state")).status).toBe(200);
+    } finally {
+      sql(`drop trigger if exists ${name} on storage.objects; drop function if exists private.${name}();`);
+    }
+    // Try again to finish: the same button deletes the remaining photo and the account, then the app
+    // signs out and goes to the start page.
+    const retry = c.page.waitForResponse((r) => r.url().endsWith("/v1/account/delete") && r.request().method() === "POST");
+    await d.getByRole("button", { name: "Delete my account" }).click();
+    expect((await retry).status()).toBe(200);
+    await expect(c.page).toHaveURL(/127\.0\.0\.1:\d+\/$/, { timeout: 20000 });
+    expect(sql(`select count(*) from auth.users where id = '${uid}'`)).toBe("0");
+    expect(records()).toBe(0);
+    expect(stored()).toBe(0);
+  });
+}

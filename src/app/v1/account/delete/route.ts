@@ -2,14 +2,16 @@ import { z } from "zod";
 import { ApiError, route } from "@/server/http";
 import { srv } from "@/server/db";
 import type { Db } from "@/server/supabase";
+import { DELETE_UNFINISHED } from "@/lib/wording";
 
 // Delete account (free, never blocked by plan). Verify, remove kept photos, then purge every record
 // and the sign-in itself. A tombstone stops a restored backup from bringing the account back.
 //
 // Photos first, and only the account's own sign-in can remove them: once the account is gone nothing
 // could. So the account is deleted only after storage confirms the photo folder is empty. If storage
-// keeps failing, nothing is deleted, the person is told to try again, and the founder gets an alert
-// (counts only). That way a photo is never left behind without an owner.
+// keeps failing, the account and diary are not deleted (photos already removed stay removed), the
+// person is told so and can try again, and the founder gets an alert (counts only). That way a photo
+// is never left behind without an owner.
 const RETRY_DELAYS_MS = [0, 250, 750, 1500];
 const BUCKET = "meal-photos";
 
@@ -42,7 +44,8 @@ export const POST = route({ body: z.strictObject({ confirm: z.string() }) }, asy
     const detail = { files_left: photos.left, attempts: RETRY_DELAYS_MS.length, reason: photos.reason };
     console.error(JSON.stringify({ level: "error", request_id: ctx.requestId, event: "photo_cleanup_failed", ...detail }));
     await srv("srv_alert", { p_kind: "photo_cleanup_failed", p_detail: detail }).catch(() => {});
-    throw new ApiError(503, "PHOTOS_NOT_REMOVED", "Your photos couldn't be removed yet, so nothing was deleted. Try again in a moment.");
+    // Some photos may already be removed (storage can remove some files and then fail); the account and diary stay.
+    throw new ApiError(503, "PHOTOS_NOT_REMOVED", DELETE_UNFINISHED);
   }
   await srv("srv_delete_account", { p_user: ctx.userId });
   await ctx.db.auth.signOut().catch(() => {});

@@ -6,6 +6,7 @@ import { ChevronRight, Lock } from "lucide-react";
 import { Button, Caption, Card, Chip, ErrorState, Field, Label, Loading, ProTag, SaveStatus, Screen, Segmented, Sheet, inputClass } from "@/components/ui";
 import { QuestionField } from "@/components/question";
 import { useLoad, useSave } from "@/lib/client/hooks";
+import { DELETE_REFUSED, DELETE_UNFINISHED } from "@/lib/wording";
 import { api, ApiFailure } from "@/lib/client/api";
 import { browserSupabase } from "@/lib/client/supabase";
 import { clearPre } from "@/lib/client/pre";
@@ -484,7 +485,8 @@ function DeleteSheet({ onClose }: { onClose: () => void }) {
       <p>This deletes your account and every record in it for good: bloating, meals, reviews, reports and photos. It cannot be undone.</p>
       <Caption>You may want to download your data first.</Caption>
       <Field label="Type DELETE to confirm"><input className={inputClass} value={text} onChange={(e) => setText(e.target.value)} autoCapitalize="characters" autoComplete="off" /></Field>
-      {del.state === "error" && <p role="alert" className="t-caption text-ink">That didn&apos;t work. Nothing was deleted. Try again.</p>}
+      {/* 500 or more: the server got as far as the photos, so some may already be gone (see DELETE_UNFINISHED). */}
+      {del.state === "error" && <p role="alert" className="t-caption text-ink">{(del.error?.status ?? 0) >= 500 ? DELETE_UNFINISHED : DELETE_REFUSED}</p>}
       {del.state === "unknown" && (
         <div role="alert" className="flex flex-col gap-2">
           <p className="t-caption text-ink">Connection lost. We can&apos;t tell yet whether your account was deleted.</p>

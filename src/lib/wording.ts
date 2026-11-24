@@ -25,6 +25,13 @@ export const FOLLOWED_ONLY_NOTE = "You can compare the 3 habits you follow. Foll
 export const KIWI_WARNING = "Don't try this if you're allergic to kiwi";
 export const STOP_IF_WORSE = "Stop if you feel worse";
 export const DOWNLOAD_NOTE = "Downloaded copies can't be recalled.";
+// Deleting an account removes kept photos first, then the account. A failure from the photo step on
+// (the server answers 500 or more) leaves the account and diary in place, but kept photos removed before
+// the failure stay removed. Owner's wording, 24 Nov 2026 (was decision D20).
+export const DELETE_UNFINISHED =
+  "We couldn't finish deleting your account. Your account and diary are still available, but some saved meal photos may already have been deleted. Try again to finish.";
+// The server refused before anything was removed (an answer below 500).
+export const DELETE_REFUSED = "That didn't work. Nothing was deleted. Try again.";
 
 export const HOW_BLOAT_WORKS = [
   "Tap I feel bloated when it starts, and Bloating gone when it ends.",
