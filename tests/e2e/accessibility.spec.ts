@@ -9,11 +9,9 @@ import { expect, test, type BrowserContext, type Locator, type Page } from "@pla
 // twice the pixel density; that is how the browser's own zoom works, so it is emulated exactly that way.
 // Not covered here: a screen reader (needs a person with VoiceOver, TalkBack or NVDA).
 //
-// Known defect K1 (found 23 Nov 2026, reported, not fixed while the preview is frozen on 83fe4da): when
-// a save removes the button that opened the sheet (saving "Log bloating", ending bloating, confirming
-// "Delete"), focus falls back to the page itself, so the next Tab starts from the top. The check
-// "known defect K1" below is marked as expected to fail; it will report "unexpectedly passed" once
-// the fix lands, and should then become a normal check.
+// Focus after a sheet closes (defect K1, found 23 Nov 2026): when a save removes the button that opened
+// the sheet, focus goes to the control that replaced it, or else to the nearest meaningful heading,
+// and the next Tab continues from there. The four reported cases are checked below.
 
 const HELP_VERSION = "nhs-bloating-2026-11-07";
 const PASSWORD = "synthetic-password-1";
@@ -102,7 +100,7 @@ for (const [label, size] of Object.entries(SIZES)) {
       await page.keyboard.press("Enter");
       await expect(log).toBeHidden({ timeout: 20000 });
       await expect.poll(async () => (await api("GET", "/v1/me/state")).body.open_episode?.current_strength).toBe(5);
-      test.info().annotations.push({ type: "known defect K1", description: `focus after saving Log bloating: ${await focusedName(page)}` });
+      await expect(page.getByRole("button", { name: /Bloating ongoing/ }), "focus moves to the button that replaced I feel bloated").toBeFocused();
 
       // 3. Escape closes a sheet and returns focus to the button that opened it.
       const addMeal = page.getByRole("button", { name: "Add meal" });
@@ -155,7 +153,7 @@ for (const [label, size] of Object.entries(SIZES)) {
       await page.keyboard.press("Enter");
       await expect.poll(async () => (await api("GET", `/v1/days/${today}`)).body.meals.length).toBe(0);
       await expect(confirm).toBeHidden();
-      test.info().annotations.push({ type: "known defect K1", description: `focus after confirming Delete: ${await focusedName(page)}` });
+      await expect(page.getByRole("heading", { level: 1 }), "the day had no other meal, so focus goes to the screen title").toBeFocused();
 
       // 6. You: change units, export JSON.
       await tabTo(page, page.getByRole("link", { name: "You", exact: true }));
@@ -266,11 +264,26 @@ test.describe("200% browser zoom (1280 x 800 window)", () => {
   });
 });
 
-test.describe("known defect K1", () => {
+/** Press Tab once and check focus lands on the first control after the restored position, in page order. */
+async function nextTabContinuesHere(page: Page) {
+  const found = await page.evaluate(() => {
+    const from = document.activeElement as HTMLElement;
+    const all = [...document.querySelectorAll<HTMLElement>("a[href], button, input, select, textarea, [tabindex]")]
+      .filter((el) => el.tabIndex >= 0 && !(el as HTMLButtonElement).disabled && el.getClientRects().length > 0 && getComputedStyle(el).visibility !== "hidden");
+    const next = all.find((el) => !from.contains(el) && (from.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING));
+    document.querySelectorAll("[data-next-expected]").forEach((e) => e.removeAttribute("data-next-expected"));
+    next?.setAttribute("data-next-expected", "");
+    return next ? (next.getAttribute("aria-label") ?? next.textContent ?? "").trim().slice(0, 40) : null;
+  });
+  expect(found, "there is a control after the restored position").not.toBeNull();
+  await page.keyboard.press("Tab");
+  expect(await page.evaluate(() => document.activeElement?.hasAttribute("data-next-expected")), `next Tab goes to "${found}"`).toBe(true);
+}
+
+test.describe("focus after a save removes the button that opened the sheet (K1)", () => {
   test.use({ ...SIZES["desktop at 100%"], isMobile: false, hasTouch: false });
 
-  test("after saving Log bloating with the keyboard, focus stays on a control in the page", async ({ context }) => {
-    test.fail(true, "K1: focus falls back to the page body when the button that opened the sheet is replaced");
+  test("1. saving Log bloating: focus moves to its replacement, Bloating ongoing, and the next Tab continues from there", async ({ context }) => {
     const { page } = await account(context);
     await page.goto("/today");
     await expect(page.getByRole("heading", { name: "Today", exact: true })).toBeVisible();
@@ -282,6 +295,92 @@ test.describe("known defect K1", () => {
     await tabTo(page, log.getByRole("button", { name: "Save" }));
     await page.keyboard.press("Enter");
     await expect(log).toBeHidden({ timeout: 20000 });
-    expect(await focusedName(page)).not.toBe("BODY");
+    await expect(page.getByRole("button", { name: /Bloating ongoing/ })).toBeFocused();
+    await expectRing(page);
+    await nextTabContinuesHere(page);
+  });
+
+  test("2. ending bloating: focus moves to its replacement, I feel bloated, and the next Tab continues from there", async ({ context }) => {
+    const { page, api } = await account(context);
+    expect((await api("POST", "/v1/episodes", { strength: 4, started: { mode: "now" } })).status).toBe(201);
+    await page.goto("/today");
+    await tabTo(page, page.getByRole("button", { name: /Bloating ongoing/ }));
+    await page.keyboard.press("Enter");
+    const now = page.getByRole("dialog", { name: "Bloating now" });
+    await tabTo(page, now.getByRole("button", { name: "Bloating gone" }));
+    await page.keyboard.press("Enter");
+    const end = page.getByRole("dialog", { name: "Bloating ended" });
+    await tabTo(page, end.getByRole("button", { name: "Save" }));
+    await page.keyboard.press("Enter");
+    await expect(end.getByText(/Lasted/)).toBeVisible({ timeout: 20000 });
+    await tabTo(page, end.getByRole("button", { name: "Done" }));
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "I feel bloated" })).toBeFocused();
+    await nextTabContinuesHere(page);
+  });
+
+  test("3. deleting one of two meals: focus moves to the Meals heading, and the next Tab continues from there", async ({ context }) => {
+    const { page, api } = await account(context);
+    for (const dish of ["First test meal", "Second test meal"]) expect((await api("POST", "/v1/meals", { save_key: crypto.randomUUID(), dish_text: dish, eaten: { mode: "now" } })).status).toBe(201);
+    const today = (await api("GET", "/v1/me/state")).body.today.date as string;
+    await page.goto(`/day/${today}`);
+    const row = page.locator("div").filter({ hasText: "Second test meal" }).filter({ has: page.getByRole("button", { name: "Delete", exact: true }) }).last();
+    await tabTo(page, row.getByRole("button", { name: "Delete", exact: true }));
+    await page.keyboard.press("Enter");
+    const confirm = page.getByRole("dialog", { name: "Delete this?" });
+    await tabTo(page, confirm.getByRole("button", { name: "Delete", exact: true }));
+    await page.keyboard.press("Enter");
+    await expect(page.getByText("Second test meal")).toHaveCount(0, { timeout: 20000 });
+    await expect(page.getByRole("heading", { name: "Meals" })).toBeFocused();
+    await expectRing(page);
+    await nextTabContinuesHere(page);
+  });
+
+  test("4. deleting the only bloating record: its section goes, so focus moves to the screen title, and the next Tab continues from there", async ({ context }) => {
+    const { page, api } = await account(context);
+    const ep = await api("POST", "/v1/episodes", { strength: 3, started: { mode: "now" } });
+    expect(ep.status).toBe(201);
+    expect((await api("POST", `/v1/episodes/${ep.body.episode.id}/end`, { ended: { mode: "now" } })).status).toBeLessThan(300);
+    expect((await api("POST", "/v1/meals", { save_key: crypto.randomUUID(), dish_text: "Meal that stays", eaten: { mode: "now" } })).status).toBe(201);
+    const today = (await api("GET", "/v1/me/state")).body.today.date as string;
+    await page.goto(`/day/${today}`);
+    const section = page.locator("section", { has: page.getByRole("heading", { name: "Bloating", exact: true }) });
+    await tabTo(page, section.getByRole("button", { name: "Delete", exact: true }));
+    await page.keyboard.press("Enter");
+    const confirm = page.getByRole("dialog", { name: "Delete this?" });
+    await tabTo(page, confirm.getByRole("button", { name: "Delete", exact: true }));
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("heading", { name: "Bloating", exact: true })).toHaveCount(0, { timeout: 20000 });
+    await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+    await nextTabContinuesHere(page);
+  });
+
+  test("normal return is kept, and focus is never taken back once the person has moved on", async ({ context }) => {
+    const { page, api } = await account(context);
+    expect((await api("POST", "/v1/meals", { save_key: crypto.randomUUID(), dish_text: "Meal to edit", eaten: { mode: "now" } })).status).toBe(201);
+    const today = (await api("GET", "/v1/me/state")).body.today.date as string;
+    // The button that opened the sheet still exists: focus goes back to it (Escape and Save).
+    await page.goto(`/day/${today}`);
+    const edit = page.getByRole("button", { name: "Edit", exact: true });
+    await tabTo(page, edit);
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("Escape");
+    await expect(edit).toBeFocused();
+    // Saving Log bloating, then moving focus elsewhere at once: when Today reloads a moment later
+    // and replaces I feel bloated, focus stays where the person put it.
+    await page.goto("/today");
+    await tabTo(page, page.getByRole("button", { name: "I feel bloated" }));
+    await page.keyboard.press("Enter");
+    const log = page.getByRole("dialog", { name: "Log bloating" });
+    await tabTo(page, log.getByRole("radio", { name: "2", exact: true }));
+    await page.keyboard.press("Space");
+    await tabTo(page, log.getByRole("button", { name: "Save" }));
+    await page.keyboard.press("Enter");
+    await expect(log).toBeHidden({ timeout: 20000 });
+    const elsewhere = page.getByRole("link", { name: "History", exact: true });
+    await elsewhere.focus();
+    await page.waitForTimeout(5500);
+    await expect(elsewhere).toBeFocused();
   });
 });
