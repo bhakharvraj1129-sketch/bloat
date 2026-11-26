@@ -4,6 +4,7 @@ import type { UserCtx } from "./userdata";
 import type { DaysView } from "./days";
 import { adaptiveOf, focusOf, loadBundle, triggersOf } from "./insights";
 import { activeExperiment } from "./experiments";
+import { featureOff } from "./availability";
 import { cardForToday } from "./cards";
 import { dayNumber, experimentDef } from "@/lib/domain/experiments";
 import { phase, shortcuts } from "@/lib/domain/focus";
@@ -32,7 +33,7 @@ export async function todayExtras(ctx: Ctx<unknown>, u: UserCtx, view: DaysView,
   const f = focusOf(b, t);
   const exp = await activeExperiment(ctx.db, ctx.userId, u.today);
   const [card, { data: dishes }, { data: xpDay }] = await Promise.all([
-    cardForToday(ctx.db, ctx.userId, u, b),
+    featureOff("daily_cards") ? Promise.resolve(null) : cardForToday(ctx.db, ctx.userId, u, b),
     ctx.db.from("saved_dishes").select("id,name,place").eq("user_id", ctx.userId).eq("archived", false).order("created_at", { ascending: false }).limit(12),
     exp ? ctx.db.from("experiment_days").select("date").eq("user_id", ctx.userId).eq("experiment_id", exp.id).eq("date", u.today) : Promise.resolve({ data: [] }),
   ]);

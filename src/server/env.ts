@@ -10,7 +10,10 @@ export const env = {
   get supabaseUrl() { return need("NEXT_PUBLIC_SUPABASE_URL"); },
   get supabaseKey() { return need("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"); },
   get serverSecret() { return need("BLOAT_SERVER_SECRET"); },
+  /** "mock", "anthropic", or "off" (no AI anywhere: its features are not offered). */
   get aiProvider() { return process.env.BLOAT_AI_PROVIDER ?? "mock"; },
+  /** Comma-separated feature keys switched off for this deployment (see server/availability.ts). */
+  get offFeatures() { return process.env.BLOAT_OFF_FEATURES ?? ""; },
   get aiModel() { return process.env.BLOAT_AI_MODEL ?? "claude-haiku-5-5"; },
   get anthropicKey() { return process.env.ANTHROPIC_API_KEY ?? ""; },
   get billingProvider() { return process.env.BLOAT_BILLING_PROVIDER ?? "mock"; },

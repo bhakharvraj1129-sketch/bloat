@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { staleDoctorReportOps } from "@/server/meals";
 import { ApiError, ok, route } from "@/server/http";
 import type { Op } from "@/server/db";
 import { optionValues } from "@/lib/registry";
@@ -33,5 +34,12 @@ export const PUT = route({ body, mutation: true, feature: "health_background" },
   const ops: Op[] = [{ op: "delete", table: "health_conditions", match: {} }];
   for (const c of ctx.body.conditions) ops.push({ op: "insert", table: "health_conditions", row: { condition: c.condition, status: c.status ?? null, year: c.year ?? null } });
   if (!seen.has("lactose_intolerance")) ops.push({ op: "delete", table: "lactose_details", match: {} });
+  // A condition removed or changed (not just added) corrects the record: stored doctor reports are
+  // flagged and their share links revoked (plan B05).
+  const { data: prior } = await ctx.db.from("health_conditions").select("condition,status,year").eq("user_id", ctx.userId);
+  const key = (c: { condition: string; status?: string | null; year?: number | null }) => `${c.condition}|${c.status ?? ""}|${c.year ?? ""}`;
+  const now = new Set(ctx.body.conditions.map(key));
+  const { data: lactose } = await ctx.db.from("lactose_details").select("user_id").eq("user_id", ctx.userId).maybeSingle();
+  if ((prior ?? []).some((c) => !now.has(key(c))) || (lactose && !seen.has("lactose_intolerance"))) ops.push(...(await staleDoctorReportOps(ctx.db, ctx.userId)));
   return ctx.commit(ops, 200, { conditions: ctx.body.conditions });
 });

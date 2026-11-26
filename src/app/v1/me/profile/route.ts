@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { staleDoctorReportOps } from "@/server/meals";
 import { ApiError, route } from "@/server/http";
 import { loadAnswers, loadUser } from "@/server/userdata";
 import { ifMatch } from "@/server/schemas";
@@ -47,11 +48,14 @@ export const PATCH = route({ body, mutation: true }, async (ctx) => {
   if ((b.goals ?? []).includes("whether_my_cycle_plays_a_part") && !on10.includes("cycle_context")) {
     throw new ApiError(422, "VALIDATION", "That goal needs cycle context to be on.");
   }
+  let corrected = false;
   for (const [id, value] of Object.entries(b.answers ?? {})) {
     if (value !== null) {
       const c = checkAnswer(id, value);
       if (!c.ok) throw new ApiError(422, "VALIDATION", c.reason);
     }
+    // ON-10, ON-14 and ON-15 appear in the doctor report: changing an earlier answer is a correction.
+    if (answers[id] !== undefined && answers[id] !== null && JSON.stringify(answers[id]) !== JSON.stringify(value)) corrected = true;
     ops.push({
       op: "insert", table: "question_responses",
       row: { question_id: id, question_version: question(id).version ?? REGISTRY_VERSION, value, status: value === null ? "skipped" : "answered", answered_at: new Date(ctx.now).toISOString() },
@@ -71,5 +75,7 @@ export const PATCH = route({ body, mutation: true }, async (ctx) => {
   set.revision = u.profile.revision + 1;
   set.updated_at = new Date(ctx.now).toISOString();
   ops.unshift({ op: "update", table: "profiles", match: { user_id: ctx.userId }, set });
+  // Stored doctor reports that show the corrected answer are flagged and their share links revoked (plan B05).
+  if (corrected) ops.push(...(await staleDoctorReportOps(ctx.db, ctx.userId)));
   return ctx.commit(ops, 200, { profile: { ...u.profile, ...set }, zone_change: zonePreview });
 });

@@ -105,3 +105,69 @@ describe("R1: deleting or correcting any record flags the stored reports that us
     await expectRevoked(u, rep, "meal moved onto a reported day");
   });
 });
+
+// Defect R2 (26 Nov 2026): the same rule for records without a date that the doctor report shows.
+// Deleting a medicine or a test, or correcting health background, lactose details, family history or
+// the optional context answers (ON-10, ON-14, ON-15), left a shared doctor report live with the old
+// record. Every stored doctor report is now flagged and its links revoked. Adding information is not
+// a correction and flags nothing.
+describe("R2: correcting or deleting an undated record the doctor report shows flags stored doctor reports and revokes their links", () => {
+  let u: User;
+  beforeAll(async () => {
+    u = await proUser();
+    for (let i = 0; i < 3; i++) await logDay(u, day(i), { score: 3, episode: { start: "09:00", end: "10:00", strength: 3 } });
+    const setup = [
+      await call(u, "POST", "/v1/medicines", { name: "Test iron", type: "supplement", med_group: "iron", started_precision: "not_sure" }, { now: NOW }),
+      await call(u, "POST", "/v1/health/tests", { test: "full_blood_count", date_precision: "not_sure" }, { now: NOW }),
+      await call(u, "PUT", "/v1/health/conditions", { conditions: [{ condition: "ibs" }, { condition: "lactose_intolerance" }] }, { now: NOW }),
+      await call(u, "PUT", "/v1/health/lactose", { breath_test: "positive", after_dairy: ["gas"] }, { now: NOW }),
+      await call(u, "PUT", "/v1/health/family", { value: ["coeliac_disease"] }, { now: NOW }),
+      await call(u, "PATCH", "/v1/me/profile", { answers: { "ON-14": "30_39" } }, { now: NOW }),
+    ];
+    for (const r of setup) expect(r.status, JSON.stringify(r.body)).toBeLessThan(300);
+  });
+
+  it("control: adding a medicine is new information and leaves the report and its link alone", async () => {
+    const rep = await share(u, day(0), day(2));
+    expect((await call(u, "POST", "/v1/medicines", { name: "Test fibre", type: "supplement", started_precision: "not_sure" }, { now: NOW })).status).toBe(201);
+    await expectLive(u, rep, "medicine added");
+  });
+
+  it("a medicine deleted", async () => {
+    const rep = await share(u, day(0), day(2));
+    const med = (await call(u, "GET", "/v1/medicines", undefined, { now: NOW })).body.medicines.find((m: { name: string }) => m.name === "Test iron");
+    expect((await call(u, "DELETE", `/v1/medicines/${med.id}`, undefined, { now: NOW })).status).toBe(204);
+    await expectRevoked(u, rep, "medicine deleted");
+  });
+
+  it("a test deleted", async () => {
+    const rep = await share(u, day(0), day(2));
+    const test = (await call(u, "GET", "/v1/health/conditions", undefined, { now: NOW })).body.tests[0];
+    expect((await call(u, "DELETE", `/v1/health/tests?id=${test.id}`, undefined, { now: NOW })).status).toBe(204);
+    await expectRevoked(u, rep, "test deleted");
+  });
+
+  it("lactose details changed", async () => {
+    const rep = await share(u, day(0), day(2));
+    expect((await call(u, "PUT", "/v1/health/lactose", { breath_test: "negative", after_dairy: ["gas"] }, { now: NOW })).status).toBe(200);
+    await expectRevoked(u, rep, "lactose details changed");
+  });
+
+  it("a health condition removed", async () => {
+    const rep = await share(u, day(0), day(2));
+    expect((await call(u, "PUT", "/v1/health/conditions", { conditions: [{ condition: "lactose_intolerance" }] }, { now: NOW })).status).toBe(200);
+    await expectRevoked(u, rep, "condition removed");
+  });
+
+  it("family history changed", async () => {
+    const rep = await share(u, day(0), day(2));
+    expect((await call(u, "PUT", "/v1/health/family", { value: null }, { now: NOW })).status).toBe(200);
+    await expectRevoked(u, rep, "family history changed");
+  });
+
+  it("an optional context answer changed (age range)", async () => {
+    const rep = await share(u, day(0), day(2));
+    expect((await call(u, "PATCH", "/v1/me/profile", { answers: { "ON-14": "40_49" } }, { now: NOW })).status).toBe(200);
+    await expectRevoked(u, rep, "age range changed");
+  });
+});

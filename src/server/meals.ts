@@ -129,3 +129,16 @@ export async function staleReportOps(db: Db, userId: string, ...dates: string[])
   ]);
 }
 
+/**
+ * A record without a date that the doctor report shows (medicines, health background, family history,
+ * tests, optional context answers) was deleted or corrected: every stored doctor report is flagged
+ * and its share links revoked (plan B05). Adding new information does not flag anything.
+ */
+export async function staleDoctorReportOps(db: Db, userId: string): Promise<Op[]> {
+  const { data } = await db.from("reports").select("id").eq("user_id", userId).eq("kind", "doctor").eq("stale", false);
+  const at = new Date().toISOString();
+  return (data ?? []).flatMap((r) => [
+    { op: "update" as const, table: "reports", match: { id: r.id }, set: { stale: true } },
+    { op: "update" as const, table: "report_shares", match: { report_id: r.id }, set: { revoked_at: at } },
+  ]);
+}

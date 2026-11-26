@@ -69,7 +69,7 @@ export function PasswordSignIn() {
 
   return (
     <AuthPage title="Sign in" eyebrow="Welcome back" back={fromHelp ? "/help?signup=1" : "/"}>
-      <Caption>This preview uses test accounts set up by the owner. New accounts can&apos;t be created here.</Caption>
+      <Caption>Bloat is invite-only for now. Accounts are set up for invited testers; new accounts can&apos;t be created here.</Caption>
       <form onSubmit={submit} method="post" noValidate className="flex flex-col gap-4" aria-describedby={message ? "signin-error" : undefined}>
         <div className="flex flex-col gap-2">
           <label htmlFor="email" className="t-body-strong">Email</label>
@@ -111,6 +111,8 @@ export function PasswordSignIn() {
         <Button type="submit" disabled={!ready || busy} aria-busy={busy || undefined}>{busy ? "Signing in…" : "Sign in"}</Button>
       </form>
       {message && <p id="signin-error" role="alert" className="t-caption text-ink">{message}</p>}
+      {/* No email is sent while Bloat is invite-only, so a forgotten password is reset by the person who invited you. */}
+      <Caption>Forgot your password? Ask the person who invited you to set a new temporary one. Once you&apos;re signed in, you can change it in You.</Caption>
     </AuthPage>
   );
 }

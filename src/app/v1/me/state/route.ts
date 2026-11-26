@@ -7,6 +7,7 @@ import { isPaused } from "@/lib/domain/plan";
 import { thresholds, activity } from "@/lib/registry";
 import { ApiError } from "@/server/http";
 import { todayExtras } from "@/server/today";
+import { featuresOff } from "@/server/availability";
 
 // Everything Today needs in one answer: open episode, pending review, plan, flags.
 export const GET = route({}, async (ctx) => {
@@ -60,6 +61,8 @@ export const GET = route({}, async (ctx) => {
   return ok({
     onboarded: true,
     plan: ctx.plan,
+    // Features this deployment does not offer (invited beta): screens hide their buttons and links.
+    unavailable: featuresOff(),
     paused: isPaused(ctx.entitlement, ctx.now),
     profile: {
       country: u.profile.residence_country, time_zone: u.profile.time_zone, analysis_time_zone: u.profile.analysis_time_zone,

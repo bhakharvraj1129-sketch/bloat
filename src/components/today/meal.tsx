@@ -22,6 +22,10 @@ type Props = { open: boolean; onOpenChange: (o: boolean) => void; state: State; 
 // Screens 20 and 21. A meal always saves: on Free at once, on Pro with or without the ingredient check.
 export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
   const pro = state.plan === "pro";
+  // Invited beta without AI: no ingredient check, no photo, and no advert for them. Manual logging is unchanged.
+  const off = new Set(state.unavailable ?? []);
+  const checkOn = pro && !off.has("ai_ingredient_check");
+  const photoOn = pro && !off.has("meal_photos");
   const zone = deviceZone();
   const saveKey = useRef(newKey());
   const [step, setStep] = useState<"details" | "consent" | "check">("details");
@@ -119,17 +123,17 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
               )}
             </div>
           )}
-          {pro ? (
+          {photoOn ? (
             <>
               <input ref={fileRef} type="file" accept="image/*" capture="environment" className="sr-only" tabIndex={-1} aria-hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) onPhoto(f); e.target.value = ""; }} />
               <Button variant="secondary" onClick={() => fileRef.current?.click()} disabled={checking}><Camera size={20} strokeWidth={1.75} aria-hidden />{checking ? "Checking photo…" : "Take a photo"}</Button>
             </>
-          ) : (
+          ) : !pro && !off.has("ai_ingredient_check") ? (
             <div className="flex items-center justify-between gap-2 rounded-lg border border-line p-4 text-ink-muted">
               <span className="inline-flex items-center gap-2"><Lock size={18} strokeWidth={1.75} aria-hidden />Photo and ingredient check</span>
               <Link href="/upgrade" className="inline-flex min-h-11 items-center font-semibold">See Pro<ProTag /></Link>
             </div>
-          )}
+          ) : null}
           {notice && <p role="status" className="t-caption text-ink">{notice}</p>}
           <div className="flex flex-col gap-3">
             <p className="t-body-strong">{question("ML-02").prompt}</p>
@@ -148,7 +152,7 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
           <QuestionField id="ML-06" value={origin} onChange={(v) => setOrigin(v as string | null)} hide={["skip"]} />
           <AmbiguousChoice error={save.error} onChoose={(o) => finish(dishId ? { ...base(o), saved_dish_id: dishId } : base(o))} />
           <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { if ((await save.check()).ok) { onSaved(); onOpenChange(false); } }} />
-          {pro && !dishId ? (
+          {checkOn && !dishId ? (
             <>
               <Button onClick={runCheck} disabled={!text.trim() || timeMissing(when) || checking || save.saving}>{checking ? "Checking…" : "Next: check ingredients"}</Button>
               <Button variant="secondary" onClick={() => finish(base())} disabled={!text.trim() || timeMissing(when) || save.saving}>Save without the check</Button>

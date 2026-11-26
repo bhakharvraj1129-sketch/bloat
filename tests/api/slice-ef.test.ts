@@ -438,6 +438,14 @@ describe("Designated Pro test accounts (BLOAT_PRO_TEST_EMAILS)", () => {
     expect(ent.body).toMatchObject({ plan: "pro", status: "none" });
     const { data: rows } = await asUser(u).from("entitlements").select("plan,status");
     expect((rows ?? []).filter((r) => r.plan === "pro")).toEqual([]); // Pro comes from the server list, not a purchase
+    // A1 (26 Nov): there is no subscription, so there is nothing to pause or cancel, and no billing record is made.
+    const pause = await call(u, "POST", "/v1/billing/pause", { months: 1 });
+    expect(pause.status).toBe(409);
+    expect(pause.body.error.code).toBe("NO_SUBSCRIPTION");
+    expect((await call(u, "POST", "/v1/billing/cancel")).status).toBe(409);
+    const { data: after } = await asUser(u).from("entitlements").select("plan,status");
+    expect(after ?? []).toEqual(rows ?? []); // unchanged: no paused or cancelled record was made
+    expect((await call(u, "GET", "/v1/billing/entitlement")).body).toMatchObject({ plan: "pro", status: "none", paused: false });
     const other = await onboarded();
     expect((await call(other, "GET", "/v1/journey")).status).toBe(403);
   });

@@ -158,7 +158,7 @@ describe("Slice A: export, save status and account deletion (plan B04)", () => {
     const res = await fetch(`${BASE}${job.body.download_url}`, { headers: { Authorization: `Bearer ${u.token}` } });
     expect(res.status).toBe(200);
     const file = await res.json();
-    expect(file.schema_version).toBe("bloat-export-1");
+    expect(file.schema_version).toBe("bloat-export-2");
     expect(file.tables.episodes).toHaveLength(1);
     expect(file.tables.meals[0].dish_text).toBe("export lunch");
     expect(file.tables.strength_samples[0].strength).toBe(6);

@@ -10,6 +10,8 @@ import { DELETE_REFUSED, DELETE_UNFINISHED } from "@/lib/wording";
 import { api, ApiFailure } from "@/lib/client/api";
 import { browserSupabase } from "@/lib/client/supabase";
 import { clearPre } from "@/lib/client/pre";
+import { MIN_NEW_PASSWORD, newPasswordProblem, passwordChangeMessage } from "@/lib/sign-in-messages";
+import type { AuthErrorLike } from "@/lib/otp-messages";
 import { activities, ACTIVITY_GROUP_LABELS, country as countryCfg, foodTags, label as optionLabel, PRO_ACTIVITY_IDS, question, tagLabel } from "@/lib/registry";
 import type { State } from "@/components/today/types";
 
@@ -45,13 +47,13 @@ export async function signOutEverywhere() {
 }
 
 // Screen 39: settings and rights.
-export function Me({ testMode }: { testMode: boolean }) {
+export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; passwordSignIn?: boolean }) {
   const router = useRouter();
   const st = useLoad<State>("/v1/me/state");
   const meds = useLoad<{ medicines: Med[] }>("/v1/medicines");
   const consents = useLoad<{ consents: Consent[] }>("/v1/consents");
   const ent = useLoad<Ent>("/v1/billing/entitlement");
-  const [sheet, setSheet] = useState<null | "habits" | "zone" | "med" | "delete" | "eye" | "goal" | "context" | "pause" | "cancel">(null);
+  const [sheet, setSheet] = useState<null | "habits" | "zone" | "med" | "delete" | "eye" | "goal" | "context" | "pause" | "cancel" | "password">(null);
   const profile = useSave();
   const plan = useSave();
   const mode = useSave();
@@ -118,12 +120,14 @@ export function Me({ testMode }: { testMode: boolean }) {
         <Label id="plan">Plan</Label>
         <Card className="flex flex-col gap-3">
           <p className="t-body-strong">{pro ? "Bloat Pro" : s.paused ? "Bloat Pro (paused)" : "Bloat Free"}</p>
-          {pro && ent.data && <Caption>{ent.data.status === "cancelled" ? "Cancelled. Pro stays on until" : "Renews on"} {ent.data.renews_or_ends_at ? new Date(ent.data.renews_or_ends_at).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }) : "the end of the period"}.</Caption>}
+          {/* Pro given for testing has no subscription: nothing renews, nothing to pause or cancel. */}
+          {pro && ent.data?.status === "none" && <Caption>Switched on for testing. There is no subscription, so nothing renews and nothing is charged.</Caption>}
+          {pro && ent.data && ent.data.status !== "none" && <Caption>{ent.data.status === "cancelled" ? "Cancelled. Pro stays on until" : "Renews on"} {ent.data.renews_or_ends_at ? new Date(ent.data.renews_or_ends_at).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }) : "the end of the period"}.</Caption>}
           {s.paused && ent.data && <Caption>Paused until {ent.data.pause_until ? new Date(ent.data.pause_until).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }) : "you resume"}. No charge while paused. Your records are kept.</Caption>}
           {!pro && !s.paused && <Caption>Free logging never expires. There is no trial: Free is yours to keep.</Caption>}
           {!pro && !s.paused && <Link href="/upgrade" className="inline-flex min-h-12 items-center justify-center rounded-sm bg-brand px-5 font-semibold text-on-brand no-underline">See what Pro adds</Link>}
           {s.paused && <Button disabled={plan.saving} onClick={async () => { if ((await plan.run("POST", "/v1/billing/resume")) !== null) reloadPlan(); }}>{plan.saving ? "Resuming…" : "Resume Pro"}</Button>}
-          {pro && ent.data?.status !== "cancelled" && (
+          {pro && ent.data && ent.data.status !== "cancelled" && ent.data.status !== "none" && (
             <div className="grid grid-cols-2 gap-2">
               <Button variant="secondary" onClick={() => setSheet("pause")}>Pause Pro</Button>
               <Button variant="secondary" onClick={() => setSheet("cancel")}>Cancel</Button>
@@ -183,7 +187,7 @@ export function Me({ testMode }: { testMode: boolean }) {
         <Label id="pro">Pro</Label>
         <Card className="px-4 py-1">
           <Row href={pro ? "/health" : "/upgrade"} title="Health background" text="Conditions and tests for your record" locked={!pro} />
-          <Row href={pro ? "/learn" : "/upgrade"} title="Learn library" text="Cards and articles, each with its source" locked={!pro} />
+          {!(s.unavailable ?? []).includes("learn_library") && <Row href={pro ? "/learn" : "/upgrade"} title="Learn library" text="Cards and articles, each with its source" locked={!pro} />}
           <Row href={pro ? "/doctor" : "/upgrade"} title="Doctor PDF" text="A report to bring to an appointment" locked={!pro} />
           <Row href={pro ? "/journey" : "/upgrade"} title="Your journey" text="Your whole story on one screen" locked={!pro} />
         </Card>
@@ -198,10 +202,10 @@ export function Me({ testMode }: { testMode: boolean }) {
               </div>
             ) : <Button variant="secondary" onClick={() => setSheet("eye")}>Switch on</Button>}
             <SaveStatus state={mode.state} error={mode.error} onCheck={async () => { if ((await mode.check()).ok) st.reload(); }} />
-            <label className="flex min-h-11 items-center gap-3">
+            {!(s.unavailable ?? []).includes("meal_photos") && <label className="flex min-h-11 items-center gap-3">
               <input type="checkbox" className="h-6 w-6 accent-(--brand)" checked={shown("keep_meal_photos")} disabled={profile.saving} onChange={(e) => patch({ keep_meal_photos: e.target.checked })} />
               <span>Keep my meal photos <span className="t-caption">(off: a photo is deleted right after its check)</span></span>
-            </label>
+            </label>}
             {switchStatus(["keep_meal_photos"])}
           </Card>
         )}
@@ -240,6 +244,7 @@ export function Me({ testMode }: { testMode: boolean }) {
           <Row href="/help" title="When to get medical help" />
           <Row href="/how-bloat-works" title="How Bloat works" text="How scores and comparisons are calculated" />
         </Card>
+        {passwordSignIn && <Button variant="secondary" onClick={() => setSheet("password")}>Change password</Button>}
         <Button variant="secondary" disabled={signingOut} onClick={async () => { setSigningOut(true); await signOutEverywhere(); router.replace("/"); router.refresh(); }}>{signingOut ? "Signing out…" : "Sign out"}</Button>
         <Button variant="danger" onClick={() => setSheet("delete")}>Delete account</Button>
         {testMode && pro === false && !s.paused && (
@@ -255,6 +260,7 @@ export function Me({ testMode }: { testMode: boolean }) {
       {sheet === "zone" && <ZoneSheet s={s} onClose={() => setSheet(null)} onSaved={() => { setSheet(null); st.reload(); }} />}
       {sheet === "med" && <MedSheet meds={meds.data?.medicines ?? []} onClose={() => { setSheet(null); meds.reload(); }} />}
       {sheet === "delete" && <DeleteSheet onClose={() => setSheet(null)} />}
+      {sheet === "password" && <PasswordSheet onClose={() => setSheet(null)} />}
       {sheet === "eye" && <EyeSheet s={s} onClose={() => setSheet(null)} onSaved={() => { setSheet(null); st.reload(); }} />}
       {sheet === "goal" && <GoalSheet s={s} onClose={() => setSheet(null)} onSaved={() => { setSheet(null); st.reload(); }} />}
       {sheet === "context" && <ContextSheet onClose={() => setSheet(null)} onSaved={() => { setSheet(null); st.reload(); }} />}
@@ -470,6 +476,56 @@ function ContextSheet({ onClose, onSaved }: { onClose: () => void; onSaved: () =
         const ok = await save.run("PATCH", "/v1/me/profile", { answers });
         if (ok) onSaved();
       }}>{save.saving ? "Saving…" : "Save"}</Button>
+    </Sheet>
+  );
+}
+
+/**
+ * Change password (invited testers replace the temporary password they were given). The new password
+ * goes from the browser straight to Supabase Auth, as at sign-in; Bloat's server never sees it.
+ */
+function PasswordSheet({ onClose }: { onClose: () => void }) {
+  const [password, setPassword] = useState("");
+  const [again, setAgain] = useState("");
+  const [show, setShow] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
+  async function submit() {
+    const found = newPasswordProblem(password, again);
+    setProblem(found);
+    if (found || busy) return;
+    setBusy(true);
+    let error: AuthErrorLike = null;
+    try { ({ error } = await browserSupabase().auth.updateUser({ password })); } catch { error = { status: 0 }; }
+    setBusy(false);
+    const msg = passwordChangeMessage(error);
+    if (msg) { setProblem(msg); return; }
+    setPassword(""); setAgain(""); setDone(true);
+  }
+  return (
+    <Sheet open onOpenChange={(o) => { if (!o && !busy) onClose(); }} title="Change password" dirty={!done && (!!password || !!again) && !busy}>
+      {done ? (
+        <>
+          <p role="status">Password changed. Use the new one next time you sign in.</p>
+          <Button onClick={onClose}>Done</Button>
+        </>
+      ) : (
+        <>
+          <Field label="New password" hint={`At least ${MIN_NEW_PASSWORD} characters.`}>
+            <input className={inputClass} type={show ? "text" : "password"} autoComplete="new-password" autoCapitalize="none" spellCheck={false} value={password} onChange={(e) => setPassword(e.target.value)} />
+          </Field>
+          <Field label="New password again">
+            <input className={inputClass} type={show ? "text" : "password"} autoComplete="new-password" autoCapitalize="none" spellCheck={false} value={again} onChange={(e) => setAgain(e.target.value)} />
+          </Field>
+          <label className="flex min-h-11 items-center gap-3">
+            <input type="checkbox" className="h-6 w-6 accent-(--brand)" checked={show} onChange={(e) => setShow(e.target.checked)} />
+            <span>Show passwords</span>
+          </label>
+          {problem && <p role="alert" className="t-caption text-ink">{problem}</p>}
+          <Button disabled={busy} aria-busy={busy || undefined} onClick={submit}>{busy ? "Saving…" : "Change password"}</Button>
+        </>
+      )}
     </Sheet>
   );
 }

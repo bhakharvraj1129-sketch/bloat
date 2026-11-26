@@ -10,9 +10,15 @@ export const EXPORT_TABLES = [
   "medicines", "medicine_changes", "health_conditions", "lactose_details", "health_tests", "reports",
   "experiments", "experiment_days", "experiment_checks", "wellbeing_checks", "card_events", "hidden_cards",
   "activity_responses", "focus_state", "nudge_state",
+  // Added 26 Nov 2026 (defect X1): owner-visible but missing before. Share links you made, the
+  // ingredient suggestions saved for your dishes, the product events about your account, and your exports.
+  "report_shares", "food_suggestions", "product_events", "export_jobs",
 ] as const;
 
-export const EXPORT_SCHEMA_VERSION = "bloat-export-1";
+/** Columns left out of the file: hashes of link tokens are of no use to the person and stay on the server. */
+const EXPORT_OMIT: Partial<Record<(typeof EXPORT_TABLES)[number], string[]>> = { report_shares: ["token_hash"], export_jobs: ["token_hash"] };
+
+export const EXPORT_SCHEMA_VERSION = "bloat-export-2";
 
 /**
  * Key columns per table, in order, leaving out user_id when the export already filters on it.
@@ -30,6 +36,7 @@ const EXPORT_KEYS: Record<(typeof EXPORT_TABLES)[number], string[]> = {
   cycle_events: ["id"], exercise_records: ["id"], bowel_movements: ["id"], medicines: ["id"], medicine_changes: ["id"],
   health_tests: ["id"], reports: ["id"], experiments: ["id"], experiment_checks: ["id"], wellbeing_checks: ["id"],
   card_events: ["id"], activity_responses: ["id"],
+  report_shares: ["id"], food_suggestions: ["id"], product_events: ["id"], export_jobs: ["id"],
 };
 
 export const EXPORT_PAGE_SIZE = 1000;
@@ -73,9 +80,11 @@ async function readTable(db: Db, userId: string, table: (typeof EXPORT_TABLES)[n
 export async function buildExport(db: Db, userId: string, pageSize = EXPORT_PAGE_SIZE): Promise<Record<string, unknown[]>> {
   const out: Record<string, unknown[]> = {};
   for (const t of EXPORT_TABLES) {
+    const omit = EXPORT_OMIT[t] ?? [];
     out[t] = (await readTable(db, userId, t, pageSize)).map((r) => {
       const { user_id: _omit, ...rest } = r;
       void _omit;
+      for (const c of omit) delete rest[c];
       return rest;
     });
   }

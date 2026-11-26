@@ -1,6 +1,8 @@
 export type State = {
   onboarded: boolean;
   plan: "free" | "pro";
+  /** Feature keys this deployment does not offer (invited beta): their buttons and links are hidden. */
+  unavailable?: string[];
   paused: boolean;
   profile: {
     country: string; time_zone: string; analysis_time_zone: string; units: "us" | "metric"; date_format: "MM/DD" | "DD/MM";

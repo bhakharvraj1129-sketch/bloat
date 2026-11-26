@@ -232,6 +232,16 @@ export function Loading({ what = "Loading" }: { what?: string }) {
 
 export function ErrorState({ error, onRetry }: { error: ApiFailure | null; onRetry?: () => void }) {
   const offline = error?.code === "NETWORK";
+  // A feature this version does not offer (invited beta): trying again cannot help, so no retry.
+  if (error?.code === "NOT_AVAILABLE") {
+    return (
+      <Card className="flex flex-col gap-3">
+        <p className="t-body-strong">Not available</p>
+        <Caption>{error.message}</Caption>
+        <Link href="/today" className="font-semibold">Go to Today</Link>
+      </Card>
+    );
+  }
   return (
     <Card className="flex flex-col gap-3">
       <p className="t-body-strong">{offline ? "Connection lost" : "This didn't load"}</p>

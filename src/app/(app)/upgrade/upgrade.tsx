@@ -26,7 +26,8 @@ const ADDS = [
 export function Upgrade({ testMode }: { testMode: boolean }) {
   const ent = useLoad<Ent>("/v1/billing/entitlement");
   const st = useLoad<State>("/v1/me/state");
-  const recall = useLoad<Recall>(ent.data?.plan === "pro" ? "/v1/meals/recalled-check" : null);
+  const st0 = st.data?.unavailable ?? [];
+  const recall = useLoad<Recall>(ent.data?.plan === "pro" && st.data && !st0.includes("recalled_meal_check") ? "/v1/meals/recalled-check" : null);
   const [plan, setPlan] = useState<"annual" | "three_month" | "monthly">("annual");
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
@@ -72,7 +73,7 @@ export function Upgrade({ testMode }: { testMode: boolean }) {
       )}
       <section className="flex flex-col gap-2" aria-labelledby="adds">
         <Label id="adds">What Pro adds</Label>
-        <Card><ul className="list-disc pl-5">{ADDS.map((a) => <li key={a} className="py-0.5">{a}</li>)}</ul></Card>
+        <Card><ul className="list-disc pl-5">{ADDS.filter((a) => !(a === ADDS[0] && st0.includes("ai_ingredient_check")) && !(a === ADDS[6] && st0.includes("learn_library") && st0.includes("daily_cards"))).map((a) => <li key={a} className="py-0.5">{a}</li>)}</ul></Card>
         <Caption>Free logging never stops, and safety information is never part of Pro.</Caption>
       </section>
       <section className="flex flex-col gap-2" aria-labelledby="price">

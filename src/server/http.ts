@@ -1,4 +1,5 @@
 import "server-only";
+import { featureOff } from "./availability";
 import { createHash, randomUUID } from "node:crypto";
 import { z, type ZodType } from "zod";
 import { bearerClient, cookieClient, type Db } from "./supabase";
@@ -158,6 +159,9 @@ export function route<B = undefined>(opts: Options<B>, handler: Handler<B>) {
       // Test mode only (synthetic accounts): a fixed clock so time rules can be exercised end to end.
       const testNow = process.env.BLOAT_TEST_LOGIN === "1" ? req.headers.get("x-bloat-test-now") : null;
       const now = testNow && !Number.isNaN(Date.parse(testNow)) ? Date.parse(testNow) : Date.now();
+      // A feature switched off for this deployment (invited beta: no AI, unreviewed content) is not
+      // offered to anyone, whatever the plan.
+      if (opts.feature && featureOff(opts.feature)) throw new ApiError(404, "NOT_AVAILABLE", "This isn't part of this version of Bloat.");
       if (who) {
         entitlement = await loadEntitlement(who.db, who.userId);
         plan = effectivePlan(entitlement, now);

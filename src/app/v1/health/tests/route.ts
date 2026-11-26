@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { staleDoctorReportOps } from "@/server/meals";
 import { z } from "zod";
 import { notFound, route } from "@/server/http";
 
@@ -18,5 +19,6 @@ export const DELETE = route({ mutation: true, feature: "health_background" }, as
   const id = new URL(ctx.req.url).searchParams.get("id") ?? "";
   const { data } = await ctx.db.from("health_tests").select("id").eq("user_id", ctx.userId).eq("id", id).maybeSingle();
   if (!data) notFound("Test");
-  return ctx.commit([{ op: "delete", table: "health_tests", match: { id: data!.id }, require: true }], 204, null);
+  // A deleted test also flags stored doctor reports and revokes their share links (plan B05).
+  return ctx.commit([{ op: "delete", table: "health_tests", match: { id: data!.id }, require: true }, ...(await staleDoctorReportOps(ctx.db, ctx.userId))], 204, null);
 });

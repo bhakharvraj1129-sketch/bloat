@@ -33,3 +33,22 @@ export function validateSignIn(v: { email: string; password: string; needAdult: 
   if (v.needAdult && !v.adult) errors.adult = "Bloat is for adults. Tick the box to confirm you are 18 or older.";
   return errors;
 }
+
+/** A new password chosen in You (invited testers replace the temporary one they were given). */
+export const MIN_NEW_PASSWORD = 10;
+export function newPasswordProblem(password: string, again: string): string | null {
+  if (!password) return "Enter a new password.";
+  if (password.length < MIN_NEW_PASSWORD) return `Use at least ${MIN_NEW_PASSWORD} characters.`;
+  if (password !== again) return "The two passwords don't match.";
+  return null;
+}
+
+/** What Supabase's answer to a password change means for the person. Null when it changed. */
+export function passwordChangeMessage(error: AuthErrorLike): string | null {
+  if (!error) return null;
+  if (error.code === "same_password") return "That is your current password. Choose a different one.";
+  if (error.code === "weak_password") return "Choose a longer password that is harder to guess.";
+  if (error.status === 0) return "No connection. Your password has not changed. Try again.";
+  if (error.status === 401 || error.status === 403) return "You were signed out. Sign in again, then change your password.";
+  return "That didn't work. Your password has not changed. Try again.";
+}

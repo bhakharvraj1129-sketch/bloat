@@ -21,6 +21,7 @@ let alertedBadModel = false;
 
 /** The provider is chosen in configuration; the rest of the app never knows which one runs. */
 export async function provider(): Promise<AiProvider | null> {
+  if (env.aiProvider === "off") return null; // switched off on purpose: no call, no alert
   const checked = configCheck(env.aiProvider, env.aiModel);
   if (!checked.ok) {
     // Refused before any call, with one alert to the founder (no user data).
