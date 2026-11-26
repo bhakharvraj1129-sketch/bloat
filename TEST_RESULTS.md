@@ -1,12 +1,44 @@
 # Test results
 
-Last run: 26 Nov 2026 (Today and logging review, local only, not published). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 26 Nov 2026 (Today fixes published by run 15 as `8ef62e7`; History fixes tested locally, not published). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
 
-## Today and logging review (26 Nov 2026): local only, not published
+## History and editing review (26 Nov 2026): local only, not published
 
-New session, new Claude account. The preview still serves `f8fcd9d` (`dpl_7N1RRQjq8qFDNmw9x3ihfcxk9iBD`); nothing was published and no hosted account was used or changed. Local stack in Docker, synthetic `@example.com` accounts only. The fixes are on branch `claude/bloat-continuation-9mjd46`.
+Fixes R1 (every delete or correction flags the stored reports that used it and revokes their share links) and H1 (habit answers can be deleted), commit `0ffc99a` on `claude/bloat-continuation-9mjd46`. Local stack, synthetic `@example.com` accounts only. Not published: the push to the publishing branch was held back because the owner's yes covered the Today fixes only.
+
+| Check | Where | Passed | Expected failure | Skipped | Failed |
+|---|---|---|---|---|---|
+| New R1 API checks `tests/api/report-staleness.test.ts` (1 control, 7 kinds of change) | Local, code before the fix (`8ef62e7`) | 1 (the control) | 0 | 0 | 7, each at "report flagged: expected false to be true" (bloating time corrected, bloating deleted, bowel deleted, exercise deleted, habit removed, review changed, meal moved onto a reported day) |
+| The same 8 checks | Local, fixed code | 8 | 0 | 0 | 0 |
+| New H1 browser check `tests/e2e/history.spec.ts` | Local, code before the fix | 0 | 0 | 0 | 1 (no Delete on a habit) |
+| The same check | Local, fixed code | 1 | 0 | 0 | 0 |
+| Rule tests | Local, fixed code | 97 | 0 | 0 | 0 |
+| API tests, all files | Local, fixed code | 149 | 0 | 0 | 0 |
+| Browser tests, all files | Local, fixed code | 268 | 0 | 0 | 0 |
+| Type check, lint | Local, fixed code | 0 errors (5 old warnings) | | | |
+
+**On the way:** the first full API run on the fixed code had 1 failure: the weekly-report test labelled Q40 expected a week's report to be reused after a review in that week was changed. Under the plan's rule (B05) a changed review is a correction, so the stored week is now flagged (its snapshot kept exactly as stored) and the next request makes a new one; deleting a meal already worked that way. The test was made stricter, not looser: it still checks that asking again with nothing changed reuses the same snapshot, and now also checks that the stored snapshot is unchanged and flagged after a correction. This choice is recorded in `DECISIONS.md`, choice 25, and can be reversed.
+
+**Not performed:** anything on the hosted preview (not published).
+
+## Today fixes (26 Nov 2026): published build `8ef62e7` (run 15)
+
+Published revision `8ef62e71c97310ac0ac332fad3287ee0f95a5e22`, Vercel deployment `dpl_EZyj38upABHtKaQidLokQB4n6cxo` (made 17:39 UTC), served at `https://bloat-preview.vercel.app` and the branch address. The three main addresses still serve `83fe4da` (`dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`).
+
+| Check | Where | Result |
+|---|---|---|
+| GitHub run 15, first attempt | CI | **Stopped before any app test**: typecheck, lint and rule tests passed, then "Start the local Supabase stack" failed because GitHub's machine already had port 54324 in use (`failed to bind host port 0.0.0.0:54324/tcp: address already in use`). Nothing was built on Vercel or published |
+| GitHub run 15, re-run of the failed job (same commit) | CI and live | **All passed**: typecheck, lint, rule, API and browser tests on a clean checkout; controls read back; Vercel build; the 6 signed-out live checks on the new build, then publish, then the same 6 on the public address (finished 17:42 UTC) |
+| Tested = deployed | Vercel | Both preview addresses on `dpl_EZyj38upABHtKaQidLokQB4n6cxo`; all 211 repository files Vercel lists for it are byte-identical to `8ef62e7` (SHA-1 of contents), including 5 of the 7 changed files and the new checks. The Today screen and the day screen sit in folders Vercel lists only partly, so they were not compared one by one |
+| `bloat-tester` read-only check after run 15 | `bloat-test` | Exists; 1 meal (the 23 Nov QA meal), 1 bloating record, 1 report; no account with a test-run marker |
+
+**Not performed** (not counted above): the signed-in hosted suite on `8ef62e7` (needs accounts the owner approves); real phones; any screen reader.
+
+## Today and logging review (26 Nov 2026): local results
+
+New session, new Claude account. At the start the preview served `f8fcd9d` (`dpl_7N1RRQjq8qFDNmw9x3ihfcxk9iBD`). Local stack in Docker, synthetic `@example.com` accounts only. The fixes are commit `8ef62e7`, published later the same day (above).
 
 | Check | Where | Passed | Expected failure | Skipped | Failed |
 |---|---|---|---|---|---|
@@ -23,7 +55,7 @@ New session, new Claude account. The preview still serves `f8fcd9d` (`dpl_7N1RRQ
 
 **On the way:** the first version of the score fix put the spoken text in visually hidden text; the existing 200% zoom check counted that as cut-off text (1 failed, 266 passed). The score now has one spoken name instead (an image role with a label), with no hidden text, and the zoom check was not changed.
 
-**Not performed** (not counted above): any of this on the hosted preview (not published); real phones; any screen reader; the signed-in hosted suite.
+**Not performed** (not counted above): real phones; any screen reader; the signed-in hosted suite.
 
 ## P2 fix (24 Nov 2026): published build `f8fcd9d`, frozen again
 
