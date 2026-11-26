@@ -20,6 +20,9 @@ function nowLocal(zone?: string): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
+/** A typed time was chosen ("Choose time", "Earlier" or "Roughly") but its field is empty: nothing can be saved yet. */
+export const timeMissing = (v: TimeValue | null) => !!v && (v.mode === "exact" || v.mode === "approximate") && !v.local;
+
 type Props = {
   value: TimeValue;
   onChange: (v: TimeValue) => void;
@@ -44,10 +47,13 @@ export function TimePick({ value, onChange, labels = {}, allowApproximate = true
         {allowUnknown && <Chip role="radio" selected={value.mode === "unknown"} onClick={() => onChange({ mode: "unknown" })}>{labels.unknown ?? "I don't know"}</Chip>}
       </div>
       {(value.mode === "exact" || value.mode === "approximate") && (
-        <label className="flex flex-col gap-2">
-          <span className="t-caption">{value.mode === "approximate" ? "About when? Your best estimate is fine; it is saved as approximate." : "Date and time"}</span>
-          <input type="datetime-local" className={inputClass} value={value.local} max={nowLocal(inZone)} onChange={(e) => onChange({ mode: value.mode, local: e.target.value, zone })} />
-        </label>
+        <div className="flex flex-col gap-2">
+          <label className="flex flex-col gap-2">
+            <span className="t-caption">{value.mode === "approximate" ? "About when? Your best estimate is fine; it is saved as approximate." : "Date and time"}</span>
+            <input type="datetime-local" className={inputClass} value={value.local} max={nowLocal(inZone)} onChange={(e) => onChange({ mode: value.mode, local: e.target.value, zone })} />
+          </label>
+          {!value.local && <Caption>Choose a date and time to save.</Caption>}
+        </div>
       )}
     </div>
   );

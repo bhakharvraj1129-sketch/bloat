@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { Button, Caption, Card, ErrorState, Label, Loading, SaveStatus, ScoreBadge, Screen } from "@/components/ui";
 import { useLoad, useSave } from "@/lib/client/hooks";
+import { rememberOpener, returnFocus } from "@/lib/client/nav";
 import { formatClock, formatDate, formatDuration } from "@/lib/time";
 import type { State } from "@/components/today/types";
 import { EndSheet, LogBloatingSheet, OngoingSheet, StillHappeningSheet } from "@/components/today/bloating";
@@ -14,13 +15,23 @@ import { ProToday } from "@/components/today/pro";
 import { tagLabel } from "@/lib/registry";
 
 type SheetName = null | "log" | "ongoing" | "end" | "end-earlier" | "still" | "meal" | "activity" | "exercise" | "bowel";
+type Notice = { at: "bloating" | "add"; text: string };
+
+/** Says what was just saved, next to where it was started. Always on the page, so screen readers announce each change. */
+function SavedNotice({ text }: { text: string | null }) {
+  return <p role="status" className={text ? "t-caption text-ink" : "sr-only"}>{text}</p>;
+}
 
 // Screen 15. Home: log fast and see today. Never a confirmed score for today, never a doctor card.
 export function Today() {
   const router = useRouter();
   const { data: state, error, loading, reload } = useLoad<State>("/v1/me/state");
-  const [sheet, setSheet] = useState<SheetName>(null);
+  const [sheet, setSheetState] = useState<SheetName>(null);
   const [stillDismissed, setStillDismissed] = useState(false);
+  // A sheet closes as soon as the server confirms its save, so the confirmation is shown here (plan: "Meal saved.").
+  const [notice, setNotice] = useState<Notice | null>(null);
+  const setSheet = (s: SheetName) => { if (s) setNotice(null); setSheetState(s); };
+  const savedThen = (n: Notice) => () => { setNotice(n); reload(); };
   const none = useSave();
 
   useEffect(() => { if (state && !state.onboarded) router.replace("/setup"); }, [state, router]);
@@ -52,7 +63,8 @@ export function Today() {
         <Card as="section" className="flex flex-col gap-6">
           <div className="flex flex-col gap-1">
             <Label>Highest logged so far</Label>
-            <p className="t-score" aria-label={today.highest_logged !== null ? `Highest logged so far: ${today.highest_logged}` : "Nothing logged yet"}>
+            {/* One spoken name for the figure, the same as what the screen shows (a provisional zero is 0). */}
+            <p className="t-score" role="img" aria-label={highest !== null ? `${highest} out of 10` : "Nothing logged yet"}>
               {highest ?? "?"}{highest !== null && <span className="ml-2 align-baseline text-xl font-medium tracking-normal text-ink-muted">/ 10</span>}
             </p>
             <p className="font-semibold">
@@ -71,10 +83,16 @@ export function Today() {
             )}
             {!ep && today.episodes === 0 && !today.provisional_zero && (
               <>
-                <Button variant="quiet" disabled={none.saving} onClick={async () => { const ok = await none.run("POST", `/v1/days/${today.date}/no-bloating-so-far`); if (ok) reload(); }}>No bloating so far today</Button>
-                <SaveStatus state={none.state === "saved" ? "idle" : none.state} error={none.error} onCheck={async () => { if ((await none.check()).ok) reload(); }} />
+                {/* Saving removes this button: focus then moves to I feel bloated (same focus key), never to the page. */}
+                <Button variant="quiet" data-focus-key="today-bloating" disabled={none.saving} onClick={async () => {
+                  const back = rememberOpener();
+                  const ok = await none.run("POST", `/v1/days/${today.date}/no-bloating-so-far`);
+                  if (ok) { setNotice({ at: "bloating", text: "Noted: no bloating so far today." }); reload(); returnFocus(back); }
+                }}>No bloating so far today</Button>
+                <SaveStatus state={none.state === "saved" ? "idle" : none.state} error={none.error} onCheck={async () => { if ((await none.check()).ok) { setNotice({ at: "bloating", text: "Noted: no bloating so far today." }); reload(); } }} />
               </>
             )}
+            <SavedNotice text={notice?.at === "bloating" ? notice.text : null} />
           </div>
         </Card>
 
@@ -85,6 +103,7 @@ export function Today() {
             <Button variant="secondary" onClick={() => setSheet("activity")}>Add activity</Button>
             {state.plan === "pro" && <Button variant="secondary" className="col-span-2" onClick={() => setSheet("bowel")}>Log bowel movement</Button>}
           </div>
+          <SavedNotice text={notice?.at === "add" ? notice.text : null} />
           {keepEye && (
             <div className="flex flex-col gap-1 border-t border-line pt-4">
               <Label>Keeping an eye on</Label>
@@ -125,14 +144,14 @@ export function Today() {
       </section>
 
       {/* Sheets are mounted only while open, so each one starts with a clean form. */}
-      {open === "log" && <LogBloatingSheet open onOpenChange={close} {...sheetProps} />}
+      {open === "log" && <LogBloatingSheet open onOpenChange={close} {...sheetProps} onSaved={savedThen({ at: "bloating", text: "Bloating saved." })} />}
       {open === "ongoing" && <OngoingSheet open onOpenChange={close} {...sheetProps} onEnd={(earlier) => setSheet(earlier ? "end-earlier" : "end")} />}
       {(open === "end" || open === "end-earlier") && <EndSheet open earlier={open === "end-earlier"} onOpenChange={close} {...sheetProps} />}
       {open === "still" && <StillHappeningSheet open onOpenChange={close} {...sheetProps} onEnd={() => { setStillDismissed(true); setSheet("end-earlier"); }} />}
-      {open === "meal" && <MealSheet open onOpenChange={close} {...sheetProps} />}
-      {open === "activity" && <ActivitySheet open onOpenChange={close} {...sheetProps} onExercise={() => setSheet("exercise")} />}
-      {open === "exercise" && <ExerciseSheet open onOpenChange={close} {...sheetProps} />}
-      {open === "bowel" && <BowelSheet open onOpenChange={close} {...sheetProps} />}
+      {open === "meal" && <MealSheet open onOpenChange={close} {...sheetProps} onSaved={savedThen({ at: "add", text: "Meal saved." })} />}
+      {open === "activity" && <ActivitySheet open onOpenChange={close} {...sheetProps} onSaved={savedThen({ at: "add", text: "Activity saved." })} onExercise={() => setSheet("exercise")} />}
+      {open === "exercise" && <ExerciseSheet open onOpenChange={close} {...sheetProps} onSaved={savedThen({ at: "add", text: "Exercise saved." })} />}
+      {open === "bowel" && <BowelSheet open onOpenChange={close} {...sheetProps} onSaved={savedThen({ at: "add", text: "Bowel movement saved." })} />}
     </Screen>
   );
 }

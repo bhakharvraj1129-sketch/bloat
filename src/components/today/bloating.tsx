@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Lock } from "lucide-react";
 import { Advice, Button, Caption, Chip, ChipGroup, Label, ProTag, SaveStatus, Sheet, StrengthScale, ScoreBadge } from "@/components/ui";
 import { QuestionField } from "@/components/question";
-import { AmbiguousChoice, TimePick, type TimeValue } from "@/components/timepick";
+import { AmbiguousChoice, TimePick, timeMissing, type TimeValue } from "@/components/timepick";
 import { useNow, useSave } from "@/lib/client/hooks";
 import { deviceZone } from "@/lib/client/api";
 import { options, question } from "@/lib/registry";
@@ -112,7 +112,7 @@ export function LogBloatingSheet({ open, onOpenChange, state, onSaved }: SheetPr
       <Link href="/help" className="font-semibold">When to get medical help</Link>
       <AmbiguousChoice error={save.error} onChoose={(o) => submit(o)} />
       <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { if ((await save.check()).ok) { onSaved(); onOpenChange(false); } }} />
-      <Button onClick={() => submit()} disabled={strength === null || save.saving}>{save.saving ? "Saving…" : "Save"}</Button>
+      <Button onClick={() => submit()} disabled={strength === null || timeMissing(when) || save.saving}>{save.saving ? "Saving…" : "Save"}</Button>
       {strength === null && <Caption>Choose a strength to save.</Caption>}
     </Sheet>
   );
@@ -143,7 +143,6 @@ export function OngoingSheet({ open, onOpenChange, state, onSaved, onEnd }: Shee
           <p className="t-body-strong">How strong is it now?</p>
           <StrengthScale name="New strength reading" value={strength} onChange={setStrength} />
           <Button disabled={strength === null || save.saving} onClick={async () => { const ok = await save.run("POST", `/v1/episodes/${ep.id}/samples`, { strength }); if (ok) { setUpdating(false); setStrength(null); onSaved(); } }}>{save.saving ? "Saving…" : "Save reading"}</Button>
-          <SaveStatus state={save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) onSaved(); }} />
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-2">
@@ -151,6 +150,8 @@ export function OngoingSheet({ open, onOpenChange, state, onSaved, onEnd }: Shee
           <Button variant="secondary" onClick={() => onEnd(true)}>Ended earlier</Button>
         </div>
       )}
+      {/* Outside the form, so "Saved" stays on screen after the form closes. */}
+      <SaveStatus state={save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) { setUpdating(false); setStrength(null); onSaved(); } }} />
       <div className="flex flex-col gap-2">
         <Label>Strength readings</Label>
         <ul className="rounded-lg border border-line px-4">
@@ -200,7 +201,6 @@ export function EndSheet({ open, onOpenChange, state, onSaved, earlier }: SheetP
       </Sheet>
     );
   }
-  const timeMissing = (when.mode === "exact" || when.mode === "approximate") && !when.local;
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title="Bloating ended">
       <div className="flex flex-col gap-3">
@@ -210,7 +210,7 @@ export function EndSheet({ open, onOpenChange, state, onSaved, earlier }: SheetP
       {state.plan === "pro" && <QuestionField id="EP-09" value={eased} onChange={(v) => setEased(v as string | null)} />}
       <AmbiguousChoice error={save.error} onChoose={(o) => submit(o)} />
       <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { if ((await save.check()).ok) { onSaved(); onOpenChange(false); } }} />
-      <Button onClick={() => submit()} disabled={save.saving || timeMissing}>{save.saving ? "Saving…" : "Save"}</Button>
+      <Button onClick={() => submit()} disabled={save.saving || timeMissing(when)}>{save.saving ? "Saving…" : "Save"}</Button>
     </Sheet>
   );
 }

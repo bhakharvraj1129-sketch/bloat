@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Button, Caption, Card, Empty, ErrorState, Field, Label, Loading, SaveStatus, ScoreBadge, Screen, Sheet, inputClass } from "@/components/ui";
-import { TimePick, AmbiguousChoice, type TimeValue } from "@/components/timepick";
+import { TimePick, AmbiguousChoice, timeMissing, type TimeValue } from "@/components/timepick";
 import { useLoad, useSave } from "@/lib/client/hooks";
 import { deviceZone } from "@/lib/client/api";
 import { label as optionLabel, question } from "@/lib/registry";
@@ -234,7 +234,7 @@ function EpisodeEdit({ ep, zone, clock, onClose, onSaved }: { ep: Ep; zone: stri
       <AmbiguousChoice error={save.error} onChoose={(o) => submit(o)} />
       <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { if ((await save.check()).ok) onSaved(); }} />
       {save.error?.code === "REVISION_CONFLICT" && <Button variant="secondary" onClick={onSaved}>Reload this day</Button>}
-      <Button onClick={() => submit()} disabled={save.saving}>{save.saving ? "Saving…" : "Save changes"}</Button>
+      <Button onClick={() => submit()} disabled={timeMissing(start) || timeMissing(end) || save.saving}>{save.saving ? "Saving…" : "Save changes"}</Button>
     </Sheet>
   );
 }
@@ -258,7 +258,7 @@ function MealEdit({ meal, zone, clock, onClose, onSaved }: { meal: MealRow; zone
       <AmbiguousChoice error={save.error} onChoose={(o) => submit(o)} />
       <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { if ((await save.check()).ok) onSaved(); }} />
       {save.error?.code === "REVISION_CONFLICT" && <Button variant="secondary" onClick={onSaved}>Reload this day</Button>}
-      <Button disabled={!text.trim() || save.saving} onClick={() => submit()}>{save.saving ? "Saving…" : "Save changes"}</Button>
+      <Button disabled={!text.trim() || timeMissing(when) || save.saving} onClick={() => submit()}>{save.saving ? "Saving…" : "Save changes"}</Button>
     </Sheet>
   );
 }

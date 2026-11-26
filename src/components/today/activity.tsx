@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Lock } from "lucide-react";
 import { Button, Caption, Chip, Field, Label, ProTag, SaveStatus, Segmented, Sheet, inputClass } from "@/components/ui";
 import { QuestionField } from "@/components/question";
-import { TimePick, type TimeValue } from "@/components/timepick";
+import { TimePick, timeMissing, type TimeValue } from "@/components/timepick";
 import { useSave } from "@/lib/client/hooks";
 import { deviceZone } from "@/lib/client/api";
 import { activities, ACTIVITY_GROUP_LABELS, PRO_ACTIVITY_IDS, question } from "@/lib/registry";
@@ -117,7 +117,7 @@ export function ExerciseSheet({ open, onOpenChange, state, onSaved }: Props) {
       <QuestionField id="EX-04" value={intensity} onChange={(v) => setIntensity(v as string | null)} />
       <QuestionField id="EX-05" value={near} onChange={(v) => setNear(v as string | null)} />
       <SaveStatus state={save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) { onSaved(); onOpenChange(false); } }} />
-      <Button disabled={!type || !(mins > 0) || save.saving} onClick={async () => {
+      <Button disabled={!type || !(mins > 0) || timeMissing(when) || save.saving} onClick={async () => {
         const started = when.mode === "now" || when.mode === "unknown" ? { mode: "now", zone } : when;
         const ok = await save.run("POST", "/v1/exercise", { type, started, minutes: mins, ...(intensity ? { intensity } : {}), ...(near ? { meal_relation: near } : {}) });
         if (ok) { onSaved(); onOpenChange(false); }
@@ -142,7 +142,7 @@ export function BowelSheet({ open, onOpenChange, onSaved }: Props) {
       <QuestionField id="BW-03" value={strain} onChange={(v) => setStrain(v as string | null)} hide={["skip"]} />
       <QuestionField id="BW-04" value={complete} onChange={(v) => setComplete(v as string | null)} hide={["skip"]} />
       <SaveStatus state={save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) { onSaved(); onOpenChange(false); } }} />
-      <Button disabled={save.saving} onClick={async () => {
+      <Button disabled={timeMissing(when) || save.saving} onClick={async () => {
         const occurred = when.mode === "now" || when.mode === "unknown" ? { mode: "now", zone } : when;
         const ok = await save.run("POST", "/v1/bowel", { occurred, ...(look ? { stool_type: look } : {}), ...(strain ? { strain } : {}), ...(complete ? { complete } : {}) });
         if (ok) { onSaved(); onOpenChange(false); }

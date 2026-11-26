@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { Camera, Lock } from "lucide-react";
 import { Button, Caption, Card, Chip, Field, Label, ProTag, SaveStatus, Segmented, Sheet, inputClass } from "@/components/ui";
 import { QuestionField } from "@/components/question";
-import { AmbiguousChoice, TimePick, type TimeValue } from "@/components/timepick";
+import { AmbiguousChoice, TimePick, timeMissing, type TimeValue } from "@/components/timepick";
 import { useSave } from "@/lib/client/hooks";
 import { api, ApiFailure, deviceZone, newKey } from "@/lib/client/api";
 import { question, tagLabel } from "@/lib/registry";
@@ -150,11 +150,11 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
           <SaveStatus state={save.state} error={save.error?.code === "AMBIGUOUS_TIME" ? null : save.error} onCheck={async () => { if ((await save.check()).ok) { onSaved(); onOpenChange(false); } }} />
           {pro && !dishId ? (
             <>
-              <Button onClick={runCheck} disabled={!text.trim() || checking || save.saving}>{checking ? "Checking…" : "Next: check ingredients"}</Button>
-              <Button variant="secondary" onClick={() => finish(base())} disabled={!text.trim() || save.saving}>Save without the check</Button>
+              <Button onClick={runCheck} disabled={!text.trim() || timeMissing(when) || checking || save.saving}>{checking ? "Checking…" : "Next: check ingredients"}</Button>
+              <Button variant="secondary" onClick={() => finish(base())} disabled={!text.trim() || timeMissing(when) || save.saving}>Save without the check</Button>
             </>
           ) : (
-            <Button onClick={() => finish(dishId ? { ...base(), saved_dish_id: dishId } : base())} disabled={!text.trim() || save.saving}>{save.saving ? "Saving…" : "Save"}</Button>
+            <Button onClick={() => finish(dishId ? { ...base(), saved_dish_id: dishId } : base())} disabled={!text.trim() || timeMissing(when) || save.saving}>{save.saving ? "Saving…" : "Save"}</Button>
           )}
           {!text.trim() && <Caption>Type what you had to save.</Caption>}
         </>
