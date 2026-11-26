@@ -1,8 +1,29 @@
 # Test results
 
-Last run: 24 Nov 2026 (K1 and P2 fixes, then frozen again). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 26 Nov 2026 (Today and logging review, local only, not published). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
+
+## Today and logging review (26 Nov 2026): local only, not published
+
+New session, new Claude account. The preview still serves `f8fcd9d` (`dpl_7N1RRQjq8qFDNmw9x3ihfcxk9iBD`); nothing was published and no hosted account was used or changed. Local stack in Docker, synthetic `@example.com` accounts only. The fixes are on branch `claude/bloat-continuation-9mjd46`.
+
+| Check | Where | Passed | Expected failure | Skipped | Failed |
+|---|---|---|---|---|---|
+| Rule tests | Local, `f8fcd9d` (current preview code, fresh session) | 97 | 0 | 0 | 0 |
+| API tests | Local, `f8fcd9d` | 141 | 0 | 0 | 0 |
+| Browser tests (phone screen, plus keyboard and 200% zoom) | Local, `f8fcd9d` | 261 | 0 | 0 | 0 |
+| New Today checks `tests/e2e/today.spec.ts` (T1 to T4, 6 checks), final version | Local, `f8fcd9d` app code (before the fixes) | 0 | 0 | 0 | 6, each at the defect: no "Bloating saved." line; no "Bowel movement saved." line; focus not on I feel bloated after "No bloating so far today"; focus not on Open experiment after an answer; focus on the page body after "Not useful"; no hint and Save still on with an empty time |
+| T3 on the old code, by a separate walkthrough | Local, `f8fcd9d` | | | | After "No bloating so far today" the score showed "0 / 10" and its spoken name was "Nothing logged yet" |
+| The same 6 checks | Local, fixed code | 6 | 0 | 0 | 0 |
+| Rule tests | Local, fixed code | 97 | 0 | 0 | 0 |
+| API tests | Local, fixed code | 141 | 0 | 0 | 0 |
+| Browser tests, all files (the 261 before, plus the 6 new) | Local, fixed code | 267 (none retried) | 0 | 0 | 0 |
+| Type check, lint | Local, fixed code | 0 errors (the same 5 old warnings) | | | |
+
+**On the way:** the first version of the score fix put the spoken text in visually hidden text; the existing 200% zoom check counted that as cut-off text (1 failed, 266 passed). The score now has one spoken name instead (an image role with a label), with no hidden text, and the zoom check was not changed.
+
+**Not performed** (not counted above): any of this on the hosted preview (not published); real phones; any screen reader; the signed-in hosted suite.
 
 ## P2 fix (24 Nov 2026): published build `f8fcd9d`, frozen again
 

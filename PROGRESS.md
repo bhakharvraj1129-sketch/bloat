@@ -1,16 +1,17 @@
 # Progress
 
-Last updated: 24 Nov 2026 (K1 focus fix and P2 deletion-message fix published, preview frozen again). Branch: `claude/bloat-software-build-uxzoru`.
+Last updated: 26 Nov 2026 (Today and logging review: four defects found and fixed locally, **not yet published**; the preview still serves `f8fcd9d`). The fixes are on branch `claude/bloat-continuation-9mjd46`; only a push to `claude/bloat-software-build-uxzoru` runs the publishing workflow.
 
 This file has four parts: **current status** (what is true now, with the evidence), **what remains** (your decisions, launch requirements, tests not yet performed), **your phone checklist**, and **history** (completed work by date, kept as it was then). How the preview is published and run is in `DEPLOYMENT.md`; what was tested, where and on which build is in `docs/verification-report.md`.
 
-## Current status (verified 24 Nov 2026)
+## Current status (verified 26 Nov 2026)
 
 | What | State | How it was verified |
 |---|---|---|
 | Testing preview | `https://bloat-preview.vercel.app` and the branch address serve commit `f8fcd9d`, Vercel deployment `dpl_7N1RRQjq8qFDNmw9x3ihfcxk9iBD`. Today's two fixes are in it: keyboard focus after a sheet closes (K1) and the message after a failed account deletion (P2) | Published by the Preview workflow, run 14 (24 Nov, 09:56 UTC), after all its checks passed. Vercel reports both addresses on this deployment; all 210 source files Vercel lists for it match the commit, and the two changed files it does not list were found in it by content fingerprint |
 | Main addresses | `bloat-olive.vercel.app`, `bloat-typeshi2.vercel.app` and `bloat-git-main-typeshi2.vercel.app` still show an **older** build, `83fe4da` (`dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`), **without the K1 and P2 fixes**. They were pointed there by hand on 24 Nov (your decision; not a launch). The workflow moves only the two preview addresses, so they stay there until you ask for them to be moved. Same settings as the preview: `bloat-test`, mock AI, mock billing, test mode off | Vercel address list read before run 13 and after runs 13 and 14 (`test-evidence/ledger/deploy-7N1R.txt`) |
-| **Freeze** | **Frozen again for your feature-by-feature review.** Nothing is published unless you send a reproducible issue; a fix then goes through the same workflow and gets its own entry in the report. Notes-only commits carry `[skip ci]` and cannot publish | No workflow run and no new deployment since run 14 |
+| **Freeze** | **Frozen again for your feature-by-feature review.** Nothing is published unless you send a reproducible issue; a fix then goes through the same workflow and gets its own entry in the report. Notes-only commits carry `[skip ci]` and cannot publish | No workflow run and no new deployment since run 14 (GitHub run list and Vercel deployment and address lists read on 26 Nov) |
+| **Today and logging review (26 Nov)** | Four defects found and fixed, **local only, not published** (T1 to T4, below, under "Today and logging review"). Three gaps against the plan need your decision: D21, D22, D23 | New checks `tests/e2e/today.spec.ts`: 6 failed on the old build, 6 passed on the fixed build. Full local results in `TEST_RESULTS.md` |
 | Tests on this build | Local on `f8fcd9d`: rule 97 passed, API 141 passed, browser 261 passed; 0 expected failures, 0 skipped, 0 failed. CI (run 14): all checks passed, incl. 6 live checks before and after publishing. Live signed-in checks ran on the build before (`9c6ed14`, which differs only in the deletion message): full hosted suite 16 passed, 0 skipped, and the keyboard-focus check 1 passed. Tests not performed are listed below, never counted as passed | `docs/verification-report.md`, top, and `TEST_RESULTS.md` |
 | Sign-in | Email and password, for accounts you make in Supabase. Sign-ups are off in Supabase itself. Test mode is off (`BLOAT_TEST_LOGIN=0`) | Hosted check "nobody can create an account" passed on this build; Vercel variables read on 24 Nov |
 | Your test account | `bloat-tester@bloat.test` exists, with its sample meal, bloating record and report; Pro without a purchase; not staff | Read-only fingerprint identical before and after the hosted run and before and after run 14, 24 Nov |
@@ -26,14 +27,14 @@ This file has four parts: **current status** (what is true now, with the evidenc
 
 All in one table: `DECISIONS.md`, "Open decisions" (D1 to D19), each with what is built now and a recommended default. They are grouped by **who can use the affected feature on the preview today**, not by whether people pay:
 
-- **On now for every signed-in tester (3):** D1 ("Is it still happening?" asks again on every app open), D2 (countries not yet reviewed), D18 (account deletion during a storage outage).
+- **On now for every signed-in tester (4):** D1 ("Is it still happening?" asks again on every app open), D2 (countries not yet reviewed), D18 (account deletion during a storage outage), D23 (Add activity has no time choice).
 - **On now for everyone, signed out too, on the public pages (3):** D8 ("English only" note), D11 (company name and support address), D12 (legal text).
-- **On now for Pro testers (7):** D4, D7, D9, D13, D14, D15, D16.
+- **On now for Pro testers (9):** D4, D7, D9, D13, D14, D15, D16, D21 (no screen asks EP-04, "something you suspect"), D22 (no "Looks like ... Is this right?" step after a meal photo).
 
 The former D20 (the message after a failed account deletion) was a wrong message, not a product question: it is fixed (defect P2, below).
 - **Not on for anyone (6):** D3, D5, D6, D10, D17, D19 (off, paused, hidden or not built).
 
-Settled questions, including the light-only design, are listed under "Settled" and are not reopened. None of D1 to D19 has been built yet.
+Settled questions, including the light-only design, are listed under "Settled" and are not reopened. None of D1 to D19 or D21 to D23 has been built yet (D20 is closed).
 
 ### Launch requirements (before anyone outside is invited)
 
@@ -57,10 +58,24 @@ Settled questions, including the light-only design, are listed under "Settled" a
 9. The 19 screens without approved designs have not been compared with designs (only the 20 Slice A screens have them).
 10. Any check on the three main addresses after 23 Nov (they serve `83fe4da`, which was tested on 23 Nov).
 11. The signed-in hosted suite on the final build `f8fcd9d` (it ran on `9c6ed14`), and the new deletion message on the live preview (it needs a storage failure, which can only be caused locally).
+12. The 26 Nov Today fixes (T1 to T4) on the hosted preview: they are not published yet.
 
 ### Account deletion when storage fails (message fixed, P2)
 
 If storage fails while an account is being deleted, the account and the diary are **not** deleted and the person can try again. Photos are removed first, so kept photos removed before the failure stay removed. The sheet used to say "Nothing was deleted", which was wrong in that case. It now says: "We couldn't finish deleting your account. Your account and diary are still available, but some saved meal photos may already have been deleted. Try again to finish." (your wording). How deletion works did not change. Only Pro accounts can keep photos.
+
+### Today and logging review (26 Nov 2026): fixed locally, not published
+
+Each defect was reproduced first by a check in `tests/e2e/today.spec.ts` that failed on the current preview code, then fixed. Nothing about what is saved changed; these are messages, focus and one disabled button.
+
+| # | What was wrong | Now |
+|---|---|---|
+| T1 | A save started on Today said nothing. The sheet closed and, on a phone, the new meal was listed below the fold, so the screen looked the same as before. The plan's wording is "Meal saved." and "Noted: no bloating so far today." After a new strength reading, "Saved" disappeared with the form | A short line under the button that started it: "Bloating saved.", "Noted: no bloating so far today.", "Meal saved.", "Activity saved.", "Exercise saved.", "Bowel movement saved.". It is announced to screen readers, shown only after the server confirms, and cleared when another sheet opens. "Saved" stays after a new reading |
+| T2 | "No bloating so far today", an experiment answer (Yes, Partly, No) and "Not useful" remove their own button once saved, and keyboard focus fell back to the page (the same kind of defect as K1) | Focus moves to I feel bloated, to Open experiment, or to the screen title |
+| T3 | After "No bloating so far today" the score showed "0 / 10" but a screen reader was told "Nothing logged yet" | Both say 0 out of 10 |
+| T4 | With "Earlier" or "Choose time" picked and the date field emptied, Save stayed on and the reply was only "Some answers were not valid." | Save waits for a time, and the field says "Choose a date and time to save." (Log bloating, Bloating ended, Add meal, exercise, bowel movement, and the edit sheets on the day screen) |
+
+Gaps against the plan that need your decision (not built): D21 (EP-04 "something you suspect" is never asked, so "Your suspicion" and the P5 card cannot appear), D22 (no dish confirmation after a meal photo), D23 (no time choice on Add activity). Looked at and found as the plan describes: the Today layout, the progress counter, warning chips, one open episode at a time, update, end with "I don't know", "Is it still happening?" and the Review yesterday steps.
 
 ## Owner checklist: the main journeys on your phone
 
@@ -68,8 +83,8 @@ Use `https://bloat-preview.vercel.app` and your test account `bloat-tester@bloat
 
 1. Open the address in your phone's browser. → The homepage shows "Sign in", not "Get started". No Vercel login page.
 2. Sign in. → You land on Today. Pull to refresh → you are still signed in.
-3. Log bloating, pick a strength, Save. → "Saved", and it shows on Today. Change the strength, then End it. → Each shows "Saved".
-4. Add a meal (type a dish). If the ingredient check is offered, run it, then Save. → The meal shows on Today and on History.
+3. Log bloating, pick a strength, Save. → It shows on Today as "Bloating ongoing". Update strength. → The new reading is listed. End it. → "Bloating ended" with how long it lasted. (Once the 26 Nov fixes are published: "Bloating saved." under the button, and "Saved" after the new reading.)
+4. Add a meal (type a dish). If the ingredient check is offered, run it, then Save. → The meal shows in "Today so far" and on History. (Once the 26 Nov fixes are published: "Meal saved." under Add meal.)
 5. History: open today, edit the meal's text, Save. Then delete it. → After a refresh it is gone.
 6. Log a bowel movement and some exercise (Pro). Delete one of them from the day screen. → It is gone after a refresh.
 7. Patterns and Experiments: open both. → Patterns shows charts or says there is not enough yet; on Experiments, "Choose" is greyed out with a reason until you have 4 confirmed days in the past week.
@@ -99,6 +114,12 @@ Screens: 39 of the plan's 39 have a working screen. The approved designs exist o
 ## History: completed work by date
 
 These entries record what was done and true **on that date**. Later work may have changed them; where an entry said something was still pending, a note in brackets says how it ended. For what is true now, use "Current status" above.
+
+### 26 Nov 2026
+
+- Started from a new Claude account. Checked the handoff against the repository, Vercel, GitHub and Supabase with this session's own access: D20 had already been fixed and published (P2, run 14), and the stale notes it mentioned had already been corrected. The preview addresses serve `dpl_7N1RRQjq8qFDNmw9x3ihfcxk9iBD` (`f8fcd9d`), the three main addresses still serve `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (`83fe4da`), run 14 is the last workflow run, and `bloat-test` has the same six migrations as the repository. The `bloat-olive` bypass link expired on 24 Nov at 18:48 UTC. `bloat-tester` was not opened or changed.
+- Local suites on `f8fcd9d` in a fresh session: rule 97, API 141, browser 261, all passed.
+- Today and logging review: four defects found and fixed locally (T1 to T4, above); three gaps recorded as decisions D21 to D23. Not published.
 
 ### 24 Nov 2026
 

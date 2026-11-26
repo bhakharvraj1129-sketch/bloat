@@ -64,6 +64,7 @@ Only questions still waiting for the owner, grouped by **who can use the affecte
 | D1 | "Is it still happening?" after an answer of Yes or Not sure | Asked again on every app open while the record has been open 8 hours or more | Ask again only after another 8 hours: fewer repeat prompts; the open record and its safety wording are unchanged |
 | D2 | Countries not yet reviewed (`not_reviewed`), and the two "paused" sentences | Not blocked; the sentences are new wording | Block them on a live site until marked ready (fail closed); keep the preview open. Approve the sentences or edit them |
 | D18 | Account deletion during a storage outage | Photos first, then the account; on failure the account and diary stay and the person tries again | Keep for now. For `bloat-live`, add a background deletion job with a server storage key (a new secret), as the plan describes |
+| D23 | Time on Add activity (plan screen 22: "Time: Now / Choose time") | No time choice: a tap counts for today, stamped with the time it was saved. Found in the 26 Nov review | Keep as built: habits are daily answers and nothing uses their time of day yet. Add the time choice only if the previous-evening window should use habit times |
 
 **On now for everyone, signed out too (public pages)**
 
@@ -84,6 +85,8 @@ Only questions still waiting for the owner, grouped by **who can use the affecte
 | D14 | One conflicting day pauses all comparisons | Strict, as the plan's first comparison state | Keep the plan's rule for now; revisit with tester feedback |
 | D15 | Medicine "sensitivity view" (test Q21) | Shading and the 14 days before and after, no second comparison | Add one line repeating the comparison without the 14 days after any medicine change, with the number of days left out |
 | D16 | Learn articles | Outlines only, as in the plan | Keep outlines until you supply sources and approve the wording: no new health text without them |
+| D21 | EP-04 "Do you want to note a meal or activity you suspect was related?" (plan screen 16, Pro) | **No screen asks it.** The server saves it, and Possible triggers and the P5 focus card use it, so the "Your suspicion" label and the P5 card can never appear. Found in the 26 Nov review | Add it to Log bloating for Pro, after "Anything else with it?": Choose an entry (today's meals and habit taps up to the start time) / Not sure / Skip. Stored as the person's suspicion, never a cause, as the plan says. The list of entries offered is a product choice, so it waits for your yes |
+| D22 | Photo check: ML-07 "Looks like: [dishes]. Is this right?" with Keep / Edit / Remove (plan screen 21, Pro) | Not built: the photo goes straight to the ingredient list, and the dish name cannot be corrected there (only by closing the sheet). Only the labelled mock answers photos on the preview. Found in the 26 Nov review | Build it before a real AI provider is switched on: with the mock it shows nothing real, with a real provider a wrong dish name would be saved |
 
 **Not on for anyone** (off, paused, hidden or not built)
 
