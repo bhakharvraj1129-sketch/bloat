@@ -314,7 +314,7 @@ describe("Slice D: insights, reports and the doctor PDF, end to end", () => {
     expect(fizzy.with_days + fizzy.without_days).toBe(13);
   }, 120000);
 
-  it("weekly Pattern Report: a stored snapshot of a finished week that does not change afterwards (Q40)", async () => {
+  it("weekly Pattern Report: a stored snapshot of a finished week that never changes afterwards; a later correction flags it and the next one is new (Q40)", async () => {
     const u = await proUser();
     const now = await fizzyFortnight(u); // 1–14 Sep 2026; 7 Sep is a Monday
     const r = await call(u, "POST", "/v1/reports", { kind: "pattern", week_of: "2026-09-07" }, { now });
@@ -322,10 +322,20 @@ describe("Slice D: insights, reports and the doctor PDF, end to end", () => {
     expect(r.body.snapshot).toMatchObject({ from: "2026-09-07", to: "2026-09-13", counts: { confirmed: 7, late: 0, missing: 0 } });
     expect(r.body.snapshot.seven_day_average.label).toBe("Average of 7 days (0 late)");
     expect(r.body.snapshot.footer).toBe("These are patterns in your own records, not proof of a cause. Bloat doesn't diagnose.");
+    // Asked for again with nothing changed: the same stored snapshot, unchanged.
+    const same = await call(u, "POST", "/v1/reports", { kind: "pattern", week_of: "2026-09-07" }, { now });
+    expect(same.body.reused).toBe(true);
+    expect(same.body.snapshot).toEqual(r.body.snapshot);
+    // A review in that week is corrected afterwards (plan B05, R1 of 26 Nov): the stored snapshot is
+    // kept exactly as it was (no silent rewrite) but flagged, and the next request makes a new one.
     await call(u, "PUT", `/v1/days/2026-09-08/review`, { worst: 9, whole_day: "yes" }, { now });
+    const { data: old } = await asUser(u).from("reports").select("snapshot,stale").eq("id", r.body.id).single();
+    expect(old!.stale).toBe(true);
+    expect(old!.snapshot).toEqual(r.body.snapshot);
     const again = await call(u, "POST", "/v1/reports", { kind: "pattern", week_of: "2026-09-07" }, { now });
-    expect(again.body.reused).toBe(true);
-    expect(again.body.snapshot).toEqual(r.body.snapshot);
+    expect(again.status).toBe(201);
+    expect(again.body.reused).toBe(false);
+    expect(again.body.id).not.toBe(r.body.id);
     const unfinished = await call(u, "POST", "/v1/reports", { kind: "pattern", week_of: day(14) }, { now });
     expect(unfinished.status).toBe(422);
   }, 120000);

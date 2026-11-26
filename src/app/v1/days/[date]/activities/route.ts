@@ -4,6 +4,7 @@ import { loadAnswers, loadUser } from "@/server/userdata";
 import type { Op } from "@/server/db";
 import { activity, PRO_ACTIVITY_IDS } from "@/lib/registry";
 import { diffDays, isDate } from "@/lib/time";
+import { staleReportOps } from "@/server/meals";
 
 const body = z.strictObject({
   taps: z.array(z.strictObject({
@@ -33,6 +34,8 @@ export const PUT = route({ capability: "recording", body, mutation: true, featur
     });
   }
   for (const id of ctx.body.remove) ops.push({ op: "delete", table: "activity_observations", match: { date, activity_id: id } });
+  // Removing a habit corrects the day: stored reports covering it are flagged and their share links revoked.
+  if (ctx.body.remove.length) ops.push(...(await staleReportOps(ctx.db, ctx.userId, date)));
   if (ctx.body.cycle.length) {
     // CY-01 / CY-02 are visible only after the ON-10 cycle-context opt-in.
     const answers = await loadAnswers(ctx.db, ctx.userId);

@@ -113,9 +113,15 @@ export async function hasAiConsent(db: Db, userId: string): Promise<boolean> {
 }
 
 
-/** Stored reports that cover this instant become stale and their share links are revoked (plan B05). */
-export async function staleReportOps(db: Db, userId: string, date: string): Promise<Op[]> {
-  const { data } = await db.from("reports").select("id").eq("user_id", userId).lte("range_from", date).gte("range_to", date).eq("stale", false);
+/**
+ * A record was deleted or corrected (plan B05, "Record deleted or corrected: recompute; flag dependent
+ * reports; revoke shares"): stored reports whose range overlaps the days it touched become stale and
+ * their share links are revoked. Used by every delete and correction, not only meals.
+ */
+export async function staleReportOps(db: Db, userId: string, ...dates: string[]): Promise<Op[]> {
+  const days = dates.filter(Boolean).sort();
+  if (!days.length) return [];
+  const { data } = await db.from("reports").select("id").eq("user_id", userId).lte("range_from", days[days.length - 1]!).gte("range_to", days[0]!).eq("stale", false);
   const at = new Date().toISOString();
   return (data ?? []).flatMap((r) => [
     { op: "update" as const, table: "reports", match: { id: r.id }, set: { stale: true } },

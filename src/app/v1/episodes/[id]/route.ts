@@ -4,6 +4,8 @@ import { loadUser, resolveTime } from "@/server/userdata";
 import { ifMatch, timeInput } from "@/server/schemas";
 import { assertStartFree, getEpisode, samplesOf } from "@/server/episodes";
 import { DbError } from "@/server/db";
+import { staleReportOps } from "@/server/meals";
+import { analysisDate } from "@/lib/time";
 
 const body = z.strictObject({
   started: timeInput.optional(),
@@ -41,7 +43,9 @@ export const PATCH = route({ body, mutation: true, feature: "edit_delete" }, asy
   }
   if (endMs !== null && endMs <= startMs) throw new ApiError(422, "END_BEFORE_START", "The end time is before the start time.");
   const samples = await samplesOf(ctx.db, ctx.userId, e.id);
-  const ops = [{ op: "update" as const, table: "episodes", match: { id: e.id, revision: e.revision }, set, require: true }];
+  const day = (ms: number | null) => (ms === null ? "" : analysisDate(ms, u.periods));
+  const stale = await staleReportOps(ctx.db, ctx.userId, day(Date.parse(e.started_at)), day(e.ended_at ? Date.parse(e.ended_at) : null), day(startMs), day(endMs));
+  const ops = [{ op: "update" as const, table: "episodes", match: { id: e.id, revision: e.revision }, set, require: true }, ...stale];
   // Keep the first reading on the start time when the start is corrected.
   const first = samples[0];
   const extra = ctx.body.started && first
@@ -56,9 +60,12 @@ export const PATCH = route({ body, mutation: true, feature: "edit_delete" }, asy
 });
 
 // Delete removes the record and all its revisions and readings.
+// Stored reports that used it are flagged for regeneration and their share links revoked.
 export const DELETE = route({ mutation: true, feature: "edit_delete" }, async (ctx) => {
+  const u = await loadUser(ctx.db, ctx.userId, ctx.now);
   const e = await getEpisode(ctx.db, ctx.userId, ctx.params.id!);
   const rev = ifMatch(ctx.req);
   if (rev !== null && rev !== e.revision) throw new ApiError(409, "REVISION_CONFLICT", "This record changed somewhere else. Reload and try again.");
-  return ctx.commit([{ op: "delete", table: "episodes", match: { id: e.id }, require: true }], 204, null);
+  const stale = await staleReportOps(ctx.db, ctx.userId, analysisDate(Date.parse(e.started_at), u.periods), e.ended_at ? analysisDate(Date.parse(e.ended_at), u.periods) : "");
+  return ctx.commit([{ op: "delete", table: "episodes", match: { id: e.id }, require: true }, ...stale], 204, null);
 });

@@ -30,7 +30,7 @@ export const PATCH = route({ body, mutation: true, feature: "edit_delete" }, asy
     Object.assign(set, { eaten_at: t.iso, zone: t.zone, offset_min: t.offset_min, time_precision: t.precision });
   }
   const { analysisDate } = await import("@/lib/time");
-  const stale = await staleReportOps(ctx.db, ctx.userId, analysisDate(Date.parse(m.eaten_at), u.periods));
+  const stale = await staleReportOps(ctx.db, ctx.userId, analysisDate(Date.parse(m.eaten_at), u.periods), set.eaten_at ? analysisDate(Date.parse(set.eaten_at as string), u.periods) : "");
   try {
     return await ctx.commit(
       [{ op: "update", table: "meals", match: { id: m.id, revision: m.revision }, set, require: true }, ...stale],

@@ -39,7 +39,8 @@ export function DayDetail({ date }: { date: string }) {
   const { data, error, loading, reload } = useLoad<Data>(`/v1/days/${date}`);
   const [editEp, setEditEp] = useState<Ep | null>(null);
   const [editMeal, setEditMeal] = useState<MealRow | null>(null);
-  const [confirm, setConfirm] = useState<{ path: string; what: string; rev?: number } | null>(null);
+  // What the Delete sheet removes: a record (DELETE path), or a habit answer (removed from the day, so it becomes unknown).
+  const [confirm, setConfirm] = useState<{ path: string; what: string; rev?: number; habit?: string; note?: string } | null>(null);
   const del = useSave();
 
   if (loading && !data) return <Screen title="Day" back="/history"><Loading /></Screen>;
@@ -128,8 +129,10 @@ export function DayDetail({ date }: { date: string }) {
           <Label id="acts" heading>Habits</Label>
           <Card className="px-4 py-1"><ul>
             {data.activities.map((a) => (
-              <li key={a.id} className="flex items-center justify-between gap-3 border-b border-line py-3 last:border-0">
-                <span>{a.label}</span><span className="t-caption">{a.answer === "yes" ? "Yes" : a.answer === "no" ? "No" : "Not sure"}{a.source === "review" ? " · review" : ""}</span>
+              <li key={a.id} className="flex items-center justify-between gap-3 border-b border-line py-2 last:border-0">
+                <span className="grow">{a.label}</span><span className="t-caption">{a.answer === "yes" ? "Yes" : a.answer === "no" ? "No" : "Not sure"}{a.source === "review" ? " · review" : ""}</span>
+                <button type="button" className="min-h-11 px-2 font-semibold text-alert" aria-label={`Delete ${a.label}`}
+                  onClick={() => setConfirm({ path: `/v1/days/${date}/activities`, what: `"${a.label}" for this day`, habit: a.activity_id, note: "It becomes unknown, not No." })}>Delete</button>
               </li>
             ))}
           </ul></Card>
@@ -172,10 +175,15 @@ export function DayDetail({ date }: { date: string }) {
 
       <Sheet open={!!confirm} onOpenChange={(o) => { if (!o) { setConfirm(null); del.reset(); } }} title="Delete this?">
         <p>This removes {confirm?.what} for good. Anything worked out from it is recalculated.</p>
+        {confirm?.note && <Caption>{confirm.note}</Caption>}
         <SaveStatus state={del.state === "saved" ? "idle" : del.state} error={del.error} onCheck={async () => { if ((await del.check()).ok) { setConfirm(null); del.reset(); reload(); } }} />
         <Button variant="danger" disabled={del.saving} onClick={async () => {
           // Close only once the server has confirmed the delete; a failure stays on screen.
-          if ((await del.run("DELETE", confirm!.path, undefined, confirm!.rev !== undefined ? { ifMatch: confirm!.rev } : {})) === null) return;
+          const c = confirm!;
+          const done = c.habit
+            ? await del.run("PUT", c.path, { remove: [c.habit] })
+            : await del.run("DELETE", c.path, undefined, c.rev !== undefined ? { ifMatch: c.rev } : {});
+          if (done === null) return;
           setConfirm(null); del.reset(); reload();
         }}>{del.saving ? "Deleting…" : "Delete"}</Button>
         <Button variant="secondary" disabled={del.saving} onClick={() => setConfirm(null)}>Keep it</Button>

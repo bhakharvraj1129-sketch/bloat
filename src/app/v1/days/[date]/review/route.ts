@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ApiError, route } from "@/server/http";
 import { loadUser } from "@/server/userdata";
+import { staleReportOps } from "@/server/meals";
 import { yesNoNotSure } from "@/server/schemas";
 import type { Op } from "@/server/db";
 import { daysView } from "@/server/days";
@@ -55,6 +56,8 @@ export const PUT = route({ capability: "recording", body, mutation: true, featur
     row.watched = { ...(prior?.watched ?? {}), ...b.watched };
   }
   const ops: Op[] = [{ op: "upsert", table: "day_reviews", row, conflict: ["user_id", "date"] }];
+  // Changing an earlier review corrects the day: stored reports covering it are flagged and their share links revoked.
+  if (prior) ops.push(...(await staleReportOps(ctx.db, ctx.userId, date)));
 
   if (b.habits) {
     const { data: followed } = await ctx.db.from("followed_activities").select("activity_id").eq("user_id", ctx.userId);
