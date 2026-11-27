@@ -5,6 +5,7 @@ import { bloatingDates } from "./days";
 import { doctorLineFor } from "./overview";
 import { contextOf, focusOf, loadBundle, triggersOf, usualOf, weeklyImpact, type Bundle } from "./insights";
 import { activeExperiment } from "./experiments";
+import { experimentsOn } from "./availability";
 import { cycleView, hourPattern, INSIGHTS_VERSION, medicineViews, weeklyAverages, type Comparison, type InsightInput, possibleTriggers } from "@/lib/domain/insights";
 import { mean, median, round1, sevenDayAverage } from "@/lib/domain/day";
 import { experimentDef, result as experimentResult, type Exp } from "@/lib/domain/experiments";
@@ -51,7 +52,8 @@ export async function patternSnapshot(db: Db, userId: string, u: UserCtx, now: n
   const before = new Map<string, string>(((previous?.[0]?.snapshot as { triggers?: Array<{ label: string; section: string }> } | undefined)?.triggers ?? []).map((x) => [x.label, x.section]));
   const all = [...t.worth_watching, ...t.no_clear_difference, ...t.not_enough_data, ...t.daily_food].map(slim);
   const changed = all.filter((c) => before.size > 0 && before.get(c.label) !== c.section && (c.section === "worth_watching" || before.get(c.label) === "worth_watching" || c.section === "no_clear_difference"));
-  const exp = await activeExperiment(db, userId, u.today);
+  // With experiments switched off, a running experiment is kept but not reported as running.
+  const exp = experimentsOn() ? await activeExperiment(db, userId, u.today) : null;
   const obs = b.view.data.observations.filter((o) => o.date >= from && o.date <= to && o.answer === "yes");
   const habitCounts = [...new Set(obs.map((o) => o.activity_id))].map((id) => ({ label: activity(id)?.label ?? id, days: obs.filter((o) => o.activity_id === id).length })).sort((a, b2) => a.label.localeCompare(b2.label));
   const bowel = b.extras.bowel.filter((x) => { const d = dateOf(x.occurred_at); return d >= from && d <= to; });
@@ -100,7 +102,9 @@ export async function journeySnapshot(db: Db, userId: string, u: UserCtx, now: n
   if (conflicts) missing.push(`${conflicts} ${conflicts === 1 ? "day needs" : "days need"} correcting before comparisons can run.`);
   if (t.not_enough_data.length) missing.push(`${t.not_enough_data.length} food groups or habits don't have enough days to compare yet.`);
   if (!b.followed.length) missing.push("You don't follow any habits, so no habit can be compared.");
-  const next = { Discover: "Keep logging. Possible triggers appear once a food group or habit has 7 days with it and 7 days without.", Understand: "A short experiment can test one pattern at a time.", Maintain: "You are keeping an eye on a few food groups. One tap in Me returns to full logging." }[ph];
+  const xOn = experimentsOn();
+  // The Understand step points to experiments; with experiments switched off it has no next step.
+  const next = { Discover: "Keep logging. Possible triggers appear once a food group or habit has 7 days with it and 7 days without.", Understand: xOn ? "A short experiment can test one pattern at a time." : null, Maintain: "You are keeping an eye on a few food groups. One tap in Me returns to full logging." }[ph];
   const goals = u.profile.goals;
   const order = ["since", "usual", "records", "tried", "phase", "missing", "monthly"];
   const front = goals.includes("getting_ready_for_a_doctor_visit") ? ["doctor"] : goals.includes("which_foods_affect_me") || goals.includes("whether_timing_or_habits_matter") ? ["records"] : goals.includes("whether_my_cycle_plays_a_part") ? ["records"] : goals.includes("how_my_bloating_changes_over_time") ? ["since", "usual"] : [];
@@ -120,7 +124,7 @@ export async function journeySnapshot(db: Db, userId: string, u: UserCtx, now: n
       cycle: cycleView(b.on10, b.extras.cycle, b.view.summaries, u.today),
       medicines: medicineViews(b.extras.medicines, b.extras.medicineChanges, b.view.summaries, u.today),
     },
-    tried: exps,
+    tried: exps, experiments_offered: xOn,
     phase: { label: ph, next },
     missing,
     monthly: { hours: hourPattern(b.view.data.episodes, u.periods), coverage: { confirmed, late: done.filter((s) => s.status === "LATE").length, days: done.length }, context: contextOf(b) },

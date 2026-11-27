@@ -1,83 +1,85 @@
-# Invited beta candidate (no AI)
+# First invited acceptance round (no AI)
 
-Prepared 26 Nov 2026; published on 27 Nov by the Preview workflow (run 17) as commit `da4bb77`, Vercel deployment `dpl_DMcN8fjTd9f99QHXjxA5Rc7uerhR`, and checked signed in on that deployment. **Status: frozen for your acceptance. Nobody has been invited.** Public sign-ups stay off. Real payments stay off. No real AI provider is connected.
+**Status: being prepared on 27 Nov 2026 (the final commit and deployment are recorded in `PROGRESS.md`). Nobody has been invited.** Public sign-ups stay off. Real payments stay off. No real AI provider is connected.
 
-Address: `https://bloat-preview.vercel.app` (the canonical review address). The three older addresses (`bloat-olive`, `bloat-typeshi2`, `bloat-git-main-typeshi2`) were left as they were.
+Review address: `https://bloat-preview.vercel.app`. The three older addresses (`bloat-olive`, `bloat-typeshi2`, `bloat-git-main-typeshi2`) are left as they are.
 
-Related: `docs/beta/tester-guide.md` (what to send testers), `docs/beta/owner-runbook.md` (invite, reset, remove, check), `PROGRESS.md` and `DECISIONS.md`.
+Files in this folder:
 
-## 1. How the candidate is set up
-
-| Setting | Value on the preview | What it does |
+| File | For | What |
 |---|---|---|
-| `BLOAT_AI_PROVIDER` | `off` (was `mock`) | No AI anywhere. The ingredient check, meal photos and the "add ingredients to recent meals" offer are not offered: their buttons are hidden and their server routes answer "not available". Meals are typed and saved as plain meals |
-| `BLOAT_OFF_FEATURES` | `learn_library,daily_cards` | The Learn library and the daily cards (health content not yet reviewed, section 3) are not offered to anyone |
-| `BLOAT_SIGN_IN_METHOD` | `password` (unchanged) | Email and password for accounts you create. No sign-up, no email is sent |
-| `BLOAT_TEST_LOGIN` | `0` (unchanged) | No test-only login, no mock purchase, no test clock |
-| `BLOAT_BILLING_PROVIDER` | `mock` (unchanged); checkout off | Nothing can be bought or charged |
-| `BLOAT_PRO_TEST_EMAILS` | unchanged | Accounts on this list get the Pro screens without a purchase. Whether testers go on it is your decision (section 5) |
-| Supabase "Allow new users to sign up" | Off (unchanged) | Only accounts you create can sign in |
+| `tester-guide.md` | Testers | The review address, what they can use, what is not in this round, "made-up entries only" |
+| `feedback-template.md` | Testers | Screen, steps, expected result, actual result, device and browser |
+| `real-phone-checklist.md` | You or a tester with a real phone | Sign-in, logging, editing, reports and sharing, export, password change, sign-out; screen readers separately |
+| `owner-checklist.md` | You | Create accounts, switch Pro on, send passwords safely, reset a password, remove a tester, weekly check |
 
-Both new settings are empty by default in the code, so removing them returns the app to how it was. Changing them needs the Preview workflow to be started by hand (`DEPLOYMENT.md`).
+## 1. Your decisions for this round (27 Nov 2026)
 
-Known small issue, not fixed in this candidate: an account with Pro given for testing that types the Pro page's address (`/upgrade`) reads "Manage, pause or cancel in Me.", although You (rightly) offers neither. Nothing in the app links a Pro account to that page. A one-line fix for the next publish (`PROGRESS.md`).
+3 to 5 trusted testers. Pro test access without payment. Experiments off. Made-up data only. AI, photos, Learn, daily cards, payments and public sign-ups off. No support email yet: testers report to the person who invited them, through an existing channel (**awaiting your selection**). Nobody is invited until you give the testers' details and approve the invitations.
 
-## 2. What testers can and cannot use
+## 2. How it is set up
 
-**Every invited tester (Free plan, the default):** log bloating (start, strength, end, warning signs with the NHS advice), "No bloating so far today", typed meals, habits, the morning review and Bloat Score, History, the day screen with editing and deletion (including deleting a habit answer), medicines, the help page "When to get medical help", the progress counter, export (JSON and CSV), change password, sign out, and delete account.
-
-**If you put a tester on the Pro test list (your choice, section 5), also:** Patterns (possible triggers with day counts), chart and 7-day average, weekly report, Your journey, the doctor report with share links you can revoke, experiments, bowel and exercise logs, Keep an eye on it mode, saved dishes, health background. All of these are worked out by fixed rules from the person's own records; none uses AI.
-
-**Not available to anyone in this beta:** AI ingredient checks and meal photos, the "add ingredients to recent meals" offer, the Learn library, daily cards, payments and checkout, email-code sign-in and any email from Bloat, Google sign-in, founder tools.
-
-**Seen by Free testers:** the Pro page still lists Pro features with prices, and an "Upgrade" button that charges nothing and answers "Payments are not switched on yet. Nothing was charged, and your free diary keeps working." (the plan's interest count). The AI line and the Learn line are no longer listed there. If testers are on the Pro list, they never see this page's prices.
-
-## 3. Health content that must stay unavailable
-
-| Content | State | Why it is unavailable |
+| Setting (Vercel, Preview) | Value | What it does |
 |---|---|---|
-| Learn library (all articles) | Off in the beta (`learn_library`) | Outlines only, not finished articles (D16) |
-| Daily cards (all) | Off in the beta (`daily_cards`) | 7 cards have source-backed corrections waiting for your approval (D4); no person has checked every card's source (D7) |
+| `BLOAT_AI_PROVIDER` | `off` | No AI anywhere: no ingredient check, photos or "add ingredients to recent meals"; their buttons are hidden and their routes answer "not available" |
+| `BLOAT_OFF_FEATURES` | `learn_library,daily_cards,experiments_habit,experiments_swap` | Learn, daily cards and both kinds of experiment are not offered: no button, link or card, a direct visit says "Not available", their routes refuse. Experiment records already made are kept (and are in the export) |
+| `BLOAT_PRO_TEST_EMAILS` | the test accounts; testers' addresses are added when you invite them | Pro without a purchase. You and the Pro page say "Switched on for testing. There is no subscription, so nothing renews and nothing is charged." and offer no Pause or Cancel |
+| `BLOAT_SIGN_IN_METHOD` | `password` | Email and password, for accounts you create. No sign-up, no email sent. Testers change their password in You |
+| `BLOAT_TEST_LOGIN` | `0` | No test-only login, mock purchase or test clock |
+| `BLOAT_BILLING_PROVIDER` | `mock`; checkout off | Nothing can be bought or charged |
+| Supabase "Allow new users to sign up" | Off | Only accounts you create can sign in |
+
+Each switch is empty by default in the code; removing it gives back the app as it was. A change needs the Preview workflow to be run by hand (`DEPLOYMENT.md`).
+
+## 3. What testers can and cannot use
+
+**Available (Pro, switched on for testing):** log bloating (start, strength, end, warning signs with the NHS advice), "No bloating so far today", typed meals, habits, bowel movements, exercise, the morning review and Bloat Score, History with the chart and 7-day average, the day screen with editing and deletion (including a habit answer), Possible triggers with day counts, Your journey, the weekly report, the doctor report with share links that can be revoked, Keep an eye on it mode, medicines, health background, family history, optional context, "When to get medical help", export (JSON and CSV), change password, sign out, delete account. All patterns are worked out by fixed rules from the person's own records; none uses AI.
+
+**Not available:** AI ingredient checks, meal photos, adding ingredients to a meal, saved dishes (a dish is saved from the ingredient step), the "add ingredients to recent meals" offer, experiments, the Learn library, daily cards, payments and checkout, email-code sign-in and any email from Bloat, Google sign-in, founder tools.
+
+**Limitation testers will notice:** typed meals carry no food groups without the ingredient step, so in normal logging every food group in Possible triggers says "No usable days yet". Habits the person follows are compared as usual. Foods can be compared in **Keep an eye on it** mode (a daily yes or no for up to 5 food groups in the morning review). Checked on a local server with the round's settings on 27 Nov. Adding a manual food step would be a new feature: decision D30.
+
+## 4. Health content that stays unavailable
+
+| Content | State | Why |
+|---|---|---|
+| Learn library (all articles) | Off (`learn_library`) | Outlines only, not finished articles (D16) |
+| Daily cards (all) | Off (`daily_cards`) | 7 cards have source-backed corrections waiting for your approval (D4); no person has checked every card's source (D7) |
 | "Gentle stretch" and "Wind down for sleep" cards | Unpublished drafts | No linkable source (D6) |
-| Kiwifruit card and kiwifruit experiment | Card unpublished; experiment refused on the server for everyone | Dose and duration differ from the BDA 2025 guideline (D5) |
-| Experiments (habit and swap) | **On** for Pro testers | Their text comes from your Master Plan, with a source on each. No clinician review is recorded. Your decision: keep on, or add `experiments_habit,experiments_swap` to `BLOAT_OFF_FEATURES` |
+| Kiwifruit card and kiwifruit experiment | Unpublished; experiment refused for everyone | Dose and duration differ from the BDA 2025 guideline (D5) |
+| Experiments (habit and swap) | Off (`experiments_habit`, `experiments_swap`), your decision of 27 Nov | Plan text with sources; no clinician review recorded |
 
 Available and fixed: the help page and the warning-sign and doctor-line sentences, adapted from the NHS bloating page and labelled "Adapted from NHS, Bloating" (approved by you on 18 Nov). They are safety information and stay on.
 
-## 4. Privacy, deletion and sharing (checked)
+## 5. Privacy, deletion and sharing
 
-- Every record is private to its owner (row-level security; `tests/api/privacy.test.ts`).
-- Deleting or correcting a record flags every stored report that covers it and revokes its share links (R1, R2). A signed-out visitor then sees "This link no longer works". Reports that do not cover the record keep working. Checked locally and on the deployed candidate (section 7).
-- The export holds every record the person can see, including their share links, product events and export jobs (X1). Hashes of link tokens stay out of the file.
-- Delete account removes everything and leaves only a hash of the account ID, so a restored backup cannot bring it back.
-- No health data in logs, analytics events or alerts (unchanged rule).
+- Every record is private to its owner (row-level security; `tests/api/privacy.test.ts`). Testers cannot see each other's records.
+- Deleting or correcting a record flags every stored report that covers it and revokes its share links (R1, R2). A signed-out visitor then sees "This link no longer works"; reports that do not cover the record keep working.
+- The export holds every record the person can see (X1).
+- Delete account removes everything and keeps only a hash of the account ID, so a restored backup cannot bring it back.
+- No health data in logs, analytics events or alerts.
 
-## 5. Your decisions before inviting anyone
+## 6. Still needed before inviting the 3 to 5 testers
 
-The smallest concrete choices. Nothing below has been done for you.
+1. Each tester's name and email address, and your approval to invite them.
+2. The reporting channel for each tester (an existing one), and a second way to send the temporary password.
+3. Then, from `owner-checklist.md`: create the accounts, add the addresses to the Pro test list and run the workflow, send the guide and the password separately.
 
-1. **Plan for testers.** (a) Free plan: nothing to do. (b) Pro test list: add each tester's address to `BLOAT_PRO_TEST_EMAILS` and run the workflow; they get Patterns, reports, experiments and logs, without AI. *Recommended: (b), so testers can use the pattern features the beta is meant to test.*
-2. **Experiments for Pro testers:** keep on (plan text with sources) or switch off (one setting). Only matters if you choose 1(b).
-3. **Where real testers' health data lives.** The preview uses `bloat-test`, a project on Supabase's **free plan**. Supabase's own documentation says free-plan projects are **not backed up automatically** and are **paused after about a week of low activity** (restoring is a manual step in the dashboard). Choose one: (a) upgrade the Supabase organization to Pro (US$25 a month: daily backups kept 7 days, no pausing); or (b) stay on the free plan and accept the risk: you take a backup yourself each week (`owner-runbook.md`, section 5) and watch for Supabase's pause warning email. *Recommended: (a) before anyone outside enters real records.*
-4. **A contact for testers** (an email address you read) and the name testers should see as running the test (D11). The tester guide has a blank for it.
-5. **What testers agree to.** The Terms and Privacy pages are honest stubs that say this is a preview (D12). Before real people enter health data, decide on at least a short tester notice: what is collected, where it is stored (Supabase, US region; Vercel), who can see it (you), how to delete it, and that Bloat gives no medical advice. This is legal wording: yours to approve or to have reviewed.
-6. **Error alerts.** Today server errors appear only in Vercel's logs, and app alerts are stored in a database table; nothing is emailed. Choose: (a) check both once a week (free; `owner-runbook.md`, section 4), or (b) connect an alert service later (needs an account and a key). *Recommended: (a) for a few testers.*
-7. **Leaked-password protection** in Supabase (Authentication, Password security) is off. Supabase lists it as a security warning; it may need a paid plan. Switch it on if your plan offers it.
+Recorded but not needed for a made-up-data round: D27 (backups; matters before real records), D12 (a short tester notice; legal wording, yours to approve), D28 (alerts: weekly check for now), D29 (leaked-password protection, if your Supabase plan offers it), D30 (food groups without AI).
 
-## 6. Outside-beta blockers (not needed for a few invited testers, needed before a public launch)
+## 7. Outside-this-round blockers (needed before a public launch)
 
-Email-code sign-in with a working email sender; a real AI provider with its accuracy test and spending approval; legal text from a proper source (Gate 1); business entity, payment provider and real payments (Gate 2); the live project `bloat-live`; founder tools on a hosted site (staff address and authenticator); country availability decisions (D2); reviewed Learn articles and cards (D4, D5, D6, D7, D16); backups with point-in-time recovery and a tested restore; alert delivery and error monitoring; real-phone and screen-reader testing; the open decisions D1 to D24 in `DECISIONS.md`.
+Email-code sign-in with a working email sender; a real AI provider with its accuracy test and spending approval; legal text from a proper source (Gate 1); business entity, payment provider and real payments (Gate 2); the live project `bloat-live`; founder tools on a hosted site; country decisions (D2); reviewed Learn articles, cards and experiments (D4, D5, D6, D7, D16); backups with a tested restore; alert delivery and error monitoring; real-phone and screen-reader testing; the open decisions in `DECISIONS.md`.
 
-## 7. Checks: what was and was not tested
+## 8. What was and was not tested
 
-Kept apart by where they ran. Counts and builds are in `TEST_RESULTS.md`.
+Kept apart by where they ran; counts and builds are in `TEST_RESULTS.md`.
 
 | Kind | Where | What |
 |---|---|---|
-| Local, synthetic accounts | Local Supabase in Docker, local build | Rule, API and browser tests (phone screen, keyboard, 200% zoom); a second local server started with the beta settings |
-| Hosted, synthetic accounts | The deployed candidate `dpl_DMcN8fjTd9f99QHXjxA5Rc7uerhR` on `bloat-preview.vercel.app`, 27 Nov; 8 accounts created for the run and deleted through the app, checked gone | The full signed-in hosted suite (16 of 16 passed) and the beta checks `tests/hosted/beta-candidate.spec.ts` (3 of 3 passed, one after a fix in the test itself) |
-| Mock provider | Local only | The AI checks in the local tests use the labelled mock; the candidate has AI off |
-| Browser emulation | Desktop Chromium driving a Pixel 7 profile | Phone layout, keyboard-only use, 200% zoom |
-| **Not performed** | | Real phones (iOS Safari, Android Chrome), any screen reader (VoiceOver, TalkBack, NVDA), a real AI provider, a backup restore on `bloat-test`. The checklist for real phones and screen readers is in `owner-runbook.md`, section 6 |
+| Local, synthetic accounts | Local database in Docker; one local server as normal and one started with the round's settings | Rule, API and browser tests (phone-sized browser, keyboard, 200% zoom); the round's checks, first on the published code (they fail at each defect), then on the fixed code |
+| Hosted, synthetic accounts | The deployed candidate on `bloat-preview.vercel.app`, accounts created for the run and deleted through the app | The full signed-in hosted suite and the round's checks (`tests/hosted/beta-candidate.spec.ts`) |
+| Browser emulation | Desktop Chromium pretending to be a Pixel 7 | Phone layout, keyboard-only use, 200% zoom. Not a real phone |
+| **Not performed** | | Real phones (iOS Safari, Android Chrome), any screen reader (VoiceOver, TalkBack), a real AI provider, a backup restore. Checklist: `real-phone-checklist.md` |
 
 Passing tests do not make the candidate bug-free or launch-ready; they show that the checked behaviour works on the checked builds.

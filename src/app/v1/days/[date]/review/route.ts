@@ -2,6 +2,7 @@ import { z } from "zod";
 import { ApiError, route } from "@/server/http";
 import { loadUser } from "@/server/userdata";
 import { staleReportOps } from "@/server/meals";
+import { experimentsOn } from "@/server/availability";
 import { yesNoNotSure } from "@/server/schemas";
 import type { Op } from "@/server/db";
 import { daysView } from "@/server/days";
@@ -34,6 +35,8 @@ export const PUT = route({ capability: "recording", body, mutation: true, featur
   if ((b.bowel !== undefined || b.watched !== undefined || b.experiment_answer !== undefined) && ctx.plan !== "pro") {
     throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Pro.");
   }
+  // Experiments switched off: no experiment answer is recorded (the review screen does not ask).
+  if (b.experiment_answer !== undefined && !experimentsOn()) throw new ApiError(404, "NOT_AVAILABLE", "This isn't part of this version of Bloat.");
 
   const { data: prior } = await ctx.db.from("day_reviews").select("*").eq("user_id", ctx.userId).eq("date", date).maybeSingle();
   const reviewedAt = new Date(ctx.now).toISOString();

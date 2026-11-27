@@ -1,7 +1,7 @@
 import "server-only";
 import { env } from "./env";
 import { config, type FeatureKey } from "@/lib/registry";
-import { featuresOffFrom } from "@/lib/availability";
+import { experimentsOffered, featuresOffFrom, swapExperimentsOffered } from "@/lib/availability";
 
 /**
  * Features switched off for this deployment: the keys in BLOAT_OFF_FEATURES, plus every AI feature
@@ -11,3 +11,6 @@ export function featuresOff(): FeatureKey[] {
   return featuresOffFrom(env.offFeatures, env.aiProvider, Object.keys(config.features)) as FeatureKey[];
 }
 export const featureOff = (key: FeatureKey) => featuresOff().includes(key);
+/** Experiments offered on this deployment (both switched off for the first acceptance round). */
+export const experimentsOn = () => experimentsOffered(featuresOff());
+export const swapExperimentsOn = () => swapExperimentsOffered(featuresOff());

@@ -133,3 +133,18 @@ test("A1: Pro given for testing shows no renewal and no Pause or Cancel; a bough
   await expect(p2.getByText(/Renews on/)).toBeVisible();
   await expect(p2.getByRole("button", { name: "Pause Pro" })).toBeVisible();
 });
+
+test("A1, Pro page: Pro given for testing is not described as a subscription to manage; a bought plan still is", async ({ context }) => {
+  // The Pro page (/upgrade) said "Manage, pause or cancel in Me." to an account with Pro given for
+  // testing, although there is no subscription and You offers neither (found 27 Nov 2026).
+  const { page } = await account(context, { email: "pro-tester@bloat.test" });
+  await page.goto("/upgrade");
+  await expect(page.getByRole("heading", { name: "You have Pro" })).toBeVisible();
+  await expect(page.getByText("Switched on for testing. There is no subscription, so nothing renews and nothing is charged.")).toBeVisible();
+  await expect(page.getByText(/pause or cancel/i)).toHaveCount(0);
+
+  const bought = await account(context, { pro: true });
+  await bought.page.goto("/upgrade");
+  await expect(bought.page.getByRole("heading", { name: "You have Pro" })).toBeVisible();
+  await expect(bought.page.getByText("Manage, pause or cancel in Me.")).toBeVisible();
+});

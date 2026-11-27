@@ -6,9 +6,10 @@ import { Button, Caption, Card, ErrorState, Label, Loading, SaveStatus, Screen, 
 import { useLoad, useSave } from "@/lib/client/hooks";
 import { api } from "@/lib/client/api";
 import type { State } from "@/components/today/types";
+import { experimentsOffered } from "@/lib/availability";
 
 type Ent = {
-  plan: string; paused: boolean; checkout_enabled: boolean; recalled_check_offered: boolean;
+  plan: string; status: string; paused: boolean; checkout_enabled: boolean; recalled_check_offered: boolean;
   prices: { currency: string; tax: string; annual: string; three_month: string; monthly: string; annual_per_month: string; three_month_per_month: string };
 };
 type Recall = { offered: boolean; meals: Array<{ id: string; dish_text: string }> };
@@ -48,7 +49,8 @@ export function Upgrade({ testMode }: { testMode: boolean }) {
   if (e.plan === "pro") {
     return (
       <Screen title="You have Pro" back="/me">
-        <Card><p>Everything in Pro is switched on.</p><Caption>Manage, pause or cancel in Me.</Caption></Card>
+        {/* Pro given for testing has no subscription: nothing to manage, pause or cancel (same wording as Me). */}
+        <Card><p>Everything in Pro is switched on.</p><Caption>{e.status === "none" ? "Switched on for testing. There is no subscription, so nothing renews and nothing is charged." : "Manage, pause or cancel in Me."}</Caption></Card>
         {recall.data && !recall.data.offered && recall.data.meals.length > 0 && (
           <Card className="flex flex-col gap-3">
             <p className="t-body-strong">Add ingredients to your last 7 days of meals?</p>
@@ -73,7 +75,7 @@ export function Upgrade({ testMode }: { testMode: boolean }) {
       )}
       <section className="flex flex-col gap-2" aria-labelledby="adds">
         <Label id="adds">What Pro adds</Label>
-        <Card><ul className="list-disc pl-5">{ADDS.filter((a) => !(a === ADDS[0] && st0.includes("ai_ingredient_check")) && !(a === ADDS[6] && st0.includes("learn_library") && st0.includes("daily_cards"))).map((a) => <li key={a} className="py-0.5">{a}</li>)}</ul></Card>
+        <Card><ul className="list-disc pl-5">{ADDS.filter((a) => !(a === ADDS[0] && st0.includes("ai_ingredient_check")) && !(a === ADDS[3] && !experimentsOffered(st0)) && !(a === ADDS[6] && st0.includes("learn_library") && st0.includes("daily_cards"))).map((a) => <li key={a} className="py-0.5">{a}</li>)}</ul></Card>
         <Caption>Free logging never stops, and safety information is never part of Pro.</Caption>
       </section>
       <section className="flex flex-col gap-2" aria-labelledby="price">

@@ -14,7 +14,7 @@ type Item = {
 type Data = {
   from: string; to: string; examined: number; header: string; date_format: "MM/DD" | "DD/MM"; worth_watching: Item[]; no_clear_difference: Item[];
   not_enough_data: Item[]; daily_food: Item[]; needs_correction: string[]; recalled_days: number; mostly_days: number;
-  co_occurrence: Array<{ note: string }>; followed_note: string; footer: string; comparison_line: string;
+  co_occurrence: Array<{ note: string }>; followed_note: string; footer: string; comparison_line: string; experiments_offered?: boolean;
 };
 
 function needText(i: Item): string {
@@ -107,7 +107,7 @@ export function Triggers() {
           <Caption>{d.followed_note} <Link href="/me">Change habits in Me</Link></Caption>
           <p className="t-caption text-ink">{d.footer}</p>
           <nav aria-label="More" className="grid grid-cols-2 gap-2">
-            <Link href="/experiments" className="flex min-h-12 items-center justify-center rounded-sm border border-line bg-surface px-3 font-semibold text-ink no-underline">Experiments</Link>
+            {d.experiments_offered !== false && <Link href="/experiments" className="flex min-h-12 items-center justify-center rounded-sm border border-line bg-surface px-3 font-semibold text-ink no-underline">Experiments</Link>}
             <Link href="/journey" className="flex min-h-12 items-center justify-center rounded-sm border border-line bg-surface px-3 font-semibold text-ink no-underline">Your journey</Link>
           </nav>
         </>

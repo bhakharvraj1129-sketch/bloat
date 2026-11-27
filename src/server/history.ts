@@ -5,6 +5,7 @@ import type { DaysView } from "./days";
 import { sevenDayAverage } from "@/lib/domain/day";
 import { baselineMarker, contextRanges, usualScore } from "@/lib/domain/insights";
 import { loadAnswers, loadExtras } from "./userdata";
+import { experimentsOn } from "./availability";
 
 /** Pro additions to History: 7-day average, baseline markers and shaded context periods. */
 export async function historyExtras(ctx: Ctx<unknown>, u: UserCtx, all: DaysView) {
@@ -21,6 +22,7 @@ export async function historyExtras(ctx: Ctx<unknown>, u: UserCtx, all: DaysView
   return {
     seven_day_average: sevenDayAverage(done.slice(-7)),
     hide_charts: u.profile.hide_charts,
+    experiments_offered: experimentsOn(),
     baseline,
     context: contextRanges({ cycle: extras.cycle, medicines: extras.medicines, medicineChanges: extras.medicineChanges, observations: all.data.observations }, on10, all.summaries[0]?.date ?? u.today, u.today),
   };

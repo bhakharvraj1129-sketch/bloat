@@ -4,7 +4,7 @@ import type { UserCtx } from "./userdata";
 import type { DaysView } from "./days";
 import { adaptiveOf, focusOf, loadBundle, triggersOf } from "./insights";
 import { activeExperiment } from "./experiments";
-import { featureOff } from "./availability";
+import { experimentsOn, featureOff } from "./availability";
 import { cardForToday } from "./cards";
 import { dayNumber, experimentDef } from "@/lib/domain/experiments";
 import { phase, shortcuts } from "@/lib/domain/focus";
@@ -31,7 +31,9 @@ export async function todayExtras(ctx: Ctx<unknown>, u: UserCtx, view: DaysView,
   }
   const t = triggersOf(b);
   const f = focusOf(b, t);
-  const exp = await activeExperiment(ctx.db, ctx.userId, u.today);
+  // With experiments switched off, a running experiment is kept as it is but not shown or asked about.
+  const xOn = experimentsOn();
+  const exp = xOn ? await activeExperiment(ctx.db, ctx.userId, u.today) : null;
   const [card, { data: dishes }, { data: xpDay }] = await Promise.all([
     featureOff("daily_cards") ? Promise.resolve(null) : cardForToday(ctx.db, ctx.userId, u, b),
     ctx.db.from("saved_dishes").select("id,name,place").eq("user_id", ctx.userId).eq("archived", false).order("created_at", { ascending: false }).limit(12),
@@ -43,7 +45,7 @@ export async function todayExtras(ctx: Ctx<unknown>, u: UserCtx, view: DaysView,
       phase: { label: phase(u.profile.logging_mode, ctx.entitlement?.pro_since ?? null, u.today, t.worth_watching.length > 0, !!exp) },
       experiment: exp ? { id: exp.id, name: experimentDef(exp.key)?.name ?? exp.key, phase: exp.phase, ...dayNumber(exp, u.today), answered_today: (xpDay ?? []).length > 0 } : null,
       card: card ? { id: card.card.id, title: card.card.title, kind: card.card.kind } : null,
-      next_best_log: f.next, shortcuts: shortcuts(u.profile.goals),
+      next_best_log: f.next, shortcuts: shortcuts(u.profile.goals).filter((s) => xOn || s.href !== "/experiments"),
       // Add meal shows saved dishes and the 5 most frequent dishes of the last 30 days first.
       frequent_dishes: r.frequent, saved_dishes: dishes ?? [],
     },

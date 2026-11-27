@@ -11,6 +11,9 @@ import { account, PASSWORD, SUPABASE_KEY, SUPABASE_URL } from "./session";
 //   - a corrected or deleted record revokes the shared reports that cover it, a signed-out visitor
 //     cannot open a revoked link, and a report outside the affected dates still opens;
 //   - an invited tester can change the temporary password, and sign in with the new one.
+// First invited acceptance round (27 Nov 2026), added: experiments switched off (BLOAT_OFF_FEATURES also
+// lists experiments_habit,experiments_swap) on every screen and route, Pro test access worded as no
+// subscription, and every other non-AI Pro feature still working.
 // Synthetic, made-up entries only. The password is never printed.
 const BASE = process.env.HOSTED_URL!;
 test.beforeAll(() => { if (!BASE) throw new Error("Set HOSTED_URL"); });
@@ -58,13 +61,14 @@ async function signedOut(browser: Browser, url: string): Promise<string> {
 const notice = (page: Page, where: "bloating" | "add") =>
   page.locator("section", { has: where === "add" ? page.getByRole("heading", { name: "Add to today" }) : page.getByText("Highest logged so far") }).getByRole("status").last();
 const AI = ["ai_ingredient_check", "meal_photos", "recalled_meal_check", "ai_source_labels"];
+const ROUND_OFF = [...AI, "daily_cards", "learn_library", "experiments_habit", "experiments_swap"];
 
 test("beta (Free): Today says what was saved, an empty time cannot be sent, a habit is deleted to unknown, and no AI or Learn is offered", async ({ page }) => {
   test.skip(!process.env.HOSTED_PASSWORD, "needs the run's synthetic accounts");
   await signIn(page, "beta");
   const api = apiFor(page);
   const st = await ready(page, api);
-  expect([...st.unavailable].sort()).toEqual([...AI, "daily_cards", "learn_library"].sort());
+  expect([...st.unavailable].sort()).toEqual([...ROUND_OFF].sort());
   expect((await api("GET", "/v1/library")).body?.error?.code).toBe("NOT_AVAILABLE");
   expect((await api("POST", "/v1/food-suggestions", { save_key: crypto.randomUUID(), dish_text: "toast" })).body?.error?.code).toBe("NOT_AVAILABLE");
 
@@ -214,4 +218,74 @@ test("pro: a corrected or deleted record revokes the shared reports covering it;
   const c = await share(d(2), d(1));
   expect((await api("DELETE", `/v1/medicines/${med.body.medicine.id}`)).status).toBe(204);
   expect(await signedOut(browser, c.url)).toContain("This link no longer works");
+});
+
+test("pro (acceptance round): Pro test access says there is no subscription; experiments are not offered anywhere; the other Pro features work", async ({ page, browser }) => {
+  test.skip(!process.env.HOSTED_PASSWORD, "needs the run's synthetic accounts");
+  await signIn(page, "pro");
+  const api = apiFor(page);
+  const st = await ready(page, api);
+  expect(st.plan).toBe("pro");
+  expect([...st.unavailable].sort()).toEqual([...ROUND_OFF].sort());
+  expect(st.pro.experiment).toBeNull();
+  expect(st.pro.shortcuts.map((x: { href: string }) => x.href)).not.toContain("/experiments");
+  expect(st.pro.next_best_log?.id ?? null).not.toBe("save_dishes");
+
+  // Pro given for testing: no subscription, nothing to renew, pause or cancel (You and the Pro page).
+  expect((await api("GET", "/v1/billing/entitlement")).body.status).toBe("none");
+  await page.goto("/me");
+  const plan = page.locator("section", { has: page.getByText("Plan", { exact: true }) });
+  await expect(plan.getByText("Switched on for testing. There is no subscription, so nothing renews and nothing is charged.")).toBeVisible();
+  await expect(plan.getByRole("button", { name: /Pause|Cancel/ })).toHaveCount(0);
+  await expect(plan.getByText(/Renews on/)).toHaveCount(0);
+  await page.goto("/upgrade");
+  await expect(page.getByRole("heading", { name: "You have Pro" })).toBeVisible();
+  await expect(page.getByText("Switched on for testing. There is no subscription, so nothing renews and nothing is charged.")).toBeVisible();
+  await expect(page.getByText(/pause or cancel/i)).toHaveCount(0);
+
+  // Experiments: every route says "not available"; a review cannot record an experiment answer.
+  for (const [m, p, body] of [["GET", "/v1/experiments"], ["POST", "/v1/experiments", { key: "eat_more_slowly" }], ["POST", "/v1/experiments/checks", { fx01: "no", fx02: "no", fx03: "no", fx04: "no" }]] as Array<[string, string, unknown?]>) {
+    const r = await api(m, p, body);
+    expect(r.status, `${m} ${p}`).toBe(404);
+    expect(r.body?.error?.code, `${m} ${p}`).toBe("NOT_AVAILABLE");
+  }
+  const yesterday = new Date(Date.parse(`${st.today.date}T12:00:00Z`) - 86400000).toISOString().slice(0, 10);
+  const xp = await api("PUT", `/v1/days/${yesterday}/review`, { worst: 3, whole_day: "yes", food_coverage: "all", experiment_answer: "yes" });
+  expect(xp.status, JSON.stringify(xp.body)).toBe(404);
+  // ...and no screen links to them; a direct visit says Not available.
+  for (const path of ["/today", "/history", "/insights", "/journey"]) {
+    await page.goto(path);
+    await expect(page.locator("main h1").first(), path).toBeVisible({ timeout: 30000 });
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator('a[href^="/experiments"]'), path).toHaveCount(0);
+  }
+  await page.goto("/experiments");
+  await expect(page.getByText("Not available", { exact: true })).toBeVisible({ timeout: 30000 });
+  await expect(page.getByRole("link", { name: "Go to Today" })).toBeVisible();
+
+  // The other non-AI Pro features.
+  const t = await api("GET", "/v1/insights/triggers");
+  expect(t.status).toBe(200);
+  expect(t.body.experiments_offered).toBe(false);
+  expect((await api("GET", "/v1/journey")).status).toBe(200);
+  expect((await api("GET", "/v1/history")).status).toBe(200);
+  expect((await api("GET", "/v1/health/conditions")).status).toBe(200);
+  const at = (h: string) => ({ mode: "exact", local: `${yesterday}T${h}`, zone: ZONE });
+  expect((await api("POST", "/v1/bowel", { occurred: at("08:00"), stool_type: "watery_no_solid_pieces", strain: "no", complete: "yes" })).status).toBe(201);
+  expect((await api("POST", "/v1/exercise", { type: "walking", started: at("18:00"), minutes: 20 })).status).toBe(201);
+  expect((await api("PUT", "/v1/me/logging-mode", { mode: "keep_an_eye", watched_groups: ["TAG-09"] })).status).toBe(200);
+  expect((await api("PUT", "/v1/me/logging-mode", { mode: "full" })).status).toBe(200);
+  for (const [path, heading] of [["/insights", "Possible triggers"], ["/journey", "Your journey"], ["/doctor", "Doctor report"], ["/health", "Health background"]]) {
+    await page.goto(path!);
+    await expect(page.getByRole("heading", { name: heading, exact: true }).first(), path).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText("Not available", { exact: true }), path).toHaveCount(0);
+  }
+
+  // Signed out: the start page lists neither experiments nor the ingredient check.
+  const visitor = await (await browser.newContext()).newPage();
+  await visitor.goto(`${BASE}/`, { waitUntil: "load" });
+  await expect(visitor.getByRole("rowheader", { name: "Possible triggers", exact: true })).toBeVisible();
+  await expect(visitor.getByText(/experiments/i)).toHaveCount(0);
+  await expect(visitor.getByText("Ingredient check and saved dishes")).toHaveCount(0);
+  await visitor.context().close();
 });

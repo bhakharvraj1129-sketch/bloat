@@ -14,3 +14,16 @@ export function featuresOffFrom(offList: string, aiProvider: string, known: read
   const ai = aiProvider === "off" ? AI_FEATURES.filter((k) => known.includes(k)) : [];
   return [...new Set([...listed, ...ai])];
 }
+
+/**
+ * Experiments (plan section on habit and food-swap experiments). The list, start, daily answer and end
+ * routes use experiments_habit; the swap-only steps (checks, wellbeing, add-back, resume) also need
+ * experiments_swap. So experiments are offered at all only while experiments_habit is on, and
+ * swap experiments only while both are on. Records already made are kept either way.
+ */
+export function experimentsOffered(off: readonly string[]): boolean {
+  return !off.includes("experiments_habit");
+}
+export function swapExperimentsOffered(off: readonly string[]): boolean {
+  return experimentsOffered(off) && !off.includes("experiments_swap");
+}

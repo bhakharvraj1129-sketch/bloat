@@ -7,6 +7,7 @@ import type { DayRow } from "@/app/(app)/history/history";
 export type ProHistoryData = {
   seven_day_average: { available: true; value: number; label: string } | { available: false; days: number; needed: number };
   hide_charts?: boolean;
+  experiments_offered?: boolean;
   context?: Array<{ from: string; to: string; kind: string }>;
 };
 
@@ -24,7 +25,7 @@ export function ProHistory({ data, days, dateFormat }: { data: ProHistoryData; d
       </Card>
       {!data.hide_charts && <DayChart days={[...days].reverse()} dateFormat={dateFormat} context={data.context ?? []} />}
       <nav aria-label="Reports" className="grid grid-cols-2 gap-2">
-        {[["/insights", "Possible triggers"], ["/journey", "Your journey"], ["/report", "Weekly report"], ["/experiments", "Experiments"]].map(([href, label]) => (
+        {[["/insights", "Possible triggers"], ["/journey", "Your journey"], ["/report", "Weekly report"], ...(data.experiments_offered === false ? [] : [["/experiments", "Experiments"]])].map(([href, label]) => (
           <Link key={href} href={href!} className="flex min-h-12 items-center justify-center rounded-sm border border-line bg-surface px-3 text-center font-semibold text-ink no-underline">{label}</Link>
         ))}
       </nav>

@@ -18,7 +18,7 @@ type Data = {
   your_usual: { available: true; usual: number; recent: Figures; first_30: Figures | null; bloating_days_30: number; weekly_impact: string | null } | { available: false; confirmed_days: number; needed: number };
   records: { worth_watching: Pattern[]; examined: number; header: string; cycle: Cycle; medicines: Med[] };
   tried: Array<{ id: string; name: string; phase: string; started_on: string; result: string | null }>;
-  phase: { label: string; next: string }; missing: string[];
+  phase: { label: string; next: string | null }; missing: string[]; experiments_offered?: boolean;
   monthly: { hours: { available: boolean; episodes: number; hours: number[] }; coverage: { confirmed: number; late: number; days: number } };
   doctor_line: DoctorLineData | null; comparison_line: string; medicine_line: string; footer: string; doctor_report: { from: string; to: string };
 };
@@ -124,7 +124,8 @@ export function Journey() {
               ))}
             </section>
           ),
-          tried: (
+          // Experiments switched off: earlier ones are still listed (records are kept), without links.
+          tried: d.experiments_offered === false && !d.tried.length ? null : (
             <section key="tried" className="flex flex-col gap-2" aria-labelledby="j-tried">
               <Label id="j-tried">What you have tried</Label>
               {d.tried.length ? d.tried.map((e) => (
@@ -132,7 +133,7 @@ export function Journey() {
                   <p className="t-body-strong">{e.name}</p>
                   <Caption>Started {formatDate(e.started_on, d.date_format, false)}</Caption>
                   <p>{e.result ?? "In progress."}</p>
-                  <Link href={`/experiments/${e.id}`} className="font-semibold">Open</Link>
+                  {d.experiments_offered !== false && <Link href={`/experiments/${e.id}`} className="font-semibold">Open</Link>}
                 </Card>
               )) : <Card><Caption>No experiments yet. <Link href="/experiments">See experiments</Link></Caption></Card>}
             </section>
@@ -140,7 +141,7 @@ export function Journey() {
           phase: (
             <section key="phase" className="flex flex-col gap-2" aria-labelledby="j-phase">
               <Label id="j-phase">Your phase</Label>
-              <Card><p className="t-body-strong">{d.phase.label}</p><Caption>{d.phase.next}</Caption></Card>
+              <Card><p className="t-body-strong">{d.phase.label}</p>{d.phase.next && <Caption>{d.phase.next}</Caption>}</Card>
             </section>
           ),
           missing: (

@@ -3,6 +3,7 @@ import type { Db } from "./supabase";
 import { loadAnswers, loadExtras, type UserCtx } from "./userdata";
 import { bloatingDates, daysView, type DaysView } from "./days";
 import { historyFrom } from "./overview";
+import { featureOff } from "./availability";
 import { possibleTriggers, yourUsual, cycleView, medicineViews, hourPattern, contextRanges, weeklyAverages, usualScore, type InsightInput, type Triggers } from "@/lib/domain/insights";
 import { personalFocus, nextBestLog, adaptive, type FocusInput } from "@/lib/domain/focus";
 import { activities, optionValues } from "@/lib/registry";
@@ -63,6 +64,8 @@ export async function loadBundle(db: Db, userId: string, u: UserCtx, now: number
     followed, comparisons: [], suspicions: (sus.data ?? []).filter((s) => s.kind !== "not_sure").length,
     cycleContext: on10.includes("cycle_context"), menopause: on10.includes("perimenopause_or_menopause"),
     cycleStarts: extras.cycle.filter((c) => c.kind === "start").length, dismissed,
+    // With AI off (the invited beta) the meal sheet has no ingredient step, so no dish can be saved.
+    canSaveDishes: !featureOff("ai_ingredient_check") && !featureOff("saved_dishes"),
   };
   void impacts;
   return { view, input, answers, extras, followed, firstDay, symptomsByDate, focus, on10 };

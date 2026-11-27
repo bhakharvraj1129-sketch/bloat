@@ -7,6 +7,7 @@ import { PublicFooter, PublicHeader } from "@/components/public";
 import { TAGLINE } from "@/lib/wording";
 import { COUNTRIES, formatMoney, prices, type CountryCode } from "@/lib/registry";
 import { signInMethod } from "@/server/auth-settings";
+import { experimentsOn, featureOff } from "@/server/availability";
 
 const ROWS: Array<[string, boolean]> = [
   ["When to get medical help, and warning signs", true],
@@ -34,6 +35,11 @@ export default async function Landing() {
   // While new accounts can't be created (the testing sign-in), the main action is Sign in.
   const openSignUp = signInMethod() !== "password";
   const [first, ...rest] = TAGLINE.split(/(?<=\.) /);
+  // Rows for features this deployment does not offer are left out or shortened (the invited beta).
+  const rows = ROWS.flatMap(([text, free]): Array<[string, boolean]> =>
+    text === "Ingredient check and saved dishes" && featureOff("ai_ingredient_check") ? []
+      : text === "Possible triggers and experiments" && !experimentsOn() ? [["Possible triggers", free]]
+      : [[text, free]]);
   const cta = openSignUp ? { href: "/start", label: "Get started" } : { href: "/sign-in", label: "Sign in" };
 
   return (
@@ -92,7 +98,7 @@ export default async function Landing() {
                   </tr>
                 </thead>
                 <tbody>
-                  {ROWS.map(([name, free]) => (
+                  {rows.map(([name, free]) => (
                     <tr key={name} className="border-b border-line last:border-0">
                       <th scope="row" className="p-4 font-normal md:px-6">{name}</th>
                       <td className="py-4 text-center">{free ? <Check size={20} strokeWidth={2} className="mx-auto text-ink" aria-label="Included" /> : <Minus size={20} strokeWidth={1.75} className="mx-auto text-ink-muted" aria-label="Not included" />}</td>

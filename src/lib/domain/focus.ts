@@ -15,6 +15,8 @@ export type FocusInput = {
   bowelNoDates: string[]; bowelEntries: number; followed: string[]; comparisons: Comparison[];
   suspicions: number; cycleContext: boolean; menopause: boolean; cycleStarts: number;
   dismissed: Record<string, { until: string | null; count: number }>;
+  /** Whether a dish can be saved on this deployment (it is saved from the ingredient step, which needs AI). Default: yes. */
+  canSaveDishes?: boolean;
 };
 
 const last = (today: string, n: number) => ({ from: addDays(today, -n), to: addDays(today, -1) });
@@ -92,7 +94,7 @@ export function nextBestLog(i: FocusInput): NextBestLog | null {
   const mealsByDate = new Map<string, Meal[]>();
   for (const m of i.meals) { const d = analysisDate(Date.parse(m.eaten_at), i.periods); mealsByDate.set(d, [...(mealsByDate.get(d) ?? []), m]); }
   const unknownDays = [...mealsByDate.entries()].filter(([d, ms]) => d >= w14.from && d <= w14.to && ms.some((m) => ["failed", "paused", "limited", "dont_know", "not_requested", "abstained"].includes(m.ai_check_status))).length;
-  if (unknownDays >= 9) out.push({ id: "save_dishes", text: "Try saving your usual dishes so meals are one tap." });
+  if (unknownDays >= 9 && i.canSaveDishes !== false) out.push({ id: "save_dishes", text: "Try saving your usual dishes so meals are one tap." });
 
   const starts = i.episodes.filter((e) => { const d = analysisDate(Date.parse(e.started_at), i.periods); return d >= w14.from && d <= w14.to; });
   const eveningStarts = starts.filter((e) => { const ms = Date.parse(e.started_at); return localParts(ms, zoneForDate(analysisDate(ms, i.periods), i.periods)).h >= 18; });
