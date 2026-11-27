@@ -26,7 +26,7 @@ The round, as you decided on 27 Nov 2026: 3 to 5 trusted testers, Pro switched o
 
 1. Vercel, project **bloat**, Settings, Environment Variables, `BLOAT_PRO_TEST_EMAILS` (Preview): add each tester's address, separated by commas. Keep the addresses already there. Save.
 2. GitHub, Actions, **Preview**, **Run workflow** on `claude/bloat-software-build-uxzoru`. It runs every check and publishes the same app again with the new list (about 15 minutes). Until then, the tester has the Free plan.
-3. After their first sign-in, ask the tester to look at You, Plan: it should say **Bloat Pro** and "Switched on for testing. There is no subscription, so nothing renews and nothing is charged."
+3. After their first sign-in, ask the tester to look at You, Plan: it should say **Bloat Buddy Pro** and "Switched on for testing. There is no subscription, so nothing renews and nothing is charged."
 
 You can also ask Claude to do step 2 for you, giving the addresses in the chat.
 
@@ -41,7 +41,7 @@ Never put a password in the same message as the email address, in a shared docum
 
 ## 4. A tester forgot their password, or is locked out
 
-Bloat sends no email in this round, so you set a new temporary password:
+Bloat Buddy sends no email in this round, so you set a new temporary password:
 
 1. Follow `DEPLOYMENT.md`, "Change the test account's password", using the **tester's** User UID. It changes only the password; the account and its records stay.
 2. Send the new temporary password the second way (section 3), never in the reporting channel.

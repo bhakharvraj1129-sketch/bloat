@@ -50,8 +50,8 @@ export function LinkButton({ href, children, variant = "primary", className }: {
   );
 }
 
-export function Card({ children, className, as: Tag = "div" }: { children: ReactNode; className?: string; as?: "div" | "section" | "li" }) {
-  return <Tag className={cx("rounded-lg border border-line bg-surface p-5 md:p-6", className)}>{children}</Tag>;
+export function Card({ children, className, as: Tag = "div", "aria-labelledby": labelledBy }: { children: ReactNode; className?: string; as?: "div" | "section" | "li"; "aria-labelledby"?: string }) {
+  return <Tag aria-labelledby={labelledBy} className={cx("rounded-lg border border-line bg-surface p-5 md:p-6", className)}>{children}</Tag>;
 }
 
 export function Label({ children, className, id, heading = false }: { children: ReactNode; className?: string; id?: string; heading?: boolean }) {

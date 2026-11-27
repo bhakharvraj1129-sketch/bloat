@@ -10,7 +10,7 @@ export const NHS_SOURCE_URL = "https://www.nhs.uk/symptoms/bloating/";
 export const NHS_SOURCE_LABEL = "Adapted from NHS, Bloating";
 
 export const INTENDED_USE =
-  "Bloat is a general wellness app for adults. It lets people record bloating, meals, bowel movements, exercise and daily habits, and shows patterns in their own records. Bloat does not diagnose, treat, cure, mitigate or prevent any disease or condition, does not give medical advice, and is not for emergencies.";
+  "Bloat Buddy is a general wellness app for adults. It lets people record bloating, meals, bowel movements, exercise and daily habits, and shows patterns in their own records. Bloat Buddy does not diagnose, treat, cure, mitigate or prevent any disease or condition, does not give medical advice, and is not for emergencies.";
 
 export const TAGLINE = "Track your bloating. Spot your possible triggers. Bring real data to your doctor.";
 
@@ -37,7 +37,7 @@ export const HOW_BLOAT_WORKS = [
   "Tap I feel bloated when it starts, and Bloating gone when it ends.",
   "Add meals as you eat. Pro can snap a photo.",
   "Each morning, answer a few questions about yesterday to set your Bloat Score. \"Mostly\" is a fine answer.",
-  "Bloat shows patterns in your own records. It doesn't diagnose or treat anything. For worrying symptoms, see When to get medical help.",
+  "Bloat Buddy shows patterns in your own records. It doesn't diagnose or treat anything. For worrying symptoms, see When to get medical help.",
 ];
 
 export type HelpLevel = "emergency" | "urgent" | "see_doctor";
@@ -52,7 +52,7 @@ export function helpPage(countryCode: string | null | undefined) {
   return {
     version: HELP_PAGE_VERSION,
     title: "When to get medical help",
-    intro: "Bloat is a tracker. It can't tell you what is causing your symptoms or whether they are serious.",
+    intro: "Bloat Buddy is a tracker. It can't tell you what is causing your symptoms or whether they are serious.",
     sections: [
       {
         level: "emergency" as HelpLevel,

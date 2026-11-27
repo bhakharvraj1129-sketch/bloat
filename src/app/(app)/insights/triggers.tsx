@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import { Caption, Card, Label } from "@/components/ui";
 import { CompareBars } from "@/components/charts";
 import { ProScreen, signed } from "@/components/pro";
@@ -15,7 +16,28 @@ type Data = {
   from: string; to: string; examined: number; header: string; date_format: "MM/DD" | "DD/MM"; worth_watching: Item[]; no_clear_difference: Item[];
   not_enough_data: Item[]; daily_food: Item[]; needs_correction: string[]; recalled_days: number; mostly_days: number;
   co_occurrence: Array<{ note: string }>; followed_note: string; footer: string; comparison_line: string; experiments_offered?: boolean;
+  progress?: { confirmed_days: number; confirmed_needed: number };
 };
+
+/** Before anything can be compared: real progress towards the fewest confirmed days a comparison needs. */
+function OnTheirWay({ confirmed, needed }: { confirmed: number; needed: number }) {
+  const r = 36, c = 2 * Math.PI * r, done = Math.min(confirmed, needed);
+  const each = needed / 2;
+  return (
+    <Card className="flex items-center gap-5">
+      <svg width="88" height="88" viewBox="0 0 88 88" role="img" aria-label={`${done} of ${needed} confirmed days`} className="shrink-0">
+        <circle cx="44" cy="44" r={r} fill="none" stroke="var(--brand-tint)" strokeWidth="9" />
+        {done > 0 && <circle cx="44" cy="44" r={r} fill="none" stroke="var(--brand)" strokeWidth="9" strokeLinecap="round" strokeDasharray={`${(done / needed) * c} ${c}`} transform="rotate(-90 44 44)" />}
+        <text x="44" y="43" textAnchor="middle" className="font-display" fontWeight="800" fontSize="22" fill="var(--ink)">{done}</text>
+        <text x="44" y="59" textAnchor="middle" fontSize="11" fill="var(--ink-muted)">of {needed} days</text>
+      </svg>
+      <div className="flex min-w-0 flex-col gap-1.5">
+        <h2 className="t-title">Your patterns are on their way</h2>
+        <p className="text-[0.9375rem] leading-6 text-ink-muted">A comparison needs at least {each} confirmed days with something and {each} without it. Log during the day and answer the short review each morning.</p>
+      </div>
+    </Card>
+  );
+}
 
 function needText(i: Item): string {
   if (i.state === "NEEDS_CORRECTION") return "Waiting for a day to be corrected.";
@@ -49,9 +71,14 @@ export function Triggers() {
   const load = useLoad<Data>("/v1/insights/triggers");
   return (
     <ProScreen title="Possible triggers" eyebrow="Patterns" load={load}>
-      {(d) => (
+      {(d) => {
+        const waiting = !!d.progress && d.worth_watching.length === 0 && d.no_clear_difference.length === 0;
+        return (
         <>
           <Caption>{d.header} {formatRange(d.from, d.to, d.date_format) ?? "No finished days yet"}.{d.recalled_days ? ` Includes ${d.recalled_days} days with ingredients added afterwards.` : ""}{d.mostly_days ? ` Includes ${d.mostly_days} "mostly" days.` : ""}</Caption>
+
+          {/* Before anything is compared, one progress card replaces the two empty result sections. */}
+          {waiting && <OnTheirWay confirmed={d.progress!.confirmed_days} needed={d.progress!.confirmed_needed} />}
 
           {d.needs_correction.length > 0 && (
             <Card className="flex flex-col gap-2">
@@ -61,6 +88,8 @@ export function Triggers() {
             </Card>
           )}
 
+          {!waiting && (
+            <>
           <section aria-labelledby="ww" className="flex flex-col gap-2">
             <Label id="ww">Worth watching</Label>
             {d.worth_watching.length ? <ul className="flex flex-col gap-3">{d.worth_watching.map((i) => <Result key={i.target.id} i={i} line={d.comparison_line} />)}</ul>
@@ -72,6 +101,8 @@ export function Triggers() {
             {d.no_clear_difference.length ? <ul className="flex flex-col gap-3">{d.no_clear_difference.map((i) => <Result key={i.target.id} i={i} line={d.comparison_line} />)}</ul>
               : <Card><Caption>Nothing compared yet.</Caption></Card>}
           </section>
+            </>
+          )}
 
           {d.daily_food.length > 0 && (
             <section aria-labelledby="daily" className="flex flex-col gap-2">
@@ -91,8 +122,13 @@ export function Triggers() {
 
           <section aria-labelledby="ned" className="flex flex-col gap-2">
             <Label id="ned">Not enough data yet</Label>
-            <Card className="px-4 py-1">
-              <ul>
+            {/* Folded, so a long list of items waiting for days does not fill the screen. */}
+            <details className="group rounded-lg border border-line bg-surface">
+              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-5 font-semibold [&::-webkit-details-marker]:hidden">
+                <span>{d.not_enough_data.length} {d.not_enough_data.length === 1 ? "item waits" : "items wait"} for more days</span>
+                <ChevronDown size={20} strokeWidth={2} aria-hidden className="shrink-0 transition-transform duration-150 group-open:rotate-180" />
+              </summary>
+              <ul className="border-t border-line px-5">
                 {d.not_enough_data.map((i) => (
                   <li key={i.target.id} className="border-b border-line py-3 last:border-0">
                     <p className="font-semibold">{i.target.label}</p>
@@ -100,7 +136,7 @@ export function Triggers() {
                   </li>
                 ))}
               </ul>
-            </Card>
+            </details>
           </section>
 
           {d.co_occurrence.map((c) => <Card key={c.note}><Caption>{c.note}</Caption></Card>)}
@@ -111,7 +147,8 @@ export function Triggers() {
             <Link href="/journey" className="flex min-h-12 items-center justify-center rounded-sm border border-line bg-surface px-3 font-semibold text-ink no-underline">Your journey</Link>
           </nav>
         </>
-      )}
+        );
+      }}
     </ProScreen>
   );
 }

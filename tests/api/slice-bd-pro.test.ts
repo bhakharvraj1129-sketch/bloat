@@ -321,7 +321,7 @@ describe("Slice D: insights, reports and the doctor PDF, end to end", () => {
     expect(r.status).toBe(201);
     expect(r.body.snapshot).toMatchObject({ from: "2026-09-07", to: "2026-09-13", counts: { confirmed: 7, late: 0, missing: 0 } });
     expect(r.body.snapshot.seven_day_average.label).toBe("Average of 7 days (0 late)");
-    expect(r.body.snapshot.footer).toBe("These are patterns in your own records, not proof of a cause. Bloat doesn't diagnose.");
+    expect(r.body.snapshot.footer).toBe("These are patterns in your own records, not proof of a cause. Bloat Buddy doesn't diagnose.");
     // Asked for again with nothing changed: the same stored snapshot, unchanged.
     const same = await call(u, "POST", "/v1/reports", { kind: "pattern", week_of: "2026-09-07" }, { now });
     expect(same.body.reused).toBe(true);

@@ -23,7 +23,7 @@ export class AnthropicProvider implements AiProvider {
   private client: Anthropic;
 
   constructor(readonly model: string, apiKey: string) {
-    // One automatic retry is handled by Bloat's own retry rule, so the SDK does none.
+    // One automatic retry is handled by Bloat Buddy's own retry rule, so the SDK does none.
     this.client = new Anthropic({ apiKey, maxRetries: 0, timeout: 20_000 });
   }
 

@@ -37,7 +37,7 @@ export function SignIn({ testLogin, google: googleOn }: { testLogin: boolean; go
     // Checked here, with the same wording as the password form, instead of the browser's own bubble.
     const problem = validateSignIn({ email, password: "unused", needAdult: false, adult: true }).email;
     if (problem) { setMessage(problem); return emailRef.current?.focus(); }
-    if (needAdult) return setMessage("Bloat is for adults. Tick the box to confirm you are 18 or older.");
+    if (needAdult) return setMessage("Bloat Buddy is for adults. Tick the box to confirm you are 18 or older.");
     setBusy(true); setMessage("");
     writePre({ adult: isNew ? true : undefined });
     let error: AuthErrorLike = null;
@@ -55,7 +55,7 @@ export function SignIn({ testLogin, google: googleOn }: { testLogin: boolean; go
   }
 
   async function google() {
-    if (needAdult) return setMessage("Bloat is for adults. Tick the box to confirm you are 18 or older.");
+    if (needAdult) return setMessage("Bloat Buddy is for adults. Tick the box to confirm you are 18 or older.");
     writePre({ adult: isNew ? true : undefined });
     const { error } = await browserSupabase().auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${location.origin}/auth/callback` } });
     if (error) setMessage("Google sign-in isn't available right now. Use an email code instead.");

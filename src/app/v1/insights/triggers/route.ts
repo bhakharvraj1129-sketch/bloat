@@ -6,6 +6,7 @@ import { experimentsOn, swapExperimentsOn } from "@/server/availability";
 import { experimentDef } from "@/lib/domain/experiments";
 import { COMPARISON_LINE, FOLLOWED_ONLY_NOTE, TRIGGERS_FOOTER } from "@/lib/wording";
 import { addDays, diffDays, isDate } from "@/lib/time";
+import { thresholds } from "@/lib/registry";
 
 // Possible triggers (Pro). Free accounts get 403 with no Pro values in the answer.
 export const GET = route({ feature: "possible_triggers" }, async (ctx) => {
@@ -41,5 +42,7 @@ export const GET = route({ feature: "possible_triggers" }, async (ctx) => {
     })),
     followed_note: FOLLOWED_ONLY_NOTE, footer: TRIGGERS_FOOTER, comparison_line: COMPARISON_LINE,
     experiments_offered: xOn,
+    // Real counts for the "on their way" card: confirmed days so far and the fewest a comparison needs.
+    progress: { confirmed_days: b.view.summaries.filter((s) => s.status === "CONFIRMED").length, confirmed_needed: thresholds.comparison_min_each_group * 2 },
   });
 });

@@ -16,7 +16,7 @@ function sql(query: string): string {
   return execFileSync("docker", ["exec", "supabase_db_bloat", "psql", "-U", "postgres", "-tAc", query], { encoding: "utf8" }).trim();
 }
 
-/** A signed-in, set-up account whose Bloat time zone is `zone`. */
+/** A signed-in, set-up account whose Bloat Buddy time zone is `zone`. */
 async function account(context: BrowserContext, zone: string, country: "US" | "IN" = "US"): Promise<{ page: Page; api: Api; email: string }> {
   const page = await context.newPage();
   await page.goto("/");
@@ -105,8 +105,8 @@ for (const z of ZONES) {
       const meal = await addMeal(api, "tz explicit rice");
       const sheet = await openMealEdit(page, dayIn(Date.parse(meal.eaten_at), z.account), "tz explicit rice");
       await sheet.getByRole("radio", { name: "Choose time" }).click();
-      if (z.account !== z.device) await expect(sheet.getByText(`Times here are in your Bloat time zone, ${z.account}.`)).toBeVisible();
-      else await expect(sheet.getByText(/Times here are in your Bloat time zone/)).toHaveCount(0);
+      if (z.account !== z.device) await expect(sheet.getByText(`Times here are in your Bloat Buddy time zone, ${z.account}.`)).toBeVisible();
+      else await expect(sheet.getByText(/Times here are in your Bloat Buddy time zone/)).toHaveCount(0);
       const target = Date.now() - 2 * 3600_000; // two hours ago, whatever the zones
       const local = localIn(target, z.account);
       await sheet.getByLabel("Date and time").fill(local);

@@ -44,7 +44,7 @@ type Options<B> = {
 export type Capability = "recording" | "payments";
 const CAPABILITY_OFF: Record<Capability, string> = {
   recording: "New entries are paused in your country for now. You can still read, export and delete your records.",
-  payments: "Bloat Pro can't be bought in your country for now. Nothing has been charged.",
+  payments: "Bloat Buddy Pro can't be bought in your country for now. Nothing has been charged.",
 };
 
 /** A capability is off for a country when the founder has suspended or retired it there. */
@@ -161,13 +161,13 @@ export function route<B = undefined>(opts: Options<B>, handler: Handler<B>) {
       const now = testNow && !Number.isNaN(Date.parse(testNow)) ? Date.parse(testNow) : Date.now();
       // A feature switched off for this deployment (invited beta: no AI, unreviewed content) is not
       // offered to anyone, whatever the plan.
-      if (opts.feature && featureOff(opts.feature)) throw new ApiError(404, "NOT_AVAILABLE", "This isn't part of this version of Bloat.");
+      if (opts.feature && featureOff(opts.feature)) throw new ApiError(404, "NOT_AVAILABLE", "This isn't part of this version of Bloat Buddy.");
       if (who) {
         entitlement = await loadEntitlement(who.db, who.userId);
         plan = effectivePlan(entitlement, now);
         if (plan !== "pro" && isProTestAccount(who.email)) plan = "pro";
         if (opts.feature && isProFeature(opts.feature) && plan !== "pro") {
-          throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Pro.");
+          throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Buddy Pro.");
         }
         if (opts.capability) await assertCapability(who.db, who.userId, opts.capability);
       }

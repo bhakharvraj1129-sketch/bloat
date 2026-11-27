@@ -41,8 +41,8 @@ export function Upgrade({ testMode }: { testMode: boolean }) {
     if ((await offer.run("POST", "/v1/meals/recalled-check", { answer: a })) === null) return;
     if (a === "yes_go_through_them") router.push("/meal/recall"); else recall.reload();
   };
-  if (ent.loading && !ent.data) return <Screen title="Bloat Pro" back="/me"><Loading /></Screen>;
-  if (ent.error && !ent.data) return <Screen title="Bloat Pro" back="/me"><ErrorState error={ent.error} onRetry={ent.reload} /></Screen>;
+  if (ent.loading && !ent.data) return <Screen title="Bloat Buddy Pro" back="/me"><Loading /></Screen>;
+  if (ent.error && !ent.data) return <Screen title="Bloat Buddy Pro" back="/me"><ErrorState error={ent.error} onRetry={ent.reload} /></Screen>;
   const e = ent.data!;
   const p = e.prices;
 
@@ -67,7 +67,7 @@ export function Upgrade({ testMode }: { testMode: boolean }) {
   }
   const progress = st.data?.progress;
   return (
-    <Screen title="Bloat Pro" back="/me">
+    <Screen title="Bloat Buddy Pro" back="/me">
       {progress && (
         <Card className="bg-brand-tint">
           <p>You have {progress.confirmed_days} confirmed {progress.confirmed_days === 1 ? "day" : "days"} and {progress.days_logged} {progress.days_logged === 1 ? "day" : "days"} logged. Pro shows your chart and compares your days once there are enough of them.</p>

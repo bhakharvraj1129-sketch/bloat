@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ChevronRight, Lock } from "lucide-react";
 import { Button, Caption, Card, Chip, ErrorState, Field, Label, Loading, ProTag, SaveStatus, Screen, Segmented, Sheet, inputClass } from "@/components/ui";
 import { QuestionField } from "@/components/question";
+import { ThemeSwitch } from "@/components/theme-switch";
 import { useLoad, useSave } from "@/lib/client/hooks";
 import { DELETE_REFUSED, DELETE_UNFINISHED } from "@/lib/wording";
 import { api, ApiFailure } from "@/lib/client/api";
@@ -119,7 +120,7 @@ export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; pa
       <section className="flex flex-col gap-2" aria-labelledby="plan">
         <Label id="plan">Plan</Label>
         <Card className="flex flex-col gap-3">
-          <p className="t-body-strong">{pro ? "Bloat Pro" : s.paused ? "Bloat Pro (paused)" : "Bloat Free"}</p>
+          <p className="t-body-strong">{pro ? "Bloat Buddy Pro" : s.paused ? "Bloat Buddy Pro (paused)" : "Bloat Buddy Free"}</p>
           {/* Pro given for testing has no subscription: nothing renews, nothing to pause or cancel. */}
           {pro && ent.data?.status === "none" && <Caption>Switched on for testing. There is no subscription, so nothing renews and nothing is charged.</Caption>}
           {pro && ent.data && ent.data.status !== "none" && <Caption>{ent.data.status === "cancelled" ? "Cancelled. Pro stays on until" : "Renews on"} {ent.data.renews_or_ends_at ? new Date(ent.data.renews_or_ends_at).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }) : "the end of the period"}.</Caption>}
@@ -149,6 +150,7 @@ export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; pa
             <p className="t-body-strong">{question("ST-01").prompt}</p>
             <Segmented label="Units" value={shown("units")} onChange={(v) => { if (!profile.saving) patch({ units: v }); }} options={[{ value: "us", label: "US" }, { value: "metric", label: "Metric" }]} />
           </div>
+          <ThemeSwitch />
           <div className="flex items-center justify-between gap-3">
             <p>What you want to find out: <strong>{s.profile.goals.length ? s.profile.goals.map((g) => optionLabel("ON-16", g)).join(", ") : "Not chosen"}</strong></p>
             <Button variant="quiet" full={false} onClick={() => setSheet("goal")}>Change</Button>
@@ -178,7 +180,7 @@ export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; pa
               </li>
             ))}</ul>
           ) : <Caption>Nothing in your record yet.</Caption>}
-          <Caption>A record only. Bloat never comments on medicines.</Caption>
+          <Caption>A record only. Bloat Buddy never comments on medicines.</Caption>
           <Button variant="secondary" onClick={() => setSheet("med")}>Add or change</Button>
         </Card>
       </section>
@@ -226,7 +228,7 @@ export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; pa
             </li>
           ))}</ul>
         </Card>
-        <Caption>The first three are needed to use Bloat. To withdraw them, delete your account below. Withdrawing an optional consent never deletes your diary.</Caption>
+        <Caption>The first three are needed to use Bloat Buddy. To withdraw them, delete your account below. Withdrawing an optional consent never deletes your diary.</Caption>
       </section>
 
       <section className="flex flex-col gap-2" aria-labelledby="data">
@@ -242,7 +244,7 @@ export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; pa
         </Card>
         <Card className="px-4 py-1">
           <Row href="/help" title="When to get medical help" />
-          <Row href="/how-bloat-works" title="How Bloat works" text="How scores and comparisons are calculated" />
+          <Row href="/how-bloat-works" title="How Bloat Buddy works" text="How scores and comparisons are calculated" />
         </Card>
         {passwordSignIn && <Button variant="secondary" onClick={() => setSheet("password")}>Change password</Button>}
         <Button variant="secondary" disabled={signingOut} onClick={async () => { setSigningOut(true); await signOutEverywhere(); router.replace("/"); router.refresh(); }}>{signingOut ? "Signing out…" : "Sign out"}</Button>
@@ -482,7 +484,7 @@ function ContextSheet({ onClose, onSaved }: { onClose: () => void; onSaved: () =
 
 /**
  * Change password (invited testers replace the temporary password they were given). The new password
- * goes from the browser straight to Supabase Auth, as at sign-in; Bloat's server never sees it.
+ * goes from the browser straight to Supabase Auth, as at sign-in; Bloat Buddy's server never sees it.
  */
 function PasswordSheet({ onClose }: { onClose: () => void }) {
   const [password, setPassword] = useState("");

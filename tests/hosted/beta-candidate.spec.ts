@@ -59,7 +59,7 @@ async function signedOut(browser: Browser, url: string): Promise<string> {
   return text;
 }
 const notice = (page: Page, where: "bloating" | "add") =>
-  page.locator("section", { has: where === "add" ? page.getByRole("heading", { name: "Add to today" }) : page.getByText("Highest logged so far") }).getByRole("status").last();
+  page.locator("section", { has: where === "add" ? page.getByRole("heading", { name: "Add to today" }) : page.getByRole("heading", { name: "How are you feeling?" }) }).getByRole("status").last();
 const AI = ["ai_ingredient_check", "meal_photos", "recalled_meal_check", "ai_source_labels"];
 const ROUND_OFF = [...AI, "daily_cards", "learn_library", "experiments_habit", "experiments_swap"];
 
@@ -284,7 +284,7 @@ test("pro (acceptance round): Pro test access says there is no subscription; exp
   // Signed out: the start page lists neither experiments nor the ingredient check.
   const visitor = await (await browser.newContext()).newPage();
   await visitor.goto(`${BASE}/`, { waitUntil: "load" });
-  await expect(visitor.getByRole("rowheader", { name: "Possible triggers", exact: true })).toBeVisible();
+  await expect(visitor.getByRole("heading", { name: "Patterns in your records", exact: true })).toBeVisible();
   await expect(visitor.getByText(/experiments/i)).toHaveCount(0);
   await expect(visitor.getByText("Ingredient check and saved dishes")).toHaveCount(0);
   await visitor.context().close();

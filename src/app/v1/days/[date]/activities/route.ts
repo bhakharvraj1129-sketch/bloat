@@ -26,7 +26,7 @@ export const PUT = route({ capability: "recording", body, mutation: true, featur
   const at = new Date(ctx.now).toISOString();
   for (const t of ctx.body.taps) {
     if (!activity(t.activity_id)) throw new ApiError(422, "VALIDATION", "Unknown habit.");
-    if (PRO_ACTIVITY_IDS.has(t.activity_id) && ctx.plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Pro.");
+    if (PRO_ACTIVITY_IDS.has(t.activity_id) && ctx.plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Buddy Pro.");
     ops.push({
       op: "upsert", table: "activity_observations",
       row: { date, activity_id: t.activity_id, answer: "yes", detail: t.detail ?? null, source: "tap", observed_at: date === u.today ? at : null },

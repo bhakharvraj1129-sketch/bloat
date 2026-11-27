@@ -122,7 +122,7 @@ export function ExerciseSheet({ open, onOpenChange, state, onSaved }: Props) {
         const ok = await save.run("POST", "/v1/exercise", { type, started, minutes: mins, ...(intensity ? { intensity } : {}), ...(near ? { meal_relation: near } : {}) });
         if (ok) { onSaved(); onOpenChange(false); }
       }}>{save.saving ? "Saving…" : "Save"}</Button>
-      {state.plan !== "pro" && <Caption>The exercise log is part of Bloat Pro.</Caption>}
+      {state.plan !== "pro" && <Caption>The exercise log is part of Bloat Buddy Pro.</Caption>}
     </Sheet>
   );
 }

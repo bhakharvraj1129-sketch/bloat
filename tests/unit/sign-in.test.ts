@@ -21,7 +21,7 @@ describe("email and password sign-in messages", () => {
 
   it("fields are checked before anything is sent, with messages that say what to do", () => {
     expect(validateSignIn({ email: "", password: "", needAdult: true, adult: false })).toEqual({
-      email: "Enter your email address.", password: "Enter your password.", adult: "Bloat is for adults. Tick the box to confirm you are 18 or older.",
+      email: "Enter your email address.", password: "Enter your password.", adult: "Bloat Buddy is for adults. Tick the box to confirm you are 18 or older.",
     });
     expect(validateSignIn({ email: "not-an-email", password: "x", needAdult: false, adult: false })).toEqual({ email: "Enter an email address like name@example.com." });
     expect(validateSignIn({ email: " tester@bloat.test ", password: "x", needAdult: true, adult: true })).toEqual({});

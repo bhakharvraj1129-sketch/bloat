@@ -77,7 +77,7 @@ export function LogBloatingSheet({ open, onOpenChange, state, onSaved }: SheetPr
   if (advice) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange} title="Saved">
-        <p>Your bloating is being recorded. Nothing in Bloat has been paused.</p>
+        <p>Your bloating is being recorded. Nothing in Bloat Buddy has been paused.</p>
         <Advice items={advice} />
         <Button onClick={() => onOpenChange(false)}>Done</Button>
       </Sheet>
@@ -234,7 +234,7 @@ export function StillHappeningSheet({ open, onOpenChange, state, onSaved, onEnd 
         <Button variant="secondary" onClick={() => answer("no")} disabled={save.saving}>No, it ended</Button>
         <Button variant="secondary" onClick={() => answer("not_sure")} disabled={save.saving}>Not sure</Button>
       </div>
-      <Caption>Not sure keeps the record open. Bloat never fills in an end time for you.</Caption>
+      <Caption>Not sure keeps the record open. Bloat Buddy never fills in an end time for you.</Caption>
       <SaveStatus state={save.state === "saved" ? "idle" : save.state} error={save.error} />
     </Sheet>
   );

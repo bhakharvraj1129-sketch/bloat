@@ -14,9 +14,9 @@ export default function Unavailable() {
   const key = useRef(newKey()); // kept after a lost reply, so trying again never adds the email twice
   return (
     <AuthPage title="Not available yet" back="/start">
-      <p>Bloat isn&apos;t available in your country yet.</p>
+      <p>Bloat Buddy isn&apos;t available in your country yet.</p>
       {state === "done" ? (
-        <Card><p className="t-body-strong">You&apos;re on the waitlist</p><Caption>We&apos;ll email you once when Bloat opens in your country.</Caption></Card>
+        <Card><p className="t-body-strong">You&apos;re on the waitlist</p><Caption>We&apos;ll email you once when Bloat Buddy opens in your country.</Caption></Card>
       ) : (
         <form
           noValidate
@@ -41,7 +41,7 @@ export default function Unavailable() {
           }}
         >
           <Field label="Your country"><input className={inputClass} value={country} onChange={(e) => setCountry(e.target.value)} autoComplete="country-name" required maxLength={60} /></Field>
-          <Field label="Email" hint="Only used to tell you when Bloat is available. Nothing else is stored."><input className={inputClass} type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required /></Field>
+          <Field label="Email" hint="Only used to tell you when Bloat Buddy is available. Nothing else is stored."><input className={inputClass} type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required /></Field>
           <Button type="submit" disabled={state === "saving"}>{state === "saving" ? "Saving…" : "Join waitlist"}</Button>
           {state === "error" && <p role="alert" className="t-caption text-ink">{message}</p>}
         </form>

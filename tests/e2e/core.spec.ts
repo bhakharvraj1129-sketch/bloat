@@ -27,7 +27,7 @@ async function setup(page: Page) {
   await page.getByRole("checkbox", { name: "Ate quickly" }).click();
   await expect(page.getByText("1/3 chosen")).toBeVisible();
   await page.getByRole("button", { name: "Continue" }).click();
-  await expect(page.getByRole("heading", { name: "How Bloat works" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "How Bloat Buddy works" })).toBeVisible();
   await page.getByRole("button", { name: "Go to Today" }).click();
   await expect(page.getByRole("heading", { name: "Today", exact: true })).toBeVisible({ timeout: 20000 });
 }
@@ -40,9 +40,10 @@ test("Q92, Q61: sign-up shows the help page first, then setup, then Today. Q129:
   });
   await signUp(page);
   await setup(page);
-  await expect(page.getByText("Highest logged so far")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "How are you feeling?" })).toBeVisible();
+  await expect(page.getByText("Nothing logged yet today.")).toBeVisible();
   await expect(page.getByText(/0 days logged · 0 of 14 confirmed days needed/)).toBeVisible();
-  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link")).toHaveText(["Today", "History", "Patterns", "You"]);
+  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link")).toHaveText(["Today", "History", "Log bloating", "Patterns", "You"]);
   expect(outside).toEqual([]);
 });
 
@@ -59,7 +60,7 @@ test("log bloating with a warning sign, update it, end it, add a meal, and see i
   // Pro fields are locked for Free, with a truthful label
   await expect(sheet.getByText("How it feels, other symptoms")).toBeVisible();
   await sheet.getByRole("button", { name: "Save" }).click();
-  await expect(page.getByRole("dialog", { name: "Saved" }).getByText("Nothing in Bloat has been paused.")).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Saved" }).getByText("Nothing in Bloat Buddy has been paused.")).toBeVisible();
   await page.getByRole("button", { name: "Done" }).click();
   await expect(page.getByRole("button", { name: /Bloating ongoing/ })).toBeVisible();
   await expect(page.getByText("1 episode")).toBeVisible();
@@ -125,14 +126,15 @@ test("Q59 core recording works with the keyboard alone, and controls have names 
   await expect(page.getByText("Call 911 now if you have bloating with a swollen stomach and:")).toBeVisible();
 });
 
-test("phone layout: no sideways scrolling, readable text on every filled button and link, 44px touch targets, and the Silver light theme", async ({ page }) => {
+test("phone layout: no sideways scrolling, readable text on every filled button and link in light and dark, 44px touch targets, and both themes", async ({ page }) => {
   await signUp(page);
   await setup(page);
-  for (const path of ["/today", "/history", "/me", "/upgrade", "/help", "/"]) {
+  for (const [scheme, path] of (["light", "dark"] as const).flatMap((s) => ["/today", "/history", "/me", "/upgrade", "/help", "/"].map((p) => [s, p] as const))) {
+    await page.emulateMedia({ colorScheme: scheme });
     await page.goto(path);
     await page.waitForLoadState("networkidle");
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-    expect(overflow, path).toBeLessThanOrEqual(0);
+    expect(overflow, `${scheme} ${path}`).toBeLessThanOrEqual(0);
     // A filled control's text must stand out from its own fill (it once matched it: invisible text).
     const unreadable = await page.evaluate(() => {
       const lum = (c: string) => { const [r, g, b] = (c.match(/[\d.]+/g) ?? []).map(Number).slice(0, 3).map((v) => { const x = v / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!; };
@@ -146,25 +148,26 @@ test("phone layout: no sideways scrolling, readable text on every filled button 
       }
       return out;
     });
-    expect(unreadable, path).toEqual([]);
+    expect(unreadable, `${scheme} ${path}`).toEqual([]);
   }
+  await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/today");
   for (const b of await page.getByRole("button").all()) {
     const box = await b.boundingBox();
     if (box) expect(box.height, await b.textContent() ?? "").toBeGreaterThanOrEqual(44);
   }
-  // Silver is light only for now (DECISIONS.md): a phone set to dark mode still gets the light tokens.
+  // Design v2 (owner, 27 Nov 2026): light and dark themes. The device setting picks one unless You sets it.
   await page.emulateMedia({ colorScheme: "dark" });
-  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(245, 245, 246)");
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(14, 18, 19)");
   await page.emulateMedia({ colorScheme: "light" });
-  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(245, 245, 246)");
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(246, 248, 248)");
 });
 
 test("Q91 another country gets the honest waitlist; Q203 a Free user who opens Your journey lands on Upgrade with no preview; Q39 sign-out; delete account", async ({ page }) => {
   await page.goto("/start");
   await page.getByRole("radio", { name: "Other" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
-  await expect(page.getByText("Bloat isn't available in your country yet.")).toBeVisible();
+  await expect(page.getByText("Bloat Buddy isn't available in your country yet.")).toBeVisible();
   await page.getByLabel("Your country").fill("France");
   await page.getByRole("textbox", { name: /^Email/ }).fill(email()); // required by the server, so no longer labelled "optional"
   await page.getByRole("button", { name: "Join waitlist" }).click();
@@ -173,7 +176,7 @@ test("Q91 another country gets the honest waitlist; Q203 a Free user who opens Y
   await signUp(page, "India");
   await setup(page);
   await page.goto("/journey");
-  await expect(page.getByRole("heading", { name: "Bloat Pro" })).toBeVisible({ timeout: 15000 });
+  await expect(page.getByRole("heading", { name: "Bloat Buddy Pro" })).toBeVisible({ timeout: 15000 });
   await expect(page.getByText("₹1,999 a year")).toBeVisible(); // yearly first, in the user's currency
   await expect(page.getByText(/Includes 18% GST/)).toBeVisible();
   await expect(page.getByText(/There is no free trial/)).toBeVisible();

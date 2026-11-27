@@ -13,7 +13,7 @@ export function ProScreen<T>({ title, back, eyebrow, width, load, children }: { 
   const router = useRouter();
   const locked = load.error?.code === "PLAN_REQUIRED";
   useEffect(() => { if (locked) router.replace("/upgrade"); }, [locked, router]);
-  if (locked) return <Screen {...frame}><p role="status">This is part of Bloat Pro.</p></Screen>;
+  if (locked) return <Screen {...frame}><p role="status">This is part of Bloat Buddy Pro.</p></Screen>;
   if (load.loading && !load.data) return <Screen {...frame}><Loading /></Screen>;
   if (load.error && !load.data) return <Screen {...frame}><ErrorState error={load.error} onRetry={load.reload} /></Screen>;
   if (!load.data) return null;

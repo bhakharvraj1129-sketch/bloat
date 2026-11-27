@@ -1,4 +1,4 @@
-// One provider call with Bloat's retry rule and output validation. This is the single code path
+// One provider call with Bloat Buddy's retry rule and output validation. This is the single code path
 // used by the app (check.ts) and by the accuracy harness (scripts/ai-eval.mts), so the harness
 // measures exactly what users get: same provider, model, prompt, schema and group mapping.
 // No "server-only" import here on purpose: the harness runs it from the command line.

@@ -299,7 +299,7 @@ const ACTIONS: Action[] = [
     submit: (c) => dialog(c, "Pause Pro").getByRole("button", { name: "Pause for 1 month" }),
     write: { method: "POST", path: /\/v1\/billing\/pause$/ },
     changed: async (c) => (await c.api("GET", "/v1/billing/entitlement")).body.paused === true,
-    after: async (c) => { await expect(c.page.getByText("Bloat Pro (paused)")).toBeVisible(); },
+    after: async (c) => { await expect(c.page.getByText("Bloat Buddy Pro (paused)")).toBeVisible(); },
   },
   {
     name: "Switch on Keep an eye on it (Pro)", role: "pro",

@@ -13,7 +13,7 @@ export type CodeRequestOutcome =
 
 export const SENT_MESSAGE = "If that address can sign in, a code is on its way. It can take a minute to arrive. Check your spam folder too.";
 export const SEND_FAILED_MESSAGE = "We couldn't send the email just now. The problem is on our side, not with your address. Please try again in a few minutes.";
-export const OFFLINE_MESSAGE = "We couldn't reach Bloat. Check your connection and try again. No code was sent.";
+export const OFFLINE_MESSAGE = "We couldn't reach Bloat Buddy. Check your connection and try again. No code was sent.";
 
 /** Seconds from "For security purposes, you can only request this after 42 seconds." */
 export function retryAfterSeconds(message: string | undefined): number | null {
@@ -48,7 +48,7 @@ export function verifyMessage(error: AuthErrorLike): string | null {
   if (!error) return null;
   const status = error.status ?? 0;
   if (status === 429 || error.code === "over_request_rate_limit") return "Too many tries. Wait a few minutes, then ask for a new code.";
-  if (status === 0) return "We couldn't reach Bloat. Check your connection and try again.";
+  if (status === 0) return "We couldn't reach Bloat Buddy. Check your connection and try again.";
   if (status >= 500) return "Something went wrong on our side. Try again in a moment.";
   return "That code is wrong or has expired. Check it, or ask for a new one.";
 }

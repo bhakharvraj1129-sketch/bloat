@@ -32,7 +32,7 @@ export const PATCH = route({ body, mutation: true }, async (ctx) => {
   if (b.units) set.units = b.units;
   if (b.region !== undefined) set.region = b.region;
   if (b.keep_meal_photos !== undefined) {
-    if (b.keep_meal_photos && ctx.plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Pro.");
+    if (b.keep_meal_photos && ctx.plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Buddy Pro.");
     set.keep_meal_photos = b.keep_meal_photos;
   }
   if (b.hide_charts !== undefined) set.hide_charts = b.hide_charts;

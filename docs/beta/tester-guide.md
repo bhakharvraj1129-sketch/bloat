@@ -1,12 +1,12 @@
-# Bloat test version: guide for invited testers
+# Bloat Buddy test version: guide for invited testers
 
 *For the owner, before sending: this guide is for the first invited acceptance round (3 to 5 trusted testers, Pro switched on for testing, made-up data only). Shareable copies to send as they are: `docs/beta/share/` (PDF, a web page that opens from the file, and plain text to paste into a message). Send it with the first-session checklist (`first-session-checklist.md`). Send each tester's temporary password separately (`owner-checklist.md`). **Reporting channel: awaiting the owner's selection.** Tell each tester which existing way to use; this guide only says "the person who invited you". There is nothing else to fill in.*
 
 ---
 
-Thank you for helping test Bloat.
+Thank you for helping test Bloat Buddy.
 
-**What Bloat is.** A private diary for bloating: when it happens, how strong it is, what you ate, and your habits. Over time it shows patterns in your own records. It is a wellness tracker, not a medical service: it never diagnoses anything and never tells you what caused your bloating.
+**What Bloat Buddy is.** A private diary for bloating: when it happens, how strong it is, what you ate, and your habits. Over time it shows patterns in your own records. It is a wellness tracker, not a medical service: it never diagnoses anything and never tells you what caused your bloating.
 
 **This is a test version.** Things may change or break.
 
@@ -26,9 +26,9 @@ To test the food comparisons, switch on **Keep an eye on it** in You and choose 
 2. Tap **Sign in** and use the email address and temporary password you were given.
 3. Go to **You** and tap **Change password**. Choose a new password of at least 10 characters that you don't use anywhere else.
 
-Forgot your password? Ask the person who invited you for a new temporary one, then change it again in You. Bloat sends no emails in this test version.
+Forgot your password? Ask the person who invited you for a new temporary one, then change it again in You. Bloat Buddy sends no emails in this test version.
 
-To add Bloat to your home screen: in Chrome, open the menu and tap "Add to Home screen"; in Safari, tap Share, then "Add to Home Screen".
+To add Bloat Buddy to your home screen: in Chrome, open the menu and tap "Add to Home screen"; in Safari, tap Share, then "Add to Home Screen".
 
 **Your first session:** follow the short first-session checklist (`first-session-checklist.md`).
 
@@ -36,17 +36,17 @@ To add Bloat to your home screen: in Chrome, open the menu and tap "Add to Home 
 
 Pro is switched on for your account for testing. There is no subscription: nothing to pay, renew, pause or cancel.
 
-- **Today:** "I feel bloated" with a strength from 1 to 10, when it started and any warning signs; update the strength; end it. "No bloating so far today". Add a meal by typing what you had (when, how much, how fast, where it was made). Add habits. Log a bowel movement or exercise.
+- **Today:** "I feel bloated" (or the **+** button in the middle of the bottom bar, from any screen) with a strength from 1 to 10, when it started and any warning signs; update the strength; end it ("It's gone"). "No bloating so far today". Add a meal by typing what you had (when, how much, how fast, where it was made). Add habits (the **Activity** tile). Log a bowel movement or exercise. A week strip shows which days this week have anything logged.
 - **Morning review:** see "Which day the morning review scores", below.
 - **History:** every day, a chart (week, month, all) and a 7-day average. On a day: change times and a meal's name, and delete any entry, including a habit answer.
 - **Patterns:** Possible triggers (with day counts), Your journey, the weekly report, and the doctor report, which you can download or share by link and stop sharing at any time.
-- **You:** units, time zone, habits to follow, medicines, health background, family history, optional context, Keep an eye on it mode, hide charts, download your data (JSON or CSV), change password, sign out, delete account.
+- **You:** units, time zone, habits to follow, medicines, health background, family history, optional context, Keep an eye on it mode, hide charts, Appearance (same as the phone, light or dark), download your data (JSON or CSV), change password, sign out, delete account.
 - **When to get medical help:** on the Log bloating screen and in You.
 
 ## Which day the morning review scores
 
 - A day runs from midnight to midnight in your time zone.
-- During the day, Today shows the **highest strength logged so far**. That is not a score yet ("Your score is set in tomorrow's review").
+- During the day, Today shows the **highest strength logged so far**. That is not a score yet ("Tomorrow morning, a short review sets today's Bloat Score.").
 - The next day, Today offers **Review yesterday** (a morning review). Your answers set the **Bloat Score for yesterday**, the day that has just finished, not for today.
 - A review done by the end of that next day is on time. A later review still sets the day's score and shows as late, but Possible triggers uses only days reviewed on time.
 - You can review or change an earlier finished day from History (up to 92 days back). Today itself can only be reviewed once it has finished.
@@ -55,7 +55,7 @@ Pro is switched on for your account for testing. There is no subscription: nothi
 
 - No AI: no ingredient check or photos for meals, and no way to add ingredients or save a dish.
 - No experiments, no Learn library and no daily cards.
-- No payments, no emails from Bloat, no Google sign-in, and no new sign-ups.
+- No payments, no emails from Bloat Buddy, no Google sign-in, and no new sign-ups.
 
 ## Good to know
 
@@ -72,7 +72,7 @@ Pro is switched on for your account for testing. There is no subscription: nothi
 - A **deletion record** that holds only a one-way code made from your account's ID number, and the date. It contains no name, email address or records, and can't be turned back into your account. It exists so that, if the database is ever restored from a backup, your account is deleted again instead of coming back.
 - Files you downloaded and PDFs you saved stay wherever you saved them. Links you shared stop working.
 - The person who invited you keeps your name and email address on their private list of testers until they remove you.
-- The hosting services (Supabase and Vercel) keep their own technical logs, such as sign-ins and page requests, for a limited time. Bloat writes no health records into logs.
+- The hosting services (Supabase and Vercel) keep their own technical logs, such as sign-ins and page requests, for a limited time. Bloat Buddy writes no health records into logs.
 
 **If it can't finish**, the screen tells you which case it is:
 - "That didn't work. Nothing was deleted. Try again." Nothing was removed. Try again.

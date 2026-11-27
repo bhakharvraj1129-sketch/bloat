@@ -11,7 +11,7 @@ export const PUT = route({ body, mutation: true, feature: "habit_taps_basic" }, 
   if (new Set(ids).size !== ids.length) throw new ApiError(422, "VALIDATION", "A habit can be followed once.");
   for (const id of ids) {
     if (!activity(id)) throw new ApiError(422, "VALIDATION", "Unknown habit.");
-    if (PRO_ACTIVITY_IDS.has(id) && ctx.plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This habit is part of Bloat Pro.");
+    if (PRO_ACTIVITY_IDS.has(id) && ctx.plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This habit is part of Bloat Buddy Pro.");
   }
   const ops: Op[] = [{ op: "delete", table: "followed_activities", match: {} }];
   ids.forEach((activity_id, i) => ops.push({ op: "insert", table: "followed_activities", row: { activity_id, position: i + 1 } }));

@@ -30,8 +30,8 @@ const body = z.strictObject({
 // consents with versions and the help-page acknowledgement. Retrying with the same key replays it.
 export const POST = route({ body, mutation: true }, async (ctx) => {
   const b = ctx.body;
-  if (b.age_18_or_older !== "yes") throw new ApiError(422, "UNDER_18", "Bloat is for adults aged 18 or older.");
-  if (!COUNTRIES.includes(b.country as never)) throw new ApiError(403, "CAPABILITY_OFF", "Bloat isn't available in your country yet.");
+  if (b.age_18_or_older !== "yes") throw new ApiError(422, "UNDER_18", "Bloat Buddy is for adults aged 18 or older.");
+  if (!COUNTRIES.includes(b.country as never)) throw new ApiError(403, "CAPABILITY_OFF", "Bloat Buddy isn't available in your country yet.");
   if (!isValidZone(b.time_zone)) throw new ApiError(422, "VALIDATION", "That time zone is not valid.");
   for (const c of ["terms_privacy", "health_data", "wellness_ack"] as const) {
     if (!b.consents.includes(c)) throw new ApiError(422, "CONSENT_REQUIRED", "All three agreements are needed to continue.");
@@ -87,7 +87,7 @@ export const POST = route({ body, mutation: true }, async (ctx) => {
   b.followed.forEach((id, i) => {
     if (!activity(id)) throw new ApiError(422, "VALIDATION", "Unknown habit.");
     // New accounts are Free, so Pro habits cannot be followed here.
-    if (PRO_ACTIVITY_IDS.has(id)) throw new ApiError(403, "PLAN_REQUIRED", "This habit is part of Bloat Pro.");
+    if (PRO_ACTIVITY_IDS.has(id)) throw new ApiError(403, "PLAN_REQUIRED", "This habit is part of Bloat Buddy Pro.");
     ops.push({ op: "insert", table: "followed_activities", row: { activity_id: id, position: i + 1 } });
   });
   ops.push({ op: "insert", table: "product_events", row: { name: "onboarding_completed", props: {} } });

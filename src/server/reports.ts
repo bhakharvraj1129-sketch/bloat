@@ -76,7 +76,7 @@ export async function patternSnapshot(db: Db, userId: string, u: UserCtx, now: n
     habits: habitCounts,
     next_best_log: focusOf(b, t).next?.text ?? null,
     doctor_line: line.show ? line : null,
-    footer: `${TRIGGERS_FOOTER} Bloat doesn't diagnose.`, comparison_line: COMPARISON_LINE,
+    footer: `${TRIGGERS_FOOTER} Bloat Buddy doesn't diagnose.`, comparison_line: COMPARISON_LINE,
     versions: REPORT_VERSIONS,
   };
 }
@@ -191,7 +191,7 @@ export async function doctorSnapshot(db: Db, userId: string, u: UserCtx, now: nu
   const snapshot = {
     kind: "doctor" as const, from: o.from, to: o.to, time_zone: u.profile.analysis_time_zone, generated_at: new Date(now).toISOString(),
     included: DOCTOR_SECTIONS.filter((k) => on(k)) as DoctorSection[],
-    notice: "This report was made by the person named on it from their own Bloat diary. Everything in it is self-reported.",
+    notice: "This report was made by the person named on it from their own Bloat Buddy diary. Everything in it is self-reported.",
     intended_use: INTENDED_USE,
     summary: {
       tracking_days: days.length, confirmed_days: confirmed.length, completeness: days.length ? Math.round((confirmed.length / days.length) * 100) : null,

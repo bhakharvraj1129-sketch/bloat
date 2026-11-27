@@ -214,7 +214,7 @@ test("Pro plan actions, the photo setting and account deletion each confirm thei
   await page.goto("/me");
   await page.getByRole("button", { name: "Pause Pro" }).click();
   await page.getByRole("dialog", { name: "Pause Pro" }).getByRole("button", { name: "Pause for 1 month" }).click();
-  await expect(page.getByText("Bloat Pro (paused)")).toBeVisible();
+  await expect(page.getByText("Bloat Buddy Pro (paused)")).toBeVisible();
   await page.getByRole("button", { name: "Resume Pro" }).click();
   await expect(page.getByRole("button", { name: "Pause Pro" })).toBeVisible();
   await page.getByRole("button", { name: "Cancel", exact: true }).click();

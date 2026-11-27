@@ -12,7 +12,7 @@ import { safeNext } from "@/lib/next-path";
 // Screen 05, testing version: email and password for test accounts the owner set up in Supabase.
 // There is no sign-up here, and sign-ups are switched off in Supabase itself, so a new account
 // cannot be made from this screen or by calling Supabase directly.
-// The password goes from the browser straight to Supabase Auth. It never reaches Bloat's server,
+// The password goes from the browser straight to Supabase Auth. It never reaches Bloat Buddy's server,
 // never appears in a URL (the inputs have no "name", so even a form sent before the page is ready
 // carries nothing), and is cleared from memory after each try.
 export function PasswordSignIn() {
@@ -69,7 +69,7 @@ export function PasswordSignIn() {
 
   return (
     <AuthPage title="Sign in" eyebrow="Welcome back" back={fromHelp ? "/help?signup=1" : "/"}>
-      <Caption>Bloat is invite-only for now. Accounts are set up for invited testers; new accounts can&apos;t be created here.</Caption>
+      <Caption>Bloat Buddy is invite-only for now. Accounts are set up for invited testers; new accounts can&apos;t be created here.</Caption>
       <form onSubmit={submit} method="post" noValidate className="flex flex-col gap-4" aria-describedby={message ? "signin-error" : undefined}>
         <div className="flex flex-col gap-2">
           <label htmlFor="email" className="t-body-strong">Email</label>
@@ -111,7 +111,7 @@ export function PasswordSignIn() {
         <Button type="submit" disabled={!ready || busy} aria-busy={busy || undefined}>{busy ? "Signing in…" : "Sign in"}</Button>
       </form>
       {message && <p id="signin-error" role="alert" className="t-caption text-ink">{message}</p>}
-      {/* No email is sent while Bloat is invite-only, so a forgotten password is reset by the person who invited you. */}
+      {/* No email is sent while Bloat Buddy is invite-only, so a forgotten password is reset by the person who invited you. */}
       <Caption>Forgot your password? Ask the person who invited you to set a new temporary one. Once you&apos;re signed in, you can change it in You.</Caption>
     </AuthPage>
   );
@@ -131,7 +131,7 @@ export function AdultConfirm() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (!adult) return setError("Bloat is for adults. Tick the box to confirm you are 18 or older.");
+          if (!adult) return setError("Bloat Buddy is for adults. Tick the box to confirm you are 18 or older.");
           writePre({ adult: true });
           router.replace("/setup");
         }}

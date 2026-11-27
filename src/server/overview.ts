@@ -3,7 +3,7 @@ import type { Db } from "./supabase";
 import { loadAnswers, type UserCtx } from "./userdata";
 import { bloatingDates, daysView, mealsOn, type DaysView } from "./days";
 import { buildDoctorLine, type DoctorLine } from "@/lib/domain/doctorline";
-import { addDays, analysisDate, diffDays } from "@/lib/time";
+import { addDays, analysisDate, diffDays, weekStart } from "@/lib/time";
 import { doctorLine as doctorCfg, thresholds } from "@/lib/registry";
 
 export async function doctorLineFor(db: Db, userId: string, u: UserCtx, view: DaysView, answers?: Record<string, unknown>): Promise<DoctorLine> {
@@ -15,15 +15,30 @@ export async function doctorLineFor(db: Db, userId: string, u: UserCtx, view: Da
 
 /** The honest progress counter (plan A04): real counts only, never a hint of any finding. */
 export function progressCounter(u: UserCtx, view: DaysView) {
+  const logged = loggedDates(u, view);
+  const inRange = [...logged].filter((d) => d >= view.summaries[0]!.date && d <= u.today);
+  const confirmed = view.summaries.filter((s) => s.status === "CONFIRMED").length;
+  const needed = thresholds.comparison_min_each_group * 2;
+  return { days_logged: inRange.length, confirmed_days: confirmed, confirmed_needed: needed };
+}
+
+/** The week containing today, Monday first: which days have anything logged. Later days are "future". */
+export function weekStrip(u: UserCtx, view: DaysView) {
+  const logged = loggedDates(u, view);
+  const start = weekStart(u.today);
+  return Array.from({ length: 7 }, (_, i) => {
+    const date = addDays(start, i);
+    return { date, logged: logged.has(date), future: date > u.today };
+  });
+}
+
+function loggedDates(u: UserCtx, view: DaysView): Set<string> {
   const logged = new Set<string>();
   for (const s of view.summaries) {
     if (s.episodeCount > 0 || s.status !== "UNKNOWN") logged.add(s.date);
   }
   for (const m of view.data.meals) logged.add(analysisDate(Date.parse(m.eaten_at), u.periods));
-  const inRange = [...logged].filter((d) => d >= view.summaries[0]!.date && d <= u.today);
-  const confirmed = view.summaries.filter((s) => s.status === "CONFIRMED").length;
-  const needed = thresholds.comparison_min_each_group * 2;
-  return { days_logged: inRange.length, confirmed_days: confirmed, confirmed_needed: needed };
+  return logged;
 }
 
 export function historyFrom(u: UserCtx, days = 92): string {

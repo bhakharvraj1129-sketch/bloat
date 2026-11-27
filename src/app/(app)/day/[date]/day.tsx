@@ -216,7 +216,7 @@ function SavedTimePick({ name, saved, savedText, zone, value, onChange, allowApp
         }}
       />
       {value === null ? <Caption>Keeps the saved time: {savedText}.</Caption>
-        : value.mode !== "unknown" && zone !== deviceZone() ? <Caption>Times here are in your Bloat time zone, {zone}.</Caption> : null}
+        : value.mode !== "unknown" && zone !== deviceZone() ? <Caption>Times here are in your Bloat Buddy time zone, {zone}.</Caption> : null}
     </>
   );
 }

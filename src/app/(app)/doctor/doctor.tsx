@@ -70,7 +70,7 @@ export function Doctor() {
                 <Card className="flex flex-col gap-2"><DoctorReportView snapshot={made.snapshot} /></Card>
               </section>
               <a href={made.pdf_url} className="inline-flex min-h-12 items-center justify-center rounded-sm bg-brand px-5 font-semibold text-on-brand no-underline" download>Download PDF</a>
-              <Caption>Downloaded copies can&apos;t be recalled. Once you save or send the file, Bloat can no longer remove it.</Caption>
+              <Caption>Downloaded copies can&apos;t be recalled. Once you save or send the file, Bloat Buddy can no longer remove it.</Caption>
 
               <section className="flex flex-col gap-3" aria-labelledby="share">
                 <Label id="share">Share by link</Label>

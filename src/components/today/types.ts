@@ -19,6 +19,7 @@ export type State = {
   followed: string[];
   cycle_context: boolean;
   progress: { days_logged: number; confirmed_days: number; confirmed_needed: number };
+  week: Array<{ date: string; logged: boolean; future: boolean }>;
   timeline: Array<{ kind: "meal" | "episode" | "activity"; id: string; at: string | null; text: string; strongest?: number | null; open?: boolean }>;
   pro: null | {
     phase?: { label: string } | null;

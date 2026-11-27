@@ -89,7 +89,7 @@ export function Experiments() {
             <Sheet open={!!pick} onOpenChange={(o) => { if (!o) setPick(null); }} title={pick?.name ?? ""}>
               <p>{pick?.instruction}</p>
               {pick?.warning && <p className="font-semibold">{pick.warning}</p>}
-              <Caption>{d.stop_line}. You can end it at any time. Each day Bloat asks whether you did it.</Caption>
+              <Caption>{d.stop_line}. You can end it at any time. Each day Bloat Buddy asks whether you did it.</Caption>
               {start.error && start.error.code !== "NETWORK" && <p role="alert" className="t-caption text-ink">{start.error.message}</p>}
               {start.state === "unknown" && <SaveStatus state="unknown" error={start.error} onCheck={async () => { const r = await start.check(); if (r.ok && r.value) await open(r.value.experiment.id); }} />}
               <Button disabled={start.saving} onClick={async () => {

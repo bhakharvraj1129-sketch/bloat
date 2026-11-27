@@ -33,10 +33,10 @@ export const PUT = route({ capability: "recording", body, mutation: true, featur
   if (diffDays(u.today, date) > 92) throw new ApiError(422, "TOO_OLD", "This day is too old to change here.");
   const b = ctx.body;
   if ((b.bowel !== undefined || b.watched !== undefined || b.experiment_answer !== undefined) && ctx.plan !== "pro") {
-    throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Pro.");
+    throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Buddy Pro.");
   }
   // Experiments switched off: no experiment answer is recorded (the review screen does not ask).
-  if (b.experiment_answer !== undefined && !experimentsOn()) throw new ApiError(404, "NOT_AVAILABLE", "This isn't part of this version of Bloat.");
+  if (b.experiment_answer !== undefined && !experimentsOn()) throw new ApiError(404, "NOT_AVAILABLE", "This isn't part of this version of Bloat Buddy.");
 
   const { data: prior } = await ctx.db.from("day_reviews").select("*").eq("user_id", ctx.userId).eq("date", date).maybeSingle();
   const reviewedAt = new Date(ctx.now).toISOString();
@@ -68,7 +68,7 @@ export const PUT = route({ capability: "recording", body, mutation: true, featur
     for (const [activity_id, answer] of Object.entries(b.habits)) {
       // Only followed habits get an explicit No, so only followed habits can be compared.
       if (!ids.has(activity_id)) throw new ApiError(422, "NOT_FOLLOWED", "Only habits you follow are asked in the review.");
-      if (PRO_ACTIVITY_IDS.has(activity_id) && ctx.plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Pro.");
+      if (PRO_ACTIVITY_IDS.has(activity_id) && ctx.plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Buddy Pro.");
       if (answer === "skip") continue;
       ops.push({
         op: "upsert", table: "activity_observations",

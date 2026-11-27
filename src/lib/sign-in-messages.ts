@@ -7,7 +7,7 @@ import type { AuthErrorLike } from "./otp-messages";
 
 export const WRONG_CREDENTIALS = "Email or password is incorrect.";
 export const TOO_MANY_TRIES = "Too many tries. Wait a few minutes, then try again.";
-export const NO_CONNECTION = "We couldn't reach Bloat. Check your connection and try again.";
+export const NO_CONNECTION = "We couldn't reach Bloat Buddy. Check your connection and try again.";
 export const SERVER_TROUBLE = "Something went wrong on our side. Try again in a moment.";
 
 export function passwordSignInMessage(error: AuthErrorLike): string | null {
@@ -30,7 +30,7 @@ export function validateSignIn(v: { email: string; password: string; needAdult: 
   if (!email) errors.email = "Enter your email address.";
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = "Enter an email address like name@example.com.";
   if (!v.password) errors.password = "Enter your password.";
-  if (v.needAdult && !v.adult) errors.adult = "Bloat is for adults. Tick the box to confirm you are 18 or older.";
+  if (v.needAdult && !v.adult) errors.adult = "Bloat Buddy is for adults. Tick the box to confirm you are 18 or older.";
   return errors;
 }
 

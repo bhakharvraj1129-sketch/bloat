@@ -2,7 +2,7 @@
 // Navigation helpers shared by every screen.
 //
 // 1. A trail of the screens visited in this tab, so "Back" returns to where the person came from
-//    and falls back to a fixed parent screen when there is no earlier Bloat screen (a deep link,
+//    and falls back to a fixed parent screen when there is no earlier Bloat Buddy screen (a deep link,
 //    a new tab, or arriving from another site).
 // 2. A record of unsaved changes, so leaving a half-filled form asks first.
 // 3. A history entry for each open sheet, so a phone's own Back button closes the sheet instead
@@ -47,7 +47,7 @@ export function onTrailChange(l: () => void) {
   return () => removeEventListener(TRAIL_EVENT, l);
 }
 
-/** The Bloat screen before this one in this tab, if there is one Back can safely return to. */
+/** The Bloat Buddy screen before this one in this tab, if there is one Back can safely return to. */
 export function previousScreen(): string | null {
   const t = read();
   if (t.length < 2 || t[t.length - 1] !== here()) return null;
@@ -55,7 +55,7 @@ export function previousScreen(): string | null {
   return SKIP.test(prev) ? null : prev;
 }
 
-/** Back: the previous Bloat screen when there is one, otherwise the fixed parent screen. */
+/** Back: the previous Bloat Buddy screen when there is one, otherwise the fixed parent screen. */
 export function goBack(router: Router, fallback: string) {
   if (previousScreen()) router.back();
   else router.push(fallback);

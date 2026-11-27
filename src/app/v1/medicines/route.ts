@@ -13,7 +13,7 @@ const body = z.strictObject({
   note: z.string().trim().max(300).optional(),
 });
 
-// Medicines are a record only (free). Bloat never comments on medicines.
+// Medicines are a record only (free). Bloat Buddy never comments on medicines.
 export const GET = route({ feature: "medicines" }, async (ctx) => {
   const [{ data: meds }, { data: changes }] = await Promise.all([
     ctx.db.from("medicines").select("*").eq("user_id", ctx.userId).order("created_at"),

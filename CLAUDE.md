@@ -1,6 +1,6 @@
 # Bloat: standing rules for Claude
 
-Bloat is an installable mobile-web bloating tracker. It is a general wellness tracker, never a medical product. The owner (Krunal) is a first-time builder: use plain words and short sentences, and explain any technical term in one line.
+Bloat is an installable mobile-web bloating tracker, shown to people as "Bloat Buddy" since the owner renamed it on 27 Nov 2026. It is a general wellness tracker, never a medical product. The owner (Krunal) is a first-time builder: use plain words and short sentences, and explain any technical term in one line.
 
 ## Source of truth
 
@@ -28,7 +28,7 @@ Bloat is an installable mobile-web bloating tracker. It is a general wellness tr
 - Insights are deterministic code. AI never writes a result, advice or a health judgement.
 - No health data in logs, analytics events or error reports. Secrets only in environment variables.
 - User-facing text: sentence case, plain "and", no emoji, none of the banned words (`BANNED_PHRASES` in `src/lib/wording.ts`). Medical-help text is the fixed copy adapted from the NHS bloating page, labelled "Adapted from NHS, Bloating"; never rewrite it, never call it word for word.
-- UI uses the design tokens only (`src/app/globals.css`). No shadows, no new colours.
+- UI uses the design tokens only (`src/app/globals.css`: design v2 of 27 Nov 2026, light and dark themes, DECISIONS.md choice 31). No shadows, no new colours.
 - No production build, no payments, no real health data. The branch preview (`bloat-preview.vercel.app` and the branch address) is public by the owner's decision (18 Nov 2026), shows the current test build and must keep `BLOAT_TEST_LOGIN=0`; only the Preview workflow moves those two addresses. Since 24 Nov 2026 the main Vercel addresses (`bloat-olive`, `bloat-typeshi2`, `bloat-git-main-typeshi2`) show an older test build, `83fe4da`, set by hand at the owner's decision; the workflow does not move them, and this is not a launch. Supabase: only the `bloat-test` project (`qntazirusbuwfmnmihzu`). Never touch the owner's other projects.
 
 ## Commands

@@ -2,13 +2,13 @@ import { Card, Caption } from "@/components/ui";
 import { PublicPage } from "@/components/public";
 import { COMPARISON_LINE, TRIGGERS_FOOTER } from "@/lib/wording";
 
-export const metadata = { title: "How Bloat works" };
+export const metadata = { title: "How Bloat Buddy works" };
 
 // The methodology page: how scores and comparisons are calculated, in plain words.
 export default function Method() {
   return (
-    <PublicPage title="How Bloat works" eyebrow="Method">
-      <p>Bloat shows what your own records say. Every number comes from a fixed rule, not from AI, and every result shows how many days it is based on.</p>
+    <PublicPage title="How Bloat Buddy works" eyebrow="Method">
+      <p>Bloat Buddy shows what your own records say. Every number comes from a fixed rule, not from AI, and every result shows how many days it is based on.</p>
       <Card as="section">
         <h2 className="t-title">Bloat Score</h2>
         <p className="mt-2">Your Bloat Score for a day is the strongest bloating you say you felt that day, from 0 to 10. You confirm it in the next morning&apos;s review.</p>
@@ -27,9 +27,9 @@ export default function Method() {
       </Card>
       <Card as="section">
         <h2 className="t-title">Possible triggers (Pro)</h2>
-        <p className="mt-2">For each food group and each habit you follow, Bloat compares your average score on days with it and days without it.</p>
+        <p className="mt-2">For each food group and each habit you follow, Bloat Buddy compares your average score on days with it and days without it.</p>
         <ul className="mt-2 list-disc pl-5">
-          <li>A day counts only with a confirmed score and when Bloat knows whether the food was there. &quot;Not sure&quot; stays unknown.</li>
+          <li>A day counts only with a confirmed score and when Bloat Buddy knows whether the food was there. &quot;Not sure&quot; stays unknown.</li>
           <li>Food counts for a day if you had it that day or from 18:00 the evening before, and before your strongest bloating started.</li>
           <li>A comparison needs at least 7 days with and 7 days without.</li>
           <li>&quot;Worth watching&quot; means a difference of 1 point or more that points the same way in both halves of the period.</li>
@@ -42,8 +42,8 @@ export default function Method() {
         <p className="mt-2">An AI service lists ingredients that are often linked to gas or bloating. It only ever receives the dish name or the photo. It can be wrong, so you mark every item yourself, and anything left untouched is saved as &quot;Not sure&quot;.</p>
       </Card>
       <Card as="section">
-        <h2 className="t-title">What Bloat does not do</h2>
-        <p className="mt-2">Bloat is a wellness tracker. It does not name conditions, rate your symptoms or give medical advice. Check with your doctor before changing your diet.</p>
+        <h2 className="t-title">What Bloat Buddy does not do</h2>
+        <p className="mt-2">Bloat Buddy is a wellness tracker. It does not name conditions, rate your symptoms or give medical advice. Check with your doctor before changing your diet.</p>
       </Card>
     </PublicPage>
   );

@@ -21,7 +21,7 @@ export function NavTracker() {
       first.current = false;
       const nav = performance.getEntriesByType?.("navigation")[0] as PerformanceNavigationTiming | undefined;
       // A typed address, a bookmark or a link from another site starts a new trail. A reload, the
-      // browser's Back and Forward, or a full page load from another Bloat page (such as Try again
+      // browser's Back and Forward, or a full page load from another Bloat Buddy page (such as Try again
       // on the offline page) keeps it.
       let fromBloat = false;
       try { fromBloat = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch { fromBloat = false; }
@@ -33,7 +33,7 @@ export function NavTracker() {
 }
 
 /**
- * Back: returns to the previous Bloat screen in this tab, or to `fallback` (the screen's parent)
+ * Back: returns to the previous Bloat Buddy screen in this tab, or to `fallback` (the screen's parent)
  * when there is none. It is a real link to `fallback`, so it also works before the page is ready
  * and opens in a new tab like any link.
  */

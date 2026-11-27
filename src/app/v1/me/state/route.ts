@@ -1,7 +1,7 @@
 import { ok, route } from "@/server/http";
 import { loadAnswers, loadUser } from "@/server/userdata";
 import { daysView, mealsOn } from "@/server/days";
-import { historyFrom, progressCounter } from "@/server/overview";
+import { historyFrom, progressCounter, weekStrip } from "@/server/overview";
 import { addDays, analysisDate, weekStart, weekday } from "@/lib/time";
 import { isPaused } from "@/lib/domain/plan";
 import { thresholds, activity } from "@/lib/registry";
@@ -82,6 +82,8 @@ export const GET = route({}, async (ctx) => {
     followed: (followed ?? []).map((f) => f.activity_id),
     cycle_context: on10.includes("cycle_context"),
     progress: progressCounter(u, view),
+    // This week, Monday first: which days have anything logged (no scores, no judgement).
+    week: weekStrip(u, view),
     timeline,
     ...extras,
   });

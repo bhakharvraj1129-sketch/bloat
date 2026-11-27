@@ -1,4 +1,4 @@
-# Bloat test version: feedback form
+# Bloat Buddy test version: feedback form
 
 Copy this, fill it in, and send it to the person who invited you (in the way you agreed with them). One problem per form. Made-up entries only: if you add a screenshot, check it shows nothing real.
 

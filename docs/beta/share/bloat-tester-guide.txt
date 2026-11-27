@@ -1,9 +1,9 @@
-BLOAT TESTER GUIDE
-==================
+BLOAT BUDDY TESTER GUIDE
+========================
 
-Thank you for helping test Bloat.
+Thank you for helping test Bloat Buddy.
 
-What Bloat is. A private diary for bloating: when it happens, how strong it is, what you ate, and your habits. Over time it shows patterns in your own records. It is a wellness tracker, not a medical service: it never diagnoses anything and never tells you what caused your bloating.
+What Bloat Buddy is. A private diary for bloating: when it happens, how strong it is, what you ate, and your habits. Over time it shows patterns in your own records. It is a wellness tracker, not a medical service: it never diagnoses anything and never tells you what caused your bloating.
 
 This is a test version. Things may change or break.
 
@@ -23,9 +23,9 @@ SIGNING IN
 2. Tap Sign in and use the email address and temporary password you were given.
 3. Go to You and tap Change password. Choose a new password of at least 10 characters that you don't use anywhere else.
 
-Forgot your password? Ask the person who invited you for a new temporary one, then change it again in You. Bloat sends no emails in this test version.
+Forgot your password? Ask the person who invited you for a new temporary one, then change it again in You. Bloat Buddy sends no emails in this test version.
 
-To add Bloat to your home screen: in Chrome, open the menu and tap "Add to Home screen"; in Safari, tap Share, then "Add to Home Screen".
+To add Bloat Buddy to your home screen: in Chrome, open the menu and tap "Add to Home screen"; in Safari, tap Share, then "Add to Home Screen".
 
 Your first session: follow the short first-session checklist (after this guide).
 
@@ -33,17 +33,17 @@ WHAT YOU CAN USE
 
 Pro is switched on for your account for testing. There is no subscription: nothing to pay, renew, pause or cancel.
 
-• Today: "I feel bloated" with a strength from 1 to 10, when it started and any warning signs; update the strength; end it. "No bloating so far today". Add a meal by typing what you had (when, how much, how fast, where it was made). Add habits. Log a bowel movement or exercise.
+• Today: "I feel bloated" (or the + button in the middle of the bottom bar, from any screen) with a strength from 1 to 10, when it started and any warning signs; update the strength; end it ("It's gone"). "No bloating so far today". Add a meal by typing what you had (when, how much, how fast, where it was made). Add habits (the Activity tile). Log a bowel movement or exercise. A week strip shows which days this week have anything logged.
 • Morning review: see "Which day the morning review scores", below.
 • History: every day, a chart (week, month, all) and a 7-day average. On a day: change times and a meal's name, and delete any entry, including a habit answer.
 • Patterns: Possible triggers (with day counts), Your journey, the weekly report, and the doctor report, which you can download or share by link and stop sharing at any time.
-• You: units, time zone, habits to follow, medicines, health background, family history, optional context, Keep an eye on it mode, hide charts, download your data (JSON or CSV), change password, sign out, delete account.
+• You: units, time zone, habits to follow, medicines, health background, family history, optional context, Keep an eye on it mode, hide charts, Appearance (same as the phone, light or dark), download your data (JSON or CSV), change password, sign out, delete account.
 • When to get medical help: on the Log bloating screen and in You.
 
 WHICH DAY THE MORNING REVIEW SCORES
 
 • A day runs from midnight to midnight in your time zone.
-• During the day, Today shows the highest strength logged so far. That is not a score yet ("Your score is set in tomorrow's review").
+• During the day, Today shows the highest strength logged so far. That is not a score yet ("Tomorrow morning, a short review sets today's Bloat Score.").
 • The next day, Today offers Review yesterday (a morning review). Your answers set the Bloat Score for yesterday, the day that has just finished, not for today.
 • A review done by the end of that next day is on time. A later review still sets the day's score and shows as late, but Possible triggers uses only days reviewed on time.
 • You can review or change an earlier finished day from History (up to 92 days back). Today itself can only be reviewed once it has finished.
@@ -52,7 +52,7 @@ WHAT IS NOT IN THIS ROUND
 
 • No AI: no ingredient check or photos for meals, and no way to add ingredients or save a dish.
 • No experiments, no Learn library and no daily cards.
-• No payments, no emails from Bloat, no Google sign-in, and no new sign-ups.
+• No payments, no emails from Bloat Buddy, no Google sign-in, and no new sign-ups.
 
 GOOD TO KNOW
 
@@ -69,7 +69,7 @@ What is kept:
 • A deletion record that holds only a one-way code made from your account's ID number, and the date. It contains no name, email address or records, and can't be turned back into your account. It exists so that, if the database is ever restored from a backup, your account is deleted again instead of coming back.
 • Files you downloaded and PDFs you saved stay wherever you saved them. Links you shared stop working.
 • The person who invited you keeps your name and email address on their private list of testers until they remove you.
-• The hosting services (Supabase and Vercel) keep their own technical logs, such as sign-ins and page requests, for a limited time. Bloat writes no health records into logs.
+• The hosting services (Supabase and Vercel) keep their own technical logs, such as sign-ins and page requests, for a limited time. Bloat Buddy writes no health records into logs.
 
 If it can't finish, the screen tells you which case it is:
 • "That didn't work. Nothing was deleted. Try again." Nothing was removed. Try again.
@@ -93,11 +93,11 @@ About 15 minutes. Made-up entries only. If something doesn't match what is writt
 
 1. Open https://bloat-preview.vercel.app and tap Sign in with the email address and temporary password you were given. → You land on Today.
 2. You, Change password: choose a new one of at least 10 characters. → "Password changed. Use the new one next time you sign in."
-3. You, Plan. → "Bloat Pro" and "Switched on for testing. There is no subscription, so nothing renews and nothing is charged." If it says "Bloat Free", tell the person who invited you.
-4. Optional: add Bloat to your home screen and open it from there. → It opens on Today.
-5. Today, I feel bloated: pick a made-up strength, Save. → "Bloating saved."
-6. Add meal: type a made-up dish, Save. → "Meal saved."
-7. Add activity: tick a habit, Save. → "Activity saved."
+3. You, Plan. → "Bloat Buddy Pro" and "Switched on for testing. There is no subscription, so nothing renews and nothing is charged." If it says "Bloat Buddy Free", tell the person who invited you.
+4. Optional: add Bloat Buddy to your home screen and open it from there. → It opens on Today.
+5. Today, I feel bloated (or the + button in the bottom bar): pick a made-up strength, Save. → "Bloating saved."
+6. Add to today, Meal: type a made-up dish, Save. → "Meal saved."
+7. Add to today, Activity: tick a habit, Save. → "Activity saved."
 8. History, open today. → Your entries are there. Change the meal's time, then delete the meal. → Gone after a refresh.
 9. Optional, to test food comparisons later: You, Keep an eye on it, choose 2 food groups.
 10. Tomorrow: on Today, Review yesterday. → Yesterday gets its Bloat Score in History.
@@ -119,4 +119,4 @@ Screenshot:      yes / no
 
 Something that isn't a problem but could be better? Use the same form and write "Suggestion" next to Screen.
 
-Bloat test version, first invited acceptance round, 27 November 2026. Bloat is a general wellness tracker and does not give medical advice.
+Bloat Buddy test version, first invited acceptance round, 27 November 2026. Bloat Buddy is a general wellness tracker and does not give medical advice.

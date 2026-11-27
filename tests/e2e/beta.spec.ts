@@ -121,7 +121,7 @@ test("A1: Pro given for testing shows no renewal and no Pause or Cancel; a bough
   const { page } = await account(context, { email: "pro-tester@bloat.test" });
   await page.goto("/me");
   const plan = page.locator("section", { has: page.getByText("Plan", { exact: true }) });
-  await expect(plan.getByText("Bloat Pro", { exact: true })).toBeVisible();
+  await expect(plan.getByText("Bloat Buddy Pro", { exact: true })).toBeVisible();
   await expect(plan.getByText("Switched on for testing. There is no subscription, so nothing renews and nothing is charged.")).toBeVisible();
   await expect(plan.getByText(/Renews on/)).toHaveCount(0);
   await expect(plan.getByRole("button", { name: "Pause Pro" })).toHaveCount(0);

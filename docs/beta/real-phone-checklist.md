@@ -19,7 +19,7 @@ Do the whole list once on an **iPhone with Safari** and once on an **Android pho
 | 1.1 | Open `https://bloat-preview.vercel.app` | The start page with **Sign in** (no "Get started", no Vercel login page) | |
 | 1.2 | Sign in with the email and temporary password | You land on Today | |
 | 1.3 | Pull down to refresh | Still signed in, still on Today | |
-| 1.4 | Add to home screen, close the browser, open Bloat from the home screen | It opens on Today, still signed in | |
+| 1.4 | Add to home screen, close the browser, open Bloat Buddy from the home screen | It opens on Today, still signed in | |
 
 ## 2. Logging
 
@@ -79,7 +79,7 @@ Do the whole list once on an **iPhone with Safari** and once on an **Android pho
 | 7.1 | With a sheet open, use the phone's Back gesture or button | The sheet closes first | |
 | 7.2 | On a screen, Back | You go back one screen | |
 | 7.3 | Rotate the phone | Nothing cut off or overlapping | |
-| 7.4 | Make the text larger in the phone's settings, reopen Bloat | Nothing cut off or overlapping | |
+| 7.4 | Make the text larger in the phone's settings, reopen Bloat Buddy | Nothing cut off or overlapping | |
 
 ## 8. Screen reader (separate from the list above)
 

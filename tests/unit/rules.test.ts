@@ -80,7 +80,7 @@ describe("Wording and safety (plan A17)", () => {
     const p = helpPage("US");
     expect(p.version).toBe(HELP_PAGE_VERSION);
     expect(p.title).toBe("When to get medical help");
-    expect(p.intro).toBe("Bloat is a tracker. It can't tell you what is causing your symptoms or whether they are serious.");
+    expect(p.intro).toBe("Bloat Buddy is a tracker. It can't tell you what is causing your symptoms or whether they are serious.");
     expect(p.sections[0]).toEqual({
       level: "emergency", heading: "Call 911 now if you have bloating with a swollen stomach and:",
       items: ["stomach pain that is severe and came on very suddenly", "you are vomiting blood, or your vomit looks like coffee grounds", "severe difficulty breathing – you're gasping, choking or unable to get words out"],
@@ -125,7 +125,7 @@ describe("Wording and safety (plan A17)", () => {
     expect(COMPARISON_LINE).toBe("This is a difference in your records, not a medical measure.");
   });
 
-  it("Q96 Bloat names no condition in its own words: condition names appear only as registry options the user picks", () => {
+  it("Q96 Bloat Buddy names no condition in its own words: condition names appear only as registry options the user picks", () => {
     const names = /\b(ibs|irritable bowel|sibo|coeliac|celiac|crohn|colitis|gastroparesis|endometriosis|lactose intoleran|gluten intoleran)\b/i;
     const hits: string[] = [];
     // Learn article outlines are copied from the plan and listed apart.

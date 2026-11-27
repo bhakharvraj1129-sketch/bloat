@@ -35,7 +35,7 @@ export const POST = route({ capability: "recording", body, mutation: true, featu
   const def = experimentDef(ctx.body.key);
   // Wheat, grains, FODMAP and anything touching several groups is never offered (403 NOT_OFFERED).
   if (isNeverOffered(ctx.body.key, ctx.body.groups) || (!def && ctx.body.key.startsWith("swap"))) {
-    throw new ApiError(403, "NOT_OFFERED", "Bloat doesn't offer this experiment.");
+    throw new ApiError(403, "NOT_OFFERED", "Bloat Buddy doesn't offer this experiment.");
   }
   if (!def) throw new ApiError(422, "VALIDATION", "Unknown experiment.");
   const b = await loadBundle(ctx.db, ctx.userId, u, ctx.now, ctx.plan);

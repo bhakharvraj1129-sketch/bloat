@@ -59,7 +59,7 @@ export function Health() {
         };
         return (
           <>
-            <Caption>Optional. This is a record for you and for your doctor report. Bloat uses it only to decide whether food swap experiments are offered and to hide cards that don&apos;t fit. It is never used to suggest a condition.</Caption>
+            <Caption>Optional. This is a record for you and for your doctor report. Bloat Buddy uses it only to decide whether food swap experiments are offered and to hide cards that don&apos;t fit. It is never used to suggest a condition.</Caption>
             <section className="flex flex-col gap-3" aria-labelledby="hc01">
               <p id="hc01" className="t-body-strong">{question("HC-01").prompt}</p>
               <div className="flex flex-wrap gap-2">{options("HC-01").map((o) => <Chip key={o.value} selected={has(o.value)} onClick={() => toggle(o.value)}>{o.label}</Chip>)}</div>

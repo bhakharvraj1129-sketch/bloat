@@ -99,5 +99,5 @@ export function proDetailRequested(body: { feel?: unknown; symptoms?: unknown; s
 }
 
 export function requirePro(plan: string) {
-  if (plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Pro.");
+  if (plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Buddy Pro.");
 }

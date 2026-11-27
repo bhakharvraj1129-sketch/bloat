@@ -2,8 +2,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSyncExternalStore } from "react";
-import { CalendarDays, ChartNoAxesColumn, House, LifeBuoy, UserRound } from "lucide-react";
+import { CalendarDays, ChartNoAxesColumn, House, LifeBuoy, Plus, UserRound } from "lucide-react";
 import { cx } from "./ui";
+import { Logo } from "./logo";
 import { ownerOf, type Owner } from "@/lib/nav-owner";
 import { onTrailChange, previousScreen } from "@/lib/client/nav";
 
@@ -21,46 +22,61 @@ function useOwner(): Owner | null {
   return ownerOf(path, from);
 }
 
-// Phones: four bottom tabs, each icon with its word.
+/** Opens the bloating log from anywhere: Today reads ?log=1 and opens Log bloating, or Bloating now if one is open. */
+export const LOG_HREF = "/today?log=1";
+
+function TabLink({ id, href, label, icon: Icon, on }: (typeof TABS)[number] & { on: boolean }) {
+  return (
+    <Link href={href} aria-current={on ? "page" : undefined}
+      className={cx("flex min-h-12 flex-col items-center justify-center gap-1 text-xs no-underline", on ? "font-bold text-brand-text" : "font-medium text-ink-muted")}
+      data-tab={id}>
+      <Icon size={22} strokeWidth={on ? 2.2 : 1.75} aria-hidden />
+      {label}
+    </Link>
+  );
+}
+
+// Phones: Today, History, a raised log button, Patterns, You. Each tab has its word.
 export function TabBar() {
   const owner = useOwner();
+  const [left, right] = [TABS.slice(0, 2), TABS.slice(2)];
   return (
-    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2 md:hidden">
-      <ul className="mx-auto grid max-w-lg grid-cols-4">
-        {TABS.map(({ id, href, label, icon: Icon }) => {
-          const on = owner === id;
-          return (
-            <li key={id}>
-              <Link href={href} aria-current={on ? "page" : undefined}
-                className={cx("flex min-h-12 flex-col items-center justify-center gap-1 text-[0.8125rem] no-underline", on ? "font-bold text-ink" : "text-ink-muted")}>
-                <Icon size={22} strokeWidth={on ? 2 : 1.5} aria-hidden />
-                {label}
-              </Link>
-            </li>
-          );
-        })}
+    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-1.5 md:hidden">
+      <ul className="mx-auto grid max-w-lg grid-cols-5 items-center px-1.5">
+        {left.map((t) => <li key={t.id}><TabLink {...t} on={owner === t.id} /></li>)}
+        <li className="flex justify-center">
+          <Link href={LOG_HREF} className="-mt-5 inline-flex h-14 w-14 items-center justify-center rounded-[1.125rem] bg-brand text-on-brand no-underline hover:opacity-90">
+            <Plus size={26} strokeWidth={2.4} aria-hidden />
+            <span className="sr-only">Log bloating</span>
+          </Link>
+        </li>
+        {right.map((t) => <li key={t.id}><TabLink {...t} on={owner === t.id} /></li>)}
       </ul>
     </nav>
   );
 }
 
-// Tablets and desktops: a sidebar with the same four destinations.
+// Tablets and desktops: a sidebar with the log button and the same four destinations.
 export function SideNav() {
   const owner = useOwner();
   return (
     <aside className="sticky top-0 hidden h-dvh flex-col gap-8 border-r border-line bg-surface px-4 py-8 md:flex lg:px-5">
       <div className="flex flex-col gap-2 px-3">
-        <Link href="/today" className="font-display text-[1.6875rem] font-semibold leading-none tracking-[-0.05em] text-ink no-underline">bloat.</Link>
-        <span className="t-label">Your daily record</span>
+        <Link href="/today" className="no-underline" aria-label="Bloat Buddy, Today"><Logo size={30} /></Link>
+        <span className="t-label">Your bloating diary</span>
       </div>
-      <nav aria-label="Main">
+      <Link href={LOG_HREF} className="flex min-h-12 items-center gap-3 rounded-sm bg-brand px-3 font-semibold text-on-brand no-underline hover:opacity-90">
+        <Plus size={20} strokeWidth={2.2} aria-hidden />
+        Log bloating
+      </Link>
+      <nav aria-label="Main" className="-mt-4">
         <ul className="flex flex-col gap-1">
           {TABS.map(({ id, href, label, icon: Icon }) => {
             const on = owner === id;
             return (
               <li key={id}>
                 <Link href={href} aria-current={on ? "page" : undefined}
-                  className={cx("flex min-h-12 items-center gap-3 rounded-sm px-3 no-underline transition-colors duration-150", on ? "bg-subtle font-semibold text-ink" : "text-ink-muted hover:bg-subtle hover:text-ink")}>
+                  className={cx("flex min-h-12 items-center gap-3 rounded-sm px-3 no-underline transition-colors duration-150", on ? "bg-brand-tint font-semibold text-brand-text" : "text-ink-muted hover:bg-subtle hover:text-ink")}>
                   <Icon size={20} strokeWidth={on ? 2 : 1.5} aria-hidden />
                   {label}
                 </Link>

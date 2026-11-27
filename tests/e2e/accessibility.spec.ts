@@ -206,6 +206,9 @@ test.describe("200% browser zoom (1280 x 800 window)", () => {
         }
         for (const el of document.querySelectorAll("body *")) {
           if (!visible(el) || !(el as HTMLElement).innerText?.trim()) continue;
+          // Screen-reader-only text (a 1px clipped box on purpose, e.g. the week strip's day names) is not cut-off text.
+          const box = el.getBoundingClientRect();
+          if (el.classList.contains("sr-only") && box.width <= 1 && box.height <= 1) continue;
           const c = getComputedStyle(el);
           const clips = ["hidden", "clip"].includes(c.overflowX) || c.textOverflow === "ellipsis";
           if (clips && el.scrollWidth > el.clientWidth + 2) out.push(`text cut off: ${el.tagName} "${name(el)}"`);

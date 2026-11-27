@@ -3,33 +3,34 @@ import type { ReactNode } from "react";
 import { INTENDED_USE } from "@/lib/wording";
 import { BackLink } from "./nav";
 import { PublicMenu, type PublicLink } from "./public-menu";
+import { Logo } from "./logo";
 
 const HEADER_LINKS: PublicLink[] = [
   { href: "/how-bloat-works", label: "How it works" },
+  { href: "/privacy", label: "Privacy" },
   { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
 ];
 const ALL_LINKS: PublicLink[] = [
   ...HEADER_LINKS,
   { href: "/help", label: "When to get medical help" },
-  { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
+  { href: "/contact", label: "Contact" },
 ];
 const SIGN_IN: PublicLink = { href: "/sign-in", label: "Sign in" };
 
 export function Wordmark({ className = "" }: { className?: string }) {
-  return <span className={`font-display text-[1.6875rem] font-semibold leading-none tracking-[-0.05em] text-ink ${className}`}>bloat.</span>;
+  return <Logo className={className} />;
 }
 
 /** The public header: name, the main public pages and Sign in. On phones they move into a menu. */
 export function PublicHeader() {
   return (
-    <header className="relative border-b border-line bg-surface">
+    <header className="sticky top-0 z-20 border-b border-line bg-ground/95 backdrop-blur">
       <div className="mx-auto flex max-w-[76rem] items-center gap-6 px-5 py-4 md:px-8 lg:px-12">
-        <Link href="/" className="no-underline" aria-label="Bloat, home"><Wordmark /></Link>
+        <Link href="/" className="no-underline" aria-label="Bloat Buddy, home"><Wordmark /></Link>
         <nav aria-label="Site" className="ml-auto hidden items-center gap-7 text-[0.9375rem] md:flex">
           {HEADER_LINKS.map((l) => <Link key={l.href} href={l.href} className="no-underline hover:underline">{l.label}</Link>)}
-          <Link href={SIGN_IN.href} className="inline-flex min-h-11 items-center rounded-sm border border-brand bg-brand px-4 font-semibold text-on-brand no-underline hover:opacity-90">{SIGN_IN.label}</Link>
+          <Link href={SIGN_IN.href} className="inline-flex min-h-11 items-center rounded-sm bg-brand px-5 font-semibold text-on-brand no-underline hover:opacity-90">{SIGN_IN.label}</Link>
         </nav>
         <div className="ml-auto md:hidden"><PublicMenu links={ALL_LINKS} signIn={SIGN_IN} /></div>
       </div>
@@ -45,7 +46,7 @@ export function PublicFooter() {
           <Wordmark className="mr-4" />
           <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-2 text-[0.9375rem]">
             <Link href="/about">About</Link>
-            <Link href="/how-bloat-works">How Bloat works</Link>
+            <Link href="/how-bloat-works">How Bloat Buddy works</Link>
             <Link href="/help">When to get medical help</Link>
             <Link href="/privacy">Privacy</Link>
             <Link href="/terms">Terms</Link>

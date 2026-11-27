@@ -30,9 +30,9 @@ function Report({ d: raw, name }: { d: DoctorSnapshot; name: string }) {
   const d = privateDoctorSnapshot(raw);
   const inc = new Set(includedSections(d));
   const sm = d.summary, sec = d.sections;
-  const footer = <Text style={s.footer} fixed render={({ pageNumber, totalPages }) => `Bloat doctor report · ${d.from} to ${d.to} · self-reported · page ${pageNumber} of ${totalPages}`} />;
+  const footer = <Text style={s.footer} fixed render={({ pageNumber, totalPages }) => `Bloat Buddy doctor report · ${d.from} to ${d.to} · self-reported · page ${pageNumber} of ${totalPages}`} />;
   return (
-    <Document title="Bloat doctor report" author="Bloat" subject="Self-reported bloating diary">
+    <Document title="Bloat Buddy doctor report" author="Bloat Buddy" subject="Self-reported bloating diary">
       <Page size="A4" style={s.page}>
         <Text style={s.h1}>Bloating diary summary</Text>
         <Text style={s.muted}>{name ? `${name} · ` : ""}{d.from} to {d.to} · time zone {d.time_zone}</Text>

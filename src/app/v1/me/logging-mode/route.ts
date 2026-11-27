@@ -13,7 +13,7 @@ export const PUT = route({ body, mutation: true }, async (ctx) => {
   const u = await loadUser(ctx.db, ctx.userId, ctx.now);
   const b = ctx.body;
   if (b.mode === "keep_an_eye") {
-    if (ctx.plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Pro.");
+    if (ctx.plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Buddy Pro.");
     const groups = b.watched_groups ?? u.profile.watched_groups;
     if (!groups.length || groups.some((g) => !FOOD_TAG_IDS.includes(g)) || new Set(groups).size !== groups.length) {
       throw new ApiError(422, "VALIDATION", "Choose up to 5 food groups to keep an eye on.");

@@ -64,7 +64,7 @@ test("Pro: Today, History, Patterns and Your journey do not link to experiments;
   for (const path of ["/experiments", "/experiments?start=eat_more_slowly", `/experiments/${crypto.randomUUID()}`]) {
     await page.goto(path);
     await expect(page.getByText("Not available", { exact: true }), path).toBeVisible();
-    await expect(page.getByText("This isn't part of this version of Bloat.")).toBeVisible();
+    await expect(page.getByText("This isn't part of this version of Bloat Buddy.")).toBeVisible();
     await expect(page.getByRole("link", { name: "Go to Today" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Choose" })).toHaveCount(0);
   }
@@ -80,7 +80,7 @@ test("Pro: the other non-AI Pro screens still open", async ({ context }) => {
     await page.goto(path);
     await expect(page.getByRole("heading", { name: heading, exact: typeof heading === "string" }).first(), path).toBeVisible();
     await expect(page.getByText("Not available", { exact: true }), path).toHaveCount(0);
-    await expect(page.getByText("This is part of Bloat Pro."), path).toHaveCount(0);
+    await expect(page.getByText("This is part of Bloat Buddy Pro."), path).toHaveCount(0);
   }
   await page.goto("/today");
   await expect(page.getByRole("button", { name: "Log bowel movement" })).toBeVisible();
@@ -97,7 +97,7 @@ test("Free and signed out: the Pro page and the start page do not list experimen
 
   const visitor = await context.browser()!.newPage();
   await visitor.goto(page.url().replace(/\/upgrade.*$/, "/"));
-  await expect(visitor.getByRole("rowheader", { name: "Possible triggers", exact: true })).toBeVisible();
+  await expect(visitor.getByRole("heading", { name: "Patterns in your records", exact: true })).toBeVisible();
   await expect(visitor.getByText(/experiments/i)).toHaveCount(0);
   await expect(visitor.getByText("Ingredient check and saved dishes")).toHaveCount(0);
   await visitor.close();

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Lock } from "lucide-react";
 import { Button, Caption, Card, Chip, Field, Label, ProTag, SaveStatus, Segmented, inputClass } from "@/components/ui";
 import { QuestionField } from "@/components/question";
+import { Logo } from "@/components/logo";
 import { clearPre, readPre } from "@/lib/client/pre";
 import { deviceZone } from "@/lib/client/api";
 import { useSave } from "@/lib/client/hooks";
@@ -15,7 +16,7 @@ import { HELP_PAGE_VERSION, HOW_BLOAT_WORKS } from "@/lib/wording";
 type Answer = { value: string | string[] | null; at: string };
 type Med = { name: string; type: "medicine" | "supplement"; med_group?: string };
 
-const STEPS = ["Consent", "Location, time and units", "About your bloating", "Other symptoms you often get", "Your food", "Health context", "What you want to find out", "Habits to follow", "How Bloat works"];
+const STEPS = ["Consent", "Location, time and units", "About your bloating", "Other symptoms you often get", "Your food", "Health context", "What you want to find out", "Habits to follow", "How Bloat Buddy works"];
 const CONSENTS = [
   ["terms_privacy", "CN-01"], ["health_data", "CN-02"], ["wellness_ack", "CN-03"],
 ] as const;
@@ -115,7 +116,7 @@ export function Setup() {
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-[38rem] flex-col gap-6 px-5 pb-12 pt-8 md:pt-14">
-      <p className="font-display text-[1.6875rem] font-semibold leading-none tracking-[-0.05em]">bloat.</p>
+      <Logo />
       <div>
         <p className="t-caption">Step {step + 1} of {STEPS.length}</p>
         <div className="mt-2 h-1.5 overflow-hidden rounded-pill bg-line" aria-hidden><div className="h-full rounded-pill bg-brand transition-all duration-200" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} /></div>
@@ -126,9 +127,9 @@ export function Setup() {
         <>
           <Card>
             <ul className="flex list-disc flex-col gap-2 pl-5">
-              <li>Bloat stores what you log: bloating, meals, habits and the answers you give here.</li>
+              <li>Bloat Buddy stores what you log: bloating, meals, habits and the answers you give here.</li>
               <li>Your records are private to your account. No ads, and nothing is sold.</li>
-              <li>Bloat is a tracker. It does not diagnose or treat anything.</li>
+              <li>Bloat Buddy is a tracker. It does not diagnose or treat anything.</li>
               <li>You can download or delete everything at any time in Me.</li>
             </ul>
           </Card>
@@ -222,7 +223,7 @@ export function Setup() {
 
       {step === 7 && (
         <>
-          <p>Pick up to 3. Each morning Bloat asks whether they happened yesterday. Only habits you follow can be compared later.</p>
+          <p>Pick up to 3. Each morning Bloat Buddy asks whether they happened yesterday. Only habits you follow can be compared later.</p>
           <p className="t-body-strong tabular" aria-live="polite">{followed.length}/3 chosen</p>
           {Object.entries(ACTIVITY_GROUP_LABELS).map(([group, name]) => (
             <div key={group} className="flex flex-col gap-2">
@@ -242,7 +243,7 @@ export function Setup() {
               </div>
             </div>
           ))}
-          <Caption>Habits marked Pro are part of Bloat Pro. You can change your habits in Me.</Caption>
+          <Caption>Habits marked Pro are part of Bloat Buddy Pro. You can change your habits in Me.</Caption>
         </>
       )}
 

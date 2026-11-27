@@ -49,7 +49,7 @@ const pastDay = (c: Ctx, k: number) => new Date(Date.parse(`${c.today}T12:00:00Z
 
 /** The status line under "I feel bloated" (bloating) or under the Add to today buttons (add). */
 const notice = (page: Page, where: "bloating" | "add") =>
-  page.locator("section", { has: where === "add" ? page.getByRole("heading", { name: "Add to today" }) : page.getByText("Highest logged so far") }).getByRole("status").last();
+  page.locator("section", { has: where === "add" ? page.getByRole("heading", { name: "Add to today" }) : page.getByRole("heading", { name: "How are you feeling?" }) }).getByRole("status").last();
 
 /** Press Tab (or Shift+Tab) until the target has focus. */
 async function tabTo(page: Page, target: Locator, max = 80) {
@@ -134,15 +134,17 @@ test.describe("T2 and T3: inline saves on Today keep keyboard focus; the score r
   test("No bloating so far today: focus moves to I feel bloated, the save is announced, and the score reads 0 out of 10", async ({ context }) => {
     const { page } = await account(context);
     await page.goto("/today");
-    const score = page.locator("p.t-score");
-    await expect(score).toHaveAttribute("aria-label", "Nothing logged yet");
+    await expect(page.getByText("Nothing logged yet today.")).toBeVisible();
+    await expect(page.getByRole("img", { name: /out of 10/ })).toHaveCount(0);
+    await expect(page.getByText("?", { exact: true })).toHaveCount(0);
     await tabTo(page, page.getByRole("button", { name: "No bloating so far today" }));
     await page.keyboard.press("Enter");
     await expect(page.getByText("No bloating so far", { exact: true })).toBeVisible({ timeout: 20000 });
     await expect(page.getByRole("button", { name: "I feel bloated" })).toBeFocused();
     await expect(notice(page, "bloating")).toHaveText("Noted: no bloating so far today.");
-    await expect(score).toHaveAttribute("aria-label", "0 out of 10");
+    await expect(page.getByText("Highest logged so far")).toBeVisible();
     await expect(page.getByRole("img", { name: "0 out of 10" })).toHaveText("0/ 10");
+    await expect(page.getByText("Nothing logged yet today.")).toHaveCount(0);
   });
 
   test("experiment answer: focus moves to Open experiment", async ({ context }) => {
@@ -217,5 +219,80 @@ test.describe("T4: a typed time that is empty cannot be sent, and the field says
     await edit.locator('input[type="datetime-local"]').fill("");
     await expect(edit.getByText("Choose a date and time to save.")).toBeVisible();
     await expect(edit.getByRole("button", { name: "Save changes" })).toBeDisabled();
+  });
+});
+
+// Redesign (27 Nov 2026, owner's design canvas): the log button in the bottom bar, the week strip,
+// the theme switch and the Patterns card shown before anything can be compared.
+test.describe("Redesign: log button, week strip, theme and Patterns progress", () => {
+  test("the log button opens Log bloating from another screen, then Bloating now once one is open", async ({ context }) => {
+    const c = await account(context);
+    const { page } = c;
+    await page.goto("/history");
+    await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Log bloating" }).click();
+    const log = page.getByRole("dialog", { name: "Log bloating" });
+    await expect(log).toBeVisible();
+    await expect(page).toHaveURL(/\/today$/); // the ?log=1 address is tidied away
+    await log.getByRole("radio", { name: "4", exact: true }).click();
+    await log.getByRole("button", { name: "Save" }).click();
+    await expect(log).toBeHidden({ timeout: 20000 });
+    await expect(notice(page, "bloating")).toHaveText("Bloating saved.");
+
+    // The week strip fills in today, and says so to screen readers. No score is shown.
+    const week = page.getByRole("region", { name: "This week" });
+    await expect(week.getByRole("listitem").filter({ hasText: ", today, logged" })).toHaveCount(1);
+    await expect(week.getByRole("listitem").filter({ hasText: ", logged" })).toHaveCount(1);
+
+    await page.goto("/me");
+    await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Log bloating" }).click();
+    await expect(page.getByRole("dialog", { name: "Bloating now" })).toBeVisible();
+    await expect(page.getByRole("dialog", { name: "Log bloating" })).toHaveCount(0);
+  });
+
+  test("It's gone on Today goes straight to Bloating ended", async ({ context }) => {
+    const c = await account(context);
+    const { page } = c;
+    await page.goto("/today");
+    await page.getByRole("button", { name: "I feel bloated" }).click();
+    const log = page.getByRole("dialog", { name: "Log bloating" });
+    await log.getByRole("radio", { name: "3", exact: true }).click();
+    await log.getByRole("button", { name: "Save" }).click();
+    await expect(log).toBeHidden({ timeout: 20000 });
+    await page.getByRole("button", { name: "It's gone" }).click();
+    const end = page.getByRole("dialog", { name: "Bloating ended" });
+    await end.getByRole("button", { name: "Save" }).click();
+    await expect(end.getByRole("button", { name: "Done" })).toBeVisible({ timeout: 20000 });
+    await end.getByRole("button", { name: "Done" }).click();
+    await expect(page.getByRole("button", { name: /Bloating ongoing/ })).toHaveCount(0);
+    await expect(page.getByText(/Bloating, strongest 3$/)).toBeVisible();
+  });
+
+  test("Appearance in You switches to dark or light at once, is kept after a reload, and Same as device clears it", async ({ context }) => {
+    const { page } = await account(context);
+    await page.goto("/me");
+    const group = page.getByRole("radiogroup", { name: "Appearance" });
+    await expect(group.getByRole("radio", { name: "Same as device" })).toHaveAttribute("aria-checked", "true");
+    await group.getByRole("radio", { name: "Dark" }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await expect(page.getByRole("radiogroup", { name: "Appearance" }).getByRole("radio", { name: "Dark" })).toHaveAttribute("aria-checked", "true");
+    await page.getByRole("radiogroup", { name: "Appearance" }).getByRole("radio", { name: "Same as device" }).click();
+    await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.+/);
+    await page.reload();
+    await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.+/);
+  });
+
+  test("Patterns before anything is compared: real progress, and the waiting list is folded", async ({ context }) => {
+    const { page } = await account(context, true);
+    await page.goto("/insights");
+    await expect(page.getByRole("heading", { name: "Your patterns are on their way" })).toBeVisible({ timeout: 20000 });
+    await expect(page.getByRole("img", { name: "0 of 14 confirmed days" })).toBeVisible();
+    await expect(page.getByText("Not enough data yet")).toBeVisible();
+    const fold = page.locator("details");
+    await expect(fold).not.toHaveAttribute("open", "");
+    await fold.locator("summary").click();
+    await expect(fold).toHaveAttribute("open", "");
+    await expect(fold.getByRole("listitem").first()).toBeVisible();
   });
 });

@@ -25,7 +25,7 @@ export const POST = route({ capability: "recording", body, mutation: true, featu
   const u = await loadUser(ctx.db, ctx.userId, ctx.now);
   const b = ctx.body;
   const wantsPro = b.mode !== undefined || b.ingredients !== undefined || b.save_as_dish !== undefined || b.saved_dish_id !== undefined || b.source === "photo" || b.source === "saved_dish";
-  if (wantsPro && ctx.plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Pro.");
+  if (wantsPro && ctx.plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Buddy Pro.");
 
   const { data: dup } = await ctx.db.from("meals").select("id").eq("user_id", ctx.userId).eq("save_key", b.save_key).maybeSingle();
   if (dup) throw new ApiError(409, "IDEMPOTENCY_KEY_REUSED", "This meal was already saved.", { meal_id: dup.id });

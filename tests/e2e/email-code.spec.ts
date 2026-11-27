@@ -92,7 +92,7 @@ test("when the code email cannot be sent, or there is no connection, or codes ar
   await page.unroute("**/auth/v1/otp**");
   await page.route("**/auth/v1/otp**", (r) => r.abort("internetdisconnected"));
   await page.getByRole("button", { name: "Send code" }).click();
-  await expect(page.getByText("We couldn't reach Bloat. Check your connection and try again. No code was sent.")).toBeVisible({ timeout: 60000 });
+  await expect(page.getByText("We couldn't reach Bloat Buddy. Check your connection and try again. No code was sent.")).toBeVisible({ timeout: 60000 });
   await page.unroute("**/auth/v1/otp**");
   await page.route("**/auth/v1/otp**", (r) => r.fulfill({ status: 429, contentType: "application/json", body: JSON.stringify({ code: 429, error_code: "over_email_send_rate_limit", msg: "For security purposes, you can only request this after 37 seconds." }) }));
   await page.getByRole("button", { name: "Send code" }).click();

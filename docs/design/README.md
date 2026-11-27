@@ -1,3 +1,5 @@
+> **27 Nov 2026: design v2, "Bloat Buddy"** supersedes Silver. The owner renamed the app, chose a calm teal ("Sea glass"), logo A ("Calm wave") and both light and dark themes, from a design canvas made that day. The values live in `src/app/globals.css`; the choices are DECISIONS.md choice 31. Silver (below) is kept for the record.
+
 > **19 Nov 2026: the visual system is now Bloat / Silver** (`docs/design/silver/`, values in `tokens.json` version 2).
 > White, silver grey and black; system fonts; 12px controls and 20px cards; a sidebar from tablet width and four
 > bottom tabs on phones (Today, History, Patterns, You); light theme only for now. The colour, type and shape rules
