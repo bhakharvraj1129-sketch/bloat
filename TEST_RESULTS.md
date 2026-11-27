@@ -4,6 +4,21 @@ Last run: 27 Nov 2026 (first invited acceptance round: experiments off, Pro page
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
 
+## Participant accounts (27 Nov 2026): run 19, deployment `dpl_2QsTiDKAVFB4NaQr99RVjTtAGdvt`
+
+Run 19 was started by hand on the publishing branch to apply the extended Pro test list. It built `9cb6ee3` (app code identical to the accepted `35c947b`) and passed every step: typecheck, lint, rule, API and browser tests on a clean checkout (the round's server-specific checks skipped there, as in run 18), the 6 signed-out live checks before and after publishing. All 221 repository files Vercel lists for the deployment (86 app files among them) are byte-identical to `9cb6ee3`.
+
+| Check, on the live site | Result |
+|---|---|
+| Each of the 5 participant addresses checked before creating anything | None existed; all 5 created (confirmed, one identity each, marked as participants) |
+| Each participant account: sign in once with its temporary password | 5 of 5 signed in |
+| `/v1/me/state` | 5 of 5: plan Pro; not yet set up (`onboarded: false`, as intended: testers set up their own account and give their own consents) |
+| Experiments, Learn, daily cards, the AI recalled-meals offer | 5 of 5: each answered 404 "not available" |
+| Sign out, then the same sign-in again | 5 of 5 signed out; refused afterwards (401) |
+| Read-only check of `bloat-test` afterwards | 0 open sessions and 0 live refresh tokens for the participants; no profile, entitlement or consent rows (nothing written by the check); 9 users (4 earlier, 5 participants); 0 test-run accounts; `bloat-tester` unchanged |
+
+The check set each participant account's "last sign-in" time. No password or token was printed.
+
 ## First invited acceptance round (27 Nov 2026): commit `35c947b`
 
 The owner's decisions: experiments off, Pro test access without payment, made-up data only. Changes: experiments switched off on every screen and route (choice 29), the Pro page's wording for Pro given for testing (A1, Pro page), and no "save your usual dishes" suggestion while AI is off (choice 30). Synthetic `@example.com` accounts on the local stack.

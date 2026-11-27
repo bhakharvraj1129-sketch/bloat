@@ -1,6 +1,6 @@
 # First invited acceptance round (no AI)
 
-**Status: accepted by you on 27 Nov 2026 for the fictional-data round, and frozen: commit `35c947b`, Vercel deployment `dpl_LxVJ6VzoY4iswtpfhy78kN3B76jj` (run 18), checked signed in on that deployment. No tester account exists and nobody has been invited.** Public sign-ups stay off. Real payments stay off. No real AI provider is connected.
+**Status: accepted by you on 27 Nov 2026 for the fictional-data round, and frozen: commit `35c947b`, Vercel deployment `dpl_LxVJ6VzoY4iswtpfhy78kN3B76jj` (run 18), checked signed in on that deployment. On 27 Nov, with your approval, 5 participant accounts were created and added to the Pro test list (run 19, deployment `dpl_2QsTiDKAVFB4NaQr99RVjTtAGdvt`, the same app code). Claude has contacted nobody: you distribute the guide and credentials.** Public sign-ups stay off. Real payments stay off. No real AI provider is connected.
 
 Review address: `https://bloat-preview.vercel.app`. The three older addresses (`bloat-olive`, `bloat-typeshi2`, `bloat-git-main-typeshi2`) are left as they are.
 

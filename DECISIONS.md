@@ -63,6 +63,8 @@ Choices made while building, with the reason. Everything still waiting for the o
 
 - **27 Nov 2026, acceptance.** The owner accepted the candidate `35c947b` (deployment `dpl_LxVJ6VzoY4iswtpfhy78kN3B76jj`) for the planned fictional-data acceptance round. It stays frozen; no account is created and no invitation sent until the owner gives the testers' details and explicit approval.
 
+- **27 Nov 2026, participant accounts.** The owner approved Pro test accounts (no subscription, no charge) for five named testers. They are persistent participant accounts, not test accounts: excluded from test cleanup, and not deleted, reset or changed without the owner's instruction. The owner distributes the guide and credentials personally; Claude sends no email, text or invitation. Names and addresses are kept out of the repository.
+
 ## Open decisions
 
 Only questions still waiting for the owner, grouped by **who can use the affected feature on the preview today** (not by price). Anything in the first three groups is already in front of testers, and anyone who opens the preview addresses can see the public pages; decide those before more people use them. The last group is switched off, paused or not built; decide those before switching the feature on. Until a decision is made, the app keeps the "built now" behaviour.

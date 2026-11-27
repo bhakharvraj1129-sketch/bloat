@@ -14,6 +14,9 @@ The round, as you decided on 27 Nov 2026: 3 to 5 trusted testers, Pro switched o
 
 ## 1. Create one account per tester
 
+*First round: done by Claude on 27 Nov with your approval (5 accounts, Pro list updated, run 19). These steps are for any later tester.*
+
+
 1. Supabase dashboard, project **bloat-test**: Authentication, Users, **Add user**, **Create new user**.
 2. Email: the tester's address. Password: a new temporary one made by your password manager (at least 12 characters). Tick **Auto Confirm User**. Create.
 3. Copy the tester's **User UID** into your private list (you need it to reset a password).
