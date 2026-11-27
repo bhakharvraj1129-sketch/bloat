@@ -1,10 +1,26 @@
 # Test results
 
-Last run: 27 Nov 2026 (design v2, "Bloat Buddy": local results below; CI and live results follow the publishing run). Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
+Last run: 27 Nov 2026 (design v2, "Bloat Buddy", commit `3120a26`, published by run 20 as `dpl_7DidTdSjyyaiPWeW52ER3docj8dm`). Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
 
-## Design v2, "Bloat Buddy" (27 Nov 2026): local results
+## Design v2, "Bloat Buddy" (27 Nov 2026): run 20, deployment `dpl_7DidTdSjyyaiPWeW52ER3docj8dm`
+
+Published revision `3120a2643f88a23c529418aeed466f5337ab2c8b` on `https://bloat-preview.vercel.app` and the branch address (12:36 UTC). Preview variables unchanged (the round's settings). The three main addresses still serve `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (`83fe4da`).
+
+| Check | Passed | Failed | Notes |
+|---|---|---|---|
+| GitHub run 20, from its log | Typecheck, lint; rule tests; API tests; browser 278 (3 skipped); the account-free live checks before and after publishing | 0 | Clean checkout, one normal server. **Skipped there, not passed:** the round's 10 API and 3 browser checks (run locally against the second server, below) |
+| Tested = deployed | | | Both preview addresses on `dpl_7DidTdSjyyaiPWeW52ER3docj8dm`; all 220 repository files Vercel lists are byte-identical to `3120a26` (SHA-1 of contents), 69 of the 96 files changed since `895a05a` among them; Vercel lists 493 of 667 files, so the rest could not be compared |
+| Core hosted suite (`navigation`, `preview`, `signed-in-journey`, `signed-in-navigation`), 16 checks | 16 | 0 | 8 fresh disposable accounts marked `synthetic_test_run = 2026-11-27-run20` |
+| `tests/hosted/beta-candidate.spec.ts`, 4 checks | 4 | 0 | The round's settings live: saves say what was saved, Pro test access, experiments not offered, AI and Learn not offered |
+| Live screenshots (signed out, and a disposable Pro account in light and dark) | | | Start page shows "Invite-only test" and Sign in; Today shows the new layout and no Experiments shortcut |
+| Cleanup: the 8 accounts deleted through the app | 8 | 0 | Each answered "deleted"; the same sign-in was refused (401) straight after; the one-off password file destroyed |
+| Read-only check of `bloat-test` after the cleanup | | | 0 accounts by ID or address, 0 with a test-run marker, 0 identities, sessions or refresh tokens, 0 rows for them in all 48 tables with a user column, 0 stored files; `bloat-tester` unchanged (1 meal, 1 bloating record, 2 readings, 1 report, same sign-in times and password hash); the 5 participant accounts unchanged by the checks (same IDs, sign-in and update times before and after) |
+
+**Not performed:** real phones and screen readers (browser emulation only).
+
+### Local results
 
 The owner's redesign (DECISIONS.md choice 31): new name, logo, colour, light and dark themes, start page, bottom bar with a log button, Today, and the Patterns card before anything is compared. Local stack, synthetic accounts only, the normal server on port 3100 and a second server on port 3200 with this round's settings (`BLOAT_AI_PROVIDER=off`, `BLOAT_OFF_FEATURES=learn_library,daily_cards,experiments_habit,experiments_swap`).
 
