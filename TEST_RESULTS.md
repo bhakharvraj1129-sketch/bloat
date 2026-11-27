@@ -1,10 +1,27 @@
 # Test results
 
-Last run: 27 Nov 2026 (the owner's answers D33 to D35 and the state list: local results; CI and live results follow run 21). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
+Last run: 27 Nov 2026 (the owner's answers D33 to D35 and the state list, commit `c91169c`, published by run 21 as `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
 
-## Owner's answers D33 to D35 and the state list (27 Nov 2026): local results
+## Owner's answers D33 to D35 and the state list (27 Nov 2026): run 21, deployment `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`
+
+Published revision `c91169c128b7936e900747ef0c2226eb9c524c25` on `https://bloat-preview.vercel.app` and the branch address (17:35 UTC). Preview variables unchanged. The three main addresses still serve `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (`83fe4da`).
+
+| Check | Passed | Failed | Notes |
+|---|---|---|---|
+| GitHub run 21, from its log | Typecheck, lint, rule tests, API tests, browser 280 (3 skipped), the account-free live checks before and after publishing | 0 | Clean checkout and empty database. **Skipped there, not passed:** the round's 10 API and 3 browser checks (run locally against the second server) |
+| Tested = deployed | | | Both preview addresses on `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`; all 220 repository files Vercel lists are byte-identical to `c91169c`, 28 of the 45 files changed since run 20 among them; Vercel lists 493 of 672 files |
+| Core hosted suite, 16 checks | 16 | 0 | Disposable accounts marked `synthetic_test_run = 2026-11-27-run21` |
+| `tests/hosted/beta-candidate.spec.ts`, 4 checks | 4 | 0 | |
+| `tests/hosted/reported-fixes.spec.ts` (account in India, phone in Los Angeles), 1 check | 1 | 0 | Includes the day screen naming the zone ("India time (Kolkata)") on the live site. It needs a fresh account with Pro: the first two tries used accounts the suite had already set up (409 "already set up") or one without Pro (Patterns showed the Pro page). The used Pro test account was deleted through the app and made again fresh (same marker); then it passed. Not a product defect |
+| Live screens with the fresh test account | | | You shows "State or union territory (optional)" as a list; "Gujarat" chosen and still there after a reload; the zone reads "India time (Kolkata)"; Change time zone offers names and "My time zone isn't listed"; About shows "Who we are" |
+| Cleanup: 9 accounts deleted through the app (the 8 standard roles and one extra India account; the first Pro test account was deleted earlier the same way) | 10 | 0 | Each answered "deleted"; the same sign-in was refused (401) straight after; the one-off password file destroyed |
+| Read-only check of `bloat-test` after the cleanup | | | 0 accounts by ID or address, 0 with a test-run marker, 0 identities, sessions or refresh tokens, 0 rows in all 48 tables with a user column, 0 stored files; `bloat-tester` unchanged (1 meal, 1 bloating record, 2 readings, 1 report, same sign-in times and password hash); the 5 participant accounts unchanged by the check (same IDs, sign-in and update times before and after) |
+
+**Not performed:** real phones and screen readers (browser emulation only).
+
+### Local results (D33 to D35 and the state list)
 
 Changes: the two consent sentences say Bloat Buddy and existing accounts confirm them once (D33); "Who we are" on About (D34); the state or province and the time zone are chosen from lists of names; zone names instead of IDs; "in You" instead of "in Me"; plain consent dates (DECISIONS.md choice 32). Local stack, synthetic accounts only.
 
