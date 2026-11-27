@@ -140,7 +140,7 @@ export function Triggers() {
           </section>
 
           {d.co_occurrence.map((c) => <Card key={c.note}><Caption>{c.note}</Caption></Card>)}
-          <Caption>{d.followed_note} <Link href="/me">Change habits in Me</Link></Caption>
+          <Caption>{d.followed_note} <Link href="/me">Change habits in You</Link></Caption>
           <p className="t-caption text-ink">{d.footer}</p>
           <nav aria-label="More" className="grid grid-cols-2 gap-2">
             {d.experiments_offered !== false && <Link href="/experiments" className="flex min-h-12 items-center justify-center rounded-sm border border-line bg-surface px-3 font-semibold text-ink no-underline">Experiments</Link>}

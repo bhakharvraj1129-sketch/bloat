@@ -8,7 +8,7 @@ const body = z.strictObject({
   watched_groups: z.array(z.string()).max(thresholds.keep_an_eye_offer.groups_max).optional(),
 });
 
-// Keep an eye on it mode (Pro): anyone on Pro can switch it on in Me; one tap returns to full logging.
+// Keep an eye on it mode (Pro): anyone on Pro can switch it on in You; one tap returns to full logging.
 export const PUT = route({ body, mutation: true }, async (ctx) => {
   const u = await loadUser(ctx.db, ctx.userId, ctx.now);
   const b = ctx.body;

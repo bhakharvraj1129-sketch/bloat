@@ -135,7 +135,7 @@ test("A1: Pro given for testing shows no renewal and no Pause or Cancel; a bough
 });
 
 test("A1, Pro page: Pro given for testing is not described as a subscription to manage; a bought plan still is", async ({ context }) => {
-  // The Pro page (/upgrade) said "Manage, pause or cancel in Me." to an account with Pro given for
+  // The Pro page (/upgrade) said "Manage, pause or cancel in You." to an account with Pro given for
   // testing, although there is no subscription and You offers neither (found 27 Nov 2026).
   const { page } = await account(context, { email: "pro-tester@bloat.test" });
   await page.goto("/upgrade");
@@ -146,5 +146,5 @@ test("A1, Pro page: Pro given for testing is not described as a subscription to 
   const bought = await account(context, { pro: true });
   await bought.page.goto("/upgrade");
   await expect(bought.page.getByRole("heading", { name: "You have Pro" })).toBeVisible();
-  await expect(bought.page.getByText("Manage, pause or cancel in Me.")).toBeVisible();
+  await expect(bought.page.getByText("Manage, pause or cancel in You.")).toBeVisible();
 });

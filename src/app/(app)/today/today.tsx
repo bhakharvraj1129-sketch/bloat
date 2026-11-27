@@ -13,10 +13,10 @@ import { EndSheet, LogBloatingSheet, OngoingSheet, StillHappeningSheet } from "@
 import { MealSheet } from "@/components/today/meal";
 import { ActivitySheet, BowelSheet, ExerciseSheet } from "@/components/today/activity";
 import { ProToday } from "@/components/today/pro";
-import { tagLabel } from "@/lib/registry";
+import { question, tagLabel } from "@/lib/registry";
 
 type SheetName = null | "log" | "ongoing" | "end" | "end-earlier" | "still" | "meal" | "activity" | "exercise" | "bowel";
-type Notice = { at: "bloating" | "add"; text: string };
+type Notice = { at: "bloating" | "add" | "consent"; text: string };
 
 /** Says what was just saved, next to where it was started. Always on the page, so screen readers announce each change. */
 function SavedNotice({ text }: { text: string | null }) {
@@ -28,6 +28,36 @@ function SavedNotice({ text }: { text: string | null }) {
         </span>
       )}
     </p>
+  );
+}
+
+const CONSENT_QUESTION = { health_data: "CN-02", wellness_ack: "CN-03" } as const;
+
+/** D33: the app was renamed, so the two sentences that name it are confirmed again once. Logging is never blocked. */
+function Reconfirm({ due, onDone }: { due: Array<keyof typeof CONSENT_QUESTION>; onDone: () => void }) {
+  const [ticks, setTicks] = useState<Record<string, boolean>>({});
+  const save = useSave();
+  const all = due.every((t) => ticks[t]);
+  const confirm = async () => {
+    const back = rememberOpener();
+    const ok = await save.run("POST", "/v1/consents/reconfirm", { types: due });
+    if (ok) { onDone(); returnFocus(back); }
+  };
+  return (
+    <Card as="section" aria-labelledby="reconfirm" className="flex flex-col gap-4 border-brand">
+      <div className="flex flex-col gap-1">
+        <h2 id="reconfirm" className="t-title">Bloat is now Bloat Buddy</h2>
+        <p className="text-ink-muted">The app has a new name. Please confirm {due.length === 1 ? "this sentence" : "these sentences"} with the new name. Nothing else has changed.</p>
+      </div>
+      {due.map((t) => (
+        <label key={t} className="flex items-start gap-3 rounded-md border border-line bg-surface p-4">
+          <input type="checkbox" className="mt-0.5 h-6 w-6 shrink-0 accent-(--brand)" checked={!!ticks[t]} onChange={(e) => setTicks((x) => ({ ...x, [t]: e.target.checked }))} />
+          <span>{question(CONSENT_QUESTION[t]).prompt}</span>
+        </label>
+      ))}
+      <Button data-focus-key="today-reconfirm" disabled={!all || save.saving} onClick={confirm}>{save.saving ? "Saving…" : "Confirm"}</Button>
+      <SaveStatus state={save.state === "saved" ? "idle" : save.state} error={save.error} onCheck={async () => { if ((await save.check()).ok) onDone(); }} />
+    </Card>
   );
 }
 
@@ -119,7 +149,10 @@ export function Today() {
   return (
     <Screen title="Today" width="wide" eyebrow={`${formatDate(today.date, profile.date_format)}${state.pro?.phase ? ` · ${state.pro.phase.label}` : ""}`}
       action={<LogoMark size={36} className="md:hidden" />}>
-      {state.paused && <Card><p className="t-body-strong">Pro is paused</p><Caption>Your records are kept and free logging keeps working. <Link href="/me">Resume in Me</Link></Caption></Card>}
+      {state.paused && <Card><p className="t-body-strong">Pro is paused</p><Caption>Your records are kept and free logging keeps working. <Link href="/me">Resume in You</Link></Caption></Card>}
+
+      <SavedNotice text={notice?.at === "consent" ? notice.text : null} />
+      {!!state.consents_due?.length && <Reconfirm due={state.consents_due} onDone={() => { setNotice({ at: "consent", text: "Confirmed. Thank you." }); reload(); }} />}
 
       {state.pending_review && (
         <Link href={`/review/${state.pending_review.date}`} className="flex min-h-16 items-center gap-4 rounded-lg bg-brand px-5 py-4 text-on-brand no-underline hover:opacity-90 md:px-6">

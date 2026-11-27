@@ -7,6 +7,7 @@ import { useLoad, useSave } from "@/lib/client/hooks";
 import { deviceZone } from "@/lib/client/api";
 import { label as optionLabel, question } from "@/lib/registry";
 import { formatClock, formatDate, formatDuration, localParts } from "@/lib/time";
+import { zoneLabel } from "@/lib/regions";
 
 type Ep = {
   id: string; started_at: string; ended_at: string | null; state: string; start_precision: string; end_precision: string | null; revision: number;
@@ -216,7 +217,7 @@ function SavedTimePick({ name, saved, savedText, zone, value, onChange, allowApp
         }}
       />
       {value === null ? <Caption>Keeps the saved time: {savedText}.</Caption>
-        : value.mode !== "unknown" && zone !== deviceZone() ? <Caption>Times here are in your Bloat Buddy time zone, {zone}.</Caption> : null}
+        : value.mode !== "unknown" && zone !== deviceZone() ? <Caption>Times here are in your Bloat Buddy time zone, {zoneLabel(zone)}.</Caption> : null}
     </>
   );
 }

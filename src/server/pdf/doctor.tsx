@@ -2,6 +2,7 @@ import "server-only";
 import { Document, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import type { DoctorSnapshot } from "../reports";
 import { DOCTOR_SECTION_NAMES, includedSections, privateDoctorSnapshot } from "@/lib/domain/report-privacy";
+import { zoneLabel } from "@/lib/regions";
 
 // The doctor PDF, made on the server from an immutable snapshot. Plain black on white so it
 // prints and photocopies well. Page 1 is a two-minute summary (0.3 fix 25).
@@ -35,7 +36,7 @@ function Report({ d: raw, name }: { d: DoctorSnapshot; name: string }) {
     <Document title="Bloat Buddy doctor report" author="Bloat Buddy" subject="Self-reported bloating diary">
       <Page size="A4" style={s.page}>
         <Text style={s.h1}>Bloating diary summary</Text>
-        <Text style={s.muted}>{name ? `${name} · ` : ""}{d.from} to {d.to} · time zone {d.time_zone}</Text>
+        <Text style={s.muted}>{name ? `${name} · ` : ""}{d.from} to {d.to} · time zone: {zoneLabel(d.time_zone)}</Text>
         <Text style={[s.muted, { marginTop: 4 }]}>{d.notice}</Text>
         <Text style={s.muted}>Sections included: {[...inc].map((k) => DOCTOR_SECTION_NAMES[k]).join(", ") || "none"}.</Text>
 

@@ -47,6 +47,39 @@ test("Q92, Q61: sign-up shows the help page first, then setup, then Today. Q129:
   expect(outside).toEqual([]);
 });
 
+// Owner, 27 Nov 2026: "There is no state names there". The state was a text box and the time zone had
+// to be typed as an ID such as America/Toronto. Both are now chosen from lists of names.
+test("setup and You: the state and the time zone are chosen by name, and are shown by name, never as IDs", async ({ page }) => {
+  await signUp(page);
+  for (const box of await page.getByRole("checkbox").all()) await box.check();
+  await page.getByRole("button", { name: "Continue" }).click();
+  const state = page.getByLabel("State (optional)");
+  await expect(state.locator("option")).toHaveCount(57); // Not chosen, 50 states, DC and 5 territories
+  await expect(state).toHaveValue("");
+  await state.selectOption("New York");
+  const zone = page.getByLabel("Your time zone");
+  await zone.selectOption("America/Chicago");
+  await expect(zone.locator("option:checked")).toHaveText("Central time (Chicago)");
+  for (const id of ["America/New_York", "America/Chicago", "America/Los_Angeles"]) await expect(zone.locator(`option[value="${id}"]`)).not.toHaveText(id);
+  await page.getByRole("button", { name: "My time zone isn't listed" }).click();
+  await expect(zone.locator('option[value="Europe/Paris"]')).toHaveText("Paris (Europe)");
+  await page.getByRole("checkbox", { name: "This is right" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  for (let i = 0; i < 6; i++) await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.getByRole("heading", { name: "How Bloat Buddy works" })).toBeVisible();
+  await page.getByRole("button", { name: "Go to Today" }).click();
+  await expect(page.getByRole("heading", { name: "Today", exact: true })).toBeVisible({ timeout: 20000 });
+
+  await page.goto("/me");
+  await expect(page.getByLabel("State (optional)")).toHaveValue("New York");
+  await expect(page.getByText("Central time (Chicago)")).toBeVisible();
+  await expect(page.getByText("America/Chicago")).toHaveCount(0);
+  await page.getByLabel("State (optional)").selectOption("New Jersey");
+  await expect.poll(async () => (await (await page.request.get("/v1/me/state")).json()).profile.region, { timeout: 20000 }).toBe("New Jersey");
+  await page.reload();
+  await expect(page.getByLabel("State (optional)")).toHaveValue("New Jersey");
+});
+
 test("log bloating with a warning sign, update it, end it, add a meal, and see it in History and day detail (Q94, Q114)", async ({ page }) => {
   await signUp(page);
   await setup(page);

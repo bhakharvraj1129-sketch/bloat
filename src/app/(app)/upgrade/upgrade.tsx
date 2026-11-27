@@ -50,7 +50,7 @@ export function Upgrade({ testMode }: { testMode: boolean }) {
     return (
       <Screen title="You have Pro" back="/me">
         {/* Pro given for testing has no subscription: nothing to manage, pause or cancel (same wording as Me). */}
-        <Card><p>Everything in Pro is switched on.</p><Caption>{e.status === "none" ? "Switched on for testing. There is no subscription, so nothing renews and nothing is charged." : "Manage, pause or cancel in Me."}</Caption></Card>
+        <Card><p>Everything in Pro is switched on.</p><Caption>{e.status === "none" ? "Switched on for testing. There is no subscription, so nothing renews and nothing is charged." : "Manage, pause or cancel in You."}</Caption></Card>
         {recall.data && !recall.data.offered && recall.data.meals.length > 0 && (
           <Card className="flex flex-col gap-3">
             <p className="t-body-strong">Add ingredients to your last 7 days of meals?</p>
@@ -86,7 +86,7 @@ export function Upgrade({ testMode }: { testMode: boolean }) {
           <Chip role="radio" selected={plan === "monthly"} onClick={() => setPlan("monthly")}>{p.monthly} a month</Chip>
         </div>
         <Caption>
-          {p.tax === "added at checkout" ? "Tax is added at checkout." : "Includes 18% GST."} The plan renews at the same price until you cancel or pause. Cancel in two taps in Me; your records and past reports are kept. You can pause for 1, 2 or 3 months instead. There is no free trial: the Free plan never expires.
+          {p.tax === "added at checkout" ? "Tax is added at checkout." : "Includes 18% GST."} The plan renews at the same price until you cancel or pause. Cancel in two taps in You; your records and past reports are kept. You can pause for 1, 2 or 3 months instead. There is no free trial: the Free plan never expires.
         </Caption>
         <Caption>The price charged follows the country of your payment method.</Caption>
       </section>

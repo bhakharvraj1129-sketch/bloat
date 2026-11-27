@@ -53,7 +53,7 @@ export function Recall() {
             {needConsent && (
               <Card className="flex flex-col gap-3">
                 <p>{question("CN-04").prompt}</p>
-                <Caption>Only the dish name is sent. Nothing about your symptoms, health or identity ever is. You can withdraw this in Me.</Caption>
+                <Caption>Only the dish name is sent. Nothing about your symptoms, health or identity ever is. Withdraw this at any time in You.</Caption>
                 <Button disabled={agree.saving} onClick={agreeAndCheck}>{agree.saving ? "Saving…" : "I agree, check this dish"}</Button>
                 <SaveStatus state={agree.state === "saved" ? "idle" : agree.state} error={agree.error} onCheck={async () => { if ((await agree.check()).ok) { setNeedConsent(false); await check(); } }} />
               </Card>

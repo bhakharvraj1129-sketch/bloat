@@ -1,5 +1,6 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 import { execFileSync } from "node:child_process";
+import { zoneLabel } from "../../src/lib/regions";
 
 // Editing saved times when the phone's time zone differs from the account's time zone (external
 // report, 23 Nov 2026, B1 and B2). Rules checked:
@@ -105,7 +106,7 @@ for (const z of ZONES) {
       const meal = await addMeal(api, "tz explicit rice");
       const sheet = await openMealEdit(page, dayIn(Date.parse(meal.eaten_at), z.account), "tz explicit rice");
       await sheet.getByRole("radio", { name: "Choose time" }).click();
-      if (z.account !== z.device) await expect(sheet.getByText(`Times here are in your Bloat Buddy time zone, ${z.account}.`)).toBeVisible();
+      if (z.account !== z.device) await expect(sheet.getByText(`Times here are in your Bloat Buddy time zone, ${zoneLabel(z.account)}.`)).toBeVisible();
       else await expect(sheet.getByText(/Times here are in your Bloat Buddy time zone/)).toHaveCount(0);
       const target = Date.now() - 2 * 3600_000; // two hours ago, whatever the zones
       const local = localIn(target, z.account);

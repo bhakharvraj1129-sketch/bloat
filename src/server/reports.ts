@@ -104,7 +104,7 @@ export async function journeySnapshot(db: Db, userId: string, u: UserCtx, now: n
   if (!b.followed.length) missing.push("You don't follow any habits, so no habit can be compared.");
   const xOn = experimentsOn();
   // The Understand step points to experiments; with experiments switched off it has no next step.
-  const next = { Discover: "Keep logging. Possible triggers appear once a food group or habit has 7 days with it and 7 days without.", Understand: xOn ? "A short experiment can test one pattern at a time." : null, Maintain: "You are keeping an eye on a few food groups. One tap in Me returns to full logging." }[ph];
+  const next = { Discover: "Keep logging. Possible triggers appear once a food group or habit has 7 days with it and 7 days without.", Understand: xOn ? "A short experiment can test one pattern at a time." : null, Maintain: "You are keeping an eye on a few food groups. One tap in You returns to full logging." }[ph];
   const goals = u.profile.goals;
   const order = ["since", "usual", "records", "tried", "phase", "missing", "monthly"];
   const front = goals.includes("getting_ready_for_a_doctor_visit") ? ["doctor"] : goals.includes("which_foods_affect_me") || goals.includes("whether_timing_or_habits_matter") ? ["records"] : goals.includes("whether_my_cycle_plays_a_part") ? ["records"] : goals.includes("how_my_bloating_changes_over_time") ? ["since", "usual"] : [];

@@ -537,13 +537,14 @@ const ACTIONS: Action[] = [
     name: "Change time zone", role: "free",
     open: async (c) => {
       await c.page.goto("/me"); await c.page.getByRole("button", { name: "Change" }).first().click();
-      const d = dialog(c, "Change time zone"); await d.getByLabel("New time zone").fill("Asia/Kolkata");
+      const d = dialog(c, "Change time zone"); await d.getByLabel("New time zone").selectOption("America/Chicago");
       await d.getByRole("button", { name: "Preview the change" }).click();
     },
     submit: (c) => dialog(c, "Change time zone").getByRole("button", { name: "Confirm change" }),
     write: { method: "PATCH", path: /\/v1\/me\/profile$/, notBody: /"preview":true/ },
-    changed: async (c) => (await st(c)).profile.analysis_time_zone === "Asia/Kolkata",
-    after: async (c) => { await expect(c.page.getByText("Asia/Kolkata")).toBeVisible(); },
+    changed: async (c) => (await st(c)).profile.analysis_time_zone === "America/Chicago",
+    // The zone is shown by its name, never as an ID.
+    after: async (c) => { await expect(c.page.getByText("Central time (Chicago)")).toBeVisible(); await expect(c.page.getByText("America/Chicago")).toHaveCount(0); },
   },
   {
     name: "Choose what you want to find out", role: "free",

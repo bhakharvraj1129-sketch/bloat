@@ -40,7 +40,7 @@ export const PUT = route({ capability: "recording", body, mutation: true, featur
     // CY-01 / CY-02 are visible only after the ON-10 cycle-context opt-in.
     const answers = await loadAnswers(ctx.db, ctx.userId);
     const on10 = (answers["ON-10"] as string[] | undefined) ?? [];
-    if (!on10.includes("cycle_context")) throw new ApiError(403, "CAPABILITY_OFF", "Period logging is off. Turn on cycle context in Me first.");
+    if (!on10.includes("cycle_context")) throw new ApiError(403, "CAPABILITY_OFF", "Period logging is off. Turn on cycle context in You first.");
     for (const c of ctx.body.cycle) {
       if (c.date > u.today) throw new ApiError(422, "FUTURE_TIME", "That date is in the future.");
       ops.push({ op: "upsert", table: "cycle_events", row: { kind: c.kind, date: c.date, date_precision: c.precision }, conflict: ["user_id", "kind", "date"] });

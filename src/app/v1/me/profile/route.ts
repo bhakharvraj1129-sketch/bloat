@@ -6,6 +6,7 @@ import { ifMatch } from "@/server/schemas";
 import type { Op } from "@/server/db";
 import { addDays, isValidZone, localDate } from "@/lib/time";
 import { checkAnswer, question, REGISTRY_VERSION } from "@/lib/registry";
+import { regionName } from "@/lib/regions";
 
 const body = z.strictObject({
   units: z.enum(["us", "metric"]).optional(),
@@ -18,7 +19,7 @@ const body = z.strictObject({
   food_preferences: z.array(z.string()).max(6).optional(),
   keep_meal_photos: z.boolean().optional(),
   hide_charts: z.boolean().optional(),
-  // Optional context answers changeable in Me (ON-10, ON-14, ON-15). null deletes the answer.
+  // Optional context answers changeable in You (ON-10, ON-14, ON-15). null deletes the answer.
   answers: z.partialRecord(z.enum(["ON-10", "ON-14", "ON-15"]), z.unknown()).optional(),
 });
 
@@ -30,7 +31,12 @@ export const PATCH = route({ body, mutation: true }, async (ctx) => {
   const set: Record<string, unknown> = {};
   const ops: Op[] = [];
   if (b.units) set.units = b.units;
-  if (b.region !== undefined) set.region = b.region;
+  if (b.region !== undefined) {
+    // A state or province from the country's list (or none), saved as listed.
+    const region = b.region ? regionName(u.profile.residence_country, b.region) : null;
+    if (b.region && !region) throw new ApiError(422, "VALIDATION", "Choose your state or province from the list.");
+    set.region = region;
+  }
   if (b.keep_meal_photos !== undefined) {
     if (b.keep_meal_photos && ctx.plan !== "pro") throw new ApiError(403, "PLAN_REQUIRED", "This is part of Bloat Buddy Pro.");
     set.keep_meal_photos = b.keep_meal_photos;

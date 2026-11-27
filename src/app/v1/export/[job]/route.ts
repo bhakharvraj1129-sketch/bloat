@@ -14,7 +14,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ job: str
   const token = new URL(req.url).searchParams.get("token") ?? "";
   const { data: row } = await db.from("export_jobs").select("*").eq("user_id", auth.user.id).eq("id", job).maybeSingle();
   const valid = row && row.token_hash === createHash("sha256").update(token).digest("hex") && Date.parse(row.expires_at) > Date.now();
-  if (!valid) return errorResponse(new ApiError(404, "NOT_FOUND", "This download link has expired. Ask for a new one in Me."), requestId);
+  if (!valid) return errorResponse(new ApiError(404, "NOT_FOUND", "This download link has expired. Ask for a new one in You."), requestId);
   let data: Awaited<ReturnType<typeof buildExport>>;
   try {
     data = await buildExport(db, auth.user.id);

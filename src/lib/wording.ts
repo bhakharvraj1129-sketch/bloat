@@ -4,7 +4,9 @@
 // labelled "Adapted from NHS, Bloating" and never claimed to be an exact quote. Every NHS warning sign is kept.
 import { emergencyNumber } from "./registry";
 
-export const CONSENT_VERSION = "2026-11-16";
+export const CONSENT_VERSION = "2026-11-27";
+/** Required consents whose wording changed: a grant older than this version is confirmed again once (D33). */
+export const CONSENT_RECONFIRM: Record<"health_data" | "wellness_ack", string> = { health_data: "2026-11-27", wellness_ack: "2026-11-27" };
 export const HELP_PAGE_VERSION = "nhs-bloating-2026-11-07";
 export const NHS_SOURCE_URL = "https://www.nhs.uk/symptoms/bloating/";
 export const NHS_SOURCE_LABEL = "Adapted from NHS, Bloating";

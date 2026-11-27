@@ -12,7 +12,7 @@ export default function Terms() {
       <ul className="list-disc pl-5">
         <li>Bloat Buddy is for adults aged 18 or older.</li>
         <li>Free logging never expires. Safety information is never behind a paywall.</li>
-        <li>You can download or delete your records at any time in Me.</li>
+        <li>You can download or delete your records at any time in You.</li>
         <li>Payments are switched off in this preview. Nothing can be charged.</li>
       </ul>
     </PublicPage>

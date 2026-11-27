@@ -114,7 +114,7 @@ export function Review({ date }: { date: string }) {
 
       {step === 3 && (
         <>
-          {s.followed.length === 0 && !pro && <Card><Caption>You don&apos;t follow any habits yet. Choose up to 3 in Me to be asked about them here.</Caption></Card>}
+          {s.followed.length === 0 && !pro && <Card><Caption>You don&apos;t follow any habits yet. Choose up to 3 in You to be asked about them here.</Caption></Card>}
           {s.followed.map((id) => (
             <div key={id} className="flex flex-col gap-2">
               <p className="t-body-strong">{question("DY-04").prompt.replace("[selected activity]", `"${activity(id)?.label ?? id}"`).replace("[date]", dateLabel)}</p>

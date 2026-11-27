@@ -1,6 +1,7 @@
 import { Card, Caption, Label } from "@/components/ui";
 import { DOCTOR_SECTION_NAMES, includedSections, privateDoctorSnapshot } from "@/lib/domain/report-privacy";
 import type { DoctorSnapshot } from "@/server/reports";
+import { zoneLabel } from "@/lib/regions";
 
 // The doctor report as a web page. The in-app preview and the shared link both use this, so the
 // person sees exactly what the person they share it with will see. The PDF follows the same
@@ -29,7 +30,7 @@ export function DoctorReportView({ snapshot }: { snapshot: DoctorSnapshot }) {
     <div className="flex flex-col gap-4">
       <header>
         <p className="t-title">Bloating diary summary</p>
-        <Caption>{d.from} to {d.to} · time zone {d.time_zone}</Caption>
+        <Caption>{d.from} to {d.to} · time zone: {zoneLabel(d.time_zone)}</Caption>
         <Caption>{d.notice}</Caption>
         <Caption>Sections included: {[...inc].map((k) => DOCTOR_SECTION_NAMES[k]).join(", ") || "none"}.</Caption>
       </header>

@@ -6,6 +6,8 @@ import { Lock } from "lucide-react";
 import { Button, Caption, Card, Chip, Field, Label, ProTag, SaveStatus, Segmented, inputClass } from "@/components/ui";
 import { QuestionField } from "@/components/question";
 import { Logo } from "@/components/logo";
+import { RegionSelect, ZoneSelect } from "@/components/zone-select";
+import type { Country } from "@/lib/regions";
 import { clearPre, readPre } from "@/lib/client/pre";
 import { deviceZone } from "@/lib/client/api";
 import { useSave } from "@/lib/client/hooks";
@@ -130,7 +132,7 @@ export function Setup() {
               <li>Bloat Buddy stores what you log: bloating, meals, habits and the answers you give here.</li>
               <li>Your records are private to your account. No ads, and nothing is sold.</li>
               <li>Bloat Buddy is a tracker. It does not diagnose or treat anything.</li>
-              <li>You can download or delete everything at any time in Me.</li>
+              <li>You can download or delete everything at any time in You.</li>
             </ul>
           </Card>
           {CONSENTS.map(([type, id]) => (
@@ -139,20 +141,22 @@ export function Setup() {
               <span>{question(id).prompt} {type === "terms_privacy" && <><Link href="/terms" target="_blank">Terms</Link> · <Link href="/privacy" target="_blank">Privacy</Link></>}</span>
             </label>
           ))}
-          {!canContinue && <Caption>Tick all three to continue. You can see them again in Me.</Caption>}
+          {!canContinue && <Caption>Tick all three to continue. You can see them again in You.</Caption>}
         </>
       )}
 
       {step === 1 && (
         <>
-          <Field label="Country"><input className={inputClass} value={countryCfg(country)?.name ?? country} readOnly aria-readonly /></Field>
-          <Field label="State or province (optional)"><input className={inputClass} value={region} onChange={(e) => setRegion(e.target.value)} maxLength={80} autoComplete="address-level1" /></Field>
+          {/* Chosen on the first screen; shown as text, not as a box that looks editable but is not. */}
+          <div className="flex flex-col gap-1">
+            <p className="t-body-strong">Country</p>
+            <p>{countryCfg(country)?.name ?? country}</p>
+          </div>
+          <RegionSelect country={country as Country} value={region} onChange={setRegion} />
           <Card className="flex flex-col gap-3">
-            <p className="t-body-strong">Your time zone</p>
-            <p className="tabular">{zone}</p>
-            <Caption>This decides where each day starts and ends in your diary. It stays the same when you travel; you can change it in Me.</Caption>
+            <ZoneSelect country={country as Country} label="Your time zone" value={zone} also={[deviceZone()]} onChange={(z) => { setZone(z); setZoneConfirmed(false); }} />
+            <Caption>This decides where each day starts and ends in your diary. It stays the same when you travel; you can change it in You.</Caption>
             <Chip selected={zoneConfirmed} onClick={() => setZoneConfirmed((z) => !z)}>This is right</Chip>
-            {!zoneConfirmed && <Field label="Or type another time zone" hint="For example America/Toronto or Asia/Kolkata"><input className={inputClass} value={zone} onChange={(e) => setZone(e.target.value.trim())} /></Field>}
           </Card>
           <div className="flex flex-col gap-2">
             <p className="t-body-strong">{question("ST-01").prompt}</p>
@@ -161,9 +165,14 @@ export function Setup() {
         </>
       )}
 
-      {step === 2 && ["ON-06", "ON-07", "ON-08", "ON-12"].map((id) => (
-        <Card key={id}><QuestionField id={id} value={val(id)} onChange={set(id)} /><Caption className="mt-3">Leave blank to skip.</Caption></Card>
-      ))}
+      {step === 2 && (
+        <>
+          <Caption>Every question here is optional. Leave any of them blank.</Caption>
+          {["ON-06", "ON-07", "ON-08", "ON-12"].map((id) => (
+            <Card key={id}><QuestionField id={id} value={val(id)} onChange={set(id)} /></Card>
+          ))}
+        </>
+      )}
 
       {step === 3 && (
         <>
@@ -243,7 +252,7 @@ export function Setup() {
               </div>
             </div>
           ))}
-          <Caption>Habits marked Pro are part of Bloat Buddy Pro. You can change your habits in Me.</Caption>
+          <Caption>Habits marked Pro are part of Bloat Buddy Pro. You can change your habits in You.</Caption>
         </>
       )}
 

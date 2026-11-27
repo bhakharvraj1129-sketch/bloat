@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { account, PASSWORD, sessionFor } from "./session";
+import { zoneLabel } from "../../src/lib/regions";
 
 // The four defects from the external report of 23 Nov 2026, checked on the PUBLIC preview with one
 // synthetic account (role "pro") whose Bloat Buddy time zone is Asia/Kolkata, in a browser whose time zone
@@ -76,7 +77,7 @@ test("hosted: the four reported defects are fixed (phone in Los Angeles, account
   const keep = sheet.getByRole("radio", { name: "Keep" });
   await expect(keep).toHaveAttribute("aria-checked", "true");
   await sheet.getByRole("radio", { name: "Choose time" }).click();
-  await expect(sheet.getByText(`Times here are in your Bloat Buddy time zone, ${ZONE}.`)).toBeVisible();
+  await expect(sheet.getByText(`Times here are in your Bloat Buddy time zone, ${zoneLabel(ZONE)}.`)).toBeVisible();
   await sheet.getByLabel("Date and time").fill(localIn(Date.now() - 3 * 3600_000, ZONE));
   await keep.click();
   await expect(keep).toHaveAttribute("aria-checked", "true");

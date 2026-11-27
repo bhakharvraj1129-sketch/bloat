@@ -15,7 +15,7 @@ export default function Privacy() {
         <li>The AI ingredient check (Pro, with your separate consent) only receives a dish name or a meal photo. Never your symptoms, scores, health background, age, cycle or identity.</li>
         <li>A meal photo is deleted right after its check unless you turn on &quot;Keep my meal photos&quot;.</li>
         <li>Nothing is used for research or any other purpose without your separate, explicit consent.</li>
-        <li>Download my data and Delete account are in Me, on every plan.</li>
+        <li>Download my data and Delete account are in You, on every plan.</li>
       </ul>
     </PublicPage>
   );

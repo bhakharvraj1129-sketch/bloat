@@ -7,7 +7,7 @@ const OPTIONAL = ["ai_meal", "email", "research", "doctor_share"];
 export const DELETE = route({ mutation: true }, async (ctx) => {
   const type = ctx.params.type!;
   if (!OPTIONAL.includes(type)) {
-    throw new ApiError(422, "REQUIRED_CONSENT", "This agreement is needed to use Bloat Buddy. To withdraw it, delete your account in Me.");
+    throw new ApiError(422, "REQUIRED_CONSENT", "This agreement is needed to use Bloat Buddy. To withdraw it, delete your account in You.");
   }
   const at = new Date(ctx.now).toISOString();
   const ops = [{ op: "insert" as const, table: "consents", row: { type, version: CONSENT_VERSION, withdrawn_at: at } }];

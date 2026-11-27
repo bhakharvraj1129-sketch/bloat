@@ -5,7 +5,7 @@ export type State = {
   unavailable?: string[];
   paused: boolean;
   profile: {
-    country: string; time_zone: string; analysis_time_zone: string; units: "us" | "metric"; date_format: "MM/DD" | "DD/MM";
+    country: string; region?: string | null; time_zone: string; analysis_time_zone: string; units: "us" | "metric"; date_format: "MM/DD" | "DD/MM";
     logging_mode: "full" | "keep_an_eye"; watched_groups: string[]; goals: string[]; cuisines: string[];
     keep_meal_photos: boolean; hide_charts: boolean; revision: number;
   };
@@ -20,6 +20,8 @@ export type State = {
   cycle_context: boolean;
   progress: { days_logged: number; confirmed_days: number; confirmed_needed: number };
   week: Array<{ date: string; logged: boolean; future: boolean }>;
+  /** Required consents to confirm again because their wording changed (D33). */
+  consents_due?: Array<"health_data" | "wellness_ack">;
   timeline: Array<{ kind: "meal" | "episode" | "activity"; id: string; at: string | null; text: string; strongest?: number | null; open?: boolean }>;
   pro: null | {
     phase?: { label: string } | null;

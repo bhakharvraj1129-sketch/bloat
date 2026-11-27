@@ -296,3 +296,27 @@ test.describe("Redesign: log button, week strip, theme and Patterns progress", (
     await expect(fold.getByRole("listitem").first()).toBeVisible();
   });
 });
+
+// D33 (owner, 27 Nov 2026): the two consent sentences that name the app now say Bloat Buddy. An account
+// that agreed to the old wording confirms them once on Today; logging is never blocked meanwhile.
+test("D33: an account set up before the rename confirms the two renamed sentences once, and can log meanwhile", async ({ context }) => {
+  const c = await account(context);
+  const { page } = c;
+  sql(`update public.consents set version = '2026-11-16' where user_id = '${userId(c)}'`);
+  await page.goto("/today");
+  const card = page.getByRole("region", { name: "Bloat is now Bloat Buddy" });
+  await expect(card).toBeVisible();
+  await expect(card.getByText("I consent to Bloat Buddy storing my health information to show me my own records.")).toBeVisible();
+  await expect(card.getByText("I understand Bloat Buddy is a wellness tracker, not medical advice, and not for emergencies.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "I feel bloated" })).toBeEnabled(); // logging is not blocked
+  const confirm = card.getByRole("button", { name: "Confirm" });
+  await expect(confirm).toBeDisabled();
+  await card.getByRole("checkbox").first().check();
+  await expect(confirm).toBeDisabled();
+  await card.getByRole("checkbox").last().check();
+  await confirm.click();
+  await expect(card).toHaveCount(0, { timeout: 20000 });
+  await expect(page.getByText("Confirmed. Thank you.")).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("region", { name: "Bloat is now Bloat Buddy" })).toHaveCount(0);
+});

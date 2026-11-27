@@ -8,6 +8,7 @@ import { thresholds, activity } from "@/lib/registry";
 import { ApiError } from "@/server/http";
 import { todayExtras } from "@/server/today";
 import { featuresOff } from "@/server/availability";
+import { CONSENT_RECONFIRM } from "@/lib/wording";
 
 // Everything Today needs in one answer: open episode, pending review, plan, flags.
 export const GET = route({}, async (ctx) => {
@@ -38,12 +39,19 @@ export const GET = route({}, async (ctx) => {
       ask_still_happening: openMs >= thresholds.still_happening_after_hours * 3600_000,
     };
   }
-  const [{ data: followed }, { data: reviewRow }, answers, { data: impact }] = await Promise.all([
+  const [{ data: followed }, { data: reviewRow }, answers, { data: impact }, { data: consentRows }] = await Promise.all([
     ctx.db.from("followed_activities").select("activity_id,position").eq("user_id", ctx.userId).order("position"),
     ctx.db.from("day_reviews").select("date").eq("user_id", ctx.userId).eq("date", yesterday).maybeSingle(),
     loadAnswers(ctx.db, ctx.userId),
     ctx.db.from("weekly_impacts").select("week_start").eq("user_id", ctx.userId).eq("week_start", weekStart(addDays(weekStart(u.today), -1))).maybeSingle(),
+    ctx.db.from("consents").select("type,version,granted_at,created_at").eq("user_id", ctx.userId).in("type", Object.keys(CONSENT_RECONFIRM)).order("created_at"),
   ]);
+  // A required consent given with wording that has since changed (D33) is asked again once.
+  const latestConsent = new Map<string, { version: string; granted_at: string | null }>();
+  for (const c of consentRows ?? []) latestConsent.set(c.type as string, { version: c.version as string, granted_at: c.granted_at as string | null });
+  const consentsDue = (Object.entries(CONSENT_RECONFIRM) as Array<[string, string]>)
+    .filter(([type, from]) => { const c = latestConsent.get(type); return !!c?.granted_at && c.version < from; })
+    .map(([type]) => type);
 
   const timeline = [
     ...mealsOn(u.today, u, view.data).map((m) => ({ kind: "meal" as const, id: m.id, at: m.eaten_at, text: m.dish_text })),
@@ -65,7 +73,7 @@ export const GET = route({}, async (ctx) => {
     unavailable: featuresOff(),
     paused: isPaused(ctx.entitlement, ctx.now),
     profile: {
-      country: u.profile.residence_country, time_zone: u.profile.time_zone, analysis_time_zone: u.profile.analysis_time_zone,
+      country: u.profile.residence_country, region: u.profile.region, time_zone: u.profile.time_zone, analysis_time_zone: u.profile.analysis_time_zone,
       units: u.profile.units, date_format: u.profile.date_format, logging_mode: u.profile.logging_mode,
       watched_groups: u.profile.watched_groups, goals: u.profile.goals, cuisines: u.profile.cuisines,
       keep_meal_photos: u.profile.keep_meal_photos, hide_charts: u.profile.hide_charts, revision: u.profile.revision,
@@ -82,6 +90,7 @@ export const GET = route({}, async (ctx) => {
     followed: (followed ?? []).map((f) => f.activity_id),
     cycle_context: on10.includes("cycle_context"),
     progress: progressCounter(u, view),
+    consents_due: consentsDue,
     // This week, Monday first: which days have anything logged (no scores, no judgement).
     week: weekStrip(u, view),
     timeline,

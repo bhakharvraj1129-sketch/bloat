@@ -166,7 +166,7 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
 
       {step === "consent" && (
         <>
-          <Card><p>{question("CN-04").prompt}</p><Caption className="mt-2">Only the dish name or the photo is sent. Nothing about your symptoms, health or identity ever is. You can withdraw this in Me.</Caption></Card>
+          <Card><p>{question("CN-04").prompt}</p><Caption className="mt-2">Only the dish name or the photo is sent. Nothing about your symptoms, health or identity ever is. Withdraw this at any time in You.</Caption></Card>
           <Button aria-busy={agreeing || undefined} onClick={async () => {
             if (agreeing) return;
             setAgreeing(true); setNotice("");

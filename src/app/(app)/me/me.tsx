@@ -6,6 +6,9 @@ import { ChevronRight, Lock } from "lucide-react";
 import { Button, Caption, Card, Chip, ErrorState, Field, Label, Loading, ProTag, SaveStatus, Screen, Segmented, Sheet, inputClass } from "@/components/ui";
 import { QuestionField } from "@/components/question";
 import { ThemeSwitch } from "@/components/theme-switch";
+import { RegionSelect, ZoneSelect } from "@/components/zone-select";
+import { zoneLabel, type Country } from "@/lib/regions";
+import { formatDate, localDate } from "@/lib/time";
 import { useLoad, useSave } from "@/lib/client/hooks";
 import { DELETE_REFUSED, DELETE_UNFINISHED } from "@/lib/wording";
 import { api, ApiFailure } from "@/lib/client/api";
@@ -23,7 +26,7 @@ type Ent = {
   prices: { annual: string; three_month: string; monthly: string };
 };
 const CONSENT_NAMES: Record<string, string> = {
-  terms_privacy: "Terms and Privacy Policy", health_data: "Storing my health information", wellness_ack: "Bloat is a wellness tracker, not medical advice",
+  terms_privacy: "Terms and Privacy Policy", health_data: "Storing my health information", wellness_ack: "Bloat Buddy is a wellness tracker, not medical advice",
   ai_meal: "AI ingredient check", email: "Weekly email", research: "Research use", doctor_share: "Sharing a report by link",
 };
 const REQUIRED = ["terms_privacy", "health_data", "wellness_ack"];
@@ -79,6 +82,11 @@ export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; pa
     if (ok !== null) st.reload();
     else setPending({ body: {}, base: null });
     return ok;
+  };
+  // A date as people read it ("Nov 27, 2026" or "27 Nov 2026"), in the account's time zone.
+  const dayText = (iso: string) => {
+    const d = localDate(Date.parse(iso), s.profile.time_zone);
+    return s.profile.date_format === "MM/DD" ? `${formatDate(d, "MM/DD", false)}, ${d.slice(0, 4)}` : `${formatDate(d, "DD/MM", false)} ${d.slice(0, 4)}`;
   };
   const shown = <K extends keyof State["profile"]>(k: K): State["profile"][K] =>
     (pending.base === st.data && k in pending.body ? pending.body[k as string] : s.profile[k]) as State["profile"][K];
@@ -142,8 +150,9 @@ export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; pa
         <Label id="profile">Profile</Label>
         <Card className="flex flex-col gap-4">
           <p>Country: <strong>{countryCfg(s.profile.country)?.name}</strong></p>
+          <RegionSelect country={s.profile.country as Country} value={shown("region") ?? ""} onChange={(v) => { if (!profile.saving) patch({ region: v || null }); }} />
           <div className="flex items-center justify-between gap-3">
-            <p>Time zone: <strong className="tabular">{s.profile.analysis_time_zone}</strong></p>
+            <p>Time zone: <strong>{zoneLabel(s.profile.analysis_time_zone)}</strong></p>
             <Button variant="quiet" full={false} onClick={() => setSheet("zone")}>Change</Button>
           </div>
           <div className="flex flex-col gap-2">
@@ -156,7 +165,7 @@ export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; pa
             <Button variant="quiet" full={false} onClick={() => setSheet("goal")}>Change</Button>
           </div>
           <Button variant="secondary" onClick={() => setSheet("context")}>Cycle, age and other optional context</Button>
-          {switchStatus(["units", "goals", "answers"]) ?? (!switchKey && <SaveStatus state={profile.state === "saved" ? "idle" : profile.state} error={profile.error} />)}
+          {switchStatus(["units", "region", "goals", "answers"]) ?? (!switchKey && <SaveStatus state={profile.state === "saved" ? "idle" : profile.state} error={profile.error} />)}
         </Card>
       </section>
 
@@ -223,7 +232,7 @@ export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; pa
         <Card className="px-4 py-1">
           <ul>{(consents.data?.consents ?? []).map((c) => (
             <li key={c.type} className="flex items-center justify-between gap-3 border-b border-line py-3 last:border-0">
-              <span className="flex flex-col"><span className="font-semibold">{CONSENT_NAMES[c.type] ?? c.type}</span><span className="t-caption">{c.withdrawn_at ? `Withdrawn ${c.withdrawn_at.slice(0, 10)}` : `Agreed ${c.granted_at?.slice(0, 10)}`} · version {c.version}</span></span>
+              <span className="flex flex-col"><span className="font-semibold">{CONSENT_NAMES[c.type] ?? c.type}</span><span className="t-caption">{c.withdrawn_at ? `Withdrawn ${dayText(c.withdrawn_at)}` : c.granted_at ? `Agreed ${dayText(c.granted_at)}` : ""}</span></span>
               {!REQUIRED.includes(c.type) && !c.withdrawn_at && <button type="button" className="min-h-11 px-2 font-semibold text-brand" onClick={() => { consent.reset(); setWithdraw(c.type); }}>Withdraw</button>}
             </li>
           ))}</ul>
@@ -341,17 +350,17 @@ function ZoneSheet({ s, onClose, onSaved }: { s: State; onClose: () => void; onS
   const save = useSave();
   return (
     <Sheet open onOpenChange={(o) => { if (!o) onClose(); }} title="Change time zone">
-      <p>Your days are counted in <strong>{s.profile.analysis_time_zone}</strong>. Travelling does not change this by itself.</p>
-      <Field label="New time zone" hint="For example America/Toronto or Asia/Kolkata"><input className={inputClass} value={zone} onChange={(e) => { setZone(e.target.value.trim()); setPreview(null); }} /></Field>
+      <p>Your days are counted in <strong>{zoneLabel(s.profile.analysis_time_zone)}</strong>. Travelling does not change this by itself.</p>
+      <ZoneSelect country={s.profile.country as Country} label="New time zone" value={zone} also={[s.profile.analysis_time_zone]} onChange={(z) => { setZone(z); setPreview(null); }} />
       {!preview ? (
         <Button variant="secondary" onClick={async () => {
           setMsg("");
           try { const r = await api<{ preview: typeof preview }>("PATCH", "/v1/me/profile", { analysis_time_zone: zone, preview: true }); if (r.preview) setPreview(r.preview); else setMsg("That is already your time zone."); }
-          catch (e) { setMsg(e instanceof ApiFailure && (e.status === 400 || e.status === 422) ? "That time zone name isn't valid." : "That didn't load. Check your connection and try again."); }
+          catch (e) { setMsg(e instanceof ApiFailure && (e.status === 400 || e.status === 422) ? "That time zone can't be used. Choose another one." : "That didn't load. Check your connection and try again."); }
         }}>Preview the change</Button>
       ) : (
         <>
-          <Card><p>From <strong>{preview.effective_from}</strong>, your days will be counted in <strong>{preview.to}</strong>.</p><Caption className="mt-2">Days you have already recorded keep their dates. Nothing in your history moves.</Caption></Card>
+          <Card><p>From <strong>{preview.effective_from}</strong>, your days will be counted in <strong>{zoneLabel(preview.to)}</strong>.</p><Caption className="mt-2">Days you have already recorded keep their dates. Nothing in your history moves.</Caption></Card>
           <Button disabled={save.saving} onClick={async () => { const ok = await save.run("PATCH", "/v1/me/profile", { analysis_time_zone: zone }); if (ok) onSaved(); }}>{save.saving ? "Saving…" : "Confirm change"}</Button>
         </>
       )}
@@ -437,7 +446,7 @@ function EyeSheet({ s, onClose, onSaved }: { s: State; onClose: () => void; onSa
       <div className="flex flex-wrap gap-2">
         {foodTags.map((t) => { const on = groups.includes(t.id); return <Chip key={t.id} selected={on} disabled={!on && groups.length >= 5} onClick={() => setGroups((g) => (on ? g.filter((x) => x !== t.id) : g.length < 5 ? [...g, t.id] : g))}>{t.label}</Chip>; })}
       </div>
-      <Caption>Each morning the review asks whether you had each one. Meal logging becomes optional. One tap in Me returns to full logging.</Caption>
+      <Caption>Each morning the review asks whether you had each one. Meal logging becomes optional. One tap in You returns to full logging.</Caption>
       <SaveStatus state={save.state} error={save.error} />
       <Button disabled={!groups.length || save.saving} onClick={async () => { const ok = await save.run("PUT", "/v1/me/logging-mode", { mode: "keep_an_eye", watched_groups: groups }); if (ok) onSaved(); }}>{save.saving ? "Saving…" : "Save"}</Button>
     </Sheet>

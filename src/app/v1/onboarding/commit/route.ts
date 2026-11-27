@@ -2,6 +2,7 @@ import { z } from "zod";
 import { ApiError, route } from "@/server/http";
 import type { Op } from "@/server/db";
 import { DbError } from "@/server/db";
+import { regionName, type Country } from "@/lib/regions";
 import { checkAnswer, country as countryCfg, COUNTRIES, optionValues, PRO_ACTIVITY_IDS, question, REGISTRY_VERSION, activity } from "@/lib/registry";
 import { isValidZone } from "@/lib/time";
 import { CONSENT_VERSION, HELP_PAGE_VERSION } from "@/lib/wording";
@@ -33,6 +34,9 @@ export const POST = route({ body, mutation: true }, async (ctx) => {
   if (b.age_18_or_older !== "yes") throw new ApiError(422, "UNDER_18", "Bloat Buddy is for adults aged 18 or older.");
   if (!COUNTRIES.includes(b.country as never)) throw new ApiError(403, "CAPABILITY_OFF", "Bloat Buddy isn't available in your country yet.");
   if (!isValidZone(b.time_zone)) throw new ApiError(422, "VALIDATION", "That time zone is not valid.");
+  // The state or province is one of the country's names (the setup screen offers only those), saved as listed.
+  const region = b.region ? regionName(b.country as Country, b.region) : null;
+  if (b.region && !region) throw new ApiError(422, "VALIDATION", "Choose your state or province from the list.");
   for (const c of ["terms_privacy", "health_data", "wellness_ack"] as const) {
     if (!b.consents.includes(c)) throw new ApiError(422, "CONSENT_REQUIRED", "All three agreements are needed to continue.");
   }
@@ -42,7 +46,7 @@ export const POST = route({ body, mutation: true }, async (ctx) => {
   const cfg = countryCfg(b.country)!;
   const now = new Date(ctx.now).toISOString();
   const profile: Record<string, unknown> = {
-    residence_country: b.country, region: b.region ?? null, time_zone: b.time_zone, analysis_time_zone: b.time_zone,
+    residence_country: b.country, region, time_zone: b.time_zone, analysis_time_zone: b.time_zone,
     units: b.units, date_format: cfg.date_format, cuisines: [], subcuisines: b.subcuisines ?? [], food_preferences: [], goals: [],
     onboarding_completed_at: now,
   };

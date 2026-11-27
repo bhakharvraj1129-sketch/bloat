@@ -27,7 +27,16 @@ export type Question = {
 };
 
 export const REGISTRY_VERSION = questionsFile.version;
-export const questions = questionsFile.questions as unknown as Question[];
+
+// Owner-approved wording changes, applied on top of the extracted file (which stays as extracted).
+// 27 Nov 2026, DECISIONS.md D33: the app was renamed Bloat Buddy, so the two consent sentences that
+// name it say "Bloat Buddy". Meaning unchanged. Existing accounts confirm them again once (CONSENT_RECONFIRM).
+const OWNER_WORDING: Record<string, { prompt: string; version: string }> = {
+  "CN-02": { prompt: "I consent to Bloat Buddy storing my health information to show me my own records.", version: "4.3-2026-11-27" },
+  "CN-03": { prompt: "I understand Bloat Buddy is a wellness tracker, not medical advice, and not for emergencies.", version: "4.3-2026-11-27" },
+};
+
+export const questions = (questionsFile.questions as unknown as Question[]).map((q) => (OWNER_WORDING[q.id] ? { ...q, ...OWNER_WORDING[q.id] } : q));
 export const config = configFile;
 
 const byId = new Map(questions.map((q) => [q.id, q]));
