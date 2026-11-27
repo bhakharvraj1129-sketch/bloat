@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bloat tester guide</title>
+<style>
+:root {
+  --ground: #f5f5f6; --surface: #ffffff; --line: #dedee2; --ink: #171719; --ink-muted: #626269;
+  --subtle: #eeeef0; --alert-tint: #fbe7e4;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+body { background: var(--ground); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.55; margin: 0; }
+.wrap { max-width: 40rem; margin: 0 auto; padding-block: 2rem 3rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font-size: 2.125rem; line-height: 1.12; font-weight: 600; letter-spacing: -0.035em; margin: 0 0 1rem; text-wrap: balance; }
+h2 { font-size: 1.1875rem; line-height: 1.5rem; font-weight: 600; margin: 2rem 0 .5rem; text-wrap: balance; }
+section.key { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--ink); border-radius: 12px; padding: .25rem 1rem .75rem; margin: 1.5rem 0; }
+section.key h2 { margin-top: .75rem; }
+p { margin: .5rem 0; }
+ul, ol { padding-left: 1.25rem; margin: .5rem 0; }
+li { margin: .3rem 0; }
+code { font-family: var(--mono); font-size: .9em; background: var(--subtle); padding: 0 .25em; border-radius: 4px; }
+pre.form { font-family: var(--mono); font-size: .85rem; line-height: 1.6; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 1rem; overflow-x: auto; white-space: pre; }
+a { color: var(--ink); overflow-wrap: anywhere; }
+footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .875rem; color: var(--ink-muted); }
+@media print { body { background: #ffffff; } .wrap { max-width: none; padding: 0; } h2 { break-after: avoid; } pre.form, li { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+<h1>Bloat tester guide</h1>
+<p>Thank you for helping test Bloat.</p>
+<p><strong>What Bloat is.</strong> A private diary for bloating: when it happens, how strong it is, what you ate, and your habits. Over time it shows patterns in your own records. It is a wellness tracker, not a medical service: it never diagnoses anything and never tells you what caused your bloating.</p>
+<p><strong>This is a test version.</strong> Things may change or break.</p>
+<section class="key">
+<h2>Use made-up entries only</h2>
+<p>Please type <strong>made-up entries only</strong> during this round: invented times, strengths, meals and habits. Don't enter your real health details, medicines or conditions, even if they are true for you. The test is about whether the app works, not about your health.</p>
+</section>
+<section class="key">
+<h2>Important: foods in Possible triggers</h2>
+<p>In this round, meals are saved as the text you type, with no ingredients or food groups. So during <strong>normal logging, every food group in Possible triggers says "No usable days yet"</strong>, however many meals you add. This is expected, not a fault. Habits you follow can still be compared.</p>
+<p>To test the food comparisons, switch on <strong>Keep an eye on it</strong> in You and choose up to 5 food groups. The morning review then asks yes or no for each of them, and those answers can be compared. A food group or habit needs about 7 days with it and 7 days without before a comparison appears.</p>
+</section>
+<h2>Signing in</h2>
+<ol>
+<li>Open <strong><a href="https://bloat-preview.vercel.app">https://bloat-preview.vercel.app</a></strong> on your phone (or a computer).</li>
+<li>Tap <strong>Sign in</strong> and use the email address and temporary password you were given.</li>
+<li>Go to <strong>You</strong> and tap <strong>Change password</strong>. Choose a new password of at least 10 characters that you don't use anywhere else.</li>
+</ol>
+<p>Forgot your password? Ask the person who invited you for a new temporary one, then change it again in You. Bloat sends no emails in this test version.</p>
+<p>To add Bloat to your home screen: in Chrome, open the menu and tap "Add to Home screen"; in Safari, tap Share, then "Add to Home Screen".</p>
+<p><strong>Your first session:</strong> follow the short first-session checklist (after this guide).</p>
+<h2>What you can use</h2>
+<p>Pro is switched on for your account for testing. There is no subscription: nothing to pay, renew, pause or cancel.</p>
+<ul>
+<li><strong>Today:</strong> "I feel bloated" with a strength from 1 to 10, when it started and any warning signs; update the strength; end it. "No bloating so far today". Add a meal by typing what you had (when, how much, how fast, where it was made). Add habits. Log a bowel movement or exercise.</li>
+<li><strong>Morning review:</strong> see "Which day the morning review scores", below.</li>
+<li><strong>History:</strong> every day, a chart (week, month, all) and a 7-day average. On a day: change times and a meal's name, and delete any entry, including a habit answer.</li>
+<li><strong>Patterns:</strong> Possible triggers (with day counts), Your journey, the weekly report, and the doctor report, which you can download or share by link and stop sharing at any time.</li>
+<li><strong>You:</strong> units, time zone, habits to follow, medicines, health background, family history, optional context, Keep an eye on it mode, hide charts, download your data (JSON or CSV), change password, sign out, delete account.</li>
+<li><strong>When to get medical help:</strong> on the Log bloating screen and in You.</li>
+</ul>
+<h2>Which day the morning review scores</h2>
+<ul>
+<li>A day runs from midnight to midnight in your time zone.</li>
+<li>During the day, Today shows the <strong>highest strength logged so far</strong>. That is not a score yet ("Your score is set in tomorrow's review").</li>
+<li>The next day, Today offers <strong>Review yesterday</strong> (a morning review). Your answers set the <strong>Bloat Score for yesterday</strong>, the day that has just finished, not for today.</li>
+<li>A review done by the end of that next day is on time. A later review still sets the day's score and shows as late, but Possible triggers uses only days reviewed on time.</li>
+<li>You can review or change an earlier finished day from History (up to 92 days back). Today itself can only be reviewed once it has finished.</li>
+</ul>
+<h2>What is not in this round</h2>
+<ul>
+<li>No AI: no ingredient check or photos for meals, and no way to add ingredients or save a dish.</li>
+<li>No experiments, no Learn library and no daily cards.</li>
+<li>No payments, no emails from Bloat, no Google sign-in, and no new sign-ups.</li>
+</ul>
+<h2>Good to know</h2>
+<ul>
+<li>The doctor report has an "Experiments" section. In this round it says "None".</li>
+<li>A doctor report link opens for anyone who has it. It stops working when it expires, when you stop sharing it, or when you change or delete a record it shows.</li>
+</ul>
+<h2>Deleting your account</h2>
+<p><strong>Delete account</strong> is in You. You type DELETE to confirm, then tap <strong>Delete my account</strong>. You may want to download your data first (You, Download my data).</p>
+<p><strong>When it works:</strong> your account, your sign-in and every record in it (bloating, meals, habits, reviews, reports and their share links, medicines and the rest) are removed for good, and you are signed out. It cannot be undone.</p>
+<p><strong>What is kept:</strong></p>
+<ul>
+<li>A <strong>deletion record</strong> that holds only a one-way code made from your account's ID number, and the date. It contains no name, email address or records, and can't be turned back into your account. It exists so that, if the database is ever restored from a backup, your account is deleted again instead of coming back.</li>
+<li>Files you downloaded and PDFs you saved stay wherever you saved them. Links you shared stop working.</li>
+<li>The person who invited you keeps your name and email address on their private list of testers until they remove you.</li>
+<li>The hosting services (Supabase and Vercel) keep their own technical logs, such as sign-ins and page requests, for a limited time. Bloat writes no health records into logs.</li>
+</ul>
+<p><strong>If it can't finish</strong>, the screen tells you which case it is:</p>
+<ul>
+<li>"That didn't work. Nothing was deleted. Try again." Nothing was removed. Try again.</li>
+<li>"We couldn't finish deleting your account. Your account and diary are still available, but some saved meal photos may already have been deleted. Try again to finish." Your account and records are still there. (Meal photos are off in this round, so there are none to lose.) Try again later.</li>
+<li>"Connection lost. We can't tell yet whether your account was deleted." When you are back online, tap <strong>Check and finish</strong>. If the account was deleted, it signs you out. If not, it finishes the deletion, sending the same request again, so nothing is done twice.</li>
+</ul>
+<p>If it keeps failing, tell the person who invited you.</p>
+<h2>Your health and your privacy</h2>
+<ul>
+<li>If something worries you, open <strong>When to get medical help</strong>. In an emergency, call your local emergency number (911 in the US and Canada, 112 in India).</li>
+<li>Other testers cannot see your records. The person running the test can reach the database to look after it, which is one more reason to use made-up entries only.</li>
+</ul>
+<h2>Telling us what you found</h2>
+<p>Use the feedback form at the end of this guide and send it to the person who invited you, in the way you agreed with them. One problem per message is easiest. A screenshot helps; check it shows only made-up entries.</p>
+<h2>Your first session</h2>
+<p>About 15 minutes. <strong>Made-up entries only.</strong> If something doesn't match what is written after the arrow, note it on the feedback form.</p>
+<ol>
+<li>Open <strong><a href="https://bloat-preview.vercel.app">https://bloat-preview.vercel.app</a></strong> and tap <strong>Sign in</strong> with the email address and temporary password you were given. → You land on Today.</li>
+<li><strong>You, Change password:</strong> choose a new one of at least 10 characters. → "Password changed. Use the new one next time you sign in."</li>
+<li><strong>You, Plan.</strong> → "Bloat Pro" and "Switched on for testing. There is no subscription, so nothing renews and nothing is charged." If it says "Bloat Free", tell the person who invited you.</li>
+<li>Optional: add Bloat to your home screen and open it from there. → It opens on Today.</li>
+<li><strong>Today, I feel bloated:</strong> pick a made-up strength, Save. → "Bloating saved."</li>
+<li><strong>Add meal:</strong> type a made-up dish, Save. → "Meal saved."</li>
+<li><strong>Add activity:</strong> tick a habit, Save. → "Activity saved."</li>
+<li><strong>History</strong>, open today. → Your entries are there. Change the meal's time, then delete the meal. → Gone after a refresh.</li>
+<li>Optional, to test food comparisons later: <strong>You, Keep an eye on it</strong>, choose 2 food groups.</li>
+<li><strong>Tomorrow:</strong> on Today, <strong>Review yesterday</strong>. → Yesterday gets its Bloat Score in History.</li>
+<li>Send anything you noticed with the feedback form to the person who invited you. Then <strong>Sign out</strong> if you share the device.</li>
+</ol>
+<h2>Feedback form</h2>
+<p>Copy this, fill it in, and send it to the person who invited you (in the way you agreed with them). One problem per form. Made-up entries only: if you add a screenshot, check it shows nothing real.</p>
+<pre class="form">Screen:          (for example: Today, Add meal, History, a day, Patterns, Doctor report, You)
+Steps:           1.
+                 2.
+                 3.
+Expected result: (what you thought would happen)
+Actual result:   (what happened instead; copy any message exactly)
+Device/browser:  (for example: iPhone 13, iOS 18, Safari; or Pixel 7, Android 15, Chrome)
+Date and time:   (roughly, with your time zone)
+Screenshot:      yes / no</pre>
+<p>Something that isn't a problem but could be better? Use the same form and write "Suggestion" next to Screen.</p>
+<footer>Bloat test version, first invited acceptance round, 27 November 2026. Bloat is a general wellness tracker and does not give medical advice.</footer>
+</main>
+</body>
+</html>

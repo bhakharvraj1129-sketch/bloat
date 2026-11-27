@@ -8,13 +8,23 @@ Each result is one of: **passed** (it ran and the outcome was right), **expected
 
 The owner's decisions: experiments off, Pro test access without payment, made-up data only. Changes: experiments switched off on every screen and route (choice 29), the Pro page's wording for Pro given for testing (A1, Pro page), and no "save your usual dishes" suggestion while AI is off (choice 30). Synthetic `@example.com` accounts on the local stack.
 
+**Where each beta-specific check ran.** The round's checks were run locally and live; in CI they were skipped. They are not CI passes.
+
+| Check | Local | CI (GitHub run 18, from its log) | Live (deployed candidate) |
+|---|---|---|---|
+| `tests/api/acceptance-round.test.ts` (10 checks) | Passed 10 of 10 against a second local server with the round's settings (7 failed on `da4bb77`) | **Skipped** (log: "10 tests, 10 skipped"): CI runs one normal server | Not run: these call the local stack |
+| `tests/e2e/acceptance-round.spec.ts` (3 checks) | Passed 3 of 3 against the second local server (2 failed on `da4bb77`) | **Skipped** (log: "3 skipped") | Not run |
+| `tests/hosted/beta-candidate.spec.ts` (4 checks) | Passed 4 of 4 against a local server with password sign-in and the round's settings | **Not part of CI** (CI runs only the 6 signed-out live checks) | Passed 4 of 4, run from this session with synthetic accounts |
+| Core signed-in hosted suite (16 checks) | | **Not part of CI** | Passed 16 of 16, run from this session |
+| Rule tests for the switches and the dish suggestion (`tests/unit/beta.test.ts`), and `tests/e2e/beta.spec.ts` (switched-off screens with the state answer changed in the browser; A1 and its Pro page) | Passed | Passed, within rule 107, browser 274 (they need no special server) | |
+
 ### Hosted, signed in (the deployed candidate, run 18)
 
 Published revision `35c947bb1dc0c059a57e16db25a9f2221c3affb0`, Vercel deployment `dpl_LxVJ6VzoY4iswtpfhy78kN3B76jj` (made 27 Nov 06:56 UTC), on `https://bloat-preview.vercel.app` and the branch address. Preview variables: `BLOAT_AI_PROVIDER=off`, `BLOAT_OFF_FEATURES=learn_library,daily_cards,experiments_habit,experiments_swap`, `BLOAT_TEST_LOGIN=0`, `BLOAT_BILLING_PROVIDER=mock`. The three main addresses still serve `83fe4da`. 8 synthetic accounts made for the run (`@bloat.test`, marked `synthetic_test_run = 2026-11-27`, one password kept in a private file and never printed; the file was destroyed after the cleanup). Made-up entries only; `bloat-tester` not used.
 
 | Check | Passed | Failed | Notes |
 |---|---|---|---|
-| GitHub run 18 (first attempt) | All | 0 | Typecheck, lint, rule, API and browser tests on a clean checkout (the round's server-specific checks skip there, as designed); controls read back; Vercel build; the 6 signed-out live checks on the new build, publish (06:58 UTC), the same 6 on the public address |
+| GitHub run 18 (first attempt), from its log | Typecheck, lint; rule 107; API 157; browser 274; the 6 signed-out live checks before and after publishing | 0 | Clean checkout, one normal server. **Skipped there, not passed:** the round's 10 API checks and 3 browser checks. The signed-in hosted files are not part of CI. Controls read back; Vercel build; publish 06:58 UTC |
 | Tested = deployed | | | Both preview addresses on `dpl_LxVJ6VzoY4iswtpfhy78kN3B76jj`; all 220 repository files Vercel lists are byte-identical to `35c947b` (SHA-1 of contents), 23 of the 29 changed files among them; the other 6 sit in folders Vercel lists only partly |
 | Core hosted suite (`navigation`, `preview`, `signed-in-journey`, `signed-in-navigation`), 16 checks | 16 | 0 | |
 | `tests/hosted/beta-candidate.spec.ts`, 4 checks | 4 | 0 | First attempt. Check 4 is new: Pro test access says there is no subscription (You and the Pro page; entitlement status "none"); experiment routes and an experiment answer in a review refused ("not available"); no link to experiments on Today, History, Possible triggers or Your journey; a direct visit says Not available; no "save your usual dishes" suggestion; Possible triggers, Your journey, History, health background, bowel and exercise logs, Keep an eye on it and the doctor report work; the start page lists neither experiments nor the ingredient check |

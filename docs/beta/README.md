@@ -1,6 +1,6 @@
 # First invited acceptance round (no AI)
 
-**Status: prepared and frozen on 27 Nov 2026: commit `35c947b`, Vercel deployment `dpl_LxVJ6VzoY4iswtpfhy78kN3B76jj` (run 18), checked signed in on that deployment. Nobody has been invited.** Public sign-ups stay off. Real payments stay off. No real AI provider is connected.
+**Status: accepted by you on 27 Nov 2026 for the fictional-data round, and frozen: commit `35c947b`, Vercel deployment `dpl_LxVJ6VzoY4iswtpfhy78kN3B76jj` (run 18), checked signed in on that deployment. No tester account exists and nobody has been invited.** Public sign-ups stay off. Real payments stay off. No real AI provider is connected.
 
 Review address: `https://bloat-preview.vercel.app`. The three older addresses (`bloat-olive`, `bloat-typeshi2`, `bloat-git-main-typeshi2`) are left as they are.
 
@@ -8,10 +8,13 @@ Files in this folder:
 
 | File | For | What |
 |---|---|---|
-| `tester-guide.md` | Testers | The review address, what they can use, what is not in this round, "made-up entries only" |
+| `tester-guide.md` | Testers | The review address, made-up entries only, the food-comparison limit, what they can use, which day the morning review scores, account deletion |
+| `share/` | Testers | The guide with the first-session checklist and the feedback form, ready to send: `bloat-tester-guide.pdf`, `bloat-tester-guide.html` (opens in any browser from the file) and `bloat-tester-guide.txt` (to paste into a message). Made from the Markdown files; a private copy is also at https://claude.ai/artifact/BPVEopLxQwbCRMfhNZBdv8 |
+| `first-session-checklist.md` | Testers | About 15 minutes: sign in, change password, check Pro, a first entry of each kind, the next day's review |
 | `feedback-template.md` | Testers | Screen, steps, expected result, actual result, device and browser |
 | `real-phone-checklist.md` | You or a tester with a real phone | Sign-in, logging, editing, reports and sharing, export, password change, sign-out; screen readers separately |
 | `owner-checklist.md` | You | Create accounts, switch Pro on, send passwords safely, reset a password, remove a tester, weekly check |
+| `tester-roster-template.md`, `.csv` | You | Name, email, device and browser, feedback channel, credential-delivery channel. Keep the filled copy private |
 
 ## 1. Your decisions for this round (27 Nov 2026)
 
@@ -61,9 +64,9 @@ Available and fixed: the help page and the warning-sign and doctor-line sentence
 
 ## 6. Still needed before inviting the 3 to 5 testers
 
-1. Each tester's name and email address, and your approval to invite them.
-2. The reporting channel for each tester (an existing one), and a second way to send the temporary password.
-3. Then, from `owner-checklist.md`: create the accounts, add the addresses to the Pro test list and run the workflow, send the guide and the password separately.
+1. The filled-in roster (`tester-roster-template.md`): each tester's name, email address, device and browser, feedback channel (an existing one) and a separate channel for the temporary password.
+2. Your explicit approval to create their accounts (and, separately, to send the invitations).
+3. Then, from `owner-checklist.md`: create the accounts, add the addresses to the Pro test list and run the workflow once, send the guide (`share/`) and the password separately.
 
 Recorded but not needed for a made-up-data round: D27 (backups; matters before real records), D12 (a short tester notice; legal wording, yours to approve), D28 (alerts: weekly check for now), D29 (leaked-password protection, if your Supabase plan offers it), D30 (food groups without AI).
 
@@ -78,6 +81,7 @@ Kept apart by where they ran; counts and builds are in `TEST_RESULTS.md`.
 | Kind | Where | What |
 |---|---|---|
 | Local, synthetic accounts | Local database in Docker; one local server as normal and one started with the round's settings | Rule, API and browser tests (phone-sized browser, keyboard, 200% zoom); the round's checks, first on the published code (they fail at each defect), then on the fixed code |
+| CI (GitHub workflow) | One normal server on GitHub's machine | Rule, API and browser tests and the 6 signed-out live checks passed. **The round's own checks were skipped there** (10 API, 3 browser) and the signed-in hosted files are not part of CI: they are not CI passes |
 | Hosted, synthetic accounts | The deployed candidate `dpl_LxVJ6VzoY4iswtpfhy78kN3B76jj` on `bloat-preview.vercel.app`, 27 Nov; 8 accounts created for the run and deleted through the app, checked gone | The full signed-in hosted suite (16 of 16 passed) and the round's checks `tests/hosted/beta-candidate.spec.ts` (4 of 4 passed) |
 | Browser emulation | Desktop Chromium pretending to be a Pixel 7 | Phone layout, keyboard-only use, 200% zoom. Not a real phone |
 | **Not performed** | | Real phones (iOS Safari, Android Chrome), any screen reader (VoiceOver, TalkBack), a real AI provider, a backup restore. Checklist: `real-phone-checklist.md` |

@@ -61,6 +61,8 @@ Choices made while building, with the reason. Everything still waiting for the o
 
 - **27 Nov 2026, first invited acceptance round.** 3 to 5 trusted testers; Pro test access without payment (testers go on `BLOAT_PRO_TEST_EMAILS`; former D25); experiments off (former D26); made-up data only; AI, photos, Learn, daily cards, payments and public sign-ups stay off; no support email yet: testers report to the person who invited them through an existing channel, which the owner will choose; nobody is invited until the owner gives the testers' details and approves the invitations. Details: `docs/beta/README.md`.
 
+- **27 Nov 2026, acceptance.** The owner accepted the candidate `35c947b` (deployment `dpl_LxVJ6VzoY4iswtpfhy78kN3B76jj`) for the planned fictional-data acceptance round. It stays frozen; no account is created and no invitation sent until the owner gives the testers' details and explicit approval.
+
 ## Open decisions
 
 Only questions still waiting for the owner, grouped by **who can use the affected feature on the preview today** (not by price). Anything in the first three groups is already in front of testers, and anyone who opens the preview addresses can see the public pages; decide those before more people use them. The last group is switched off, paused or not built; decide those before switching the feature on. Until a decision is made, the app keeps the "built now" behaviour.

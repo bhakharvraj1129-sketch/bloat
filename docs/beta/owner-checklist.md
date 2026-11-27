@@ -7,7 +7,7 @@ The round, as you decided on 27 Nov 2026: 3 to 5 trusted testers, Pro switched o
 ## 0. Before the first invitation
 
 - [ ] You have approved sending invitations.
-- [ ] You have each tester's name and email address (keep them in a private list, not in the repository).
+- [ ] You have filled in the roster (`tester-roster-template.md`): each tester's name, email address, device and browser, feedback channel and credential-delivery channel. Keep it private, not in the repository, and never with passwords.
 - [ ] **Reporting channel: awaiting your selection.** For each tester, choose an existing way you already use with them (for example a messaging app you both use). Testers send the feedback form (`feedback-template.md`) there.
 - [ ] A second, separate way to send each temporary password (for example a text message or a phone call, if the first way is email).
 - [ ] You have read the tester guide (`tester-guide.md`) and are happy to send it.
@@ -29,7 +29,7 @@ You can also ask Claude to do step 2 for you, giving the addresses in the chat.
 
 ## 3. Send the invitation safely
 
-1. **First message** (the reporting channel): the tester guide, the feedback form, and the address `https://bloat-preview.vercel.app`. No password.
+1. **First message** (the reporting channel): the tester guide (a copy from `docs/beta/share/`: the PDF, or the plain text pasted in), which includes the first-session checklist and the feedback form, and the address `https://bloat-preview.vercel.app`. No password.
 2. **Second message, a different way** (text message or phone call): the temporary password only.
 3. Ask the tester to change it straight away (You, Change password).
 4. Once they confirm, delete the temporary password from wherever you noted it. Never keep testers' passwords.
