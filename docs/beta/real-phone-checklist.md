@@ -25,7 +25,7 @@ Do the whole list once on an **iPhone with Safari** and once on an **Android pho
 
 | # | Do this | Expect | Result |
 |---|---|---|---|
-| 2.1 | I feel bloated, pick a strength, Save | "Bloating saved." under the button; Today shows it as ongoing | |
+| 2.1 | I feel bloated, pick a strength, Save | The sheet slides up from the bottom; after Save, "Bloating saved." appears near the bottom of the screen with a tick for a few seconds; Today shows it as ongoing | |
 | 2.2 | Update the strength | "Saved", and the new reading is listed | |
 | 2.3 | End it | "Bloating ended" with how long it lasted | |
 | 2.4 | Add meal: type a dish, Save | "Meal saved."; it appears in "Today so far". There is no photo or ingredient step | |
@@ -34,6 +34,7 @@ Do the whole list once on an **iPhone with Safari** and once on an **Android pho
 | 2.7 | Turn on airplane mode, add a meal, Save | A clear message; your text is still there | |
 | 2.8 | Airplane mode off, Save again | Saved once (one entry in History, not two) | |
 | 2.9 | Next morning: do the review | The day gets a Bloat Score in History | |
+| 2.10 | Open a sheet, type nothing, swipe it down. Then open it again, pick a strength and try to swipe it down | Empty: it closes. With a choice made: it stays, and Close asks before discarding | |
 
 ## 3. Editing
 

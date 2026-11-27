@@ -38,7 +38,11 @@ test.describe("motion spec", () => {
     await page.mouse.up();
     const tokens = await page.evaluate(() => {
       const st = getComputedStyle(document.documentElement);
-      return ["--dur-press", "--dur-fast", "--dur-base", "--dur-slow"].map((t) => parseFloat(st.getPropertyValue(t)));
+      // The built stylesheet may write 120ms as .12s: read both.
+      return ["--dur-press", "--dur-fast", "--dur-base", "--dur-slow"].map((t) => {
+        const v = st.getPropertyValue(t).trim();
+        return Math.round(v.endsWith("ms") ? parseFloat(v) : parseFloat(v) * 1000);
+      });
     });
     expect(tokens).toEqual([120, 150, 250, 400]);
   });
@@ -79,7 +83,7 @@ test.describe("motion spec", () => {
     await expect(page.getByRole("heading", { name: "History" })).toBeVisible();
     await expect(page.locator(".skeleton").first()).toBeVisible();
     await expect(page.getByRole("status").filter({ hasText: "Loading history" })).toHaveCount(1);
-    await expect(page.getByText("Your days")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("Your days", { exact: true })).toBeVisible({ timeout: 10000 });
     await expect(page.locator(".skeleton")).toHaveCount(0);
   });
 
@@ -101,6 +105,9 @@ test.describe("motion spec", () => {
   });
 
   test("change password: a problem appears gently under its field instead of blocking", async ({ context }) => {
+    // The sheet exists only where password sign-in is on (the preview): run with a server started with
+    // BLOAT_SIGN_IN_METHOD=password and E2E_SIGN_IN=password.
+    test.skip(process.env.E2E_SIGN_IN !== "password", "needs a server with password sign-in");
     const page = await account(context);
     await page.goto("/me");
     await page.getByRole("button", { name: "Change password" }).click();

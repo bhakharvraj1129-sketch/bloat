@@ -40,7 +40,7 @@ Pro is switched on for your account for testing. There is no subscription: nothi
 - **Morning review:** see "Which day the morning review scores", below.
 - **History:** every day, a chart (week, month, all) and a 7-day average. On a day: change times and a meal's name, and delete any entry, including a habit answer.
 - **Patterns:** Possible triggers (with day counts), Your journey, the weekly report, and the doctor report, which you can download or share by link and stop sharing at any time.
-- **You:** state or province, time zone (both chosen from a list), units, habits to follow, medicines, health background, family history, optional context, Keep an eye on it mode, hide charts, Appearance (same as the phone, light or dark), download your data (JSON or CSV), change password, sign out, delete account.
+- **You:** state or province, time zone (both chosen from a list you can search; in India, typing a PIN code fills in the state, and the PIN code itself is not saved), units, habits to follow, medicines, health background, family history, optional context, Keep an eye on it mode, hide charts, Appearance (same as the phone, light or dark), download your data (JSON or CSV), change password, sign out, delete account.
 - **When to get medical help:** on the Log bloating screen and in You.
 
 ## Which day the morning review scores

@@ -175,7 +175,7 @@ export function Sheet({ open, onOpenChange, title, children, description, dirty 
   return (
     // Vaul bottom sheet: slides and fades in over 250ms (globals.css), can be dragged down to close
     // when nothing unsaved would be lost. Closing with unsaved input always asks first.
-    <Drawer.Root open={open} onOpenChange={request} dismissible={!dirty} repositionInputs={false}>
+    <Drawer.Root open={open} onOpenChange={request} dismissible={!dirty} repositionInputs={false} autoFocus>
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 z-40 bg-ink/40" />
         <Drawer.Content

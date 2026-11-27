@@ -33,7 +33,14 @@ Bloat is an installable mobile-web bloating tracker, shown to people as "Bloat B
 
 ## Toolkit
 
-The owner's chosen tools (27 Nov 2026). **Rule: prefer these tools over others when building anything.** They are installed and set up; nothing uses them yet.
+The owner's chosen tools (27 Nov 2026). **Rule: prefer these tools over others when building anything.** Since the motion pass of 27 Nov 2026 (DECISIONS.md choice 34) the app uses Motion, GSAP (start page only), AutoAnimate, Sonner, Vaul, Recharts, React Hook Form + Zod, shadcn Command and Popover, Lucide and india-pincode; Lottie is installed but unused.
+
+Motion rules (owner's spec, 27 Nov 2026):
+- One source for timing: `--dur-press` 120ms, `--dur-fast` 150ms, `--dur-base` 250ms, `--dur-slow` 400ms and `--ease-out` in `globals.css`, mirrored in `src/lib/motion.ts`. Nothing longer than 400ms (the start page's slow background drift is the only exception), no bounce or spring overshoot, nothing that makes the person wait.
+- A tap answers within 150ms (buttons shrink to 0.97 when pressed). A button whose label ends in "…" shows a loader. A finished save shows a toast with a tick (`savedToast()` in `src/lib/client/feedback.tsx`), not an inline notice.
+- Sheets are Vaul drawers (`Sheet` in `ui.tsx`) and keep the unsaved-changes check. Loading shows a page skeleton (`Loading`), never a blank screen or a lone spinner.
+- "Reduce motion" turns every animation off (a global CSS rule plus `useReducedMotion()`/`reducedMotion()` in code).
+- Form problems appear under the field (`FieldMessage`), in ink with an icon: the alert red stays for warning signs and destructive actions. The PIN code only fills in the state; it is never saved.
 
 - **Animation:** Motion (`motion`) for UI animation, GSAP (`gsap`) for scroll effects, AutoAnimate (`@formkit/auto-animate`) for lists, Lottie (`lottie-react`) for animated icons and loaders. Respect the phone's "reduce motion" setting.
 - **UI:** shadcn/ui + Lucide (`lucide-react`) for components and icons; Sonner (`sonner`) for toasts; Vaul (`vaul`) for bottom sheets.

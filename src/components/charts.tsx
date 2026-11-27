@@ -57,7 +57,7 @@ export function DayChart({ days, dateFormat, context }: { days: DayRow[]; dateFo
   }).filter((c): c is NonNullable<typeof c> => c !== null);
   return (
     <Card className="flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Label>Daily Bloat Score</Label>
         <Segmented label="Range" value={range} onChange={setRange} options={[{ value: "week", label: "Week" }, { value: "month", label: "Month" }, { value: "all", label: "All" }]} />
       </div>
