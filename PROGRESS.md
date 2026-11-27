@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 27 Nov 2026. The **invited beta candidate without AI** is published by run 17 as `da4bb77` and **frozen for your acceptance**. Nobody has been invited. Working branch `claude/bloat-continuation-9mjd46`; publishing branch `claude/bloat-software-build-uxzoru` (app at `da4bb77`; the notes commits after it carry `[skip ci]` and publish nothing). Only a push to the publishing branch runs the publishing workflow.
+Last updated: 27 Nov 2026. The **first invited acceptance round** is prepared: experiments off, Pro test access, made-up data only, AI off. Published by run 18 as `35c947b` and **frozen**. Nobody has been invited. Working branch `claude/bloat-continuation-9mjd46`; publishing branch `claude/bloat-software-build-uxzoru` (app at `35c947b`; the notes commits after it carry `[skip ci]` and publish nothing). Only a push to the publishing branch runs the publishing workflow.
 
 This file has four parts: **current status** (what is true now, with the evidence), **what remains** (your decisions, launch requirements, tests not yet performed), **your phone checklist**, and **history** (completed work by date, kept as it was then). How the preview is published and run is in `DEPLOYMENT.md`; what was tested, where and on which build is in `docs/verification-report.md`.
 
@@ -8,20 +8,22 @@ This file has four parts: **current status** (what is true now, with the evidenc
 
 | What | State | How it was verified |
 |---|---|---|
-| **Beta candidate (testing preview)** | `https://bloat-preview.vercel.app` and the branch address serve commit `da4bb77`, Vercel deployment `dpl_DMcN8fjTd9f99QHXjxA5Rc7uerhR` (made 27 Nov 03:56 UTC). It has every fix from the 26 Nov reviews (T1 to T4, R1, H1, R2, X1, A1) and the beta settings: no AI anywhere, Learn and daily cards off. Plan and limits: `docs/beta/README.md` | Published by the Preview workflow, run 17 (pushed 03:42 UTC, finished 03:59 UTC, first attempt). Vercel reports both preview addresses on this deployment; the 216 repository files Vercel lists for it are byte-identical to `da4bb77` (26 of the 37 changed files are among them; the other 11 sit in folders Vercel lists only partly) |
-| Main addresses | `bloat-olive.vercel.app`, `bloat-typeshi2.vercel.app` and `bloat-git-main-typeshi2.vercel.app` still show an **older** build, `83fe4da` (`dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`), without any fix since 23 Nov. Left unchanged, as you asked. They were pointed there by hand on 24 Nov (your decision; not a launch) | Vercel alias read on 27 Nov after run 17 |
-| **Freeze** | **Frozen for your acceptance.** Nothing more is published, no setting is changed and nobody is invited unless you say so. Notes-only commits carry `[skip ci]` and cannot publish | Run 17 is the last workflow run (read 27 Nov) |
-| **Feature reviews (26 Nov)** | All areas reviewed in the order you set: Today and logging; History and editing; Patterns, reports and sharing, exports, experiments, Learn, account and settings. **9 defects** found, each shown first by a check that fails on the code before the fix, fixed and published: T1 to T4 (run 15), R1 and H1 (run 16), R2, X1 and A1 (run 17). Gaps against the plan are recorded as decisions D21 to D24 and not built | Sections below; `TEST_RESULTS.md` |
-| Beta settings (Preview variables) | `BLOAT_AI_PROVIDER=off` (was `mock`) and `BLOAT_OFF_FEATURES=learn_library,daily_cards` (new), set on 27 Nov before run 17 built. Unchanged: `BLOAT_TEST_LOGIN=0`, `BLOAT_BILLING_PROVIDER=mock`, `BLOAT_SIGN_IN_METHOD=password`, `BLOAT_PRO_TEST_EMAILS` | Variable list read on 27 Nov after run 17 |
-| Tests on this build | Local on `da4bb77`: rule 102, API 157, browser 273 passed (one browser check failed mid-run because it expected the old export label; it was updated and passed when run again alone). CI, run 17: every check passed on a clean checkout, including the 6 signed-out live checks before and after publishing. **Hosted, signed in, on the deployed candidate** (27 Nov, 8 synthetic accounts made for the run): the core hosted suite 16 of 16 passed; the new beta checks 3 of 3 passed (one re-run after a fix to how the test itself found a field). Tests not performed are listed below, never counted as passed | `TEST_RESULTS.md`, top |
-| Sign-in | Email and password, for accounts you make in Supabase. Sign-ups are off in Supabase itself. Test mode is off (`BLOAT_TEST_LOGIN=0`). New: testers can change their password in You; the sign-in screen says to ask the person who invited them if they forget it | Hosted checks "nobody can create an account" and the password change passed on `da4bb77` |
-| Your test account | `bloat-tester@bloat.test` was not used or changed. It still has 1 meal, 1 bloating record with 2 strength readings, 1 report and no share links; last updated 23 Nov 06:25 UTC, last sign-in 23 Nov 04:23 UTC; Pro without a purchase; not staff | Read-only check on 27 Nov, after the hosted run and the cleanup |
-| Synthetic test accounts | None remain. The 8 made for the 27 Nov run were deleted through the app (each answered "deleted" and its old sign-in was refused straight after) | Read-only check on 27 Nov: no account, sign-in identity, session, refresh token, profile, meal, bloating record, report, share link, medicine, habit or photo left for them; 0 accounts with a test-run marker; photo bucket empty |
-| Publishing | Only the Preview workflow moves the preview, after its checks pass. Its `VERCEL_TOKEN` secret is in place (since 22 Nov) | Runs 6 and 9 to 17 published (run list read 27 Nov) |
-| Supabase `bloat-test` | Same six migrations as the repository. This round needed no migration | Migration list read on 27 Nov |
-| Real AI, payments, email delivery, sign-ups | Off: AI switched off (`off`, and no AI key in the project), mock billing with checkout off, no custom email sender, sign-ups off | Vercel variables read on 27 Nov; no Production variables exist |
+| **Acceptance-round candidate (testing preview)** | `https://bloat-preview.vercel.app` and the branch address serve commit `35c947b`, Vercel deployment `@@DPL@@`. It has every fix so far (T1 to T4, R1, H1, R2, X1, A1 and this round's) and the round's settings: AI off; Learn, daily cards and experiments off. Plan, limits and the tester documents: `docs/beta/` | @@PUBLISHED@@ |
+| Main addresses | `bloat-olive.vercel.app`, `bloat-typeshi2.vercel.app` and `bloat-git-main-typeshi2.vercel.app` still show the **older** build `83fe4da` (`dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`). Left unchanged, as you asked | @@ALIASES@@ |
+| **Freeze** | **Frozen.** Nothing more is published, no setting changed, no account created for a tester and nobody invited until you give the testers' details and approve the invitations. Notes-only commits carry `[skip ci]` and cannot publish | @@LASTRUN@@ |
+| **Your decisions of 27 Nov** | 3 to 5 trusted testers, Pro test access without payment, experiments off, made-up data only; AI, photos, Learn, daily cards, payments and public sign-ups stay off; reporting through an existing channel (awaiting your selection) | `DECISIONS.md`, "The owner's decisions since" |
+| **This round's fixes** | Experiments switched off everywhere (they were still offered on Today, in the morning review, Possible triggers, History, Your journey, the weekly report, the Pro page and the start page; records already made are kept); the Pro page no longer says "Manage, pause or cancel in Me." to Pro given for testing; no "save your usual dishes" suggestion while AI is off. Each first failed a check on the published code | Below; `TEST_RESULTS.md`, top |
+| **Reviews** | All planned reviews are done: Today and logging, History and editing (26 Nov); Patterns, reports and sharing, exports, experiments, Learn, account and settings (26 Nov); and, for this round, the Pro features it keeps (27 Nov). 12 defects fixed in all (T1 to T4, R1, H1, R2, X1, A1, and this round's three). Missing capabilities recorded as decisions, not built: D21 to D24, D30 | Sections below |
+| Round settings (Preview variables) | `BLOAT_AI_PROVIDER=off`, `BLOAT_OFF_FEATURES=learn_library,daily_cards,experiments_habit,experiments_swap` (experiments added on 27 Nov before run 18 built), `BLOAT_TEST_LOGIN=0`, `BLOAT_BILLING_PROVIDER=mock`, `BLOAT_SIGN_IN_METHOD=password`; `BLOAT_PRO_TEST_EMAILS` unchanged (testers' addresses are added when you invite them) | Variable changed and read back on 27 Nov |
+| Tests on this build | Local on `35c947b`: rule 107, API 157, browser 274 passed on the normal server; the round's 10 API and 3 browser checks passed against a second server with the round's settings (and failed on `da4bb77`, at each defect). @@CI@@ **Hosted, signed in, on the deployed candidate:** @@HOSTED@@ Tests not performed are listed below | `TEST_RESULTS.md`, top |
+| Sign-in | Email and password, for accounts you make in Supabase. Sign-ups off in Supabase itself. Test mode off. Testers change their password in You | Hosted checks "nobody can create an account" and the password change |
+| Your test account | `bloat-tester@bloat.test` @@TESTER@@ | Read-only check after the hosted run |
+| Synthetic test accounts | @@SYNTH@@ | Read-only check after the hosted run |
+| Experiment records on `bloat-test` | None existed before the switch (0 experiments, 0 experiment days, 0 checks), so none could be lost; keeping records was checked locally with a seeded experiment | Read-only count, 27 Nov |
+| Supabase `bloat-test` | Same six migrations as the repository; no migration needed | Migration list read 27 Nov |
+| Real AI, payments, email delivery, sign-ups | Off | Vercel variables read 27 Nov |
 
-**What happens next:** you accept the candidate (or send what to change), make the decisions in `docs/beta/README.md`, section 5, and only then invite testers yourself (`docs/beta/owner-runbook.md`).
+**What happens next:** you give the 3 to 5 testers' names and email addresses, the reporting channel for each, and your approval to invite them. Then the accounts are created, the addresses added to the Pro test list and the workflow run once (`docs/beta/owner-checklist.md`).
 
 ## What remains
 
@@ -36,9 +38,9 @@ All in one table: `DECISIONS.md`, "Open decisions" (D1 to D19), each with what i
 The former D20 (the message after a failed account deletion) was a wrong message, not a product question: it is fixed (defect P2, below).
 - **Not on for anyone (6):** D3, D5, D6, D10, D17, D19 (off, paused, hidden or not built).
 
-- **Before inviting beta testers (5):** D25 (Free or Pro test list for testers), D26 (experiments for Pro testers), D27 (where testers' records live: Supabase free plan without backups, or Pro), D28 (error alerts), D29 (leaked-password protection). D11 and D12 above also matter here: a contact for testers and a short tester notice.
+- **Before real health data is entered (not needed for a made-up-data round):** D27 (where testers' records live: Supabase free plan without backups, or Pro), D28 (error alerts), D29 (leaked-password protection), D30 (food groups without AI). D11 and D12 above also matter: a contact for testers (for this round: the reporting channel you choose) and a short tester notice. D25 and D26 were decided on 27 Nov.
 
-Settled questions, including the light-only design, are listed under "Settled" and are not reopened. None of D1 to D19 or D21 to D29 has been built yet (D20 is closed).
+Settled questions, including the light-only design, are listed under "Settled" and are not reopened. None of D1 to D19 or D21 to D30 has been built yet (D20 is closed; D25 and D26 are decided).
 
 ### Launch requirements (before anyone outside is invited)
 
@@ -48,7 +50,7 @@ Settled questions, including the light-only design, are listed under "Settled" a
 4. Founder tools on a hosted site need a staff address in `BLOAT_STAFF_EMAILS` and an authenticator app.
 5. Founder alert emails (Resend) and error monitoring (Sentry): not connected.
 6. Google sign-in: off in Supabase, so not exercised (the button is hidden while it is off).
-7. Backups with a tested restore, and alert delivery (D27, D28). Not needed for a few invited testers if you accept the weekly steps in `docs/beta/owner-runbook.md`; needed before a public launch.
+7. Backups with a tested restore, and alert delivery (D27, D28). Not needed for a few invited testers if you accept the weekly steps in `docs/beta/owner-checklist.md`; needed before a public launch.
 
 ### Tests not yet performed
 
@@ -64,7 +66,8 @@ Settled questions, including the light-only design, are listed under "Settled" a
 10. Any check on the three main addresses after 23 Nov (they serve `83fe4da`, which was tested on 23 Nov).
 11. The new deletion message on the live preview (it needs a storage failure, which can only be caused locally).
 12. On the hosted candidate, signed in, only some of the 26 Nov fixes were exercised (27 Nov): the save lines, the empty-time hint, habit deletion, password change, AI, Learn and cards not offered, and share links revoked after a bloating record is deleted or corrected and after a medicine is deleted. The other cases of R2 (tests, health background, lactose details, family history, context answers), X1 and A1 passed locally and in run 17, not signed in on the hosted preview.
-13. The beta with AI off on a real phone, and a tester's own first sign-in from an invitation (nobody is invited).
+13. The candidate on a real phone, and a tester's own first sign-in from an invitation (nobody is invited). The checklist is `docs/beta/real-phone-checklist.md`.
+14. The round's API and browser checks in the publishing workflow: it runs one normal server, so they are skipped there; they ran locally against a second server, and the deployed candidate was checked by the hosted file.
 
 ### Account deletion when storage fails (message fixed, P2)
 
@@ -111,7 +114,26 @@ Looked at and found as the plan describes: possible triggers with day counts, bo
 
 ### Invited beta candidate without AI (26 and 27 Nov 2026)
 
-Prepared with your approval, published by run 17, frozen. Everything is in `docs/beta/`: `README.md` (settings, what testers can and cannot use, health content that stays unavailable, your decisions, outside-beta blockers, what was and was not tested), `tester-guide.md` (a draft to send with each invitation, with two blanks for you) and `owner-runbook.md` (invite, reset a password, remove a tester, a weekly check, backups, a real-phone and screen-reader checklist). Two new switches (DECISIONS.md, choice 26), a password change for testers (choice 27) and A1 (choice 28). Nobody was invited, no domain was moved, sign-ups stay off, payments stay off.
+Prepared with your approval, published by run 17, frozen. Everything was put in `docs/beta/` (rewritten for the acceptance round on 27 Nov, below). Two new switches (DECISIONS.md, choice 26), a password change for testers (choice 27) and A1 (choice 28). Nobody was invited, no domain was moved, sign-ups stay off, payments stay off.
+
+### First invited acceptance round (27 Nov 2026): fixed and published (run 18, `35c947b`)
+
+Your decisions: 3 to 5 trusted testers, Pro test access without payment, experiments off, made-up data only. Experiments went off with the existing switch (`BLOAT_OFF_FEATURES`). The experiment routes already refused; the screens below did not, which the round's checks showed on the published code `da4bb77` before the fix.
+
+| # | What was wrong (with experiments switched off) | Now |
+|---|---|---|
+| E1 | Today showed a running experiment, its daily question and an Experiments shortcut; the morning review asked about it and the server accepted and saved the answer | Not shown or asked; an answer sent anyway is refused ("not available"). The experiment record stays as it was |
+| E2 | Possible triggers offered "Try an experiment" and an Experiments button; History linked to experiments | No offer, button or link |
+| E3 | Your journey's next step said "A short experiment can test one pattern at a time." and linked to experiments; the weekly report said the experiment was running | No experiment next step; earlier experiments still listed, without links; the weekly report shows none running |
+| E4 | The Pro page listed "Habit and food-swap experiments"; the start page listed "Possible triggers and experiments" and "Ingredient check and saved dishes" | Left out (the start page says "Possible triggers") |
+| A1b | The Pro page said "Manage, pause or cancel in Me." to Pro given for testing (the leftover of A1, reported on 27 Nov) | "Switched on for testing. There is no subscription, so nothing renews and nothing is charged." |
+| S1 | With AI off, Today suggested "Try saving your usual dishes so meals are one tap.", which nobody can do without the ingredient step | Not suggested while AI is off |
+
+A direct visit to an experiment page says "Not available" with a link to Today. Judgement calls (DECISIONS.md, choices 29 and 30) are easy to reverse.
+
+**Review of the Pro features this round keeps** (local, round's settings, two made-up accounts with 15 days each): Today, Possible triggers, Your journey, the weekly report, the doctor report and preview, You, Health background, History, a day, the Pro page, the meal sheet. No console errors or failed requests. Besides S1, one missing capability, recorded as **D30**: typed meals carry no food groups without the ingredient step, so in normal logging Possible triggers compares habits only; Keep an eye on it mode still compares up to 5 food groups. The tester guide says so.
+
+**Tester documents** (`docs/beta/`): `tester-guide.md`, `feedback-template.md`, `real-phone-checklist.md`, `owner-checklist.md` (replaces the runbook), `README.md`. No support address is invented: testers report to the person who invited them, through an existing channel that is **awaiting your selection**. The guide and form are also on a private page you can share: https://claude.ai/artifact/BPVEopLxQwbCRMfhNZBdv8.
 
 ## Owner checklist: the main journeys on your phone
 

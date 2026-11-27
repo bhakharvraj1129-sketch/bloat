@@ -1,8 +1,36 @@
 # Test results
 
-Last run: 27 Nov 2026 (the invited beta candidate `da4bb77`, published by run 17, checked signed in on the hosted preview). The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
+Last run: 27 Nov 2026 (first invited acceptance round: experiments off, Pro page wording, no dish suggestion without AI; commit `35c947b`). The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
+
+## First invited acceptance round (27 Nov 2026): commit `35c947b`
+
+The owner's decisions: experiments off, Pro test access without payment, made-up data only. Changes: experiments switched off on every screen and route (choice 29), the Pro page's wording for Pro given for testing (A1, Pro page), and no "save your usual dishes" suggestion while AI is off (choice 30). Synthetic `@example.com` accounts on the local stack.
+
+### Local: before and after the fix
+
+The round's checks need a server started with the round's settings, so two local servers ran from the same build and database: the normal one (port 3100, nothing switched off) and one with `BLOAT_AI_PROVIDER=off BLOAT_OFF_FEATURES=learn_library,daily_cards,experiments_habit,experiments_swap` (port 3200). The published code `da4bb77` ran the same way on port 3300 for the "before" runs.
+
+| Check | Code | Passed | Failed |
+|---|---|---|---|
+| `tests/api/acceptance-round.test.ts` (10 checks; an account with a running experiment and typed meals, another with habit records) | Published `da4bb77`, round's settings | 3 (the settings are in place; every experiment route already refused; the other Pro features work) | 7, each at the defect: Today showed the running experiment "No straws"; the review accepted an experiment answer (200, and saved it for 10 Sep); Possible triggers offered "Eat more slowly"; Your journey said "A short experiment can test one pattern at a time."; the weekly report said the experiment was running; Today suggested `save_dishes`; the export then held the extra experiment day |
+| The same 10 checks | Fixed, round's settings | 10 | 0 |
+| `tests/e2e/acceptance-round.spec.ts` (3 checks, phone-sized browser) | Published `da4bb77`, round's settings | 1 (the other Pro screens open) | 2: a link to `/experiments` on Today; "Habit and food-swap experiments" on the Pro page |
+| The same 3 checks | Fixed, round's settings | 3 | 0 |
+| A1, Pro page (`tests/e2e/beta.spec.ts`) | Published `da4bb77` | 0 | 1 ("Switched on for testing. There is no subscription, so nothing renews and nothing is charged." not shown on `/upgrade`) |
+| The same check | Fixed | 1 | 0 |
+| Rule tests (102 before, plus 3 for experiments and 2 for the dish suggestion) | Fixed | 107 | 0 |
+| API tests, all files, normal server | Fixed | 157 (10 skipped: the round's checks, which ran against the second server, above) | 0 |
+| Browser tests, all files, normal server | Fixed | 274 (3 skipped: the round's checks, above) | 0 |
+| The hosted file `tests/hosted/beta-candidate.spec.ts` (4 checks, including the new round check), against a local server with password sign-in and the round's settings | Fixed | 4 | 0 |
+| Type check, lint | Fixed | 0 errors (the same 5 old warnings) | |
+
+**On the way (test-side, not app defects):** the first "before" run had two checks that looked at a new field before the real behaviour, and a weekly report asked for an unfinished week; they were reordered and corrected, and the "before" run repeated. The export link in the new API check was first made on the test clock and had expired on the real clock; it is now made on the real clock. In the review walkthrough, the seed accounts were first set up on the real clock with records dated before they existed (an account never shows earlier days), and some seed days had a score lower than a logged reading (the app rightly asked for a correction); both were seed mistakes and were redone.
+
+### Review of the Pro features this round keeps (local, round's settings, phone-sized browser)
+
+Two made-up Pro accounts with 15 days of records on the test clock: one in normal logging (typed meals, two followed habits), one in Keep an eye on it mode (two watched food groups). Screens: Today, Possible triggers, Your journey, the weekly report, the doctor report and its preview, You, Health background, History, a day, the Pro page, the meal sheet. No console errors and no failed requests. Found: the "save your usual dishes" suggestion (fixed, above) and the food-groups gap (D30, not a defect): in normal logging "Ate quickly" became worth watching and every food group stayed at "No usable days yet"; in Keep an eye on it mode "Fizzy drinks" became worth watching.
 
 ## Invited beta candidate (27 Nov 2026): published build `da4bb77` (run 17), checked signed in on the hosted preview
 
