@@ -8,6 +8,21 @@ Each result is one of: **passed** (it ran and the outcome was right), **expected
 
 The owner's decisions: experiments off, Pro test access without payment, made-up data only. Changes: experiments switched off on every screen and route (choice 29), the Pro page's wording for Pro given for testing (A1, Pro page), and no "save your usual dishes" suggestion while AI is off (choice 30). Synthetic `@example.com` accounts on the local stack.
 
+### Hosted, signed in (the deployed candidate, run 18)
+
+Published revision `35c947bb1dc0c059a57e16db25a9f2221c3affb0`, Vercel deployment `dpl_LxVJ6VzoY4iswtpfhy78kN3B76jj` (made 27 Nov 06:56 UTC), on `https://bloat-preview.vercel.app` and the branch address. Preview variables: `BLOAT_AI_PROVIDER=off`, `BLOAT_OFF_FEATURES=learn_library,daily_cards,experiments_habit,experiments_swap`, `BLOAT_TEST_LOGIN=0`, `BLOAT_BILLING_PROVIDER=mock`. The three main addresses still serve `83fe4da`. 8 synthetic accounts made for the run (`@bloat.test`, marked `synthetic_test_run = 2026-11-27`, one password kept in a private file and never printed; the file was destroyed after the cleanup). Made-up entries only; `bloat-tester` not used.
+
+| Check | Passed | Failed | Notes |
+|---|---|---|---|
+| GitHub run 18 (first attempt) | All | 0 | Typecheck, lint, rule, API and browser tests on a clean checkout (the round's server-specific checks skip there, as designed); controls read back; Vercel build; the 6 signed-out live checks on the new build, publish (06:58 UTC), the same 6 on the public address |
+| Tested = deployed | | | Both preview addresses on `dpl_LxVJ6VzoY4iswtpfhy78kN3B76jj`; all 220 repository files Vercel lists are byte-identical to `35c947b` (SHA-1 of contents), 23 of the 29 changed files among them; the other 6 sit in folders Vercel lists only partly |
+| Core hosted suite (`navigation`, `preview`, `signed-in-journey`, `signed-in-navigation`), 16 checks | 16 | 0 | |
+| `tests/hosted/beta-candidate.spec.ts`, 4 checks | 4 | 0 | First attempt. Check 4 is new: Pro test access says there is no subscription (You and the Pro page; entitlement status "none"); experiment routes and an experiment answer in a review refused ("not available"); no link to experiments on Today, History, Possible triggers or Your journey; a direct visit says Not available; no "save your usual dishes" suggestion; Possible triggers, Your journey, History, health background, bowel and exercise logs, Keep an eye on it and the doctor report work; the start page lists neither experiments nor the ingredient check |
+| Cleanup: the 8 accounts deleted through the app | 8 | 0 | Each answered "deleted"; the same sign-in was refused (401) straight after |
+| Read-only check of `bloat-test` after the cleanup | | | 0 accounts by ID or address, 0 with a test-run marker, 0 identities, sessions or refresh tokens, 0 profiles, meals, bloating, bowel or exercise records, reports, share links, medicines, habit answers or photo rows for them; photo bucket empty; 4 users in all, as before. Experiment tables: 0 rows before the switch and after. `bloat-tester` unchanged: 1 meal, 1 bloating record, 2 strength readings, 1 report, 0 share links, last updated 23 Nov 06:25 UTC, last sign-in 23 Nov 04:23 UTC, same password hash |
+
+**Not performed** (not counted above): real phones; any screen reader; a real AI provider; a backup restore; a tester's own first sign-in (nobody is invited).
+
 ### Local: before and after the fix
 
 The round's checks need a server started with the round's settings, so two local servers ran from the same build and database: the normal one (port 3100, nothing switched off) and one with `BLOAT_AI_PROVIDER=off BLOAT_OFF_FEATURES=learn_library,daily_cards,experiments_habit,experiments_swap` (port 3200). The published code `da4bb77` ran the same way on port 3300 for the "before" runs.

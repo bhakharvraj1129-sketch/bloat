@@ -1,6 +1,6 @@
 # First invited acceptance round (no AI)
 
-**Status: being prepared on 27 Nov 2026 (the final commit and deployment are recorded in `PROGRESS.md`). Nobody has been invited.** Public sign-ups stay off. Real payments stay off. No real AI provider is connected.
+**Status: prepared and frozen on 27 Nov 2026: commit `35c947b`, Vercel deployment `dpl_LxVJ6VzoY4iswtpfhy78kN3B76jj` (run 18), checked signed in on that deployment. Nobody has been invited.** Public sign-ups stay off. Real payments stay off. No real AI provider is connected.
 
 Review address: `https://bloat-preview.vercel.app`. The three older addresses (`bloat-olive`, `bloat-typeshi2`, `bloat-git-main-typeshi2`) are left as they are.
 
@@ -78,7 +78,7 @@ Kept apart by where they ran; counts and builds are in `TEST_RESULTS.md`.
 | Kind | Where | What |
 |---|---|---|
 | Local, synthetic accounts | Local database in Docker; one local server as normal and one started with the round's settings | Rule, API and browser tests (phone-sized browser, keyboard, 200% zoom); the round's checks, first on the published code (they fail at each defect), then on the fixed code |
-| Hosted, synthetic accounts | The deployed candidate on `bloat-preview.vercel.app`, accounts created for the run and deleted through the app | The full signed-in hosted suite and the round's checks (`tests/hosted/beta-candidate.spec.ts`) |
+| Hosted, synthetic accounts | The deployed candidate `dpl_LxVJ6VzoY4iswtpfhy78kN3B76jj` on `bloat-preview.vercel.app`, 27 Nov; 8 accounts created for the run and deleted through the app, checked gone | The full signed-in hosted suite (16 of 16 passed) and the round's checks `tests/hosted/beta-candidate.spec.ts` (4 of 4 passed) |
 | Browser emulation | Desktop Chromium pretending to be a Pixel 7 | Phone layout, keyboard-only use, 200% zoom. Not a real phone |
 | **Not performed** | | Real phones (iOS Safari, Android Chrome), any screen reader (VoiceOver, TalkBack), a real AI provider, a backup restore. Checklist: `real-phone-checklist.md` |
 
