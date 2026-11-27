@@ -119,12 +119,15 @@ test("beta (Free): an invited tester changes the temporary password and signs in
     await page.goto("/me");
     await page.getByRole("button", { name: "Change password" }).click();
     const sheet = page.getByRole("dialog", { name: "Change password" });
-    await sheet.getByLabel("New password", { exact: true }).fill("short");
-    await sheet.getByLabel("New password again").fill("short");
+    // The first field's label includes its hint ("At least 10 characters."), so the two fields are found in order.
+    const first = sheet.locator('input[autocomplete="new-password"]').nth(0);
+    const second = sheet.locator('input[autocomplete="new-password"]').nth(1);
+    await first.fill("short");
+    await second.fill("short");
     await sheet.getByRole("button", { name: "Change password" }).click();
     await expect(sheet.getByText("Use at least 10 characters.")).toBeVisible();
-    await sheet.getByLabel("New password", { exact: true }).fill(fresh);
-    await sheet.getByLabel("New password again").fill(fresh);
+    await first.fill(fresh);
+    await second.fill(fresh);
     await sheet.getByRole("button", { name: "Change password" }).click();
     await expect(sheet.getByText("Password changed. Use the new one next time you sign in.")).toBeVisible({ timeout: 30000 });
     changed = true;

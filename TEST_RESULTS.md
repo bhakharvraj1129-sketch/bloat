@@ -1,10 +1,57 @@
 # Test results
 
-Last run: 26 Nov 2026 (Today fixes published by run 15 as `8ef62e7`; History fixes tested locally, not published). The newest results are first; older sections follow. Local and hosted results are kept apart below. Synthetic accounts, labelled mock AI and mock billing everywhere.
+Last run: 27 Nov 2026 (the invited beta candidate `da4bb77`, published by run 17, checked signed in on the hosted preview). The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
 
+## Invited beta candidate (27 Nov 2026): published build `da4bb77` (run 17), checked signed in on the hosted preview
+
+Published revision `da4bb7752524758acc8447b9cd96b4910febcc64`, Vercel deployment `dpl_DMcN8fjTd9f99QHXjxA5Rc7uerhR` (made 27 Nov 03:56 UTC), served at `https://bloat-preview.vercel.app` and the branch address. Preview variables for this build: `BLOAT_AI_PROVIDER=off`, `BLOAT_OFF_FEATURES=learn_library,daily_cards`, `BLOAT_TEST_LOGIN=0`, `BLOAT_BILLING_PROVIDER=mock`. The three main addresses still serve `83fe4da`.
+
+### Hosted, signed in (the deployed candidate, 27 Nov)
+
+8 synthetic accounts made for the run in `bloat-test` (addresses ending `@bloat.test`, marked as test-run accounts, one password kept in a private file and never printed; the file was destroyed after the cleanup). Made-up entries only. `bloat-tester` was not used.
+
+| Check | Passed | Failed | Notes |
+|---|---|---|---|
+| Core hosted suite (`navigation`, `preview`, `signed-in-journey`, `signed-in-navigation`), 16 checks | 16 | 0 | Includes signed-out access, sign-ups off, two accounts unable to see each other's records, the doctor report with sections left out, its share link, exports, Back and sheets |
+| Beta check 1 (Free): "Bloating saved.", "Meal saved." and "Activity saved." lines; the empty-time hint with Save off; a habit deleted from the day screen stays deleted after a refresh and is not stored as No; no ingredient check or photo offered; Learn and the AI routes answer "not available" | 1 | 0 | First run |
+| Beta check 2 (Free): change the temporary password (a too-short one is refused with "Use at least 10 characters."), the old password then fails, the new one signs in; the sign-in screen's "Forgot your password?" line | 1 (re-run) | 1 (first run) | **First run failed in the test itself**: it looked the first field up by its label, which also contains the field's hint, and timed out. The test now finds the two fields in order; nothing in the app changed. The re-run passed, and put the run's password back so the account could be deleted like the others |
+| Beta check 3 (Pro test account): no ingredient check, photo or daily card; three reports shared; deleting yesterday's bloating record revokes the link of the report covering it, which a signed-out visitor then cannot open ("This link no longer works"), while a report not covering that day still opens; that flagged report cannot be shared again (409); correcting another day's time revokes the other report; deleting a medicine revokes a shared doctor report | 1 (re-run) | 0 | Did not run in the first attempt (the checks run in order and stop after a failure); passed in the re-run |
+| Cleanup: the 8 accounts deleted through the app (You, Delete account, the same request) | 8 | 0 | Each answered "deleted"; the same sign-in was refused (401) straight after |
+| Read-only check of `bloat-test` after the cleanup | | | 0 accounts by ID or address, 0 with a test-run marker, 0 sign-in identities, sessions or refresh tokens, 0 profiles, meals, bloating records, reports, share links, medicines, habit answers or photo rows for them; the photo bucket is empty. `bloat-tester` unchanged: 1 meal, 1 bloating record, 2 strength readings, 1 report, 0 share links, last updated 23 Nov 06:25 UTC, last sign-in 23 Nov 04:23 UTC |
+
+### CI and publishing (run 17)
+
+| Check | Where | Result |
+|---|---|---|
+| GitHub run 17 (first attempt) | CI and live | **All passed**: typecheck, lint, rule, API and browser tests on a clean checkout; controls read back; Vercel build; the 6 signed-out live checks on the new build, then publish, then the same 6 on the public address (finished 03:59 UTC) |
+| Tested = deployed | Vercel | Both preview addresses on `dpl_DMcN8fjTd9f99QHXjxA5Rc7uerhR`; all 216 repository files Vercel lists for it are byte-identical to `da4bb77` (SHA-1 of contents). 26 of the 37 changed files are among them; the other 11 (the You and Pro screens and nine routes) sit in folders Vercel lists only partly, so they were not compared one by one |
+
+### Local (synthetic `@example.com` accounts)
+
+| Check | Code | Passed | Failed |
+|---|---|---|---|
+| New R2 checks in `tests/api/report-staleness.test.ts` (1 control, 6 kinds of change), with the 8 R1 checks | Before the fix (`0ffc99a`) | 9 (the R2 control and the 8 R1 checks) | 6, each at the defect (medicine deleted, test deleted, health background changed, lactose details changed, family history changed, context answers changed) |
+| The same 15 checks | Fixed | 15 | 0 |
+| New X1 check `tests/api/export-complete.test.ts` | Before the fix (the server running `0ffc99a`) | 0 | 1 (old version label `bloat-export-1`; the file also lacked the four tables, seen directly in the old server's export) |
+| The same check | Fixed | 1 | 0 |
+| A1 server check (Pause refused without a subscription, no billing record written), in `tests/api/slice-ef.test.ts` | Before the fix | 0 | 1 ("expected 200 to be 409") |
+| The same check | Fixed | 1 | 0 |
+| New browser checks `tests/e2e/beta.spec.ts` (AI off for Pro and for Free, Learn and cards off, a control with nothing off, A1 on You) | Before the fix (`0ffc99a`), final version of the checks | 1 (the control) | 4 |
+| The same 5 checks | Fixed | 5 | 0 |
+| Rule tests (97 before, plus 5 for the switch rule and the password messages) | Fixed | 102 | 0 |
+| API tests, all files | Fixed | 157 | 0 |
+| Browser tests, all files | Fixed | 272 in the full run, plus 1 re-run alone | 1 in the full run (below) |
+| Type check, lint | Fixed | 0 errors (the same 5 old warnings) | |
+
+**On the way:** (1) In the full browser run, the existing export check in `core.spec.ts` failed because it expected the old version label `bloat-export-1`; it was updated to `bloat-export-2` (the change X1 made on purpose) and passed when run again alone; CI then ran the whole suite on a clean checkout and passed. (2) A first version of the beta absence checks also passed on the old code, because it looked before the screen had loaded. The checks now wait for the loaded content first; on the old code they then failed 4 of 5, as they should. (3) Two checks left a page while a closing sheet was still undoing its history entry, which aborted the next navigation; they now wait for the sheet to close.
+
+**Not performed** (not counted above): real phones; any screen reader; a real AI provider; a backup restore; on the hosted preview, the R2 cases other than a deleted medicine, and X1 and A1 (local and CI only).
+
 ## History and editing review (26 Nov 2026): local only, not published
+
+*(Later on 26 Nov, with the owner's yes, published by run 16 as `0ffc99a`, deployment `dpl_CoBNVMnW9ivkcLvNRuKc3PML3eks`, finished 20:18 UTC; all 212 repository files Vercel lists for it are byte-identical to `0ffc99a`. Its fixes were checked signed in on the hosted preview on 27 Nov, in build `da4bb77`, above.)*
 
 Fixes R1 (every delete or correction flags the stored reports that used it and revokes their share links) and H1 (habit answers can be deleted), commit `0ffc99a` on `claude/bloat-continuation-9mjd46`. Local stack, synthetic `@example.com` accounts only. Not published: the push to the publishing branch was held back because the owner's yes covered the Today fixes only.
 

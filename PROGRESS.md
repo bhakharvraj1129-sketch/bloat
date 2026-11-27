@@ -1,26 +1,27 @@
 # Progress
 
-Last updated: 26 Nov 2026 (Today fixes T1 to T4 **published** by run 15 as `8ef62e7`; History fixes R1 and H1 made and tested locally, **not published**, waiting for your yes). Working branch `claude/bloat-continuation-9mjd46` (has everything); publishing branch `claude/bloat-software-build-uxzoru` (at `8ef62e7`). Only a push to the publishing branch runs the publishing workflow.
+Last updated: 27 Nov 2026. The **invited beta candidate without AI** is published by run 17 as `da4bb77` and **frozen for your acceptance**. Nobody has been invited. Working branch `claude/bloat-continuation-9mjd46`; publishing branch `claude/bloat-software-build-uxzoru` (app at `da4bb77`; the notes commits after it carry `[skip ci]` and publish nothing). Only a push to the publishing branch runs the publishing workflow.
 
 This file has four parts: **current status** (what is true now, with the evidence), **what remains** (your decisions, launch requirements, tests not yet performed), **your phone checklist**, and **history** (completed work by date, kept as it was then). How the preview is published and run is in `DEPLOYMENT.md`; what was tested, where and on which build is in `docs/verification-report.md`.
 
-## Current status (verified 26 Nov 2026)
+## Current status (verified 27 Nov 2026)
 
 | What | State | How it was verified |
 |---|---|---|
-| Testing preview | `https://bloat-preview.vercel.app` and the branch address serve commit `8ef62e7`, Vercel deployment `dpl_EZyj38upABHtKaQidLokQB4n6cxo` (26 Nov 17:39 UTC). It has K1, P2 and the Today fixes T1 to T4. Not yet in it: the History fixes R1 and H1 | Published by the Preview workflow, run 15 (pushed 17:22 UTC; first attempt stopped before any app test because GitHub's machine already had port 54324 in use, nothing published; re-run passed every check and published at 17:42 UTC). Vercel reports both preview addresses on this deployment; the 211 repository files Vercel lists for it are identical to `8ef62e7` (the Today and day screens are in folders Vercel lists only partly) |
-| Main addresses | `bloat-olive.vercel.app`, `bloat-typeshi2.vercel.app` and `bloat-git-main-typeshi2.vercel.app` still show an **older** build, `83fe4da` (`dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`), **without the K1 and P2 fixes**. They were pointed there by hand on 24 Nov (your decision; not a launch). The workflow moves only the two preview addresses, so they stay there until you ask for them to be moved. Same settings as the preview: `bloat-test`, mock AI, mock billing, test mode off | Vercel address list read before run 13 and after runs 13 and 14 (`test-evidence/ledger/deploy-7N1R.txt`) |
-| **Freeze** | **Frozen again for your feature-by-feature review.** Nothing is published unless you say so; a fix then goes through the same workflow and gets its own entry in the report. Notes-only commits carry `[skip ci]` and cannot publish | Run 15 (your yes on 26 Nov, Today fixes) is the only run since run 14 |
-| **Today and logging review (26 Nov)** | Four defects fixed and **published** (T1 to T4, below). Three gaps against the plan need your decision: D21, D22, D23 | New checks `tests/e2e/today.spec.ts`: 6 failed on the old build, 6 passed on the fixed build, and passed again in run 15. Results in `TEST_RESULTS.md` |
-| **History and editing review (26 Nov)** | Two defects fixed, **not published** (R1, a privacy rule: deleting or correcting a record now revokes share links of reports that used it; H1: habit answers can be deleted). One gap needs your decision: D24. Commit `0ffc99a` on the working branch | New checks `tests/api/report-staleness.test.ts` (7 cases failed on the old code, 8 of 8 pass now) and `tests/e2e/history.spec.ts` (failed, now passes). Local: rule 97, API 149, browser 268 passed |
-| Tests on this build | Local on `8ef62e7`: rule 97 passed, API 141 passed, browser 267 passed (the 261 before plus the 6 new Today checks); 0 failed, 0 skipped. CI (run 15, re-run): all checks passed on a clean checkout, incl. the 6 signed-out live checks before and after publishing. The signed-in hosted suite last ran on `9c6ed14` (24 Nov); not run on `8ef62e7` (it needs accounts you approve). History fixes, local only (`0ffc99a`): rule 97, API 149, browser 268 passed. Tests not performed are listed below, never counted as passed | `TEST_RESULTS.md`, top; `docs/session-reports/2026-11-26-work-report.md` |
-| Sign-in | Email and password, for accounts you make in Supabase. Sign-ups are off in Supabase itself. Test mode is off (`BLOAT_TEST_LOGIN=0`) | Hosted check "nobody can create an account" passed on this build (run 15); Vercel variables last read on 24 Nov |
-| Your test account | `bloat-tester@bloat.test` exists, with its sample meal, bloating record and report; Pro without a purchase; not staff | Not used or changed on 26 Nov. Read-only check on 26 Nov (after run 15): the account exists with 1 meal (the 23 Nov QA meal), 1 bloating record and 1 report; no account carries a test-run marker |
-| Synthetic test accounts | None remain. The 8 made for the 24 Nov run were deleted through the app and checked gone | Read-only check after the run (24 Nov): 0 accounts with a test marker, photo bucket empty |
-| Publishing | Only the Preview workflow moves the preview, after its checks pass. Its `VERCEL_TOKEN` secret is in place (since 22 Nov) | Runs 6, 9, 10, 11, 12, 13, 14 and 15 published; Vercel lists no other deployment since `af950f5` |
-| Real AI, payments, email delivery, sign-ups | Off: labelled mock AI (no AI key in the project), mock billing, no custom email sender, sign-ups off | Vercel variables read on 24 Nov; no Production variables exist |
+| **Beta candidate (testing preview)** | `https://bloat-preview.vercel.app` and the branch address serve commit `da4bb77`, Vercel deployment `dpl_DMcN8fjTd9f99QHXjxA5Rc7uerhR` (made 27 Nov 03:56 UTC). It has every fix from the 26 Nov reviews (T1 to T4, R1, H1, R2, X1, A1) and the beta settings: no AI anywhere, Learn and daily cards off. Plan and limits: `docs/beta/README.md` | Published by the Preview workflow, run 17 (pushed 03:42 UTC, finished 03:59 UTC, first attempt). Vercel reports both preview addresses on this deployment; the 216 repository files Vercel lists for it are byte-identical to `da4bb77` (26 of the 37 changed files are among them; the other 11 sit in folders Vercel lists only partly) |
+| Main addresses | `bloat-olive.vercel.app`, `bloat-typeshi2.vercel.app` and `bloat-git-main-typeshi2.vercel.app` still show an **older** build, `83fe4da` (`dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`), without any fix since 23 Nov. Left unchanged, as you asked. They were pointed there by hand on 24 Nov (your decision; not a launch) | Vercel alias read on 27 Nov after run 17 |
+| **Freeze** | **Frozen for your acceptance.** Nothing more is published, no setting is changed and nobody is invited unless you say so. Notes-only commits carry `[skip ci]` and cannot publish | Run 17 is the last workflow run (read 27 Nov) |
+| **Feature reviews (26 Nov)** | All areas reviewed in the order you set: Today and logging; History and editing; Patterns, reports and sharing, exports, experiments, Learn, account and settings. **9 defects** found, each shown first by a check that fails on the code before the fix, fixed and published: T1 to T4 (run 15), R1 and H1 (run 16), R2, X1 and A1 (run 17). Gaps against the plan are recorded as decisions D21 to D24 and not built | Sections below; `TEST_RESULTS.md` |
+| Beta settings (Preview variables) | `BLOAT_AI_PROVIDER=off` (was `mock`) and `BLOAT_OFF_FEATURES=learn_library,daily_cards` (new), set on 27 Nov before run 17 built. Unchanged: `BLOAT_TEST_LOGIN=0`, `BLOAT_BILLING_PROVIDER=mock`, `BLOAT_SIGN_IN_METHOD=password`, `BLOAT_PRO_TEST_EMAILS` | Variable list read on 27 Nov after run 17 |
+| Tests on this build | Local on `da4bb77`: rule 102, API 157, browser 273 passed (one browser check failed mid-run because it expected the old export label; it was updated and passed when run again alone). CI, run 17: every check passed on a clean checkout, including the 6 signed-out live checks before and after publishing. **Hosted, signed in, on the deployed candidate** (27 Nov, 8 synthetic accounts made for the run): the core hosted suite 16 of 16 passed; the new beta checks 3 of 3 passed (one re-run after a fix to how the test itself found a field). Tests not performed are listed below, never counted as passed | `TEST_RESULTS.md`, top |
+| Sign-in | Email and password, for accounts you make in Supabase. Sign-ups are off in Supabase itself. Test mode is off (`BLOAT_TEST_LOGIN=0`). New: testers can change their password in You; the sign-in screen says to ask the person who invited them if they forget it | Hosted checks "nobody can create an account" and the password change passed on `da4bb77` |
+| Your test account | `bloat-tester@bloat.test` was not used or changed. It still has 1 meal, 1 bloating record with 2 strength readings, 1 report and no share links; last updated 23 Nov 06:25 UTC, last sign-in 23 Nov 04:23 UTC; Pro without a purchase; not staff | Read-only check on 27 Nov, after the hosted run and the cleanup |
+| Synthetic test accounts | None remain. The 8 made for the 27 Nov run were deleted through the app (each answered "deleted" and its old sign-in was refused straight after) | Read-only check on 27 Nov: no account, sign-in identity, session, refresh token, profile, meal, bloating record, report, share link, medicine, habit or photo left for them; 0 accounts with a test-run marker; photo bucket empty |
+| Publishing | Only the Preview workflow moves the preview, after its checks pass. Its `VERCEL_TOKEN` secret is in place (since 22 Nov) | Runs 6 and 9 to 17 published (run list read 27 Nov) |
+| Supabase `bloat-test` | Same six migrations as the repository. This round needed no migration | Migration list read on 27 Nov |
+| Real AI, payments, email delivery, sign-ups | Off: AI switched off (`off`, and no AI key in the project), mock billing with checkout off, no custom email sender, sign-ups off | Vercel variables read on 27 Nov; no Production variables exist |
 
-**What happens next:** you review the preview feature by feature and send reproducible issues. Each one is reproduced by a test, fixed in a focused commit and published through the workflow.
+**What happens next:** you accept the candidate (or send what to change), make the decisions in `docs/beta/README.md`, section 5, and only then invite testers yourself (`docs/beta/owner-runbook.md`).
 
 ## What remains
 
@@ -35,7 +36,9 @@ All in one table: `DECISIONS.md`, "Open decisions" (D1 to D19), each with what i
 The former D20 (the message after a failed account deletion) was a wrong message, not a product question: it is fixed (defect P2, below).
 - **Not on for anyone (6):** D3, D5, D6, D10, D17, D19 (off, paused, hidden or not built).
 
-Settled questions, including the light-only design, are listed under "Settled" and are not reopened. None of D1 to D19 or D21 to D24 has been built yet (D20 is closed).
+- **Before inviting beta testers (5):** D25 (Free or Pro test list for testers), D26 (experiments for Pro testers), D27 (where testers' records live: Supabase free plan without backups, or Pro), D28 (error alerts), D29 (leaked-password protection). D11 and D12 above also matter here: a contact for testers and a short tester notice.
+
+Settled questions, including the light-only design, are listed under "Settled" and are not reopened. None of D1 to D19 or D21 to D29 has been built yet (D20 is closed).
 
 ### Launch requirements (before anyone outside is invited)
 
@@ -45,6 +48,7 @@ Settled questions, including the light-only design, are listed under "Settled" a
 4. Founder tools on a hosted site need a staff address in `BLOAT_STAFF_EMAILS` and an authenticator app.
 5. Founder alert emails (Resend) and error monitoring (Sentry): not connected.
 6. Google sign-in: off in Supabase, so not exercised (the button is hidden while it is off).
+7. Backups with a tested restore, and alert delivery (D27, D28). Not needed for a few invited testers if you accept the weekly steps in `docs/beta/owner-runbook.md`; needed before a public launch.
 
 ### Tests not yet performed
 
@@ -58,8 +62,9 @@ Settled questions, including the light-only design, are listed under "Settled" a
 8. A real backup restore on `bloat-test` (re-applying deletions after a restore is checked locally only).
 9. The 19 screens without approved designs have not been compared with designs (only the 20 Slice A screens have them).
 10. Any check on the three main addresses after 23 Nov (they serve `83fe4da`, which was tested on 23 Nov).
-11. The signed-in hosted suite on the final build `f8fcd9d` (it ran on `9c6ed14`), and the new deletion message on the live preview (it needs a storage failure, which can only be caused locally).
-12. The 26 Nov Today fixes (T1 to T4) signed in on the hosted preview (published by run 15; its six signed-out live checks passed). The History fixes (R1, H1) anywhere but locally: not published.
+11. The new deletion message on the live preview (it needs a storage failure, which can only be caused locally).
+12. On the hosted candidate, signed in, only some of the 26 Nov fixes were exercised (27 Nov): the save lines, the empty-time hint, habit deletion, password change, AI, Learn and cards not offered, and share links revoked after a bloating record is deleted or corrected and after a medicine is deleted. The other cases of R2 (tests, health background, lactose details, family history, context answers), X1 and A1 passed locally and in run 17, not signed in on the hosted preview.
+13. The beta with AI off on a real phone, and a tester's own first sign-in from an invitation (nobody is invited).
 
 ### Account deletion when storage fails (message fixed, P2)
 
@@ -78,7 +83,7 @@ Each defect was reproduced first by a check in `tests/e2e/today.spec.ts` that fa
 
 Gaps against the plan that need your decision (not built): D21 (EP-04 "something you suspect" is never asked, so "Your suspicion" and the P5 card cannot appear), D22 (no dish confirmation after a meal photo), D23 (no time choice on Add activity).
 
-### History and editing review (26 Nov 2026): fixed locally, not published
+### History and editing review (26 Nov 2026): fixed and published (run 16, `0ffc99a`)
 
 | # | What was wrong | Now |
 |---|---|---|
@@ -87,6 +92,27 @@ Gaps against the plan that need your decision (not built): D21 (EP-04 "something
 
 Gap that needs your decision (not built): D24 (only times, and a meal's name, can be edited; not strength readings, warning signs, symptoms, a meal's portion and ingredients, or bowel and exercise details). Looked at and found as the plan describes: the History list and statuses, Free locked cards, the 7-day average, the chart with Week / Month / All, report links, "your usual" markers, the day screen's sections, the review link for finished days, and "Reload this day" after a conflict. Looked at and found as the plan describes: the Today layout, the progress counter, warning chips, one open episode at a time, update, end with "I don't know", "Is it still happening?" and the Review yesterday steps.
 
+### Patterns, reports, exports, experiments, Learn and account review (26 Nov 2026): fixed and published (run 17, `da4bb77`)
+
+Looked at on a phone screen with 20 days of synthetic records (local): Patterns, Your journey, the weekly report, the doctor report, Experiments, Learn, the daily cards, You, Health background, History and the Pro page. Then the routes behind them.
+
+| # | What was wrong | Now |
+|---|---|---|
+| R2 | **Privacy rule** (same as R1, plan B05). The doctor report also shows records without a date: medicines, tests, health background, lactose details, family history and the optional context answers. Deleting a medicine or a test, or correcting one of the others, left shared doctor reports live, still showing the old record | Every stored doctor report is flagged and its share links revoked, in the same transaction. Adding new information flags nothing. 6 new checks failed on `0ffc99a`; 15 of 15 staleness checks pass |
+| X1 | The export (plan B04: "all owner-visible records") left out four tables the person can read: their report share links, saved ingredient suggestions, product events and export jobs | Added; hashes of link tokens stay out of the file. The file's version label is now `bloat-export-2` |
+| A1 | Pro given for testing (no purchase) said "Renews on the end of the period." and offered Pause and Cancel; Pause wrote a billing record for a subscription that does not exist | You says "Switched on for testing. There is no subscription, so nothing renews and nothing is charged." and shows neither button; the server refuses Pause without a subscription (Cancel already did) |
+
+Noted, not changed in this candidate (both small; neither can be reached through the app's own links by the account concerned):
+
+- A Free account that types the doctor report's address sees the whole form, and learns that it is part of Pro only after pressing Preview report. From the app, Free accounts reach Pro features only through locked cards and rows that lead to the Pro page.
+- A leftover of A1: an account with Pro given for testing that types the Pro page's address (`/upgrade`) reads "Manage, pause or cancel in Me.", although You no longer offers Pause or Cancel to it. Nothing in the app links a Pro account to that page. The fix is one line (say "Switched on for testing" there too); it was found after the candidate had been published and verified, so it waits for the next publish rather than a new publish and a new hosted run now.
+
+Looked at and found as the plan describes: possible triggers with day counts, both halves and the "not a medical measure" line; Your journey; the weekly report with the NHS line; the doctor report's sections and share links (made, opened signed out, revoked); Experiments (one at a time, each with its source, "Check with your doctor before changing your diet. Stop if you feel worse."); Learn and the cards (outlines and unreviewed drafts, which is why the beta switches them off); units, time zone, medicines, export and delete account in You.
+
+### Invited beta candidate without AI (26 and 27 Nov 2026)
+
+Prepared with your approval, published by run 17, frozen. Everything is in `docs/beta/`: `README.md` (settings, what testers can and cannot use, health content that stays unavailable, your decisions, outside-beta blockers, what was and was not tested), `tester-guide.md` (a draft to send with each invitation, with two blanks for you) and `owner-runbook.md` (invite, reset a password, remove a tester, a weekly check, backups, a real-phone and screen-reader checklist). Two new switches (DECISIONS.md, choice 26), a password change for testers (choice 27) and A1 (choice 28). Nobody was invited, no domain was moved, sign-ups stay off, payments stay off.
+
 ## Owner checklist: the main journeys on your phone
 
 Use `https://bloat-preview.vercel.app` and your test account `bloat-tester@bloat.test`. Type made-up entries only, never real health details. Tick each line only if you saw the result written after the arrow.
@@ -94,7 +120,7 @@ Use `https://bloat-preview.vercel.app` and your test account `bloat-tester@bloat
 1. Open the address in your phone's browser. → The homepage shows "Sign in", not "Get started". No Vercel login page.
 2. Sign in. → You land on Today. Pull to refresh → you are still signed in.
 3. Log bloating, pick a strength, Save. → "Bloating saved." under the button, and it shows on Today as "Bloating ongoing". Update strength. → "Saved", and the new reading is listed. End it. → "Bloating ended" with how long it lasted.
-4. Add a meal (type a dish). If the ingredient check is offered, run it, then Save. → "Meal saved." under Add meal; the meal shows in "Today so far" and on History.
+4. Add a meal (type a dish), then Save. (The ingredient check and photos are switched off in the beta candidate.) → "Meal saved." under Add meal; the meal shows in "Today so far" and on History.
 5. History: open today, edit the meal's text, Save. Then delete it. → After a refresh it is gone.
 6. Log a bowel movement and some exercise (Pro). Delete one of them from the day screen. → It is gone after a refresh.
 7. Patterns and Experiments: open both. → Patterns shows charts or says there is not enough yet; on Experiments, "Choose" is greyed out with a reason until you have 4 confirmed days in the past week.
@@ -132,6 +158,14 @@ These entries record what was done and true **on that date**. Later work may hav
 - Today and logging review: four defects found and fixed (T1 to T4, above); three gaps recorded as decisions D21 to D23. With your yes, published by run 15 as `8ef62e7` (`dpl_EZyj38upABHtKaQidLokQB4n6cxo`). Its first attempt stopped before any app test (port 54324 already in use on GitHub's machine; nothing published); the re-run passed and published. The main addresses were not moved.
 - History and editing review: two defects found and fixed locally (R1, H1, above); one gap recorded as D24. Not published: the push to the publishing branch was held back because your yes covered the Today fixes only.
 - A full work report for this session: `docs/session-reports/2026-11-26-work-report.md`.
+- With your approvals (later on 26 Nov): the History fixes were published by run 16 (`0ffc99a`, `dpl_CoBNVMnW…`). The review of Patterns, reports and sharing, exports, experiments, Learn and account settings found R2, X1 and A1 (above). The invited beta candidate without AI was prepared (`docs/beta/`). A new branch `claude/unzip-push-main-04req7`, made by someone else and pointing at an old planning commit, was left untouched.
+
+### 27 Nov 2026
+
+- Set the two beta variables on Vercel (Preview only), then published `da4bb77` through the workflow (run 17, `dpl_DMcN8fjTd9f99QHXjxA5Rc7uerhR`). The main addresses were not moved.
+- So that the signed-in hosted checks could reach `bloat-test`, this cloud session's network settings were widened to allow its Supabase address (your approval of the hosted run; it changes nothing in the app).
+- Hosted run on the deployed candidate with 8 synthetic accounts made for it (marked as test-run accounts, password kept only in a private file that was destroyed afterwards): core suite 16 of 16 and beta checks 3 of 3 passed. All 8 accounts were deleted through the app and checked gone. `bloat-tester` was not used and is unchanged.
+- Frozen for your acceptance.
 
 ### 24 Nov 2026
 
