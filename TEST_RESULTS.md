@@ -1,8 +1,21 @@
 # Test results
 
-Last run: 27 Nov 2026 (design v2, "Bloat Buddy", commit `3120a26`, published by run 20 as `dpl_7DidTdSjyyaiPWeW52ER3docj8dm`). Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
+Last run: 27 Nov 2026 (the owner's answers D33 to D35 and the state list: local results; CI and live results follow run 21). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
+
+## Owner's answers D33 to D35 and the state list (27 Nov 2026): local results
+
+Changes: the two consent sentences say Bloat Buddy and existing accounts confirm them once (D33); "Who we are" on About (D34); the state or province and the time zone are chosen from lists of names; zone names instead of IDs; "in You" instead of "in Me"; plain consent dates (DECISIONS.md choice 32). Local stack, synthetic accounts only.
+
+| Suite | Result |
+|---|---|
+| Type check and lint | Passed (lint: 0 errors, the same 5 old warnings) |
+| Rule tests | 107 passed |
+| API tests | 162 passed, 10 skipped (the round's checks, run below). New: the renamed consent sentences are asked once of an account that agreed to the old wording, Terms is not asked again, and both agreements stay in the record; the state is accepted only from the country's list, saved as listed, and can be changed or cleared. The first full run had 1 failure in the AI spending-limit test (Q190, Q191): the local database had collected 53 founder alerts over two days of runs, and the founder list shows the latest 50, so this month's budget alerts were no longer listed. After resetting the local database (synthetic data only) it passed with the rest. CI starts from an empty database |
+| API, the round's checks (second server) | 10 passed |
+| Browser tests | 278 passed, 3 skipped (the round's checks), 2 failed: both checked the old consent date format ("Withdrawn 2026-11-27"). They now expect the plain date and that no raw date or version code is shown; re-run: 4 of 4 passed. New: setup and You choose the state and time zone by name (57 state options for the US, zone names, "My time zone isn't listed"), and You shows them by name; the renamed sentences card on Today |
+| Browser, the round's checks (second server) | 3 passed |
 
 ## Design v2, "Bloat Buddy" (27 Nov 2026): run 20, deployment `dpl_7DidTdSjyyaiPWeW52ER3docj8dm`
 

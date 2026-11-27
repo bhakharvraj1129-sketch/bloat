@@ -283,7 +283,7 @@ const ACTIONS: Action[] = [
     submit: (c) => dialog(c, "Withdraw consent").getByRole("button", { name: "Withdraw" }),
     write: { method: "DELETE", path: /\/v1\/consents\/ai_meal$/ },
     changed: async (c) => (await c.api("GET", "/v1/consents")).body.consents.some((x: any) => x.type === "ai_meal" && x.withdrawn_at),
-    after: async (c) => { await expect(c.page.getByText(/Withdrawn \d{4}-\d{2}-\d{2}/)).toBeVisible(); },
+    after: async (c) => { await expect(c.page.getByText(/Withdrawn [A-Z][a-z]{2} \d{1,2}, \d{4}$/)).toBeVisible(); await expect(c.page.getByText(/\d{4}-\d{2}-\d{2}|version \d/)).toHaveCount(0); },
   },
   {
     name: "Keep my meal photos (Pro)", role: "pro",

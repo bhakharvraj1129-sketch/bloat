@@ -159,7 +159,9 @@ test("withdrawing a consent and removing a medicine ask first, and show progress
   expect(writes).toEqual([]);
   await confirm.getByRole("button", { name: "Withdraw" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await expect(page.getByText(/Withdrawn \d{4}-\d{2}-\d{2}/)).toBeVisible();
+  // Dates read as people write them (a US account: "Nov 27, 2026"), with no internal version code.
+  await expect(page.getByText(/Withdrawn [A-Z][a-z]{2} \d{1,2}, \d{4}$/)).toBeVisible();
+  await expect(page.getByText(/\d{4}-\d{2}-\d{2}|version \d/)).toHaveCount(0);
 
   await page.getByRole("button", { name: "Add or change" }).click();
   const meds = page.getByRole("dialog", { name: "Medicines and supplements" });
