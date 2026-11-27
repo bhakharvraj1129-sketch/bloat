@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "figma": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp"
+    },
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=qntazirusbuwfmnmihzu"
+    },
+    "vercel": {
+      "type": "http",
+      "url": "https://mcp.vercel.com"
+    },
+    "razorpay": {
+      "type": "http",
+      "url": "https://mcp.razorpay.com/mcp",
+      "headers": {
+        "Authorization": "Basic ${RAZORPAY_MCP_TOKEN}"
+      }
+    }
+  }
+}

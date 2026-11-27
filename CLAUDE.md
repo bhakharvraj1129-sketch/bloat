@@ -31,6 +31,22 @@ Bloat is an installable mobile-web bloating tracker, shown to people as "Bloat B
 - UI uses the design tokens only (`src/app/globals.css`: design v2 of 27 Nov 2026, light and dark themes, DECISIONS.md choice 31). No shadows, no new colours.
 - No production build, no payments, no real health data. The branch preview (`bloat-preview.vercel.app` and the branch address) is public by the owner's decision (18 Nov 2026), shows the current test build and must keep `BLOAT_TEST_LOGIN=0`; only the Preview workflow moves those two addresses. Since 24 Nov 2026 the main Vercel addresses (`bloat-olive`, `bloat-typeshi2`, `bloat-git-main-typeshi2`) show an older test build, `83fe4da`, set by hand at the owner's decision; the workflow does not move them, and this is not a launch. Supabase: only the `bloat-test` project (`qntazirusbuwfmnmihzu`). Never touch the owner's other projects.
 
+## Toolkit
+
+The owner's chosen tools (27 Nov 2026). **Rule: prefer these tools over others when building anything.** They are installed and set up; nothing uses them yet.
+
+- **Animation:** Motion (`motion`) for UI animation, GSAP (`gsap`) for scroll effects, AutoAnimate (`@formkit/auto-animate`) for lists, Lottie (`lottie-react`) for animated icons and loaders. Respect the phone's "reduce motion" setting.
+- **UI:** shadcn/ui + Lucide (`lucide-react`) for components and icons; Sonner (`sonner`) for toasts; Vaul (`vaul`) for bottom sheets.
+- **Charts:** Recharts (`recharts`) for animated charts.
+- **Forms:** React Hook Form (`react-hook-form`) + Zod (`zod`, with `@hookform/resolvers`).
+- **India data:** `india-pincode` for PIN-code autofill; state dropdowns use all 28 states + 8 union territories (already in `src/lib/regions.ts`). The package carries about 3.7 MB of data: use it on the server only, never in a client component.
+- **Services:** Supabase for data and auth, Razorpay for payments, Vercel for hosting, Figma for designs.
+
+How they are set up, and how they fit the rules above (the rules above win):
+- **MCP servers** in `.mcp.json` (project scope): `figma` (https://mcp.figma.com/mcp), `supabase` (https://mcp.supabase.com/mcp, scoped to `bloat-test` only with `project_ref=qntazirusbuwfmnmihzu`), `vercel` (https://mcp.vercel.com), `razorpay` (https://mcp.razorpay.com/mcp). Figma, Supabase and Vercel sign in through `/mcp` in Claude Code. Razorpay reads its key from the environment variable `RAZORPAY_MCP_TOKEN` (base64 of `key_id:key_secret`, test-mode keys only); never write a key into `.mcp.json` or the repository.
+- **shadcn/ui:** `components.json` uses the `radix-nova` style (Radix, like the app's existing sheets) and puts components in `src/components/shadcn` (`pnpm dlx shadcn@latest add <name>`), so they never clash with the app's own `src/components/ui.tsx`. `globals.css` and the fonts were deliberately left unchanged at init: when the first shadcn component is added, map shadcn's colour variables to the design tokens (no new colours, no shadows), keep the bundled fonts (no Geist, no font service), and check both themes.
+- **Payments stay off** until the owner decides D19; Razorpay is for later and for test mode only.
+
 ## Commands
 
 ```bash
