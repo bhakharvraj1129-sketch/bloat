@@ -1,8 +1,25 @@
 # Test results
 
-Last run: 27 Nov 2026 (first invited acceptance round: experiments off, Pro page wording, no dish suggestion without AI; commit `35c947b`). The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
+Last run: 27 Nov 2026 (design v2, "Bloat Buddy": local results below; CI and live results follow the publishing run). Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
+
+## Design v2, "Bloat Buddy" (27 Nov 2026): local results
+
+The owner's redesign (DECISIONS.md choice 31): new name, logo, colour, light and dark themes, start page, bottom bar with a log button, Today, and the Patterns card before anything is compared. Local stack, synthetic accounts only, the normal server on port 3100 and a second server on port 3200 with this round's settings (`BLOAT_AI_PROVIDER=off`, `BLOAT_OFF_FEATURES=learn_library,daily_cards,experiments_habit,experiments_swap`).
+
+| Suite | Result |
+|---|---|
+| Type check and lint | Passed (lint: 0 errors, 5 warnings, all present before) |
+| Rule tests | 107 passed |
+| API tests (normal server) | 160 passed, 10 skipped (the round's checks, which need the second server). New: `tests/api/redesign.test.ts`, 3 passed (the week list is Monday first, sends no score and fills in a day only once something is logged, "No bloating so far today" included; Patterns sends real confirmed-day counts to Pro and nothing to Free) |
+| API, the round's checks (`acceptance-round.test.ts`, second server) | 10 passed |
+| Browser tests on a phone screen (normal server) | 277 passed, 3 skipped (the round's checks), 1 failed: the 200% zoom check counted screen-reader-only text (the week strip's day names and the log button's name, clipped to 1px on purpose) as "text cut off". The check now skips only text that is screen-reader-only by design; re-run: 9 of 9 passed in that file |
+| Browser, the round's checks (`acceptance-round.spec.ts`, second server) | 3 passed |
+
+Tests changed with the layout, none removed or loosened: the start page check looks for the "Patterns in your records" card instead of the old Free/Pro table row; the bottom bar lists Today, History, Log bloating, Patterns, You; Today is found by its "How are you feeling?" heading; T3 now checks that nothing (no figure, no "?") is shown before anything is logged and that "0 out of 10" is read and shown after "No bloating so far today". The phone layout test now checks text contrast on every filled button and link in **both** themes (12 screen visits instead of 6) and the two theme colours. New browser checks: the log button from another screen (opens Log bloating, then Bloating now once one is open; the address goes back to `/today`), the week strip, "It's gone", the Appearance switch (applies at once, kept after a reload, cleared by "Same as device") and the Patterns progress card with the folded list.
+
+**Not performed:** real phones and screen readers (browser emulation only), and the hosted checks, which follow the publishing run.
 
 ## Participant accounts (27 Nov 2026): run 19, deployment `dpl_2QsTiDKAVFB4NaQr99RVjTtAGdvt`
 
