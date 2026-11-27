@@ -58,8 +58,10 @@ async function signedOut(browser: Browser, url: string): Promise<string> {
   await ctx.close();
   return text;
 }
-const notice = (page: Page, where: "bloating" | "add") =>
-  page.locator("section", { has: where === "add" ? page.getByRole("heading", { name: "Add to today" }) : page.getByRole("heading", { name: "How are you feeling?" }) }).getByRole("status").last();
+// Since 27 Nov 2026 (the owner's motion spec) every save on Today answers with a toast and a tick
+// (Sonner, announced through its polite live region), wherever the person has scrolled. The newest
+// toast is the one in front. `where` only says which control started the save.
+const notice = (page: Page, _where: "bloating" | "add") => page.locator('[data-sonner-toast][data-front="true"]');
 const AI = ["ai_ingredient_check", "meal_photos", "recalled_meal_check", "ai_source_labels"];
 const ROUND_OFF = [...AI, "daily_cards", "learn_library", "experiments_habit", "experiments_swap"];
 

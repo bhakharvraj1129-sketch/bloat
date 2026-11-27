@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ChevronRight, Lock } from "lucide-react";
+import { Check, ChevronRight, Lock } from "lucide-react";
 import { Button, Caption, Card, Chip, ErrorState, Field, Label, Loading, ProTag, SaveStatus, Screen, Segmented, Sheet, inputClass } from "@/components/ui";
 import { QuestionField } from "@/components/question";
 import { ThemeSwitch } from "@/components/theme-switch";
@@ -19,6 +19,11 @@ import type { AuthErrorLike } from "@/lib/otp-messages";
 import { activities, ACTIVITY_GROUP_LABELS, country as countryCfg, foodTags, label as optionLabel, PRO_ACTIVITY_IDS, question, tagLabel } from "@/lib/registry";
 import type { State } from "@/components/today/types";
 import { SmoothList } from "@/components/glide";
+import { PinField } from "@/components/pin-field";
+import { FieldMessage } from "@/components/field-message";
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 type Med = { id: string; name: string; type: string; med_group: string | null; started_on: string | null; changes: Array<{ change: string; date: string | null }> };
 type Consent = { type: string; version: string; granted_at: string | null; withdrawn_at: string | null };
@@ -151,6 +156,7 @@ export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; pa
         <Label id="profile">Profile</Label>
         <Card className="flex flex-col gap-4">
           <p>Country: <strong>{countryCfg(s.profile.country)?.name}</strong></p>
+          {s.profile.country === "IN" && <PinField onPlace={(place) => { if (!profile.saving) patch({ region: place.state }); }} />}
           <RegionSelect country={s.profile.country as Country} value={shown("region") ?? ""} onChange={(v) => { if (!profile.saving) patch({ region: v || null }); }} />
           <div className="flex items-center justify-between gap-3">
             <p>Time zone: <strong>{zoneLabel(s.profile.analysis_time_zone)}</strong></p>
@@ -496,47 +502,56 @@ function ContextSheet({ onClose, onSaved }: { onClose: () => void; onSaved: () =
  * Change password (invited testers replace the temporary password they were given). The new password
  * goes from the browser straight to Supabase Auth, as at sign-in; Bloat Buddy's server never sees it.
  */
+const passwordSchema = z.object({ password: z.string(), again: z.string() }).superRefine((v, ctx) => {
+  // One source for the wording: the same checks and sentences as before (sign-in-messages.ts).
+  const problem = newPasswordProblem(v.password, v.again);
+  if (problem) ctx.addIssue({ code: "custom", path: [problem.includes("match") ? "again" : "password"], message: problem });
+});
+
 function PasswordSheet({ onClose }: { onClose: () => void }) {
-  const [password, setPassword] = useState("");
-  const [again, setAgain] = useState("");
   const [show, setShow] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [problem, setProblem] = useState<string | null>(null);
   const [done, setDone] = useState(false);
-  async function submit() {
-    const found = newPasswordProblem(password, again);
-    setProblem(found);
-    if (found || busy) return;
-    setBusy(true);
+  const { register, handleSubmit, setError, reset, control, formState: { errors, isSubmitting } } = useForm<{ password: string; again: string }>({
+    resolver: zodResolver(passwordSchema), defaultValues: { password: "", again: "" },
+  });
+  const [password, again] = useWatch({ control, name: ["password", "again"] });
+  const submit = handleSubmit(async ({ password: next }) => {
     let error: AuthErrorLike = null;
-    try { ({ error } = await browserSupabase().auth.updateUser({ password })); } catch { error = { status: 0 }; }
-    setBusy(false);
+    try { ({ error } = await browserSupabase().auth.updateUser({ password: next })); } catch { error = { status: 0 }; }
     const msg = passwordChangeMessage(error);
-    if (msg) { setProblem(msg); return; }
-    setPassword(""); setAgain(""); setDone(true);
-  }
+    if (msg) { setError("root", { message: msg }); return; }
+    reset(); setDone(true);
+  });
   return (
-    <Sheet open onOpenChange={(o) => { if (!o && !busy) onClose(); }} title="Change password" dirty={!done && (!!password || !!again) && !busy}>
+    <Sheet open onOpenChange={(o) => { if (!o && !isSubmitting) onClose(); }} title="Change password" dirty={!done && (!!password || !!again) && !isSubmitting}>
       {done ? (
         <>
-          <p role="status">Password changed. Use the new one next time you sign in.</p>
+          <p role="status" className="rise-in flex items-center gap-2 font-semibold"><Check size={18} strokeWidth={2.6} aria-hidden className="text-brand-text" />Password changed. Use the new one next time you sign in.</p>
           <Button onClick={onClose}>Done</Button>
         </>
       ) : (
-        <>
-          <Field label="New password" hint={`At least ${MIN_NEW_PASSWORD} characters.`}>
-            <input className={inputClass} type={show ? "text" : "password"} autoComplete="new-password" autoCapitalize="none" spellCheck={false} value={password} onChange={(e) => setPassword(e.target.value)} />
-          </Field>
-          <Field label="New password again">
-            <input className={inputClass} type={show ? "text" : "password"} autoComplete="new-password" autoCapitalize="none" spellCheck={false} value={again} onChange={(e) => setAgain(e.target.value)} />
-          </Field>
+        <form noValidate onSubmit={submit} className="flex flex-col gap-6">
+          <div className="flex flex-col gap-2">
+            <Field label="New password" hint={`At least ${MIN_NEW_PASSWORD} characters.`}>
+              <input className={inputClass} type={show ? "text" : "password"} autoComplete="new-password" autoCapitalize="none" spellCheck={false}
+                aria-invalid={errors.password ? true : undefined} aria-describedby="pw-msg" {...register("password")} />
+            </Field>
+            <FieldMessage id="pw-msg" error={errors.password?.message} />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Field label="New password again">
+              <input className={inputClass} type={show ? "text" : "password"} autoComplete="new-password" autoCapitalize="none" spellCheck={false}
+                aria-invalid={errors.again ? true : undefined} aria-describedby="pw-again-msg" {...register("again")} />
+            </Field>
+            <FieldMessage id="pw-again-msg" error={errors.again?.message} />
+          </div>
           <label className="flex min-h-11 items-center gap-3">
             <input type="checkbox" className="h-6 w-6 accent-(--brand)" checked={show} onChange={(e) => setShow(e.target.checked)} />
             <span>Show passwords</span>
           </label>
-          {problem && <p role="alert" className="t-caption text-ink">{problem}</p>}
-          <Button disabled={busy} aria-busy={busy || undefined} onClick={submit}>{busy ? "Saving…" : "Change password"}</Button>
-        </>
+          <FieldMessage id="pw-root-msg" error={errors.root?.message} />
+          <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Saving…" : "Change password"}</Button>
+        </form>
       )}
     </Sheet>
   );

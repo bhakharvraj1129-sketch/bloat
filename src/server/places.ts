@@ -1,6 +1,10 @@
 import "server-only";
-import { getIndiaPincode, type IndiaPincode } from "india-pincode";
+import { createRequire } from "node:module";
+import type { IndiaPincode } from "india-pincode";
 import { regionName } from "@/lib/regions";
+
+// The package's ES-module build uses __dirname (undefined there), so load its CommonJS build.
+const { getIndiaPincode } = createRequire(import.meta.url)("india-pincode") as typeof import("india-pincode");
 
 // PIN code lookup (india-pincode, about 3.7 MB of post-office data, loaded once per server instance).
 // Only the state and the district (shown as the city) are returned; nothing is stored or logged.

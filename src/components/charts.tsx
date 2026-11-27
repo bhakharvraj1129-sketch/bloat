@@ -63,11 +63,11 @@ export function DayChart({ days, dateFormat, context }: { days: DayRow[]; dateFo
       </div>
       <div role="img" aria-label={`Daily Bloat Score for ${shown.length} days. Details are in the list of days below.`} className="h-[170px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 4, left: -22, bottom: 0 }} accessibilityLayer={false} barCategoryGap="18%">
+          <BarChart data={data} margin={{ top: 8, right: 4, left: 0, bottom: 0 }} accessibilityLayer={false} barCategoryGap="18%">
             <CartesianGrid vertical={false} stroke="var(--line)" />
             {areas.map((c, i) => <ReferenceArea key={i} x1={c.a} x2={c.b} fill="var(--brand-tint)" fillOpacity={0.7} ifOverflow="extendDomain" />)}
             <XAxis dataKey="date" tickLine={false} axisLine={false} interval={labelEvery - 1} tick={TICK} tickFormatter={(d: string) => formatDate(d, dateFormat, false)} />
-            <YAxis domain={[0, 10]} ticks={[0, 5, 10]} tickLine={false} axisLine={false} width={36} tick={{ ...TICK, fontSize: 11 }} />
+            <YAxis domain={[0, 10]} ticks={[0, 5, 10]} tickLine={false} axisLine={false} width={26} tick={{ ...TICK, fontSize: 11 }} />
             <Bar dataKey="value" maxBarSize={22} shape={<DayMark />} onClick={(_, i) => setPicked(shown[i] ?? null)} {...motion} />
           </BarChart>
         </ResponsiveContainer>

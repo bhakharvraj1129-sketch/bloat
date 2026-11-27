@@ -537,7 +537,9 @@ const ACTIONS: Action[] = [
     name: "Change time zone", role: "free",
     open: async (c) => {
       await c.page.goto("/me"); await c.page.getByRole("button", { name: "Change" }).first().click();
-      const d = dialog(c, "Change time zone"); await d.getByLabel("New time zone").selectOption("America/Chicago");
+      const d = dialog(c, "Change time zone"); await d.getByRole("button", { name: /^New time zone/ }).click();
+      await c.page.getByRole("combobox", { name: "Search time zones or cities" }).fill("chicago");
+      await c.page.getByRole("option", { name: "Central time (Chicago)" }).click();
       await d.getByRole("button", { name: "Preview the change" }).click();
     },
     submit: (c) => dialog(c, "Change time zone").getByRole("button", { name: "Confirm change" }),

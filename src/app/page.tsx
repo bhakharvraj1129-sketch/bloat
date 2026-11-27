@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChartNoAxesColumn, FileText, NotebookPen, Plus, ShieldCheck, Sunrise } from "lucide-react";
 import { LinkButton } from "@/components/ui";
 import { PublicFooter, PublicHeader } from "@/components/public";
+import { LandingMotion } from "@/components/landing-motion";
 import { signInMethod } from "@/server/auth-settings";
 import { featureOff } from "@/server/availability";
 
@@ -37,12 +38,12 @@ function PhonePreview() {
             <span className="t-label text-[0.6875rem]">Fri 27 Nov</span>
             <span className="font-display text-2xl font-extrabold tracking-[-0.02em] text-ink">Today</span>
           </div>
-          <div className="flex flex-col gap-2.5 rounded-[1.125rem] border border-line bg-surface p-3.5">
+          <div className="flex flex-col gap-2.5 rounded-md border border-line bg-surface p-3.5">
             <span className="text-[0.8125rem] text-ink-muted">Bloating now</span>
             <span className="flex items-baseline gap-1.5"><span className="font-display text-[2.125rem] font-extrabold tabular leading-none text-ink">4</span><span className="text-sm text-ink-muted">of 10 · since 2:14 pm</span></span>
             <span className="grid grid-cols-2 gap-2">
-              <span className="flex min-h-9 items-center justify-center rounded-[0.625rem] border border-line text-[0.8125rem] font-semibold text-ink">Update</span>
-              <span className="flex min-h-9 items-center justify-center rounded-[0.625rem] bg-brand text-[0.8125rem] font-semibold text-on-brand">It&apos;s gone</span>
+              <span className="flex min-h-9 items-center justify-center rounded-sm border border-line text-[0.8125rem] font-semibold text-ink">Update</span>
+              <span className="flex min-h-9 items-center justify-center rounded-sm bg-brand text-[0.8125rem] font-semibold text-on-brand">It&apos;s gone</span>
             </span>
           </div>
           <div className="grid grid-cols-7 gap-1 text-center">
@@ -54,7 +55,7 @@ function PhonePreview() {
             ))}
           </div>
           <div className="grid grid-cols-3 gap-2">
-            {["Meal", "Activity", "Bowel"].map((x) => <span key={x} className="flex justify-center rounded-xl border border-line bg-surface px-1 py-2.5 text-xs font-semibold text-ink">{x}</span>)}
+            {["Meal", "Activity", "Bowel"].map((x) => <span key={x} className="flex justify-center rounded-sm border border-line bg-surface px-1 py-2.5 text-xs font-semibold text-ink">{x}</span>)}
           </div>
         </div>
       </div>
@@ -73,27 +74,32 @@ export default async function Landing() {
     <>
       <PublicHeader />
       <main>
+        {/* The one strong moment: a bold hero over a slowly drifting dot pattern. */}
+        <div className="relative isolate overflow-hidden">
+        <div aria-hidden className="hero-glow absolute inset-0 -z-10" />
+        <div aria-hidden className="hero-pattern absolute inset-0 -z-10" />
         <section className="mx-auto flex max-w-[76rem] flex-wrap items-center gap-12 px-5 pb-14 pt-12 md:px-8 md:pt-20 lg:px-12">
           <div className="flex min-w-0 flex-[999_1_28rem] flex-col gap-6">
             {!openSignUp && (
-              <span className="inline-flex items-center gap-2 self-start rounded-pill bg-brand-tint px-3 py-1.5 text-sm font-semibold text-brand-text">
+              <span data-hero="1" className="inline-flex items-center gap-2 self-start rounded-pill bg-brand-tint px-3 py-1.5 text-sm font-semibold text-brand-text">
                 <span className="h-2 w-2 rounded-full bg-brand" aria-hidden />Invite-only test
               </span>
             )}
-            <h1 className="t-hero text-balance">Understand your bloating, <span className="text-brand-text">one day at a time.</span></h1>
-            <p className="max-w-xl text-lg leading-8 text-ink-muted">Bloat Buddy is a private diary for bloating. Log how you feel in two taps, add meals and habits, and see patterns in your own records.</p>
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <h1 data-hero="1" className="t-hero text-balance">Understand your bloating, <span className="text-brand-text">one day at a time.</span></h1>
+            <p data-hero="2" className="max-w-xl text-lg leading-8 text-ink-muted">Bloat Buddy is a private diary for bloating. Log how you feel in two taps, add meals and habits, and see patterns in your own records.</p>
+            <div data-hero="3" className="flex flex-col gap-3 sm:flex-row">
               <LinkButton href={cta.href} className="sm:w-auto">{cta.label}</LinkButton>
               <LinkButton href="#how" variant="secondary" className="sm:w-auto">See how it works</LinkButton>
             </div>
             <p className="t-caption">{openSignUp ? "For adults 18 and older." : "For adults 18 and older. Accounts are set up by invitation during the test."}</p>
           </div>
-          <div className="flex flex-[1_1_20rem] justify-center"><PhonePreview /></div>
+          <div data-hero="4" className="flex flex-[1_1_20rem] justify-center"><PhonePreview /></div>
         </section>
+        </div>
 
         <section aria-labelledby="features" className="mx-auto flex max-w-[76rem] flex-col gap-7 px-5 pb-16 md:px-8 lg:px-12">
-          <h2 id="features" className="t-headline">Everything in one calm place</h2>
-          <ul className="grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+          <h2 id="features" data-reveal className="t-headline">Everything in one calm place</h2>
+          <ul data-reveal data-reveal-group className="grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
             {features.map(({ icon: Icon, title, text }) => (
               <li key={title} className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-6">
                 <span className="inline-flex h-11 w-11 items-center justify-center rounded-sm bg-brand-tint text-brand-text"><Icon size={22} strokeWidth={2} aria-hidden /></span>
@@ -106,8 +112,8 @@ export default async function Landing() {
 
         <section id="how" aria-labelledby="how-title" className="border-y border-line bg-subtle">
           <div className="mx-auto flex max-w-[76rem] flex-col gap-7 px-5 py-16 md:px-8 lg:px-12">
-            <h2 id="how-title" className="t-headline">How it works</h2>
-            <ol className="grid list-none grid-cols-1 gap-8 p-0 md:grid-cols-3">
+            <h2 id="how-title" data-reveal className="t-headline">How it works</h2>
+            <ol data-reveal data-reveal-group className="grid list-none grid-cols-1 gap-8 p-0 md:grid-cols-3">
               {STEPS.map((s) => (
                 <li key={s.n} className="flex flex-col gap-3">
                   <span className="inline-flex h-10 w-10 items-center justify-center rounded-sm bg-brand font-bold tabular text-on-brand" aria-hidden>{s.n}</span>
@@ -120,7 +126,7 @@ export default async function Landing() {
           </div>
         </section>
 
-        <section aria-label="Privacy and safety" className="mx-auto grid max-w-[76rem] grid-cols-1 gap-4 px-5 py-16 md:grid-cols-2 md:px-8 lg:px-12">
+        <section aria-label="Privacy and safety" data-reveal data-reveal-group className="mx-auto grid max-w-[76rem] grid-cols-1 gap-4 px-5 py-16 md:grid-cols-2 md:px-8 lg:px-12">
           <div className="flex flex-col gap-2.5 rounded-lg border border-line bg-surface p-7">
             <h2 className="t-title text-[1.375rem]">Your records stay yours</h2>
             <p className="leading-6 text-ink-muted">Your diary is private to your account. No ads, no selling your data. Download everything or delete your account at any time.</p>
@@ -142,6 +148,7 @@ export default async function Landing() {
         </section>
       </main>
       <PublicFooter />
+      <LandingMotion />
     </>
   );
 }

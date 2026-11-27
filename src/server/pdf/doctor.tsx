@@ -7,15 +7,16 @@ import { zoneLabel } from "@/lib/regions";
 // The doctor PDF, made on the server from an immutable snapshot. Plain black on white so it
 // prints and photocopies well. Page 1 is a two-minute summary (0.3 fix 25).
 const s = StyleSheet.create({
-  page: { padding: 40, fontSize: 10, fontFamily: "Helvetica", color: "#171719", lineHeight: 1.4 },
+  // Light-theme design tokens (globals.css); a PDF cannot read CSS variables.
+  page: { padding: 40, fontSize: 10, fontFamily: "Helvetica", color: "#14191a", lineHeight: 1.4 },
   h1: { fontSize: 18, fontFamily: "Helvetica-Bold", marginBottom: 2 },
   h2: { fontSize: 12, fontFamily: "Helvetica-Bold", marginTop: 12, marginBottom: 4 },
-  muted: { color: "#626269", fontSize: 9 },
-  row: { flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: "#dedee2", paddingVertical: 3 },
-  k: { width: "45%", color: "#626269" }, v: { width: "55%" },
-  box: { borderWidth: 1, borderColor: "#171719", borderRadius: 4, padding: 8, marginTop: 8 },
-  note: { backgroundColor: "#eeeef0", padding: 8, borderRadius: 4, marginTop: 8 },
-  footer: { position: "absolute", bottom: 20, left: 40, right: 40, fontSize: 8, color: "#626269" },
+  muted: { color: "#4a5456", fontSize: 9 },
+  row: { flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: "#e1e6e6", paddingVertical: 3 },
+  k: { width: "45%", color: "#4a5456" }, v: { width: "55%" },
+  box: { borderWidth: 1, borderColor: "#14191a", borderRadius: 4, padding: 8, marginTop: 8 },
+  note: { backgroundColor: "#eef3f2", padding: 8, borderRadius: 4, marginTop: 8 },
+  footer: { position: "absolute", bottom: 20, left: 40, right: 40, fontSize: 8, color: "#4a5456" },
   li: { marginBottom: 2 },
 });
 

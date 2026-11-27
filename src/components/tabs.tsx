@@ -45,7 +45,7 @@ export function TabBar() {
       <ul className="mx-auto grid max-w-lg grid-cols-5 items-center px-1.5">
         {left.map((t) => <li key={t.id}><TabLink {...t} on={owner === t.id} /></li>)}
         <li className="flex justify-center">
-          <Link href={LOG_HREF} data-press className="-mt-5 inline-flex h-14 w-14 items-center justify-center rounded-[1.125rem] bg-brand text-on-brand no-underline hover:opacity-90">
+          <Link href={LOG_HREF} data-press className="-mt-5 inline-flex h-14 w-14 items-center justify-center rounded-md bg-brand text-on-brand no-underline hover:opacity-90">
             <Plus size={26} strokeWidth={2.4} aria-hidden />
             <span className="sr-only">Log bloating</span>
           </Link>

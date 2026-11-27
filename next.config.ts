@@ -11,8 +11,8 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   serverExternalPackages: ["@react-pdf/renderer", "sharp", "india-pincode"],
-  // india-pincode reads its data file at run time; make sure the file ships with the route.
-  outputFileTracingIncludes: { "/v1/places/pincode/[pin]": ["./node_modules/india-pincode/data/**", "./node_modules/.pnpm/india-pincode@*/node_modules/india-pincode/data/**"] },
+  // india-pincode is loaded at run time (CommonJS build and its data file); make sure both ship with the route.
+  outputFileTracingIncludes: { "/v1/places/pincode/[pin]": ["./node_modules/india-pincode/**", "./node_modules/.pnpm/india-pincode@*/node_modules/india-pincode/**"] },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },

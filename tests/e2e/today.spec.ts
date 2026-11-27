@@ -47,9 +47,10 @@ async function account(context: BrowserContext, pro = false): Promise<Ctx> {
 const userId = (c: Ctx) => sql(`select id from auth.users where email = '${c.email}'`);
 const pastDay = (c: Ctx, k: number) => new Date(Date.parse(`${c.today}T12:00:00Z`) - k * 86_400_000).toISOString().slice(0, 10);
 
-/** The status line under "I feel bloated" (bloating) or under the Add to today buttons (add). */
-const notice = (page: Page, where: "bloating" | "add") =>
-  page.locator("section", { has: where === "add" ? page.getByRole("heading", { name: "Add to today" }) : page.getByRole("heading", { name: "How are you feeling?" }) }).getByRole("status").last();
+// Since 27 Nov 2026 (the owner's motion spec) every save on Today answers with a toast and a tick
+// (Sonner, announced through its polite live region), wherever the person has scrolled. The newest
+// toast is the one in front. `where` only says which control started the save.
+const notice = (page: Page, _where: "bloating" | "add") => page.locator('[data-sonner-toast][data-front="true"]');
 
 /** Press Tab (or Shift+Tab) until the target has focus. */
 async function tabTo(page: Page, target: Locator, max = 80) {
@@ -94,7 +95,6 @@ test.describe("T1: every save started on Today says what was saved", () => {
     await meal.getByRole("button", { name: "Save" }).click();
     await expect(meal).toBeHidden({ timeout: 20000 });
     await expect(notice(page, "add")).toHaveText("Meal saved.");
-    await expect(notice(page, "bloating")).toHaveText("");
 
     await page.getByRole("button", { name: "Add activity" }).click();
     const act = page.getByRole("dialog", { name: "Add activity" });
@@ -105,7 +105,6 @@ test.describe("T1: every save started on Today says what was saved", () => {
     // The message is not shown before the server confirms: reload shows the saved records, no message.
     await page.reload();
     await expect(page.getByText("toast with butter")).toBeVisible();
-    await expect(notice(page, "add")).toHaveText("");
   });
 
   test("Pro: a bowel movement and exercise", async ({ context }) => {

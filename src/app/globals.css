@@ -22,6 +22,8 @@
      nothing takes longer than 400ms; no bounce. src/lib/motion.ts mirrors these for Motion. */
   --dur-press: 120ms; --dur-fast: 150ms; --dur-base: 250ms; --dur-slow: 400ms;
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  /* The base radius shadcn/ui components work from (the 12px control radius). */
+  --radius: 12px;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -100,6 +102,8 @@ body {
 
 /* Focus ring: 3px ink with an offset, on every interactive element (ink flips with the theme). */
 :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+/* The picker's search box shows its focus as a teal ring on its box instead (search-select.tsx). */
+[data-slot="command-input"]:focus-visible { outline: none; }
 
 /* Element defaults live in the base layer, so a utility class on a link (a button's text colour,
    no-underline) always wins. Unlayered, this rule once made filled link buttons' text the same
@@ -128,6 +132,19 @@ button:not(:disabled):active, a[data-press]:active, [data-press]:active { scale:
 .fade-in { animation: fade-in var(--dur-base) var(--ease-out); }
 @keyframes rise-in { from { transform: translateY(6px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 .rise-in { animation: rise-in var(--dur-base) var(--ease-out); }
+/* Start page hero: its parts rise into place once (400ms, 50ms apart), with no JavaScript, so
+   nothing flashes or waits. A soft dot pattern drifts slowly behind it (ambient, never in the way). */
+@keyframes hero-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+[data-hero] { animation: hero-rise var(--dur-slow) var(--ease-out) both; }
+[data-hero="2"] { animation-delay: 50ms; } [data-hero="3"] { animation-delay: 100ms; } [data-hero="4"] { animation-delay: 150ms; }
+@keyframes pattern-drift { from { background-position: 0 0; } to { background-position: 44px 44px; } }
+.hero-pattern {
+  background-image: radial-gradient(var(--line) 1.2px, transparent 1.4px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 35%, #000 30%, transparent 75%);
+  animation: pattern-drift 24s linear infinite;
+}
+.hero-glow { background: radial-gradient(ellipse 50% 45% at 70% 30%, var(--brand-tint), transparent 70%); }
 /* Skeletons: a calm shimmer while a screen loads (never a blank screen or a spinner). */
 @keyframes skeleton { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
 .skeleton { background: var(--subtle); border-radius: var(--radius-sm); animation: skeleton 1.4s var(--ease-out) infinite; }

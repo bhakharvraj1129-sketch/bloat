@@ -142,9 +142,9 @@ export function Today() {
       {!!state.consents_due?.length && <Reconfirm due={state.consents_due} onDone={() => { savedToast("Confirmed. Thank you."); reload(); }} />}
 
       {state.pending_review && (
-        <Link href={`/review/${state.pending_review.date}`} className="flex min-h-16 items-center gap-4 rounded-lg bg-brand px-5 py-4 text-on-brand no-underline hover:opacity-90 md:px-6">
-          <Sunrise size={24} strokeWidth={2} aria-hidden className="shrink-0" />
-          <span className="flex grow flex-col"><span className="font-bold">Review yesterday</span><span className="text-[0.875rem]">A few quick questions set your Bloat Score</span></span>
+        <Link href={`/review/${state.pending_review.date}`} data-press className="flex min-h-16 items-center gap-4 rounded-lg border border-brand bg-brand-tint px-5 py-4 text-ink no-underline md:px-6">
+          <Sunrise size={24} strokeWidth={2} aria-hidden className="shrink-0 text-brand-text" />
+          <span className="flex grow flex-col"><span className="font-bold">Review yesterday</span><span className="t-caption">A few quick questions set your Bloat Score</span></span>
           <ChevronRight size={20} strokeWidth={2} aria-hidden />
         </Link>
       )}
