@@ -1,7 +1,7 @@
 "use client";
-import * as Dialog from "@radix-ui/react-dialog";
+import { Drawer } from "vaul";
 import Link from "next/link";
-import { TriangleAlert, X } from "lucide-react";
+import { Check, LoaderCircle, TriangleAlert, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentProps, type ReactNode } from "react";
 import type { ApiFailure } from "@/lib/client/api";
 import type { SaveState } from "@/lib/client/hooks";
@@ -15,10 +15,15 @@ export const ICON = { size: 20, strokeWidth: 1.75 } as const;
 
 type ButtonProps = ComponentProps<"button"> & { variant?: "primary" | "secondary" | "quiet" | "danger"; size?: "lg" | "md"; full?: boolean };
 
-export function Button({ variant = "primary", size = "md", full = true, className, ...rest }: ButtonProps) {
+/** A label ending in "…" ("Saving…", "Checking…") means the button is working: it shows a small loader. */
+const isWorking = (children: ReactNode) => typeof children === "string" && children.endsWith("…");
+
+export function Button({ variant = "primary", size = "md", full = true, className, children, ...rest }: ButtonProps) {
+  const working = isWorking(children);
   return (
     <button
       {...rest}
+      aria-busy={working || rest["aria-busy"] || undefined}
       className={cx(
         "inline-flex items-center justify-center gap-2 rounded-sm border px-5 font-semibold transition-colors duration-150 disabled:cursor-not-allowed",
         size === "lg" ? "min-h-14 text-lg" : "min-h-12",
@@ -29,7 +34,10 @@ export function Button({ variant = "primary", size = "md", full = true, classNam
         variant === "danger" && "border-line bg-surface text-alert hover:bg-alert-tint disabled:text-ink-muted disabled:hover:bg-surface",
         className,
       )}
-    />
+    >
+      {working && <LoaderCircle size={18} strokeWidth={2.2} className="shrink-0 animate-spin" aria-hidden />}
+      {children}
+    </button>
   );
 }
 
@@ -37,6 +45,7 @@ export function LinkButton({ href, children, variant = "primary", className }: {
   return (
     <Link
       href={href}
+      data-press
       className={cx(
         "inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border px-5 font-semibold no-underline transition-colors duration-150",
         variant === "primary" && "border-brand bg-brand text-on-brand hover:opacity-90",
@@ -164,24 +173,25 @@ export function Sheet({ open, onOpenChange, title, children, description, dirty 
   useUnsavedGuard(open && dirty);
 
   return (
-    <Dialog.Root open={open} onOpenChange={request}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fade-in fixed inset-0 z-40 bg-ink/40" />
-        <Dialog.Content
-          className={cx(
-            "sheet-in fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[92dvh] w-full max-w-lg flex-col rounded-t-lg border border-line bg-surface pb-[env(safe-area-inset-bottom)]",
-            "md:inset-x-auto md:bottom-auto md:left-1/2 md:top-1/2 md:max-h-[88dvh] md:w-[calc(100%-3rem)] md:max-w-xl md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-lg md:pb-0",
-          )}
+    // Vaul bottom sheet: slides and fades in over 250ms (globals.css), can be dragged down to close
+    // when nothing unsaved would be lost. Closing with unsaved input always asks first.
+    <Drawer.Root open={open} onOpenChange={request} dismissible={!dirty} repositionInputs={false}>
+      <Drawer.Portal>
+        <Drawer.Overlay className="fixed inset-0 z-40 bg-ink/40" />
+        <Drawer.Content
+          onEscapeKeyDown={(e) => { if (dirty) { e.preventDefault(); request(false); } }}
+          className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[92dvh] w-full max-w-lg flex-col rounded-t-lg border border-line bg-surface pb-[env(safe-area-inset-bottom)] outline-none md:max-w-xl md:max-h-[88dvh]"
         >
-          <div className="flex items-center justify-between gap-3 px-5 pb-2 pt-5 md:px-7 md:pt-6">
-            <Dialog.Title className="t-title">{title}</Dialog.Title>
-            <Dialog.Close className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-sm text-ink hover:bg-subtle" aria-label="Close">
+          <div aria-hidden className="mx-auto mt-2.5 h-1.5 w-10 shrink-0 rounded-pill bg-line" />
+          <div className="flex items-center justify-between gap-3 px-5 pb-2 pt-3 md:px-7 md:pt-4">
+            <Drawer.Title className="t-title">{title}</Drawer.Title>
+            <button type="button" onClick={() => request(false)} className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-sm text-ink hover:bg-subtle" aria-label="Close">
               <X {...ICON} aria-hidden />
-            </Dialog.Close>
+            </button>
           </div>
-          {description ? <Dialog.Description className="px-5 t-caption md:px-7">{description}</Dialog.Description> : <Dialog.Description className="sr-only">{title}</Dialog.Description>}
+          {description ? <Drawer.Description className="px-5 t-caption md:px-7">{description}</Drawer.Description> : <Drawer.Description className="sr-only">{title}</Drawer.Description>}
           {confirming && (
-            <div role="alert" className="mx-5 mt-2 flex flex-col gap-3 rounded-sm border border-line bg-subtle p-4 md:mx-7">
+            <div role="alert" className="rise-in mx-5 mt-2 flex flex-col gap-3 rounded-sm border border-line bg-subtle p-4 md:mx-7">
               <p className="t-body-strong">Close without saving?</p>
               <Caption>What you entered here hasn&apos;t been saved yet.</Caption>
               <div className="flex flex-col gap-2">
@@ -191,9 +201,9 @@ export function Sheet({ open, onOpenChange, title, children, description, dirty 
             </div>
           )}
           <div hidden={confirming} className="flex flex-col gap-6 overflow-y-auto px-5 pb-8 pt-2 md:px-7">{children}</div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
   );
 }
 
@@ -221,11 +231,25 @@ export function Screen({ title, children, back, action, eyebrow, width = "page" 
   );
 }
 
+/** While a screen loads: a skeleton of the page (cards with lines), never a blank screen or a spinner. */
 export function Loading({ what = "Loading" }: { what?: string }) {
   return (
-    <div role="status" aria-live="polite" className="flex flex-col gap-3">
+    <div role="status" aria-live="polite" className="flex flex-col gap-4">
       <span className="sr-only">{what}…</span>
-      {[0, 1, 2].map((i) => <div key={i} className="h-20 animate-pulse rounded-lg border border-line bg-surface" />)}
+      <div aria-hidden className="flex flex-col gap-4 rounded-lg border border-line bg-surface p-5 md:p-6">
+        <div className="skeleton h-5 w-2/5" />
+        <div className="skeleton h-14 w-full" />
+        <div className="skeleton h-11 w-full" />
+      </div>
+      <div aria-hidden className="grid grid-cols-2 gap-3">
+        <div className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-5"><div className="skeleton h-9 w-9" /><div className="skeleton h-4 w-3/5" /></div>
+        <div className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-5"><div className="skeleton h-9 w-9" /><div className="skeleton h-4 w-3/5" /></div>
+      </div>
+      <div aria-hidden className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-5 md:p-6">
+        <div className="skeleton h-4 w-1/3" />
+        <div className="skeleton h-4 w-4/5" />
+        <div className="skeleton h-4 w-3/5" />
+      </div>
     </div>
   );
 }
@@ -265,8 +289,8 @@ export function SaveStatus({ state, error, onCheck }: { state: SaveState; error:
   if (state === "idle") return null;
   return (
     <div role="status" aria-live="polite" className="flex flex-col gap-2">
-      {state === "saving" && <Caption>Saving…</Caption>}
-      {state === "saved" && <Caption>Saved</Caption>}
+      {state === "saving" && <p className="t-caption flex items-center gap-1.5"><LoaderCircle size={14} strokeWidth={2.4} className="animate-spin" aria-hidden />Saving…</p>}
+      {state === "saved" && <p className="rise-in t-caption flex items-center gap-1.5 font-semibold text-brand-text"><Check size={15} strokeWidth={2.8} aria-hidden />Saved</p>}
       {state === "error" && <p className="t-caption text-ink">{error?.message ?? "Nothing was saved. Try again."}</p>}
       {state === "unknown" && (
         <>

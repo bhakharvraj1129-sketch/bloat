@@ -18,6 +18,7 @@ import { MIN_NEW_PASSWORD, newPasswordProblem, passwordChangeMessage } from "@/l
 import type { AuthErrorLike } from "@/lib/otp-messages";
 import { activities, ACTIVITY_GROUP_LABELS, country as countryCfg, foodTags, label as optionLabel, PRO_ACTIVITY_IDS, question, tagLabel } from "@/lib/registry";
 import type { State } from "@/components/today/types";
+import { SmoothList } from "@/components/glide";
 
 type Med = { id: string; name: string; type: string; med_group: string | null; started_on: string | null; changes: Array<{ change: string; date: string | null }> };
 type Consent = { type: string; version: string; granted_at: string | null; withdrawn_at: string | null };
@@ -182,12 +183,12 @@ export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; pa
         <Label id="meds">Medicines and supplements</Label>
         <Card className="flex flex-col gap-3">
           {meds.data?.medicines.length ? (
-            <ul>{meds.data.medicines.map((m) => (
+            <SmoothList>{meds.data.medicines.map((m) => (
               <li key={m.id} className="border-b border-line py-2 last:border-0">
                 <span className="font-semibold">{m.name}</span>
                 <span className="t-caption"> · {m.med_group ? optionLabel("MD-04", m.med_group) : m.type === "medicine" ? "Medicine" : "Supplement"}{m.started_on ? ` · started ${m.started_on}` : ""}{m.changes.map((c) => ` · ${c.change.replace("_", " ")}${c.date ? ` ${c.date}` : ""}`).join("")}</span>
               </li>
-            ))}</ul>
+            ))}</SmoothList>
           ) : <Caption>Nothing in your record yet.</Caption>}
           <Caption>A record only. Bloat Buddy never comments on medicines.</Caption>
           <Button variant="secondary" onClick={() => setSheet("med")}>Add or change</Button>

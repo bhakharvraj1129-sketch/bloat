@@ -6,6 +6,7 @@ import { DoctorLineBox, type DoctorLineData } from "@/components/doctorline";
 import { ProHistory, type ProHistoryData } from "@/components/history-pro";
 import { useLoad } from "@/lib/client/hooks";
 import { formatDate } from "@/lib/time";
+import { SmoothList } from "@/components/glide";
 
 export type DayRow = {
   date: string; status: "UNKNOWN" | "PROVISIONAL" | "CONFIRMED" | "LATE" | "CONFLICT"; score: number | null; highest_logged: number | null;
@@ -47,7 +48,7 @@ export function History() {
           <Empty title="No days yet">Log bloating or a meal on Today and your days will appear here.</Empty>
         ) : (
           <Card className="px-4 py-1">
-            <ul>
+            <SmoothList>
               {data.days.map((d) => (
                 <li key={d.date} className="border-b border-line last:border-0">
                   <Link href={`/day/${d.date}`} className="flex min-h-16 items-center gap-3 py-2 text-ink no-underline">
@@ -60,7 +61,7 @@ export function History() {
                   </Link>
                 </li>
               ))}
-            </ul>
+            </SmoothList>
           </Card>
         )}
         <Caption>? means no confirmed score. A score is confirmed by the morning review.</Caption>

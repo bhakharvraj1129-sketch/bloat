@@ -4,6 +4,7 @@ import { INTENDED_USE } from "@/lib/wording";
 import { BackLink } from "./nav";
 import { PublicMenu, type PublicLink } from "./public-menu";
 import { Logo } from "./logo";
+import { Glide } from "./glide";
 
 const HEADER_LINKS: PublicLink[] = [
   { href: "/how-bloat-works", label: "How it works" },
@@ -64,14 +65,16 @@ export function PublicPage({ title, eyebrow, back = "/", children }: { title: st
   return (
     <>
       <PublicHeader />
-      <main className="mx-auto flex w-full max-w-[49rem] flex-col gap-6 px-5 pb-16 pt-8 md:px-8 md:pt-14">
-        {back && <BackLink fallback={back} />}
-        <div className="flex flex-col gap-3">
-          {eyebrow && <p className="t-label">{eyebrow}</p>}
-          <h1 className="t-headline">{title}</h1>
-        </div>
-        {children}
-      </main>
+      <Glide>
+        <main className="mx-auto flex w-full max-w-[49rem] flex-col gap-6 px-5 pb-16 pt-8 md:px-8 md:pt-14">
+          {back && <BackLink fallback={back} />}
+          <div className="flex flex-col gap-3">
+            {eyebrow && <p className="t-label">{eyebrow}</p>}
+            <h1 className="t-headline">{title}</h1>
+          </div>
+          {children}
+        </main>
+      </Glide>
       <PublicFooter />
     </>
   );

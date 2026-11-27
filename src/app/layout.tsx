@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import { PwaRegister } from "@/components/pwa";
 import { LeaveGuard, NavTracker } from "@/components/nav";
 import { THEME_KEY } from "@/lib/client/theme";
+import { AppToaster } from "@/components/toaster";
 
 // Fonts are bundled with the app (no font service), so nothing is fetched from elsewhere.
 
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Suspense fallback={null}><NavTracker /></Suspense>
         <LeaveGuard />
         <PwaRegister />
+        <AppToaster />
       </body>
     </html>
   );

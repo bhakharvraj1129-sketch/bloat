@@ -3,9 +3,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Lock } from "lucide-react";
-import { Button, Caption, Card, Chip, Field, Label, ProTag, SaveStatus, Segmented, inputClass } from "@/components/ui";
+import { Button, Caption, Card, Chip, Field, Label, Loading, ProTag, SaveStatus, Segmented, inputClass } from "@/components/ui";
 import { QuestionField } from "@/components/question";
 import { Logo } from "@/components/logo";
+import { Glide } from "@/components/glide";
 import { RegionSelect, ZoneSelect } from "@/components/zone-select";
 import type { Country } from "@/lib/regions";
 import { clearPre, readPre } from "@/lib/client/pre";
@@ -114,7 +115,7 @@ export function Setup() {
     if (out) { clearPre(); router.replace("/today"); }
   }
 
-  if (!ready) return <main className="mx-auto max-w-[38rem] px-5 pt-10"><p role="status">Loading…</p></main>;
+  if (!ready) return <main className="mx-auto flex max-w-[38rem] flex-col gap-6 px-5 pt-8 md:pt-14"><Logo /><Loading what="Loading setup" /></main>;
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-[38rem] flex-col gap-6 px-5 pb-12 pt-8 md:pt-14">
@@ -125,6 +126,9 @@ export function Setup() {
       </div>
       <h1 ref={top} tabIndex={-1} className="t-headline outline-none">{STEPS[step]}</h1>
 
+      {/* Each step glides in instead of snapping (250ms; nothing moves with reduce motion). */}
+      <Glide key={step}>
+      <div className="flex flex-col gap-6">
       {step === 0 && (
         <>
           <Card>
@@ -266,6 +270,8 @@ export function Setup() {
           ))}
         </ol>
       )}
+      </div>
+      </Glide>
 
       <div className="mt-2 flex flex-col gap-3">
         {step < 8 ? (

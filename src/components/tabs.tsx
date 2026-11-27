@@ -27,7 +27,7 @@ export const LOG_HREF = "/today?log=1";
 
 function TabLink({ id, href, label, icon: Icon, on }: (typeof TABS)[number] & { on: boolean }) {
   return (
-    <Link href={href} aria-current={on ? "page" : undefined}
+    <Link href={href} data-press aria-current={on ? "page" : undefined}
       className={cx("flex min-h-12 flex-col items-center justify-center gap-1 text-xs no-underline", on ? "font-bold text-brand-text" : "font-medium text-ink-muted")}
       data-tab={id}>
       <Icon size={22} strokeWidth={on ? 2.2 : 1.75} aria-hidden />
@@ -45,7 +45,7 @@ export function TabBar() {
       <ul className="mx-auto grid max-w-lg grid-cols-5 items-center px-1.5">
         {left.map((t) => <li key={t.id}><TabLink {...t} on={owner === t.id} /></li>)}
         <li className="flex justify-center">
-          <Link href={LOG_HREF} className="-mt-5 inline-flex h-14 w-14 items-center justify-center rounded-[1.125rem] bg-brand text-on-brand no-underline hover:opacity-90">
+          <Link href={LOG_HREF} data-press className="-mt-5 inline-flex h-14 w-14 items-center justify-center rounded-[1.125rem] bg-brand text-on-brand no-underline hover:opacity-90">
             <Plus size={26} strokeWidth={2.4} aria-hidden />
             <span className="sr-only">Log bloating</span>
           </Link>
@@ -65,7 +65,7 @@ export function SideNav() {
         <Link href="/today" className="no-underline" aria-label="Bloat Buddy, Today"><Logo size={30} /></Link>
         <span className="t-label">Your bloating diary</span>
       </div>
-      <Link href={LOG_HREF} className="flex min-h-12 items-center gap-3 rounded-sm bg-brand px-3 font-semibold text-on-brand no-underline hover:opacity-90">
+      <Link href={LOG_HREF} data-press className="flex min-h-12 items-center gap-3 rounded-sm bg-brand px-3 font-semibold text-on-brand no-underline hover:opacity-90">
         <Plus size={20} strokeWidth={2.2} aria-hidden />
         Log bloating
       </Link>
@@ -75,7 +75,7 @@ export function SideNav() {
             const on = owner === id;
             return (
               <li key={id}>
-                <Link href={href} aria-current={on ? "page" : undefined}
+                <Link href={href} data-press aria-current={on ? "page" : undefined}
                   className={cx("flex min-h-12 items-center gap-3 rounded-sm px-3 no-underline transition-colors duration-150", on ? "bg-brand-tint font-semibold text-brand-text" : "text-ink-muted hover:bg-subtle hover:text-ink")}>
                   <Icon size={20} strokeWidth={on ? 2 : 1.5} aria-hidden />
                   {label}

@@ -2,9 +2,10 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Check, ChevronRight, CircleCheck, Droplet, Footprints, Sunrise, Utensils } from "lucide-react";
+import { ChevronRight, CircleCheck, Droplet, Footprints, Sunrise, Utensils } from "lucide-react";
 import { Button, Caption, Card, ErrorState, Label, Loading, SaveStatus, ScoreBadge, Screen, cx } from "@/components/ui";
 import { LogoMark } from "@/components/logo";
+import { savedToast } from "@/lib/client/feedback";
 import { useLoad, useSave } from "@/lib/client/hooks";
 import { rememberOpener, returnFocus } from "@/lib/client/nav";
 import { formatClock, formatDate, formatDuration, weekday } from "@/lib/time";
@@ -14,22 +15,10 @@ import { MealSheet } from "@/components/today/meal";
 import { ActivitySheet, BowelSheet, ExerciseSheet } from "@/components/today/activity";
 import { ProToday } from "@/components/today/pro";
 import { question, tagLabel } from "@/lib/registry";
+import { SmoothList } from "@/components/glide";
+import { CountUp } from "@/components/count-up";
 
 type SheetName = null | "log" | "ongoing" | "end" | "end-earlier" | "still" | "meal" | "activity" | "exercise" | "bowel";
-type Notice = { at: "bloating" | "add" | "consent"; text: string };
-
-/** Says what was just saved, next to where it was started. Always on the page, so screen readers announce each change. */
-function SavedNotice({ text }: { text: string | null }) {
-  return (
-    <p role="status" className={text ? "" : "sr-only"}>
-      {text && (
-        <span key={text} className="rise-in flex items-center gap-2 rounded-sm bg-brand-tint px-3.5 py-2.5 text-[0.9375rem] font-semibold text-brand-text">
-          <Check size={18} strokeWidth={2.6} aria-hidden />{text}
-        </span>
-      )}
-    </p>
-  );
-}
 
 const CONSENT_QUESTION = { health_data: "CN-02", wellness_ack: "CN-03" } as const;
 
@@ -113,10 +102,10 @@ export function Today() {
   const { data: state, error, loading, reload } = useLoad<State>("/v1/me/state");
   const [sheet, setSheetState] = useState<SheetName>(null);
   const [stillDismissed, setStillDismissed] = useState(false);
-  // A sheet closes as soon as the server confirms its save, so the confirmation is shown here (plan: "Meal saved.").
-  const [notice, setNotice] = useState<Notice | null>(null);
-  const setSheet = (s: SheetName) => { if (s) setNotice(null); setSheetState(s); };
-  const savedThen = (n: Notice) => () => { setNotice(n); reload(); };
+  // A sheet closes as soon as the server confirms its save; a toast with a tick says what was saved
+  // (the plan's sentences: "Meal saved."), visible wherever the person has scrolled.
+  const setSheet = (s: SheetName) => setSheetState(s);
+  const savedThen = (text: string) => () => { savedToast(text); reload(); };
   const none = useSave();
   const wantLog = params.get("log") === "1";
 
@@ -125,7 +114,6 @@ export function Today() {
   const [logOpened, setLogOpened] = useState(false);
   if (wantLog && state?.onboarded && !logOpened) {
     setLogOpened(true);
-    setNotice(null);
     setSheetState(state.open_episode ? "ongoing" : "log");
   }
   if (!wantLog && logOpened) setLogOpened(false);
@@ -151,8 +139,7 @@ export function Today() {
       action={<LogoMark size={36} className="md:hidden" />}>
       {state.paused && <Card><p className="t-body-strong">Pro is paused</p><Caption>Your records are kept and free logging keeps working. <Link href="/me">Resume in You</Link></Caption></Card>}
 
-      <SavedNotice text={notice?.at === "consent" ? notice.text : null} />
-      {!!state.consents_due?.length && <Reconfirm due={state.consents_due} onDone={() => { setNotice({ at: "consent", text: "Confirmed. Thank you." }); reload(); }} />}
+      {!!state.consents_due?.length && <Reconfirm due={state.consents_due} onDone={() => { savedToast("Confirmed. Thank you."); reload(); }} />}
 
       {state.pending_review && (
         <Link href={`/review/${state.pending_review.date}`} className="flex min-h-16 items-center gap-4 rounded-lg bg-brand px-5 py-4 text-on-brand no-underline hover:opacity-90 md:px-6">
@@ -175,7 +162,7 @@ export function Today() {
                   <Label>Highest logged so far</Label>
                   {/* One spoken name for the figure, the same as what the screen shows (a provisional zero is 0). */}
                   <p className="font-display text-[2.5rem] font-extrabold leading-none tracking-[-0.02em] tabular" role="img" aria-label={`${highest} out of 10`}>
-                    {highest}<span className="ml-1.5 align-baseline font-body text-lg font-medium tracking-normal text-ink-muted">/ 10</span>
+                    <CountUp value={highest} /><span className="ml-1.5 align-baseline font-body text-lg font-medium tracking-normal text-ink-muted">/ 10</span>
                   </p>
                 </div>
                 <p className="font-semibold">
@@ -204,12 +191,11 @@ export function Today() {
                   <Button variant="secondary" data-focus-key="today-bloating" disabled={none.saving} onClick={async () => {
                     const back = rememberOpener();
                     const ok = await none.run("POST", `/v1/days/${today.date}/no-bloating-so-far`);
-                    if (ok) { setNotice({ at: "bloating", text: "Noted: no bloating so far today." }); reload(); returnFocus(back); }
+                    if (ok) { savedToast("Noted: no bloating so far today."); reload(); returnFocus(back); }
                   }}>No bloating so far today</Button>
-                  <SaveStatus state={none.state === "saved" ? "idle" : none.state} error={none.error} onCheck={async () => { if ((await none.check()).ok) { setNotice({ at: "bloating", text: "Noted: no bloating so far today." }); reload(); } }} />
+                  <SaveStatus state={none.state === "saved" ? "idle" : none.state} error={none.error} onCheck={async () => { if ((await none.check()).ok) { savedToast("Noted: no bloating so far today."); reload(); } }} />
                 </>
               )}
-              <SavedNotice text={notice?.at === "bloating" ? notice.text : null} />
               {(highest !== null || ep) && <Caption>Tomorrow morning, a short review sets today&apos;s Bloat Score.</Caption>}
             </div>
           </Card>
@@ -225,7 +211,6 @@ export function Today() {
               <AddTile label="Activity" name="Add activity" icon={Footprints} onClick={() => setSheet("activity")} />
               {pro && <AddTile label="Bowel movement" name="Log bowel movement" icon={Droplet} onClick={() => setSheet("bowel")} />}
             </div>
-            <SavedNotice text={notice?.at === "add" ? notice.text : null} />
             {keepEye && (
               <Card className="flex flex-col gap-1">
                 <Label>Keeping an eye on</Label>
@@ -259,7 +244,7 @@ export function Today() {
           <Card className="flex items-center gap-3"><CircleCheck size={20} strokeWidth={1.75} aria-hidden className="shrink-0 text-control" /><Caption>Entries appear here as you add them.</Caption></Card>
         ) : (
           <Card className="py-2 md:py-3">
-            <ul>
+            <SmoothList>
               {state.timeline.map((t) => (
                 <li key={`${t.kind}-${t.id}`} className="flex items-center gap-3 border-b border-line py-3 last:border-0">
                   <span className="w-16 shrink-0 t-caption tabular">{t.at ? formatClock(Date.parse(t.at), profile.time_zone, profile.units) : "Today"}</span>
@@ -267,21 +252,21 @@ export function Today() {
                   {t.kind === "episode" ? <ScoreBadge size="sm" value={t.strongest ?? null} /> : <span className="t-caption">{t.kind === "meal" ? "Meal" : "Activity"}</span>}
                 </li>
               ))}
-            </ul>
+            </SmoothList>
             <Link href={`/day/${today.date}`} className="flex min-h-11 items-center font-semibold">Edit today&apos;s entries</Link>
           </Card>
         )}
       </section>
 
       {/* Sheets are mounted only while open, so each one starts with a clean form. */}
-      {open === "log" && <LogBloatingSheet open onOpenChange={close} {...sheetProps} onSaved={savedThen({ at: "bloating", text: "Bloating saved." })} />}
+      {open === "log" && <LogBloatingSheet open onOpenChange={close} {...sheetProps} onSaved={savedThen("Bloating saved.")} />}
       {open === "ongoing" && <OngoingSheet open onOpenChange={close} {...sheetProps} onEnd={(earlier) => setSheet(earlier ? "end-earlier" : "end")} />}
       {(open === "end" || open === "end-earlier") && <EndSheet open earlier={open === "end-earlier"} onOpenChange={close} {...sheetProps} />}
       {open === "still" && <StillHappeningSheet open onOpenChange={close} {...sheetProps} onEnd={() => { setStillDismissed(true); setSheet("end-earlier"); }} />}
-      {open === "meal" && <MealSheet open onOpenChange={close} {...sheetProps} onSaved={savedThen({ at: "add", text: "Meal saved." })} />}
-      {open === "activity" && <ActivitySheet open onOpenChange={close} {...sheetProps} onSaved={savedThen({ at: "add", text: "Activity saved." })} onExercise={() => setSheet("exercise")} />}
-      {open === "exercise" && <ExerciseSheet open onOpenChange={close} {...sheetProps} onSaved={savedThen({ at: "add", text: "Exercise saved." })} />}
-      {open === "bowel" && <BowelSheet open onOpenChange={close} {...sheetProps} onSaved={savedThen({ at: "add", text: "Bowel movement saved." })} />}
+      {open === "meal" && <MealSheet open onOpenChange={close} {...sheetProps} onSaved={savedThen("Meal saved.")} />}
+      {open === "activity" && <ActivitySheet open onOpenChange={close} {...sheetProps} onSaved={savedThen("Activity saved.")} onExercise={() => setSheet("exercise")} />}
+      {open === "exercise" && <ExerciseSheet open onOpenChange={close} {...sheetProps} onSaved={savedThen("Exercise saved.")} />}
+      {open === "bowel" && <BowelSheet open onOpenChange={close} {...sheetProps} onSaved={savedThen("Bowel movement saved.")} />}
     </Screen>
   );
 }

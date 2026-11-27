@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* Animation helpers used by shadcn/ui components (utilities and variants only, no page styles). */
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 /* Design tokens: Bloat Buddy v2 (owner's decision, 27 Nov 2026: logo A "Calm wave", colour "Sea glass",
    light and dark themes; design canvas https://claude.ai/artifact/QYeFHzB4QqFT9RvEAQ8XnB). Replaces the
@@ -13,6 +16,12 @@
   --on-score: #14191a; --on-score-strong: #ffffff; --on-score-severe: #ffffff;
   /* The one warning colour: the NHS warning signs and their advice, and destructive actions. */
   --alert: #a52a1f; --alert-tint: #fbe7e4;
+  /* Toasts are inverse (ink on ground); their tick uses the other theme's brand so it stays readable. */
+  --inverse-accent: #2dd4bf;
+  /* Motion (owner, 27 Nov 2026): fast and calm. A tap answers within 150ms; overlays take 250ms;
+     nothing takes longer than 400ms; no bounce. src/lib/motion.ts mirrors these for Motion. */
+  --dur-press: 120ms; --dur-fast: 150ms; --dur-base: 250ms; --dur-slow: 400ms;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -23,6 +32,7 @@
     --score-mild: #12302c; --score-moderate: #1d5c53; --score-strong: #2db3a0; --score-severe: #8feadb;
     --on-score: #eef2f2; --on-score-strong: #0e1213; --on-score-severe: #0e1213;
     --alert: #f87171; --alert-tint: #3a1714;
+    --inverse-accent: #0b7a6e;
     color-scheme: dark;
   }
 }
@@ -33,6 +43,7 @@
   --score-mild: #12302c; --score-moderate: #1d5c53; --score-strong: #2db3a0; --score-severe: #8feadb;
   --on-score: #eef2f2; --on-score-strong: #0e1213; --on-score-severe: #0e1213;
   --alert: #f87171; --alert-tint: #3a1714;
+  --inverse-accent: #0b7a6e;
   color-scheme: dark;
 }
 
@@ -45,6 +56,17 @@
   --color-score-strong: var(--score-strong); --color-score-severe: var(--score-severe);
   --color-on-score: var(--on-score); --color-on-score-strong: var(--on-score-strong); --color-on-score-severe: var(--on-score-severe);
   --color-alert: var(--alert); --color-alert-tint: var(--alert-tint);
+  --color-inverse-accent: var(--inverse-accent);
+  /* The names shadcn/ui components use, mapped onto the same tokens (no new colours). */
+  --color-background: var(--ground); --color-foreground: var(--ink);
+  --color-card: var(--surface); --color-card-foreground: var(--ink);
+  --color-popover: var(--surface); --color-popover-foreground: var(--ink);
+  --color-primary: var(--brand); --color-primary-foreground: var(--on-brand);
+  --color-secondary: var(--subtle); --color-secondary-foreground: var(--ink);
+  --color-muted: var(--subtle); --color-muted-foreground: var(--ink-muted);
+  --color-accent: var(--brand-tint); --color-accent-foreground: var(--ink);
+  --color-destructive: var(--alert); --color-border: var(--line); --color-input: var(--control); --color-ring: var(--brand);
+  --ease-calm: var(--ease-out);
   /* Plus Jakarta Sans for headings, Inter for text: both bundled with the app (no font service). */
   --font-display: "Plus Jakarta Sans", "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
   --font-body: "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
@@ -87,15 +109,28 @@ body {
   a:hover { text-decoration-thickness: 2px; }
 }
 
-@keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+/* Every tap answers at once: buttons (and links marked data-press) shrink slightly while pressed.
+   Unlayered on purpose, so it applies to every button whatever its utility classes say. */
+button:not(:disabled), a[data-press], [data-press] {
+  transition-property: color, background-color, border-color, opacity, scale;
+  transition-duration: var(--dur-fast); transition-timing-function: var(--ease-out);
+}
+button:not(:disabled):active, a[data-press]:active, [data-press]:active { scale: 0.97; }
+
+/* Overlays slide and fade in over 250ms (bottom sheets: Vaul; its own default is 500ms). */
+[data-vaul-drawer], [data-vaul-overlay] {
+  animation-duration: var(--dur-base) !important; animation-timing-function: var(--ease-out) !important;
+  transition-duration: var(--dur-base) !important; transition-timing-function: var(--ease-out) !important;
+}
 @keyframes menu-in { from { transform: translateY(-6px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.menu-in { animation: menu-in 140ms ease-out; }
+.menu-in { animation: menu-in var(--dur-base) var(--ease-out); }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-/* A saved line rises into place, so each save visibly answers back. */
+.fade-in { animation: fade-in var(--dur-base) var(--ease-out); }
 @keyframes rise-in { from { transform: translateY(6px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.rise-in { animation: rise-in 200ms ease-out; }
-.sheet-in { animation: sheet-in 170ms ease-out; }
-.fade-in { animation: fade-in 160ms ease-out; }
+.rise-in { animation: rise-in var(--dur-base) var(--ease-out); }
+/* Skeletons: a calm shimmer while a screen loads (never a blank screen or a spinner). */
+@keyframes skeleton { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+.skeleton { background: var(--subtle); border-radius: var(--radius-sm); animation: skeleton 1.4s var(--ease-out) infinite; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }

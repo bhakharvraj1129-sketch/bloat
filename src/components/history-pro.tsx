@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Caption, Card, Label } from "./ui";
 import { DayChart } from "./charts";
 import type { DayRow } from "@/app/(app)/history/history";
+import { CountUp } from "./count-up";
 
 export type ProHistoryData = {
   seven_day_average: { available: true; value: number; label: string } | { available: false; days: number; needed: number };
@@ -21,7 +22,7 @@ export function ProHistory({ data, days, dateFormat }: { data: ProHistoryData; d
           <Label>7-day average</Label>
           {avg.available ? <Caption>{avg.label}</Caption> : <Caption>Needs 4 scored days in the last 7. You have {avg.days}.</Caption>}
         </div>
-        <span className="t-score text-[2.5rem] leading-10">{avg.available ? avg.value.toFixed(1) : "–"}</span>
+        <span className="t-score text-[2.5rem] leading-10">{avg.available ? <CountUp value={avg.value} decimals={1} /> : "–"}</span>
       </Card>
       {!data.hide_charts && <DayChart days={[...days].reverse()} dateFormat={dateFormat} context={data.context ?? []} />}
       <nav aria-label="Reports" className="grid grid-cols-2 gap-2">

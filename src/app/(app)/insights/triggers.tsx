@@ -6,6 +6,10 @@ import { CompareBars } from "@/components/charts";
 import { ProScreen, signed } from "@/components/pro";
 import { useLoad } from "@/lib/client/hooks";
 import { formatDate, formatRange } from "@/lib/time";
+import { SmoothList } from "@/components/glide";
+import { m, useReducedMotion } from "motion/react";
+import { CountUp } from "@/components/count-up";
+import { DUR, EASE_OUT } from "@/lib/motion";
 
 type Item = {
   target: { label: string; kind: string; id: string }; state: string; with_days: number; without_days: number; mean_with: number | null; mean_without: number | null;
@@ -21,14 +25,16 @@ type Data = {
 
 /** Before anything can be compared: real progress towards the fewest confirmed days a comparison needs. */
 function OnTheirWay({ confirmed, needed }: { confirmed: number; needed: number }) {
+  const reduce = useReducedMotion();
   const r = 36, c = 2 * Math.PI * r, done = Math.min(confirmed, needed);
   const each = needed / 2;
   return (
     <Card className="flex items-center gap-5">
       <svg width="88" height="88" viewBox="0 0 88 88" role="img" aria-label={`${done} of ${needed} confirmed days`} className="shrink-0">
         <circle cx="44" cy="44" r={r} fill="none" stroke="var(--brand-tint)" strokeWidth="9" />
-        {done > 0 && <circle cx="44" cy="44" r={r} fill="none" stroke="var(--brand)" strokeWidth="9" strokeLinecap="round" strokeDasharray={`${(done / needed) * c} ${c}`} transform="rotate(-90 44 44)" />}
-        <text x="44" y="43" textAnchor="middle" className="font-display" fontWeight="800" fontSize="22" fill="var(--ink)">{done}</text>
+        {done > 0 && <m.circle cx="44" cy="44" r={r} fill="none" stroke="var(--brand)" strokeWidth="9" strokeLinecap="round" transform="rotate(-90 44 44)"
+          initial={reduce ? false : { strokeDasharray: `0 ${c}` }} animate={{ strokeDasharray: `${(done / needed) * c} ${c}` }} transition={{ duration: DUR.slow, ease: EASE_OUT }} />}
+        <text x="44" y="43" textAnchor="middle" className="font-display" fontWeight="800" fontSize="22" fill="var(--ink)"><CountUp value={done} as="tspan" /></text>
         <text x="44" y="59" textAnchor="middle" fontSize="11" fill="var(--ink-muted)">of {needed} days</text>
       </svg>
       <div className="flex min-w-0 flex-col gap-1.5">
@@ -92,13 +98,13 @@ export function Triggers() {
             <>
           <section aria-labelledby="ww" className="flex flex-col gap-2">
             <Label id="ww">Worth watching</Label>
-            {d.worth_watching.length ? <ul className="flex flex-col gap-3">{d.worth_watching.map((i) => <Result key={i.target.id} i={i} line={d.comparison_line} />)}</ul>
+            {d.worth_watching.length ? <SmoothList className="flex flex-col gap-3">{d.worth_watching.map((i) => <Result key={i.target.id} i={i} line={d.comparison_line} />)}</SmoothList>
               : <Card><Caption>Nothing here yet. An item appears when its average differs by 1 point or more and points the same way in both halves of the period.</Caption></Card>}
           </section>
 
           <section aria-labelledby="ncd" className="flex flex-col gap-2">
             <Label id="ncd">No clear difference</Label>
-            {d.no_clear_difference.length ? <ul className="flex flex-col gap-3">{d.no_clear_difference.map((i) => <Result key={i.target.id} i={i} line={d.comparison_line} />)}</ul>
+            {d.no_clear_difference.length ? <SmoothList className="flex flex-col gap-3">{d.no_clear_difference.map((i) => <Result key={i.target.id} i={i} line={d.comparison_line} />)}</SmoothList>
               : <Card><Caption>Nothing compared yet.</Caption></Card>}
           </section>
             </>
