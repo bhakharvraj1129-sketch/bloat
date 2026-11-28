@@ -1,8 +1,25 @@
 # Test results
 
-Last run: 28 Nov 2026 (the animated start page with before-and-after and flip cards, commit `0fc6d11`, published by run 24 as `dpl_9ZxDR1j2tSNyrWqDRtqT1RB6CV9C`; run 23 did not publish). Before that: the motion and design pass, commit `7953a6a`, published by run 22 as `dpl_FCsJjMaBkxJ87uNHu8tKyK8MUvGK`. Before that: 27 Nov 2026 (the owner's answers D33 to D35 and the state list, commit `c91169c`, published by run 21 as `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
+Last run: 28 Nov 2026 (charts, graphs and pattern diagrams, commit `0bfa329`, published by run 25 as `dpl_7aBmbLFDaUjXm6WBcfqWm2XKDKG1`). Before that: the animated start page with before-and-after and flip cards, commit `0fc6d11`, published by run 24 as `dpl_9ZxDR1j2tSNyrWqDRtqT1RB6CV9C` (run 23 did not publish). Before that: the motion and design pass, commit `7953a6a`, published by run 22 as `dpl_FCsJjMaBkxJ87uNHu8tKyK8MUvGK`. Before that: 27 Nov 2026 (the owner's answers D33 to D35 and the state list, commit `c91169c`, published by run 21 as `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
+
+## Charts, graphs and pattern diagrams (28 Nov 2026): run 25, deployment `dpl_7aBmbLFDaUjXm6WBcfqWm2XKDKG1`
+
+Published revision `0bfa3291e224ff64bf45bf16f8f0d61d2ed11306` on `https://bloat-preview.vercel.app` and the branch address (10:27 UTC). Preview variables unchanged. The three main addresses still serve `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (`83fe4da`), read back from Vercel after the run.
+
+| Check | Passed | Failed | Notes |
+|---|---|---|---|
+| GitHub run 25 | Typecheck, lint, rule tests, API tests, browser tests (phone screen), the Vercel build, the account-free live checks before and after publishing | 0 | Clean checkout and empty database. The round's checks and the password form are skipped there, not passed |
+| Tested = deployed | | | Both preview addresses on `dpl_7aBmbLFDaUjXm6WBcfqWm2XKDKG1`; all 235 repository files Vercel lists are byte-identical to `0bfa329`, 16 of the 22 files changed since run 24 among them; Vercel lists 497 of 713 files |
+| Core hosted suite, 16 checks | 16 | 0 | Disposable accounts marked `synthetic_test_run = 2026-11-28-run25` |
+| `tests/hosted/beta-candidate.spec.ts` and `tests/hosted/motion.spec.ts`, 8 checks | 8 | 0 | Includes the password change and the start page's sample phone, try-it sample, slider and step cards |
+| `tests/hosted/reported-fixes.spec.ts`, 1 check | 1 | 0 | With a fresh Pro test account (the used one deleted through the app and made again, same marker) |
+| `tests/hosted/charts.spec.ts` (new), 2 checks | 2 | 0 | On the live build: the How it works diagram (14 sample days, "6.0 − 3.0 = +3.0", "not proof that the habit caused anything"); with the Pro test account, the day at a glance draws today's entries and its table lists the meal; History's daily chart and month calendar show, today labelled "Highest logged 4, not confirmed", and its table says "Not yet confirmed"; ticking Hide charts in You hides the calendar, the daily chart and the day picture while the 7-day average and the entries stay; unticking brings them back |
+| Cleanup: 10 accounts deleted through the app | 10 | 0 | Each answered "deleted"; the same sign-in was refused (401) straight after; the one-off password file destroyed |
+| Read-only check of `bloat-test` after the cleanup | | | 0 accounts by ID or address, 0 with a test-run marker, 0 identities, sessions or refresh tokens, 0 rows in all 48 tables with a user column, 0 stored files; `bloat-tester` unchanged (1 meal, 1 bloating record, 2 readings, 1 report, same sign-in times and password hash); the 5 participant accounts unchanged (the same IDs, sign-in and update times as the read-only snapshot taken before the run); 9 accounts in all, as before |
+
+**Not performed:** real phones and screen readers (browser emulation only).
 
 ## Charts, graphs and pattern diagrams (28 Nov 2026): local results before run 25
 
