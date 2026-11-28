@@ -158,7 +158,7 @@ export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; pa
         <Label id="profile">Profile</Label>
         <Card className="flex flex-col gap-4">
           <p>Country: <strong>{countryCfg(s.profile.country)?.name}</strong></p>
-          {s.profile.country === "IN" && <PinField onPlace={(place) => { if (!profile.saving) patch({ region: place.state }); }} />}
+          {s.profile.country === "IN" && <PinField region={shown("region") ?? null} onPlace={(place) => { if (!profile.saving) patch({ region: place.state }); }} />}
           <RegionSelect country={s.profile.country as Country} value={shown("region") ?? ""} onChange={(v) => { if (!profile.saving) patch({ region: v || null }); }} />
           <div className="flex items-center justify-between gap-3">
             <p>Time zone: <strong>{zoneLabel(s.profile.analysis_time_zone)}</strong></p>

@@ -36,11 +36,12 @@ async function signIn(page: Page) {
 test("hosted: the PIN code lookup works on the deployed build and fills in the state; the PIN code is not saved", async ({ page }) => {
   test.skip(!PASSWORD, "needs the run's synthetic accounts");
   await signIn(page);
-  const found = await api(page, "GET", "/v1/places/pincode/380001");
+  const found = await api(page, "POST", "/v1/places/pincode", { pin: "380001" });
   expect(found.status, JSON.stringify(found.body)).toBe(200);
   expect(found.body).toEqual({ state: "Gujarat", city: "Ahmadabad" });
-  expect((await api(page, "GET", "/v1/places/pincode/999999")).status).toBe(404);
-  expect((await api(page, "GET", "/v1/places/pincode/012345")).status).toBe(422);
+  expect((await api(page, "POST", "/v1/places/pincode", { pin: "999999" })).status).toBe(404);
+  expect((await api(page, "POST", "/v1/places/pincode", { pin: "012345" })).status).toBe(422);
+  expect([404, 405]).toContain((await api(page, "GET", "/v1/places/pincode/380001")).status); // the PIN never travels in the address
 
   await page.goto("/me");
   const pin = page.getByLabel("PIN code (optional)");

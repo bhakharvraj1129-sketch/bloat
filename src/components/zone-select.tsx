@@ -25,11 +25,11 @@ export function ZoneSelect({ country, value, onChange, label, also = [] }: {
 
 /** Pick a state, province or territory by name, with search; optional, so "Not chosen" is always there. */
 export function RegionSelect({ country, value, onChange }: { country: Country; value: string; onChange: (name: string) => void }) {
-  const { label, names } = REGIONS[country];
+  const { label, plural, names } = REGIONS[country];
   // A value typed before this list existed is still shown as it was saved.
   const list = value && !names.includes(value) ? [value, ...names] : names;
   return (
-    <SearchSelect label={`${label} (optional)`} value={value} onChange={onChange} searchLabel={`Search ${label.toLowerCase()}s`}
+    <SearchSelect label={`${label} (optional)`} value={value} onChange={onChange} searchLabel={`Search ${plural}`}
       groups={[{ options: [{ value: "", label: "Not chosen" }, ...list.map((n) => ({ value: n, label: n }))] }]} />
   );
 }

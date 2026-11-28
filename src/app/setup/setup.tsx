@@ -157,7 +157,7 @@ export function Setup() {
             <p className="t-body-strong">Country</p>
             <p>{countryCfg(country)?.name ?? country}</p>
           </div>
-          {country === "IN" && <PinField onPlace={(place) => setRegion(place.state)} />}
+          {country === "IN" && <PinField region={region} onPlace={(place) => setRegion(place.state)} />}
           <RegionSelect country={country as Country} value={region} onChange={setRegion} />
           <Card className="flex flex-col gap-3">
             <ZoneSelect country={country as Country} label="Your time zone" value={zone} also={[deviceZone()]} onChange={(z) => { setZone(z); setZoneConfirmed(false); }} />

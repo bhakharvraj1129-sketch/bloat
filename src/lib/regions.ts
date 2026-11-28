@@ -4,9 +4,10 @@
 
 export type Country = "US" | "CA" | "IN";
 
-export const REGIONS: Record<Country, { label: string; names: string[] }> = {
+export const REGIONS: Record<Country, { label: string; plural: string; names: string[] }> = {
   US: {
     label: "State",
+    plural: "states",
     names: [
       "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "District of Columbia",
       "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine",
@@ -19,6 +20,7 @@ export const REGIONS: Record<Country, { label: string; names: string[] }> = {
   },
   CA: {
     label: "Province or territory",
+    plural: "provinces and territories",
     names: [
       "Alberta", "British Columbia", "Manitoba", "New Brunswick", "Newfoundland and Labrador", "Northwest Territories",
       "Nova Scotia", "Nunavut", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan", "Yukon",
@@ -26,6 +28,7 @@ export const REGIONS: Record<Country, { label: string; names: string[] }> = {
   },
   IN: {
     label: "State or union territory",
+    plural: "states and union territories",
     names: [
       "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chandigarh", "Chhattisgarh",
       "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir",
