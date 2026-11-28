@@ -41,7 +41,7 @@ export function History() {
   return (
     <Screen title="History" eyebrow="Every entry, in context">
       {data.doctor_line && <DoctorLineBox line={data.doctor_line} onChanged={reload} />}
-      {data.pro && <ProHistory data={data.pro} days={data.days} dateFormat={data.date_format} />}
+      {data.pro && <ProHistory data={data.pro} days={data.days} dateFormat={data.date_format} today={data.today} />}
       <section aria-labelledby="days" className="flex flex-col gap-2">
         <Label id="days">Your days</Label>
         {!anything ? (

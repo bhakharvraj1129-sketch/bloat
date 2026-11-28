@@ -2,7 +2,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Caption, Card, Label, LinkButton } from "@/components/ui";
-import { HourChart, TrendLine } from "@/components/charts";
+import { Dumbbell, HourChart, SegmentedBar, TrendLine, ValueBars } from "@/components/charts";
+import { ChartGate } from "@/components/chart-kit";
 import { DoctorLineBox, type DoctorLineData } from "@/components/doctorline";
 import { ProScreen, signed } from "@/components/pro";
 import { useLoad } from "@/lib/client/hooks";
@@ -58,10 +59,22 @@ export function Journey() {
                   <Fig label="Typical strength" value={d.since.typical_strength === null ? "–" : String(d.since.typical_strength)} note={`${d.since.strength_readings} readings`} />
                   <Fig label="Typical episode" value={mins(d.since.typical_episode_minutes)} note={`${d.since.episodes_with_length} with a known end`} />
                 </div>
-                <div>
-                  <p className="t-caption">Weekly average Bloat Score</p>
-                  <TrendLine points={d.since.trend.map((w) => ({ label: formatDate(w.week_start, d.date_format, false), value: w.value }))} />
-                </div>
+                <ChartGate>
+                  <div className="flex flex-col gap-1">
+                    <p className="t-caption">Weekly average Bloat Score</p>
+                    <TrendLine points={d.since.trend.map((w) => ({ label: formatDate(w.week_start, d.date_format, false), value: w.value, days: w.days }))} />
+                  </div>
+                  {d.monthly.coverage.days > 0 && (
+                    <div className="flex flex-col gap-1.5">
+                      <p className="t-caption">Your finished days</p>
+                      <SegmentedBar label="Your finished days" parts={[
+                        { label: "Confirmed", value: d.monthly.coverage.confirmed, color: "var(--brand)", ink: "var(--on-brand)" },
+                        { label: "Late review", value: d.monthly.coverage.late, color: "var(--score-moderate)", ink: "var(--on-score)" },
+                        { label: "No score", value: Math.max(0, d.monthly.coverage.days - d.monthly.coverage.confirmed - d.monthly.coverage.late), color: "var(--line)", ink: "var(--ink)" },
+                      ]} />
+                    </div>
+                  )}
+                </ChartGate>
               </Card>
             </section>
           ),
@@ -76,6 +89,11 @@ export function Journey() {
                     <Fig label="Typical episode" value={mins(d.your_usual.recent.typical_episode_minutes)} note="median length" />
                     <Fig label="Got in the way" value={d.your_usual.weekly_impact ? IMPACT[d.your_usual.weekly_impact] ?? "–" : "–"} note="last weekly answer" />
                   </div>
+                  {d.your_usual.first_30 && d.your_usual.first_30.typical_score !== null && d.your_usual.recent.typical_score !== null && (
+                    <ChartGate>
+                      <Dumbbell fromLabel="First 30 days" toLabel="Recent" rows={[{ label: "Typical daily score", from: d.your_usual.first_30.typical_score, to: d.your_usual.recent.typical_score, note: `${d.your_usual.first_30.confirmed_days} and ${d.your_usual.recent.confirmed_days} confirmed days` }]} />
+                    </ChartGate>
+                  )}
                   {d.your_usual.first_30 && (
                     <div className="rounded-sm border border-line p-3">
                       <p className="t-caption">Your first 30 days, side by side</p>
@@ -94,7 +112,12 @@ export function Journey() {
                 <p className="t-body-strong">Patterns worth watching</p>
                 {d.records.worth_watching.length ? (
                   <ul className="flex flex-col gap-2">
-                    {d.records.worth_watching.map((p) => <li key={p.label}>{p.label}: average {p.mean_with?.toFixed(1)} on {p.with_days} days with, {p.mean_without?.toFixed(1)} on {p.without_days} days without. <span className="t-caption">First half {signed(p.first_half)} · second half {signed(p.second_half)}</span></li>)}
+                    {d.records.worth_watching.map((p) => (
+                      <li key={p.label} className="flex flex-col gap-2">
+                        <span>{p.label}: average {p.mean_with?.toFixed(1)} on {p.with_days} days with, {p.mean_without?.toFixed(1)} on {p.without_days} days without. <span className="t-caption">First half {signed(p.first_half)} · second half {signed(p.second_half)}</span></span>
+                        {p.mean_with !== null && p.mean_without !== null && <ChartGate><ValueBars label={`Average Bloat Score with and without ${p.label}`} rows={[{ label: "Days with", value: p.mean_with, days: p.with_days }, { label: "Days without", value: p.mean_without, days: p.without_days }]} /></ChartGate>}
+                      </li>
+                    ))}
                   </ul>
                 ) : <Caption>None yet. {d.records.header}</Caption>}
                 <Caption>{d.comparison_line}</Caption>
@@ -106,6 +129,7 @@ export function Journey() {
                   {d.records.cycle.state === "ready" && (
                     <>
                       <p>5 days before a period: {d.records.cycle.before!.mean.toFixed(1)} ({d.records.cycle.before!.days} days) · period days: {d.records.cycle.period!.mean.toFixed(1)} ({d.records.cycle.period!.days} days) · other days: {d.records.cycle.other!.mean.toFixed(1)} ({d.records.cycle.other!.days} days)</p>
+                      <ChartGate><ValueBars label="Average Bloat Score through the cycle" rows={[{ label: "5 days before", value: d.records.cycle.before!.mean, days: d.records.cycle.before!.days }, { label: "Period days", value: d.records.cycle.period!.mean, days: d.records.cycle.period!.days }, { label: "Other days", value: d.records.cycle.other!.mean, days: d.records.cycle.other!.days }]} /></ChartGate>
                       <Caption>Before a period compared with other days: first half {signed(d.records.cycle.before_vs_other!.first_half)} · second half {signed(d.records.cycle.before_vs_other!.second_half)}. Based on {d.records.cycle.cycles} complete cycles.</Caption>
                       <Caption>{d.comparison_line}</Caption>
                     </>
@@ -117,7 +141,8 @@ export function Journey() {
               {d.records.medicines.map((m) => (
                 <Card key={`${m.medicine}-${m.event}-${m.date}`} className="flex flex-col gap-2">
                   <p className="t-body-strong">{m.medicine}: {m.event.replace(/_/g, " ")} on {formatDate(m.date, d.date_format, false)}</p>
-                  {m.state === "ready" ? <p>14 days before: {m.before_mean?.toFixed(1)} ({m.before_days} days) · 14 days after: {m.after_mean?.toFixed(1)} ({m.after_days} days)</p>
+                  {m.state === "ready" ? <><p>14 days before: {m.before_mean?.toFixed(1)} ({m.before_days} days) · 14 days after: {m.after_mean?.toFixed(1)} ({m.after_days} days)</p>
+                    <ChartGate><Dumbbell fromLabel="14 days before" toLabel="14 days after" rows={[{ label: "Average Bloat Score", from: m.before_mean, to: m.after_mean, note: `${m.before_days} and ${m.after_days} confirmed days` }]} /></ChartGate></>
                     : <Caption>Not enough days yet: {m.needed_before ? `${m.needed_before} more before` : ""}{m.needed_before && m.needed_after ? " and " : ""}{m.needed_after ? `${m.needed_after} more after` : ""} needed (7 confirmed days on each side).</Caption>}
                   <Caption>{d.medicine_line}</Caption>
                 </Card>
@@ -154,7 +179,7 @@ export function Journey() {
             <section key="monthly" className="flex flex-col gap-2" aria-labelledby="j-month">
               <Label id="j-month">When it starts</Label>
               <Card className="flex flex-col gap-2">
-                {d.monthly.hours.available ? <><HourChart hours={d.monthly.hours.hours} /><Caption>Start times of {d.monthly.hours.episodes} finished bloating records.</Caption></>
+                {d.monthly.hours.available ? <><ChartGate><HourChart hours={d.monthly.hours.hours} /></ChartGate><Caption>Start times of {d.monthly.hours.episodes} finished bloating records.</Caption></>
                   : <Caption>A time-of-day chart appears after 10 finished bloating records. You have {d.monthly.hours.episodes}.</Caption>}
               </Card>
             </section>

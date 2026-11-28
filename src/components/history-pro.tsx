@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Caption, Card, Label } from "./ui";
-import { DayChart } from "./charts";
+import { DayChart, MonthCalendar } from "./charts";
 import type { DayRow } from "@/app/(app)/history/history";
 import { CountUp } from "./count-up";
 
@@ -12,8 +12,8 @@ export type ProHistoryData = {
   context?: Array<{ from: string; to: string; kind: string }>;
 };
 
-// Pro additions at the top of History: the 7-day average, the daily chart and the report links.
-export function ProHistory({ data, days, dateFormat }: { data: ProHistoryData; days: DayRow[]; dateFormat: "MM/DD" | "DD/MM" }) {
+// Pro additions at the top of History: the 7-day average, the daily chart, the month calendar and the report links.
+export function ProHistory({ data, days, dateFormat, today }: { data: ProHistoryData; days: DayRow[]; dateFormat: "MM/DD" | "DD/MM"; today: string }) {
   const avg = data.seven_day_average;
   return (
     <>
@@ -25,6 +25,7 @@ export function ProHistory({ data, days, dateFormat }: { data: ProHistoryData; d
         <span className="t-score text-[2.5rem] leading-10">{avg.available ? <CountUp value={avg.value} decimals={1} /> : "–"}</span>
       </Card>
       {!data.hide_charts && <DayChart days={[...days].reverse()} dateFormat={dateFormat} context={data.context ?? []} />}
+      {!data.hide_charts && <MonthCalendar days={days} today={today} dateFormat={dateFormat} context={data.context ?? []} />}
       <nav aria-label="Reports" className="grid grid-cols-2 gap-2">
         {[["/insights", "Possible triggers"], ["/journey", "Your journey"], ["/report", "Weekly report"], ...(data.experiments_offered === false ? [] : [["/experiments", "Experiments"]])].map(([href, label]) => (
           <Link key={href} href={href!} className="flex min-h-12 items-center justify-center rounded-sm border border-line bg-surface px-3 text-center font-semibold text-ink no-underline">{label}</Link>

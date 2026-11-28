@@ -6,6 +6,8 @@ import { api, ApiFailure } from "@/lib/client/api";
 import { useRouter } from "next/navigation";
 import { formatDate } from "@/lib/time";
 import { signed } from "@/components/pro";
+import { MeterList, SegmentedBar, ValueBars } from "@/components/charts";
+import { ChartGate } from "@/components/chart-kit";
 
 type Snap = {
   from: string; to: string; days: Array<{ date: string; status: string; score: number | null; highest_logged: number | null }>;
@@ -45,6 +47,13 @@ export function Report() {
           <div><Label>7-day average</Label>{snap.seven_day_average.available ? <Caption>{snap.seven_day_average.label}</Caption> : <Caption>Needs 4 scored days. This week has {snap.seven_day_average.days}.</Caption>}</div>
           <span className="t-score text-[2.5rem] leading-10">{snap.seven_day_average.available ? snap.seven_day_average.value.toFixed(1) : "–"}</span>
         </div>
+        <ChartGate>
+          <SegmentedBar label="This week's days" parts={[
+            { label: "Confirmed", value: snap.counts.confirmed, color: "var(--brand)", ink: "var(--on-brand)" },
+            { label: "Late review", value: snap.counts.late, color: "var(--score-moderate)", ink: "var(--on-score)" },
+            { label: "No score", value: snap.counts.missing, color: "var(--line)", ink: "var(--ink)" },
+          ]} />
+        </ChartGate>
         <ul className="grid grid-cols-7 gap-1" aria-label="Daily scores this week">
           {snap.days.map((d) => (
             <li key={d.date} className="flex flex-col items-center gap-1">
@@ -60,7 +69,7 @@ export function Report() {
       </Card>
       <Card className="flex flex-col gap-2">
         <Label>Possible triggers</Label>
-        {snap.worth_watching.length ? snap.worth_watching.map((p) => <p key={p.label}>{p.label}: {p.mean_with?.toFixed(1)} on {p.with_days} days with, {p.mean_without?.toFixed(1)} on {p.without_days} days without. <span className="t-caption">First half {signed(p.first_half)} · second half {signed(p.second_half)}</span></p>) : <Caption>Nothing is worth watching yet.</Caption>}
+        {snap.worth_watching.length ? snap.worth_watching.map((p) => <div key={p.label} className="flex flex-col gap-2"><p>{p.label}: {p.mean_with?.toFixed(1)} on {p.with_days} days with, {p.mean_without?.toFixed(1)} on {p.without_days} days without. <span className="t-caption">First half {signed(p.first_half)} · second half {signed(p.second_half)}</span></p>{p.mean_with !== null && p.mean_without !== null && <ChartGate><ValueBars label={`Average Bloat Score with and without ${p.label}`} rows={[{ label: "Days with", value: p.mean_with, days: p.with_days }, { label: "Days without", value: p.mean_without, days: p.without_days }]} /></ChartGate>}</div>) : <Caption>Nothing is worth watching yet.</Caption>}
         {snap.triggers_changed.length > 0 && <Caption>Changed since the last report: {snap.triggers_changed.map((c) => `${c.label} is now under "${SECTION[c.section]}"`).join("; ")}.</Caption>}
         <Caption>{snap.comparison_line}</Caption>
       </Card>
@@ -69,6 +78,7 @@ export function Report() {
         <Label>Bowel and habits</Label>
         <p className="mt-1">{snap.bowel.entries} bowel movements logged ({snap.bowel.strained} with straining, {snap.bowel.incomplete} felt incomplete); {snap.bowel.no_days} days reported with none.</p>
         {snap.habits.length > 0 && <p>{snap.habits.map((h) => `${h.label}: ${h.days} ${h.days === 1 ? "day" : "days"}`).join(" · ")}</p>}
+        {snap.habits.length > 0 && <div className="mt-3"><ChartGate><MeterList label="Habits this week" max={snap.days.length || 7} unit={(v) => `${v} of ${snap.days.length || 7} days`} rows={snap.habits.map((h) => ({ label: h.label, value: h.days }))} /></ChartGate></div>}
       </Card>
       {snap.next_best_log && <Card><Label>Next best log</Label><p className="mt-1">{snap.next_best_log}</p></Card>}
       <p className="t-caption text-ink">{snap.footer}</p>

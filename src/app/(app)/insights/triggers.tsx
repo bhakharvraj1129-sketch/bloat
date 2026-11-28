@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { Caption, Card, Label } from "@/components/ui";
-import { CompareBars } from "@/components/charts";
+import { HalvesCheck, ValueBars } from "@/components/charts";
+import { ChartGate } from "@/components/chart-kit";
 import { ProScreen, signed } from "@/components/pro";
 import { useLoad } from "@/lib/client/hooks";
 import { formatDate, formatRange } from "@/lib/time";
@@ -62,8 +63,11 @@ function Result({ i, line }: { i: Item; line: string }) {
         <p className="t-title">{i.target.label}</p>
         {i.your_suspicion && <span className="t-caption">Your suspicion</span>}
       </div>
-      <CompareBars a={{ label: "Days with", value: i.mean_with!, days: i.with_days }} b={{ label: "Days without", value: i.mean_without!, days: i.without_days }} />
+      <ChartGate>
+        <ValueBars label={`Average Bloat Score with and without ${i.target.label}`} rows={[{ label: "Days with", value: i.mean_with!, days: i.with_days }, { label: "Days without", value: i.mean_without!, days: i.without_days }]} />
+      </ChartGate>
       <p>Average {i.mean_with!.toFixed(1)} on {i.with_days} days with, {i.mean_without!.toFixed(1)} on {i.without_days} days without. Difference {signed(i.difference)}.</p>
+      <ChartGate><HalvesCheck first={i.first_half} second={i.second_half} /></ChartGate>
       <Caption>First half {signed(i.first_half)} · second half {signed(i.second_half)}{i.mostly_days ? ` · includes ${i.mostly_days} "mostly" days` : ""}{i.recalled_days ? ` · includes ${i.recalled_days} days with ingredients added afterwards` : ""}</Caption>
       {i.confounding_note && <Caption>{i.confounding_note}</Caption>}
       <Caption>{line}</Caption>

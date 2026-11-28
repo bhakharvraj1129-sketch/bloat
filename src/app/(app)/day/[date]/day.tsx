@@ -8,6 +8,8 @@ import { deviceZone } from "@/lib/client/api";
 import { label as optionLabel, question } from "@/lib/registry";
 import { formatClock, formatDate, formatDuration, localParts } from "@/lib/time";
 import { zoneLabel } from "@/lib/regions";
+import { ChartGate } from "@/components/chart-kit";
+import { DayTimeline } from "@/components/day-timeline";
 
 type Ep = {
   id: string; started_at: string; ended_at: string | null; state: string; start_precision: string; end_precision: string | null; revision: number;
@@ -74,6 +76,16 @@ export function DayDetail({ date }: { date: string }) {
       )}
 
       {empty && <Empty title="Nothing logged this day">Entries you add on Today appear here.</Empty>}
+
+      {/* The day at a glance (Pro: charts are a Pro feature; hidden with Hide charts). */}
+      {data.plan === "pro" && !empty && (data.episodes.length + data.meals.length + data.exercise.length + data.bowel.length > 0) && (
+        <ChartGate>
+          <section className="flex flex-col gap-2" aria-labelledby="glance">
+            <Label id="glance" heading>The day at a glance</Label>
+            <Card><DayTimeline date={date} today={data.today} zone={data.zone} units={data.units} episodes={data.episodes} meals={data.meals} exercise={data.exercise} bowel={data.bowel} /></Card>
+          </section>
+        </ChartGate>
+      )}
 
       {data.episodes.length > 0 && (
         <section className="flex flex-col gap-2" aria-labelledby="eps">

@@ -1,6 +1,7 @@
 import { Card, Caption } from "@/components/ui";
 import { PublicPage } from "@/components/public";
 import { COMPARISON_LINE, TRIGGERS_FOOTER } from "@/lib/wording";
+import { MethodDiagram } from "@/components/method-diagram";
 
 export const metadata = { title: "How Bloat Buddy works" };
 
@@ -37,6 +38,7 @@ export default function Method() {
         </ul>
         <Caption className="mt-2">{COMPARISON_LINE} {TRIGGERS_FOOTER}</Caption>
       </Card>
+      <MethodDiagram />
       <Card as="section">
         <h2 className="t-title">Ingredient check (Pro)</h2>
         <p className="mt-2">An AI service lists ingredients that are often linked to gas or bloating. It only ever receives the dish name or the photo. It can be wrong, so you mark every item yourself, and anything left untouched is saved as &quot;Not sure&quot;.</p>
