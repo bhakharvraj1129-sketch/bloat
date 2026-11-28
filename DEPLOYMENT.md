@@ -32,13 +32,31 @@ The two preview addresses serve `dpl_7aBmbLFDaUjXm6WBcfqWm2XKDKG1` (run 25, comm
 - Both addresses move **only** through the Preview workflow, after its checks pass. A push does not publish by itself.
 - `bloat-olive.vercel.app` (with `bloat-typeshi2.vercel.app` and `bloat-git-main-typeshi2.vercel.app`) is the project's production address. Since 24 Nov 2026 it points at a test deployment, by the owner's decision; since runs 13, 14 and 15 that is an **older** build `83fe4da` (`dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`), not the one the preview serves. There is still no production build. The Preview workflow does not move these addresses: they stay where they are until someone moves them (Vercel, project `bloat`, Deployments, the new deployment, Assign domain) and records it here. Moving them is the owner's call.
 
+## Branches and addresses: reconciliation plan (28 Nov 2026; recommended, not done)
+
+Read on 28 Nov 2026 with full Git history (read only; nothing was moved or merged):
+
+| Thing | Where it is | Gap |
+|---|---|---|
+| Publishing branch `claude/bloat-software-build-uxzoru` | The tested app (run 26 onwards) | none |
+| Working branch `claude/bloat-continuation-9mjd46` | Same commits as the publishing branch | none |
+| `main` | `244c80b` (24 Nov, a notes-only commit after `3646f92`) | 52 commits behind the working head; it has **no** commit of its own that the branch lacks, so it can be fast-forwarded with no merge |
+| Main addresses `bloat-olive`, `bloat-typeshi2`, `bloat-git-main-typeshi2` | `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn`, commit `83fe4da` (set by hand on 24 Nov) | 55 commits behind: without K1, P2, the 26 and 27 Nov review fixes, the redesign, and the four fixes of choice 37. Same Preview settings and the same `bloat-test` database as the preview |
+| Branch `claude/unzip-push-main-04req7` | `8d2d4d7`, an old planning commit | fully contained in `main`; nothing would be lost by deleting it |
+
+Recommended, in this order, each only on the owner's yes:
+
+1. **Main addresses first** (they are public now and show a build with known, fixed defects). Point all three at the same deployment the preview serves after its live checks pass: Vercel, project `bloat`, Deployments, that deployment, Assign domain, once per address (or `vercel alias set <deployment> <address>`). Read the three aliases back and record them here. Alternative if they are not needed: remove the three aliases so only the preview address remains. Either way the Preview workflow keeps not moving them.
+2. **Then `main`:** fast-forward it to the verified publishing-branch commit (`git push origin <commit>:main`, fast-forward only, no force). A push to `main` publishes nothing (Git builds are off; the workflow runs only for the publishing branch). After that, decide whether future work goes to `main` through pull requests or stays on the publishing branch.
+3. **Tidy:** delete `claude/unzip-push-main-04req7`; keep the working branch until the round ends.
+
 ## Publishing the preview (the only way)
 
 A build that compiles is not a tested release. `vercel.json` switches off Vercel's automatic Git builds. The workflow `.github/workflows/preview.yml` runs on every push to `claude/bloat-software-build-uxzoru` (the checks alone on pull requests), and can be started by hand (Actions, "Preview", "Run workflow" on that branch):
 
 | Step | Blocks publishing? | What runs |
 |---|---|---|
-| 1. Checks | Yes | Typecheck, lint, rule tests; then the local Supabase stack in Docker, `scripts/ci-env.sh` (local-only test settings), the app build, the API tests and the browser tests on a phone screen. |
+| 1. Checks | Yes | Typecheck, lint, rule tests; then the local Supabase stack in Docker, `scripts/ci-env.sh` (local-only test settings), the app build, the API tests and the browser tests on a phone screen (including the interface review, `tests/e2e/interface-review.spec.ts`). Since 28 Nov (choice 37): a second app server from the same build with the preview's beta settings (AI off; Learn, daily cards and experiments off; password sign-in) runs the round's API checks and the browser checks that need those settings or password sign-in; any skipped, failed or empty beta suite blocks publishing. Passed, failed and skipped counts per suite are written to the run summary. |
 | 2. Vercel build | Yes | Reads back the deployment controls (Git builds off, Ignored Build Step) and stops if they differ; then Vercel builds the commit's files with the Preview variables. Nothing public points at it yet. |
 | 3. Hosted checks on the new build | Yes | The six account-free hosted checks (`pnpm test:hosted --grep @smoke`): signed-out return path, Back on public pages, empty-form messages, opens with no Vercel login, signed-out data refused, nobody can create an account. |
 | 4. Publish | - | Both addresses are pointed at the tested build; the workflow then confirms through Vercel which deployment `bloat-preview.vercel.app` serves and fails if it is not that one. The run summary records commit and deployment. |
@@ -49,7 +67,7 @@ A commit whose message contains `[skip ci]` skips the whole workflow, publishing
 
 **After changing a Vercel variable** (for example the sign-in method), the running build does not change. Start the workflow by hand on the branch (Actions, "Preview", "Run workflow"): it builds again with the new variables, runs the checks and publishes only if they pass. Do not use "Redeploy" in the Vercel dashboard: it rebuilds outside the workflow, so none of the checks run (what it would do to the addresses has not been tested).
 
-Not in the workflow: the control crawl, the link-by-link navigation run and the five-width check in `tests/ledger/` (long evidence runs, made by hand for the verification report), and checks on real phones.
+Not in the workflow: the older long evidence runs in `tests/ledger/` (made by hand for the verification report) and checks on real phones. Since 28 Nov a shorter control crawl, link and Back run, width check (320 to 1280 px), 200% zoom on the chart screens and password-form check run in every workflow run (`tests/e2e/interface-review.spec.ts`).
 
 **Every way the dedicated address could change, and what stops it** (checked 22 Nov; re-confirmed by every run since):
 
