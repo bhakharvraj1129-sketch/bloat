@@ -20,7 +20,7 @@ import { activities, ACTIVITY_GROUP_LABELS, country as countryCfg, foodTags, lab
 import type { State } from "@/components/today/types";
 import { SmoothList } from "@/components/glide";
 import { PinField } from "@/components/pin-field";
-import { setChartsHidden } from "@/components/chart-kit";
+import { resetChartsHidden, setChartsHidden } from "@/components/chart-kit";
 import { FieldMessage } from "@/components/field-message";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -51,6 +51,7 @@ function Row({ href, title, text, locked }: { href: string; title: string; text?
 export async function signOutEverywhere() {
   // Sign-out clears private caches so nothing is left on a shared device (plan B04).
   await browserSupabase().auth.signOut().catch(() => {});
+  resetChartsHidden(); // the next account starts with its own Hide charts choice
   clearPre();
   try { sessionStorage.clear(); } catch { /* storage off */ }
   if ("caches" in window) { const keys = await caches.keys(); await Promise.all(keys.map((k) => caches.delete(k))); }

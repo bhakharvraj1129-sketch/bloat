@@ -2,6 +2,7 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { Table2 } from "lucide-react";
 import { api } from "@/lib/client/api";
+import { browserSupabase } from "@/lib/client/supabase";
 
 // The chart kit (owner, 28 Nov 2026: "master my app in charts and graphs"). Shared by every chart so
 // they read as one system, following the data-visualisation method in DECISIONS.md choice 36:
@@ -24,34 +25,96 @@ export const scoreOutline = (n: number | null) => (n === null || n <= 3 ? "var(-
 export const AXIS_TICK = { fontSize: 11, fill: "var(--ink-muted)" } as const;
 
 // ---------- "Hide charts" (You, Settings) ----------
-let hidden: boolean | null = null;
-const listeners = new Set<() => void>();
-let asked = false;
+// The preference is kept in the page between screens, for ONE account (review of 28 Nov 2026,
+// finding 2). It is tied to the signed-in user, checked against the current session every time a
+// chart asks for it, and reset whenever the account changes (sign out, sign in, another tab). An
+// answer asked for before such a change is ignored. While it is unknown (loading, failed, signed out)
+// charts stay hidden; a failed load is tried again by itself and on the next screen.
 
-/** Called by You when the setting changes, so open screens follow at once. */
-export function setChartsHidden(value: boolean) {
-  hidden = value;
-  listeners.forEach((l) => l());
+type Pref = { user: string | null; hidden: boolean | null };
+let pref: Pref = { user: null, hidden: null };
+let epoch = 0; // bumped by every reset; answers from an older epoch are dropped
+let loading: Promise<void> | null = null;
+let retry: ReturnType<typeof setTimeout> | null = null;
+let retryDelay = 1500;
+let watching = false;
+const listeners = new Set<() => void>();
+const emit = () => listeners.forEach((l) => l());
+
+async function sessionUser(): Promise<string | null> {
+  try { return (await browserSupabase().auth.getSession()).data.session?.user.id ?? null; } catch { return null; }
 }
 
-/** True when the person chose Hide charts; null until known (nothing is drawn meanwhile). */
-export function useChartsHidden(): boolean | null {
-  const [value, setValue] = useState<boolean | null>(hidden);
-  useEffect(() => {
-    const l = () => setValue(hidden);
-    listeners.add(l);
-    if (hidden === null && !asked) {
-      asked = true;
-      // If the setting can't be read, charts stay hidden: the person may have asked for that.
-      api<{ profile?: { hide_charts?: boolean } }>("GET", "/v1/me/state")
-        .then((r) => setChartsHidden(!!r.profile?.hide_charts))
-        .catch(() => { asked = false; setChartsHidden(true); });
-    } else if (hidden !== null) {
-      queueMicrotask(l);
+/** Forget the preference (the account changed or was signed out). Charts hide until it is known again. */
+export function resetChartsHidden() {
+  epoch++;
+  pref = { user: null, hidden: null };
+  loading = null;
+  if (retry) clearTimeout(retry);
+  retry = null;
+  retryDelay = 1500;
+  emit();
+}
+
+/** Called by You when the setting changes (and to undo it if the save fails), for the current account. */
+export function setChartsHidden(value: boolean) {
+  pref = { ...pref, hidden: value };
+  emit();
+}
+
+function watchAuth() {
+  if (watching) return;
+  watching = true;
+  try {
+    browserSupabase().auth.onAuthStateChange((_event, session) => {
+      const id = session?.user.id ?? null;
+      if (id !== pref.user && (pref.user !== null || pref.hidden !== null)) resetChartsHidden();
+    });
+  } catch { /* no auth client: the per-request session check below still applies */ }
+}
+
+/** Make sure the preference belongs to the signed-in account, loading it if needed. */
+function ensure(): Promise<void> {
+  if (loading) return loading;
+  const mine = epoch;
+  const run = (async () => {
+    const user = await sessionUser();
+    if (mine !== epoch) return;
+    if (user !== pref.user) { pref = { user, hidden: null }; emit(); }
+    if (user === null || pref.hidden !== null) return;
+    try {
+      const r = await api<{ profile?: { hide_charts?: boolean } }>("GET", "/v1/me/state");
+      // Drop the answer if the account changed while it was on its way.
+      if (mine !== epoch || (await sessionUser()) !== user) return;
+      pref = { user, hidden: !!r.profile?.hide_charts };
+      retryDelay = 1500;
+      emit();
+    } catch {
+      if (mine !== epoch) return;
+      if (retry) clearTimeout(retry);
+      retry = setTimeout(() => { retry = null; void ensure(); }, retryDelay);
+      retryDelay = Math.min(retryDelay * 2, 30_000);
     }
-    return () => { listeners.delete(l); };
+  })();
+  loading = run;
+  void run.finally(() => { if (loading === run) loading = null; });
+  return run;
+}
+
+/** True when the person chose Hide charts; null until known for the signed-in account (nothing is drawn meanwhile). */
+export function useChartsHidden(): boolean | null {
+  const [checked, setChecked] = useState(false);
+  const [value, setValue] = useState<boolean | null>(null);
+  useEffect(() => {
+    let live = true;
+    const l = () => { if (live) setValue(pref.hidden); };
+    listeners.add(l);
+    watchAuth();
+    // Every chart checks the account first, so another account's choice is never shown.
+    void ensure().then(() => { if (live) { setChecked(true); setValue(pref.hidden); } });
+    return () => { live = false; listeners.delete(l); };
   }, []);
-  return value;
+  return checked ? value : null;
 }
 
 /** Draws its chart only when charts are not hidden. The numbers beside a chart stay either way. */
