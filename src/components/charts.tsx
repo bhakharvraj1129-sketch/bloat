@@ -167,7 +167,7 @@ export function MonthCalendar({ days, today, dateFormat, context }: { days: DayR
             : { background: "var(--surface)", borderColor: scoreFill(v) === "var(--score-mild)" ? "var(--control)" : scoreFill(v), borderStyle: d.status === "LATE" ? "solid" as const : "dashed" as const, color: "var(--ink)" };
           return (
             <li key={date}>
-              <Link href={`/day/${date}`} data-press title={`${formatDate(date, dateFormat)}: ${dayText(d)}`} aria-label={`${formatDate(date, dateFormat)}: ${dayText(d)}${d.status !== "CONFIRMED" && !unknown ? `, ${STATUS[d.status].toLowerCase()}` : ""}${inContext(date) ? ", context logged" : ""}`}
+              <Link href={`/day/${date}`} data-press title={`${formatDate(date, dateFormat)}: ${dayText(d)}`} aria-label={`${formatDate(date, dateFormat)}: ${dayText(d)}${d.status !== "CONFIRMED" && d.status !== "PROVISIONAL" && !unknown ? `, ${STATUS[d.status].toLowerCase()}` : ""}${inContext(date) ? ", context logged" : ""}`}
                 className={cx("relative flex aspect-square flex-col items-center justify-center rounded-sm border-2 no-underline transition-[outline-color] hover:outline-2 hover:outline-offset-1 hover:outline-ink", date === today && "outline-2 outline-offset-1 outline-brand")}
                 style={style}>
                 <span className="absolute left-1 top-0.5 text-[0.625rem] leading-none opacity-80">{n}</span>

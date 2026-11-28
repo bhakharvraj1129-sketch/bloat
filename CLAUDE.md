@@ -43,6 +43,11 @@ Motion rules (owner's spec, 27 Nov 2026):
 - "Reduce motion" turns every animation off (a global CSS rule plus `useReducedMotion()`/`reducedMotion()` in code).
 - Form problems appear under the field (`FieldMessage`), in ink with an icon: the alert red stays for warning signs and destructive actions. The PIN code only fills in the state; it is never saved.
 
+Chart rules (owner's request of 28 Nov 2026, DECISIONS.md choice 36):
+- Build every chart from `src/components/chart-kit.tsx` (score colours, `TipCard` details, `TableView`, `ScoreLegend`, `Key`, `ChartGate`). Charts draw only figures the server already works out; no new number, judgement or "high" label.
+- Bloat Score is always on a fixed 0 to 10 scale in the score ramp, with its number printed; light steps keep their control-colour outline. Unknown is a "?" or a gap, never 0. A single measure uses the brand colour; text stays in text colours.
+- Every chart has a table twin and its numbers in words, so nothing depends on colour or hovering. Charts are Pro and sit inside `ChartGate`, so "Hide charts" hides them all; the numbers stay.
+
 - **Animation:** Motion (`motion`) for UI animation, GSAP (`gsap`) for scroll effects, AutoAnimate (`@formkit/auto-animate`) for lists, Lottie (`lottie-react`) for animated icons and loaders. Respect the phone's "reduce motion" setting.
 - **UI:** shadcn/ui + Lucide (`lucide-react`) for components and icons; Sonner (`sonner`) for toasts; Vaul (`vaul`) for bottom sheets.
 - **Charts:** Recharts (`recharts`) for animated charts.

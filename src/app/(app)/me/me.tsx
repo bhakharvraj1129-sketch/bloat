@@ -229,7 +229,7 @@ export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; pa
           </Card>
         )}
         <label className="flex min-h-11 items-center gap-3 px-1">
-          <input type="checkbox" className="h-6 w-6 accent-(--brand)" checked={shown("hide_charts")} disabled={profile.saving} onChange={(e) => { patch({ hide_charts: e.target.checked }); setChartsHidden(e.target.checked); }} />
+          <input type="checkbox" className="h-6 w-6 accent-(--brand)" checked={shown("hide_charts")} disabled={profile.saving} onChange={(e) => { const v = e.target.checked; setChartsHidden(v); void patch({ hide_charts: v }).then((ok) => { if (ok === null) setChartsHidden(!v); }); }} />
           <span>Hide charts</span>
         </label>
         {switchStatus(["hide_charts"])}
