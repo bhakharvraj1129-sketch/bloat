@@ -93,3 +93,28 @@ test("hosted: Pro charts render (day timeline, month calendar, daily chart, tabl
   await page.goto("/history");
   await expect(page.getByRole("list", { name: /^Days in / })).toBeVisible({ timeout: 30000 });
 });
+
+test("hosted: a bloating record that runs through a whole day is listed on that middle day, with its 24 hours, and drawn in the day picture", async ({ page }) => {
+  test.skip(!PASSWORD, "needs the run's synthetic accounts");
+  test.setTimeout(120_000);
+  await page.goto("/sign-in", { waitUntil: "load" });
+  await page.getByLabel("Email").fill(account("pro"));
+  await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await page.waitForURL(/\/(today|setup)/, { timeout: 30000 });
+  const st = (await api(page, "GET", "/v1/me/state")).body;
+  expect(st.onboarded, "set up by the check before").toBe(true);
+  const day = (k: number) => new Date(Date.parse(`${st.today.date}T12:00:00Z`) - k * 86_400_000).toISOString().slice(0, 10);
+  const [first, middle, last] = [day(3), day(2), day(1)];
+  const zone = st.profile.time_zone as string;
+  const s = await api(page, "POST", "/v1/episodes", { strength: 3, started: { mode: "exact", local: `${first}T22:00`, zone } });
+  expect(s.status, JSON.stringify(s.body)).toBe(201);
+  expect((await api(page, "POST", `/v1/episodes/${s.body.episode.id}/end`, { ended: { mode: "exact", local: `${last}T02:00`, zone } })).status).toBe(200);
+  for (const [date, hours] of [[first, 2], [middle, 24], [last, 2]] as const) {
+    const d = (await api(page, "GET", `/v1/days/${date}`)).body;
+    expect((d.episodes as Array<{ id: string }>).map((e) => e.id), date).toContain(s.body.episode.id);
+    expect(d.duration_ms, date).toBe(hours * 3_600_000);
+  }
+  await page.goto(`/day/${middle}`);
+  await expect(page.getByRole("region", { name: "The day at a glance" }).getByRole("img", { name: /^The day from midnight to midnight: Bloating 1/ })).toBeVisible({ timeout: 30000 });
+});

@@ -82,6 +82,10 @@ Do the whole list once on an **iPhone with Safari** and once on an **Android pho
 | 7.2 | On a screen, Back | You go back one screen | |
 | 7.3 | Rotate the phone | Nothing cut off or overlapping | |
 | 7.4 | Make the text larger in the phone's settings, reopen Bloat Buddy | Nothing cut off or overlapping | |
+| 7.5 | From History, tap the round Log button, then use the phone's Back twice | First Back closes Log bloating and you stay on Today; second Back returns to History (fixed 28 Nov) | |
+| 7.6 | Pro: History, tap a bar in Daily Bloat Score, then a day in Month at a glance | The bar's details appear; the day opens; nothing is cut off at the screen's edge | |
+| 7.7 | Pro: open a day that has bloating, then "Show as a table" under The day at a glance | The table opens, scrolls sideways inside its frame if needed, and closes again | |
+| 7.8 | India account: You, type a PIN code, then quickly change it to another | The state shown is the one for the PIN now in the box | |
 
 ## 8. Screen reader (separate from the list above)
 
@@ -94,5 +98,8 @@ Only with **VoiceOver** (iPhone) or **TalkBack** (Android) switched on. Not done
 | 8.3 | Log bloating | The strength and warning signs can be chosen and are read as selected | |
 | 8.4 | Open and close a sheet | Focus moves into the sheet, and back where it was when it closes | |
 | 8.5 | You, Delete account (stop at the confirmation) | The confirmation can be reached and read | |
+| 8.6 | History, the Range choice (Week, Month, All) | Read as a group of choices with the chosen one; swiping or the arrow keys change it | |
+| 8.7 | A chart, then its "Show as a table" | The chart is read by its name and summary; the table is read row by row | |
+| 8.8 | Sign in with an empty email | The problem is read and focus is on the email field | |
 
 Write down anything that went wrong, with the phone, system version and browser.

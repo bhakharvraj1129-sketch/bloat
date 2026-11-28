@@ -72,4 +72,12 @@ pnpm typecheck && pnpm lint
 python3 scripts/acceptance-report.py   # rebuild docs/acceptance-table.md
 ```
 
+The publishing gate also runs the beta-settings checks on a second server from the same build; none may be skipped (`.github/workflows/preview.yml`, DECISIONS.md choice 37). Locally:
+
+```bash
+BLOAT_AI_PROVIDER=off BLOAT_OFF_FEATURES=learn_library,daily_cards,experiments_habit,experiments_swap BLOAT_SIGN_IN_METHOD=password pnpm exec next start -p 3200 &
+BLOAT_OFF_BASE_URL=http://127.0.0.1:3200 pnpm exec vitest run --project api tests/api/acceptance-round.test.ts
+E2E_PORT=3200 E2E_SIGN_IN=password pnpm exec playwright test --trace off tests/e2e/acceptance-round.spec.ts tests/e2e/chart-preference.spec.ts tests/e2e/motion.spec.ts tests/e2e/charts.spec.ts tests/e2e/interface-review.spec.ts
+```
+
 After changing a migration that is not yet applied to `bloat-test`, run `pnpm db:reset`. Never edit a migration that has been applied; add a new one.
