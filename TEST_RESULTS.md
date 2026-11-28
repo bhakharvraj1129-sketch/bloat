@@ -1,8 +1,25 @@
 # Test results
 
-Last run: 27 Nov 2026 (the owner's answers D33 to D35 and the state list, commit `c91169c`, published by run 21 as `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
+Last run: 28 Nov 2026 (the motion and design pass, local results below; run 22 follows). Before that: 27 Nov 2026 (the owner's answers D33 to D35 and the state list, commit `c91169c`, published by run 21 as `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
+
+## Motion and design pass (27 to 28 Nov 2026): local results before run 22
+
+The owner's motion and design spec (DECISIONS.md choice 34): press feedback, loaders, toasts with a tick, Vaul bottom sheets, page glide, page skeletons, smooth lists, Recharts charts, count-up numbers, searchable state and time zone pickers, PIN code to state for India, gentle form errors, and the start page's hero and scroll reveals. Local stack, synthetic accounts only. The hosted results follow under run 22 once it is published.
+
+| Suite | Result |
+|---|---|
+| Type check and lint | Passed (lint: 0 errors, the same 5 old warnings) |
+| Rule tests | 107 passed |
+| API tests | 165 passed, 10 skipped (the round's checks, run below). New: the PIN code lookup (a known PIN gives the listed state and the city, including the merged union territory and the Andaman and Nicobar Islands; an unknown PIN is 404 with a plain next step; a malformed one is 422; signed-in only) |
+| API, the round's checks (second server) | 10 passed, plus the 3 PIN checks again |
+| Browser tests, first full run | 282 passed, 4 skipped, **5 failed**. Two were real: when a sheet opened, keyboard focus stayed behind it (the new Vaul sheets do not move focus unless asked); fixed by turning on its focus-on-open, as the old sheets did. One more (the phone's Back button after closing a sheet with Escape left an extra history step) passed once focus moved into the sheet, and passed 3 runs of the whole navigation file in a row (42 of 42). Two were mistakes in the new tests (the built stylesheet writes 120ms as .12s; "Your days" appears twice on History); the tests were corrected, not the app |
+| Browser tests, full rerun on the fixed build | **287 passed**, 4 skipped (the round's checks and the password form, run below). New (`tests/e2e/motion.spec.ts`): a pressed button shrinks to 0.97 at once and the timing tokens are 120, 150, 250 and 400ms; a sheet slides in over 250ms and a save ends with a tick and a toast inside the polite live region; with reduce motion on, the sheet, the start page's hero and its pattern do not animate; a slow History shows a skeleton and "Loading history", then the page; India: a wrong PIN gets a message under the field, 380001 shows "Ahmadabad, Gujarat" and saves Gujarat, and the PIN code is not in the saved profile; the History chart draws its bars and keeps its text alternative; the start page's sections end fully visible after scrolling. Updated: the saved notices are now toasts; setup and You use the searchable pickers |
+| Browser, second server with the preview's settings (AI off, the round's switches, password sign-in) | 11 passed: the round's 3 checks and all 8 motion checks, including the password form (a short password and a mismatch each get a message under their field) |
+| PIN data in the server bundle | The route's traced files include `india-pincode`'s data file (`pincodes.json.gz`) and its package link, so Vercel's build can read it; checked live after publishing |
+
+**Not performed:** real phones and screen readers (browser emulation only). Swipe-to-close was not tested by automation.
 
 ## Owner's answers D33 to D35 and the state list (27 Nov 2026): run 21, deployment `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`
 
