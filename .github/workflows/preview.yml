@@ -4,7 +4,11 @@
 # (vercel.json), so the preview addresses move only when this workflow has passed, in this order:
 #
 #   1. checks   BLOCKS  typecheck, lint, rule tests, then the local Supabase stack, the app build,
-#                       the API tests and the browser tests on a phone screen.
+#                       the API tests and the browser tests on a phone screen; then a second app
+#                       server from the same build with the beta settings (AI off, Learn, daily cards
+#                       and experiments off, password sign-in) runs the checks that need them, and
+#                       none of those may be skipped. Passed, failed and skipped counts per suite go
+#                       to the run summary.
 #   2. build    BLOCKS  Vercel builds the commit as a new preview deployment. No public address
 #                       points at it yet.
 #   3. smoke    BLOCKS  The account-free hosted checks (@smoke) run against that new deployment.
@@ -62,7 +66,7 @@ jobs:
       - name: Lint
         run: pnpm lint
       - name: Rule tests
-        run: pnpm test
+        run: mkdir -p reports && pnpm test --reporter=default --reporter=json --outputFile=reports/unit.json
       - name: Start the local Supabase stack
         run: pnpm db:start
       - name: Local test settings
@@ -72,11 +76,40 @@ jobs:
       - name: PDF text tool for the report tests
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
       - name: API tests
-        run: pnpm test:api
+        run: pnpm test:api --reporter=default --reporter=json --outputFile=reports/api.json
       - name: Browser for the phone-screen tests
         run: pnpm exec playwright install --with-deps chromium
       - name: Browser tests (phone screen)
-        run: pnpm test:e2e
+        run: pnpm test:e2e --reporter=list,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: reports/e2e.json
+      # The beta settings the preview runs with (DEPLOYMENT.md): checks that need them are skipped on
+      # the normal server above and run here, on a second server from the same build and database.
+      - name: Start a second app server with the beta settings (port 3200)
+        run: |
+          BLOAT_AI_PROVIDER=off BLOAT_OFF_FEATURES=learn_library,daily_cards,experiments_habit,experiments_swap BLOAT_SIGN_IN_METHOD=password \
+            nohup pnpm exec next start -p 3200 > "$RUNNER_TEMP/next-beta.log" 2>&1 &
+          for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:3200/ && exit 0; sleep 1; done
+          echo "::error::The beta-settings server did not start"; tail -30 "$RUNNER_TEMP/next-beta.log"; exit 1
+      - name: API checks with the beta settings
+        run: pnpm exec vitest run --project api tests/api/acceptance-round.test.ts --reporter=default --reporter=json --outputFile=reports/beta-api.json
+        env:
+          BLOAT_OFF_BASE_URL: http://127.0.0.1:3200
+      - name: Browser checks with the beta settings and password sign-in
+        run: pnpm exec playwright test --trace off --reporter=list,json tests/e2e/acceptance-round.spec.ts tests/e2e/chart-preference.spec.ts tests/e2e/motion.spec.ts tests/e2e/charts.spec.ts
+        env:
+          E2E_PORT: "3200"
+          E2E_SIGN_IN: password
+          PLAYWRIGHT_JSON_OUTPUT_NAME: reports/beta-e2e.json
+      - name: No beta check may be skipped
+        run: |
+          jq -e '.numTotalTests > 0 and .numPendingTests == 0 and .numTodoTests == 0' reports/beta-api.json > /dev/null \
+            || { echo "::error::Some beta-settings API checks were skipped or none ran"; exit 1; }
+          jq -e '.stats.expected > 0 and .stats.skipped == 0 and .stats.unexpected == 0' reports/beta-e2e.json > /dev/null \
+            || { echo "::error::Some beta-settings browser checks were skipped, failed or none ran"; exit 1; }
+      - name: Test counts (passed, failed, skipped)
+        if: always()
+        run: node scripts/test-counts.mjs | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Keep the failure screenshots (synthetic local data only)
         if: failure()
         uses: actions/upload-artifact@v5
