@@ -71,8 +71,15 @@ test.describe("motion spec", () => {
     expect(await page.locator("[data-vaul-drawer]").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
     const visitor = await context.newPage();
     await visitor.goto("/");
-    expect(await visitor.locator("h1[data-hero]").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+    expect(await visitor.locator(".hero-word > span").first().evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
     expect(await visitor.locator(".hero-pattern").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+    expect(await visitor.locator(".ticker-track").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+    // The sample phone shows its finished state and does not play; there is nothing to pause.
+    await expect(visitor.getByText("Bloating saved.", { exact: true })).toHaveCount(1);
+    await expect(visitor.getByRole("button", { name: "Pause animation" })).toHaveCount(0);
+    // The day story is a plain list of its four moments.
+    await expect(visitor.getByRole("heading", { name: "Day done.", exact: true })).toBeVisible();
+    await expect(visitor.getByRole("heading", { name: "Morning review.", exact: true })).toBeVisible();
     await context.close();
   });
 
@@ -140,5 +147,68 @@ test.describe("motion spec", () => {
     await cards.last().scrollIntoViewIfNeeded();
     await expect.poll(() => cards.last().evaluate((el) => getComputedStyle(el).opacity), { timeout: 3000 }).toBe("1");
     await expect(page.getByRole("heading", { name: "Patterns in your records" })).toBeVisible();
+  });
+
+  test("start page: the sample phone plays and can be paused with everything else that moves", async ({ page }) => {
+    await page.goto("/");
+    // The sample logs bloating by itself: its save message appears within one loop.
+    await expect(page.locator(".demo-toast[data-open]")).toHaveCount(1, { timeout: 10000 });
+    await page.getByRole("button", { name: "Pause animation" }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-motion-paused", "");
+    expect(await page.locator(".ticker-track").evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("paused");
+    expect(await page.locator(".hero-pattern").evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("paused");
+    await page.getByRole("button", { name: "Play animation" }).click();
+    expect(await page.locator(".ticker-track").evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("running");
+  });
+
+  test("start page: the try-it sample uses the real scale, fills in, and says nothing was saved or sent", async ({ page }) => {
+    const writes: string[] = [];
+    page.on("request", (r) => { if (r.method() !== "GET" && new URL(r.url()).pathname.startsWith("/v1/")) writes.push(r.url()); });
+    await page.goto("/");
+    await page.locator("#try").scrollIntoViewIfNeeded();
+    const save = page.getByRole("button", { name: "Pick a number first" });
+    await expect(save).toBeDisabled();
+    await page.getByRole("radiogroup", { name: "How strong is it right now? (sample)" }).getByRole("radio", { name: "6", exact: true }).click();
+    await page.getByRole("radio", { name: "Earlier today" }).click();
+    await page.getByRole("button", { name: "Save the sample" }).click();
+    await expect(page.getByText("Saved in this sample only. Nothing was sent.")).toBeVisible();
+    await expect(page.getByText("of 10 · since earlier today")).toBeVisible();
+    await page.getByRole("button", { name: "Start again" }).click();
+    await expect(page.getByRole("button", { name: "Pick a number first" })).toBeDisabled();
+    expect(writes).toEqual([]); // nothing was sent anywhere
+  });
+
+  test("start page: the day story moves with the scroll, and the questions open one at a time", async ({ page }) => {
+    await page.goto("/");
+    const story = page.locator("section[aria-labelledby=day-title]");
+    const box = (await story.boundingBox())!;
+    const top = (await page.evaluate(() => scrollY)) + box.y;
+    await page.evaluate((y) => scrollTo(0, y + 5), top);
+    await expect.poll(() => page.getByRole("heading", { name: "Morning review.", exact: true }).evaluate((el) => getComputedStyle(el.parentElement!).opacity)).toBe("1");
+    await page.evaluate((y) => scrollTo(0, y), top + box.height - (await page.evaluate(() => innerHeight)) - 5);
+    await expect.poll(() => page.getByRole("heading", { name: "Day done.", exact: true }).evaluate((el) => getComputedStyle(el.parentElement!).opacity)).toBe("1");
+
+    const first = page.getByRole("button", { name: "Who is Bloat Buddy for?" });
+    const second = page.getByRole("button", { name: "Is it a medical app?" });
+    await second.scrollIntoViewIfNeeded();
+    await expect(first).toHaveAttribute("aria-expanded", "true");
+    await second.click();
+    await expect(second).toHaveAttribute("aria-expanded", "true");
+    await expect(first).toHaveAttribute("aria-expanded", "false");
+    await expect(page.getByRole("region", { name: "Is it a medical app?" })).toContainText("does not diagnose or treat anything");
+    await expect(page.getByRole("region", { name: "Is it a medical app?" }).getByRole("link", { name: "when to get medical help" })).toHaveAttribute("href", "/help");
+  });
+
+  test("in the app: the active tab has its pill, a chosen chip shows a tick, and logged days fill in", async ({ context }) => {
+    const page = await account(context);
+    await page.request.post("/v1/meals", { headers: { "idempotency-key": crypto.randomUUID() }, data: { save_key: crypto.randomUUID(), dish_text: "Sample toast", eaten: { mode: "now" } } });
+    await page.goto("/today");
+    await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Today" }).locator(".tab-pill")).toHaveCount(1);
+    await expect(page.locator(".week-fill")).toHaveCount(1);
+    await page.getByRole("button", { name: "I feel bloated" }).click();
+    const sheet = page.getByRole("dialog", { name: "Log bloating" });
+    await expect(sheet.getByRole("radio", { name: "Now" }).locator("svg.pop-in")).toHaveCount(1);
+    await sheet.getByRole("radio", { name: "6", exact: true }).click();
+    await expect(sheet.getByRole("radio", { name: "6", exact: true })).toHaveClass(/\bpick\b/);
   });
 });
