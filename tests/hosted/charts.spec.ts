@@ -58,7 +58,8 @@ test("hosted: Pro charts render (day timeline, month calendar, daily chart, tabl
   // The day at a glance (Pro): a 24-hour picture with its table twin.
   await page.goto(`/day/${today}`);
   const glance = page.getByRole("region", { name: "The day at a glance" });
-  await expect(glance.getByRole("img", { name: /^The day from midnight to midnight: Bloating 1, Meals 1/ })).toBeVisible({ timeout: 30000 });
+  // At least these two entries (reported-fixes, run before this, also logs a meal today).
+  await expect(glance.getByRole("img", { name: /^The day from midnight to midnight: Bloating [1-9]\d*, Meals [1-9]\d*/ })).toBeVisible({ timeout: 30000 });
   await glance.getByRole("button", { name: "Show as a table" }).click();
   await expect(glance.getByRole("table")).toContainText("SYNTHETIC chart check lunch");
 
@@ -82,7 +83,7 @@ test("hosted: Pro charts render (day timeline, month calendar, daily chart, tabl
   await expect(page.getByRole("list", { name: /^Days in / })).toHaveCount(0);
   await expect(page.getByRole("img", { name: /^Daily Bloat Score for/ })).toHaveCount(0);
   await page.goto(`/day/${today}`);
-  await expect(page.getByText("SYNTHETIC chart check lunch")).toBeVisible({ timeout: 30000 });
+  await expect(page.getByText("SYNTHETIC chart check lunch").first()).toBeVisible({ timeout: 30000 });
   await expect(page.getByText("The day at a glance")).toHaveCount(0);
 
   // And back on.

@@ -4,6 +4,24 @@ Last run: 28 Nov 2026 (the animated start page with before-and-after and flip ca
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
 
+## Charts, graphs and pattern diagrams (28 Nov 2026): local results before run 25
+
+DECISIONS.md choice 36: one chart kit (details on hover or tap, a table one tap away, keys, Hide charts everywhere), a month calendar in History, labelled average bars and the halves check in Patterns, the weekly trend, how the days finished, bloating by hour, your usual and medicine changes as before-and-after, habit meters in the weekly report, a 24-hour picture of one day (Pro), and a drawn "How a comparison works" diagram. Local stack, synthetic accounts only, the normal server on port 3100 and the round's server on port 3200 (AI off, the round's switches, password sign-in).
+
+| Suite | Result |
+|---|---|
+| Type check and lint | Passed (lint: 0 errors, the same 5 old warnings; none in the chart files) |
+| Rule tests | 107 passed (including no banned phrase in any screen text; the new chart files were also checked against the 16 banned phrases directly: none) |
+| API tests | 165 passed, 10 skipped (the round's checks, run below); no server code changed |
+| API, the round's checks (second server) | 10 passed |
+| Browser tests, new file `tests/e2e/charts.spec.ts` | 4 of 4: with 14 days logged through the real API, Patterns shows the with-and-without bars (7.0 on 7 days, 2.0 on 7 days) and "Both halves point the same way."; Your journey shows the weekly trend, how the days finished (Confirmed 14) and its table; with Hide charts the charts go and every number stays as text; History's month calendar labels each day ("Bloat Score 6", "Bloat Score 3, late review" with the small clock), its table opens and closes, pointing at a bar shows "Confirmed" and tapping it names the day with "Open this day"; the day at a glance draws the day's entries with a table for Pro and is not offered on Free; the How it works diagram has 14 sample days and "6.0 − 3.0 = +3.0". First run: 3 of 4, because the check pointed at the chart while it was below the screen; it now points at a real bar |
+| Browser tests, full run | **296 passed**, 4 skipped (the round's checks and the password form, run below), 0 failed; then again on the final build after the polish below: **296 passed**, 4 skipped, 0 failed |
+| Browser, second server (the round's 3 checks, 13 motion checks, 4 chart checks) | First 19 of 20: the start page's day story check ("Day done." after scrolling) failed 1 time in 3 on this server. Cause, measured: just after loading, the story can still be its short, unscripted height (1,397px instead of 3,020px), and the check worked out where to scroll from that first measurement; scrolled to the story's real end, "Day done." showed 6 times in 6. The page was not changed; the check now measures the story again before each scroll: 10 of 10 there and 5 of 5 on the normal server, then 20 of 20, and 40 of 40 on the final build (each check twice) |
+| The new live check `tests/hosted/charts.spec.ts`, run against the second server | 2 of 2 on a fresh Pro account and again on one with earlier entries (the second try first found two identical sample meals and was made to take the first) |
+| Looked at on a phone screen, light and dark | Every chart; fixed from the pictures: tied busiest hours are all named; the hour axis no longer cut off; late reviews in the calendar carry a small clock; the bars' scale lines up; the day timeline's times no longer wrap; the weekly trend's week labels are evenly spaced with the latest named (Oct 26 and Nov 16 had been dropped); exercise on the day timeline uses a neutral colour, not a Bloat Score colour, and every mark is in its key; the tick in the diagram's last note keeps its size. Also fixed: a not-yet-confirmed day is read out as "not confirmed" once, not twice; if saving Hide charts fails, the charts come back |
+
+**Not performed:** real phones and screen readers (browser emulation only).
+
 ## Animated start page, before and after, flip cards (28 Nov 2026): run 24, deployment `dpl_9ZxDR1j2tSNyrWqDRtqT1RB6CV9C`
 
 Published revision `0fc6d119f2994a19b5ba0fe7c8ab6cbc4c259346` on `https://bloat-preview.vercel.app` and the branch address (05:59 UTC). Preview variables unchanged. The three main addresses still serve `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (`83fe4da`), read back from Vercel after the run. Run 23 (`40be915`) did not publish: it failed twice on two tests that break in the hour after midnight in New York (below); nothing from it went out.
