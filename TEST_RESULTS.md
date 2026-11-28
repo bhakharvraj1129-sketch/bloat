@@ -1,8 +1,30 @@
 # Test results
 
-Last run: 28 Nov 2026 (charts, graphs and pattern diagrams, commit `0bfa329`, published by run 25 as `dpl_7aBmbLFDaUjXm6WBcfqWm2XKDKG1`). Before that: the animated start page with before-and-after and flip cards, commit `0fc6d11`, published by run 24 as `dpl_9ZxDR1j2tSNyrWqDRtqT1RB6CV9C` (run 23 did not publish). Before that: the motion and design pass, commit `7953a6a`, published by run 22 as `dpl_FCsJjMaBkxJ87uNHu8tKyK8MUvGK`. Before that: 27 Nov 2026 (the owner's answers D33 to D35 and the state list, commit `c91169c`, published by run 21 as `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
+Last run: 28 Nov 2026 (the outside review checked and fixed, the interface review and the stronger gate, commit `96c31de`, published by run 26 as `dpl_DnksGeN4cRVvviFHtwyeAW1vQwdL`). Before that: charts, graphs and pattern diagrams, commit `0bfa329`, published by run 25 as `dpl_7aBmbLFDaUjXm6WBcfqWm2XKDKG1`. Before that: the animated start page with before-and-after and flip cards, commit `0fc6d11`, published by run 24 as `dpl_9ZxDR1j2tSNyrWqDRtqT1RB6CV9C` (run 23 did not publish). Before that: the motion and design pass, commit `7953a6a`, published by run 22 as `dpl_FCsJjMaBkxJ87uNHu8tKyK8MUvGK`. Before that: 27 Nov 2026 (the owner's answers D33 to D35 and the state list, commit `c91169c`, published by run 21 as `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
+
+## Outside review checked and fixed, interface review, stronger gate (28 Nov 2026): run 26, deployment `dpl_DnksGeN4cRVvviFHtwyeAW1vQwdL`
+
+Published revision `96c31defb82148d43645cd916df16db969d921b7` on `https://bloat-preview.vercel.app` and the branch address (15:04 UTC). Preview variables unchanged. The three main addresses still serve `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (`83fe4da`), read back from Vercel after the run.
+
+| Check | Passed | Failed | Skipped | Notes |
+|---|---|---|---|---|
+| GitHub run 26: rule tests | 107 | 0 | 0 | Clean checkout and empty database |
+| GitHub run 26: API tests, normal server | 170 | 0 | 10 | The 10 skipped are the round's checks, run on the second server |
+| GitHub run 26: browser tests, normal server | 319 | 0 | 7 | The 7 skipped need the beta settings or password sign-in, run on the second server |
+| GitHub run 26: API, beta settings (second server, new) | 10 | 0 | 0 | |
+| GitHub run 26: browser, beta settings and password sign-in (second server, new) | 41 | 0 | 0 | Includes the interface review and the password forms; "No beta check may be skipped" passed |
+| GitHub run 26: typecheck, lint, Vercel build, account-free live checks before and after publishing | all | 0 | | |
+| Tested = deployed | | | | Both preview addresses on `dpl_DnksGeN4cRVvviFHtwyeAW1vQwdL`; all 234 repository files Vercel lists are byte-identical to `96c31de`, 25 of the 37 files changed since run 25 among them; Vercel lists 497 of 719 files |
+| Core hosted suite | 16 | 0 | 0 | Disposable accounts marked `synthetic_test_run = 2026-11-28-run26` |
+| `beta-candidate.spec.ts` and `motion.spec.ts` | 8 | 0 | 0 | Includes the password change and the PIN lookup in its new form (POST body; the old address form answers 404 or 405) |
+| `reported-fixes.spec.ts` | 1 | 0 | 0 | With a fresh Pro test account (the used one deleted through the app and made again, same marker) |
+| `charts.spec.ts` | 3 | 0 | 0 | New: a record from three days ago to yesterday is listed on the middle day with 24 hours and drawn in its day picture (finding 1, live) |
+| Cleanup: 10 accounts deleted through the app | 10 | 0 | | Each answered "deleted"; the same sign-in was refused (401) straight after; the one-off password file destroyed |
+| Read-only check of `bloat-test` after the cleanup | | | | For the 10 tracked IDs: 0 accounts, 0 identities, sessions or refresh tokens, 0 rows in all 48 tables with a user column, 0 stored files; 0 accounts with a test-run marker; `bloat-tester` unchanged (1 meal, 1 bloating record, 2 readings, 1 report, same sign-in times and password hash); the 5 participant accounts unchanged by the check (the same IDs, sign-in and update times as the read-only snapshot taken just before it; that snapshot differed from the morning's, because a participant account was signed in to during the day, not by this session); 9 accounts in all, as before |
+
+**Not performed:** real phones and screen readers.
 
 ## Outside review checked and fixed, interface review, stronger gate (28 Nov 2026): local results before run 26
 
