@@ -151,7 +151,8 @@ test.describe("motion spec", () => {
 
   test("start page: the sample phone plays and can be paused with everything else that moves", async ({ page }) => {
     await page.goto("/");
-    // The sample logs bloating by itself: its save message appears within one loop.
+    // The sample plays only while it is on screen: bring it into view, then its save message appears within one loop.
+    await page.getByText("The Today screen, shown with sample entries.").scrollIntoViewIfNeeded();
     await expect(page.locator(".demo-toast[data-open]")).toHaveCount(1, { timeout: 10000 });
     await page.getByRole("button", { name: "Pause animation" }).click();
     await expect(page.locator("html")).toHaveAttribute("data-motion-paused", "");

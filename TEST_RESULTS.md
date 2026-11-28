@@ -1,8 +1,25 @@
 # Test results
 
-Last run: 28 Nov 2026 (the animated start page and in-app responses, local results below; run 23 did not publish, run 24 follows). Before that: the motion and design pass, commit `7953a6a`, published by run 22 as `dpl_FCsJjMaBkxJ87uNHu8tKyK8MUvGK`. Before that: 27 Nov 2026 (the owner's answers D33 to D35 and the state list, commit `c91169c`, published by run 21 as `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
+Last run: 28 Nov 2026 (the animated start page with before-and-after and flip cards, commit `0fc6d11`, published by run 24 as `dpl_9ZxDR1j2tSNyrWqDRtqT1RB6CV9C`; run 23 did not publish). Before that: the motion and design pass, commit `7953a6a`, published by run 22 as `dpl_FCsJjMaBkxJ87uNHu8tKyK8MUvGK`. Before that: 27 Nov 2026 (the owner's answers D33 to D35 and the state list, commit `c91169c`, published by run 21 as `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
+
+## Animated start page, before and after, flip cards (28 Nov 2026): run 24, deployment `dpl_9ZxDR1j2tSNyrWqDRtqT1RB6CV9C`
+
+Published revision `0fc6d119f2994a19b5ba0fe7c8ab6cbc4c259346` on `https://bloat-preview.vercel.app` and the branch address (05:59 UTC). Preview variables unchanged. The three main addresses still serve `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (`83fe4da`), read back from Vercel after the run. Run 23 (`40be915`) did not publish: it failed twice on two tests that break in the hour after midnight in New York (below); nothing from it went out.
+
+| Check | Passed | Failed | Notes |
+|---|---|---|---|
+| GitHub run 24 | Typecheck, lint, rule tests, API tests, browser tests (phone screen), the Vercel build, the account-free live checks before and after publishing | 0 | Clean checkout and empty database. The round's checks and the password form are skipped there, not passed |
+| Tested = deployed | | | Both preview addresses on `dpl_9ZxDR1j2tSNyrWqDRtqT1RB6CV9C`; all 231 repository files Vercel lists are byte-identical to `0fc6d11`, 19 of the 27 files changed since run 22 among them; Vercel lists 496 of 707 files |
+| Core hosted suite, 16 checks | 16 | 0 | Disposable accounts marked `synthetic_test_run = 2026-11-28-run24` |
+| `tests/hosted/beta-candidate.spec.ts`, 4 checks | 4 | 0 | Includes the password change |
+| `tests/hosted/motion.spec.ts`, 4 checks (1 new) | 4 | 0 | New: on the live start page the sample phone plays and Pause stops the ticker, the try-it sample confirms and makes no request, the slider moves by keyboard, a step card flips, the day story is there. First try: 6 of 7 across the two files, because the start-page check still looked for run 22's headline marker; then the new check found the sample phone waiting off screen (it plays only while on screen, and the invite-only page puts it lower); both checks were corrected, not the app, then 4 of 4 |
+| `tests/hosted/reported-fixes.spec.ts`, 1 check | 1 | 0 | With a fresh Pro test account (the used one deleted through the app and made again, same marker) |
+| Cleanup: 10 accounts deleted through the app | 10 | 0 | Each answered "deleted"; the same sign-in was refused (401) straight after; the one-off password file destroyed |
+| Read-only check of `bloat-test` after the cleanup | | | 0 accounts by ID or address, 0 with a test-run marker, 0 identities, sessions or refresh tokens, 0 rows in all 48 tables with a user column, 0 stored files; `bloat-tester` unchanged (1 meal, 1 bloating record, 2 readings, 1 report, same sign-in times and password hash); the 5 participant accounts unchanged by the check (one had signed in earlier that morning, before the check; the same IDs, sign-in and update times before and after it); 9 accounts in all, as before. The database tool returned three temporary 502 errors before this read-only check went through |
+
+**Not performed:** real phones and screen readers (browser emulation only); swipe, drag and scroll feel on a real touch screen.
 
 ## Animated start page and in-app responses (28 Nov 2026): local results before run 23
 

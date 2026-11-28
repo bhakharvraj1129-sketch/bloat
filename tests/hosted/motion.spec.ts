@@ -77,9 +77,36 @@ test("hosted: the start page's sections end fully visible after scrolling", asyn
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
   await page.goto(`${BASE}/`, { waitUntil: "load" });
-  await expect(page.locator("h1[data-hero]")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("one day at a time.");
   const cards = page.locator("[data-reveal-group] > li");
   await cards.last().scrollIntoViewIfNeeded();
   await expect.poll(() => cards.last().evaluate((el) => getComputedStyle(el).opacity), { timeout: 5000 }).toBe("1");
+  await ctx.close();
+});
+
+test("hosted: the new start page plays and pauses, the try-it sample sends nothing, the slider and step cards work", async ({ browser }) => {
+  const ctx = await browser.newContext();
+  const page = await ctx.newPage();
+  const writes: string[] = [];
+  page.on("request", (r) => { if (r.method() !== "GET" && new URL(r.url()).pathname.startsWith("/v1/")) writes.push(r.url()); });
+  await page.goto(`${BASE}/`, { waitUntil: "load" });
+  // The sample phone plays only while it is on screen: bring it into view first.
+  await page.getByText("The Today screen, shown with sample entries.").scrollIntoViewIfNeeded();
+  await expect(page.locator(".demo-toast[data-open]")).toHaveCount(1, { timeout: 15000 });
+  await page.getByRole("button", { name: "Pause animation" }).click();
+  expect(await page.locator(".ticker-track").evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("paused");
+  await page.locator("#try").scrollIntoViewIfNeeded();
+  await page.getByRole("radiogroup", { name: "How strong is it right now? (sample)" }).getByRole("radio", { name: "5", exact: true }).click();
+  await page.getByRole("button", { name: "Save the sample" }).click();
+  await expect(page.getByText("Saved in this sample only. Nothing was sent.")).toBeVisible();
+  const slider = page.getByRole("slider", { name: /Compare scattered notes with a Bloat Buddy record/ });
+  await slider.focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect(slider).toHaveValue("54");
+  const card = page.getByRole("button", { name: /Log as the day goes/ });
+  await card.press("Enter");
+  await expect(card).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByRole("heading", { name: "Day done.", exact: true })).toHaveCount(1);
+  expect(writes).toEqual([]);
   await ctx.close();
 });
