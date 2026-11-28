@@ -24,6 +24,9 @@
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
   /* The base radius shadcn/ui components work from (the 12px control radius). */
   --radius: 12px;
+  /* Start page "night" scenes (the end of the day story, the promise): made from the tokens above,
+     inverted in light theme and kept dark in dark theme. No new colours. */
+  --night: var(--ink); --on-night: var(--ground); --night-accent: var(--inverse-accent);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -35,6 +38,7 @@
     --on-score: #eef2f2; --on-score-strong: #0e1213; --on-score-severe: #0e1213;
     --alert: #f87171; --alert-tint: #3a1714;
     --inverse-accent: #0b7a6e;
+    --night: var(--ground); --on-night: var(--ink); --night-accent: var(--brand-text);
     color-scheme: dark;
   }
 }
@@ -46,6 +50,7 @@
   --on-score: #eef2f2; --on-score-strong: #0e1213; --on-score-severe: #0e1213;
   --alert: #f87171; --alert-tint: #3a1714;
   --inverse-accent: #0b7a6e;
+  --night: var(--ground); --on-night: var(--ink); --night-accent: var(--brand-text);
   color-scheme: dark;
 }
 
@@ -58,6 +63,7 @@
   --color-score-strong: var(--score-strong); --color-score-severe: var(--score-severe);
   --color-on-score: var(--on-score); --color-on-score-strong: var(--on-score-strong); --color-on-score-severe: var(--on-score-severe);
   --color-alert: var(--alert); --color-alert-tint: var(--alert-tint);
+  --color-night: var(--night); --color-on-night: var(--on-night); --color-night-accent: var(--night-accent);
   --color-inverse-accent: var(--inverse-accent);
   /* The names shadcn/ui components use, mapped onto the same tokens (no new colours). */
   --color-background: var(--ground); --color-foreground: var(--ink);
@@ -148,6 +154,121 @@ button:not(:disabled):active, a[data-press]:active, [data-press]:active { scale:
 /* Skeletons: a calm shimmer while a screen loads (never a blank screen or a spinner). */
 @keyframes skeleton { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
 .skeleton { background: var(--subtle); border-radius: var(--radius-sm); animation: skeleton 1.4s var(--ease-out) infinite; }
+/* ---------- Start page v2 (owner, 28 Nov 2026: "see how animated their website is"). ----------
+   Every effect below either answers the person or tells the product's story as they scroll; each
+   timed animation is 400ms or less (a sequence may start one after another), the scroll story and
+   the promise move only as fast as the person scrolls, the ambient loops (dot drift, ticker, sample
+   phone) never block anything and can be paused, and with reduce motion everything is shown in its
+   final place. Tokens only, no shadows. */
+
+/* Header: a full-width bar at the top; once the page scrolls it floats as a rounded pill. */
+.site-header { transition: padding var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out); }
+.site-header-bar { transition: max-width var(--dur-slow) var(--ease-out), border-radius var(--dur-slow) var(--ease-out), padding var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out); border: 1px solid transparent; }
+.site-header[data-scrolled] { padding-top: 10px; background: transparent; border-color: transparent; backdrop-filter: none; }
+.site-header[data-scrolled] .site-header-bar {
+  width: calc(100% - 24px); max-width: 64rem; border-radius: 999px; border-color: var(--line);
+  background: color-mix(in oklab, var(--surface) 90%, transparent); backdrop-filter: blur(12px);
+  padding-top: 0.5rem; padding-bottom: 0.5rem;
+}
+/* A thin line across the top shows how far down the page you are. */
+.scroll-progress { position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 30; background: var(--brand); transform-origin: 0 50%; transform: scaleX(0); pointer-events: none; }
+
+/* Hero headline: each word rises out of its own line, 40ms after the one before. */
+.hero-word { display: inline-block; overflow-x: visible; overflow-y: clip; overflow-clip-margin: 0.2em; vertical-align: bottom; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.hero-word > span { display: inline-block; animation: word-rise var(--dur-slow) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 40ms); }
+@keyframes word-rise { from { transform: translateY(105%); } to { transform: none; } }
+/* The hand-drawn underline under "one day at a time." draws itself once. */
+.hero-underline path { stroke-dasharray: 1; stroke-dashoffset: 0; animation: draw-line var(--dur-slow) var(--ease-out) both; animation-delay: 380ms; }
+@keyframes draw-line { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+/* Ticker: what Bloat Buddy does, gliding sideways. Clipped with paint containment (not overflow),
+   paused while pointed at or focused, and laid out as a still, wrapped list with reduce motion. */
+.ticker { contain: paint; mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.ticker-track { display: flex; width: max-content; animation: ticker 38s linear infinite; }
+.ticker:hover .ticker-track, .ticker:focus-within .ticker-track { animation-play-state: paused; }
+/* "Pause animation" on the start page stops every ambient loop at once. */
+html[data-motion-paused] .ticker-track, html[data-motion-paused] .hero-pattern, html[data-motion-paused] .animate-ping { animation-play-state: paused; }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* Hero demo phone: a sample Today screen that logs bloating by itself, in a loop. */
+.demo-tap { position: absolute; inset: 50% auto auto 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 999px; background: var(--brand); opacity: 0; pointer-events: none; }
+[data-tapping] > .demo-tap { animation: demo-tap var(--dur-slow) var(--ease-out); }
+@keyframes demo-tap { 0% { opacity: 0.35; transform: scale(0.4); } 100% { opacity: 0; transform: scale(1.5); } }
+.demo-sheet { transform: translateY(105%); transition: transform var(--dur-base) var(--ease-out); }
+.demo-sheet[data-open] { transform: none; }
+.demo-toast { opacity: 0; transform: translateY(10px); transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out); }
+.demo-toast[data-open] { opacity: 1; transform: none; }
+.demo-swap { transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out); }
+.demo-swap[data-hidden] { opacity: 0; transform: translateY(6px); pointer-events: none; }
+
+/* Scroll reveals: sections fade and rise once as they come into view (set by landing-motion.tsx). */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal]:not([data-inview]) { opacity: 0; transform: translateY(18px); }
+  [data-reveal] { transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out); }
+  .js [data-reveal-group]:not([data-inview]) > * { opacity: 0; transform: translateY(18px); }
+  [data-reveal-group] > * { transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out); transition-delay: calc(var(--i, 0) * 60ms); }
+}
+
+/* Feature cards: each one plays a short picture of what it does when it comes into view. */
+.bento-bars > span { transform-origin: bottom; transform: scaleY(0.08); transition: transform var(--dur-slow) var(--ease-out); transition-delay: calc(150ms + var(--i, 0) * 100ms); }
+[data-inview] .bento-bars > span { transform: none; }
+.bento-week > span { transition: background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out); transition-delay: calc(var(--i, 0) * 120ms); }
+.bento-week > span[data-on] { transition-property: background-color, border-color; }
+[data-inview] .bento-week > span[data-on] { background: var(--brand); border-color: var(--brand); }
+@media (prefers-reduced-motion: no-preference) { .js .bento-type > span { opacity: 0; } }
+.bento-type > span { white-space: pre; transition: opacity 60ms linear; transition-delay: calc(var(--i, 0) * 60ms); }
+[data-inview] .bento-type > span { opacity: 1; }
+.bento-tick { opacity: 0; transform: scale(0.6); transition: opacity var(--dur-base) var(--ease-out) 900ms, transform var(--dur-base) var(--ease-out) 900ms; }
+[data-inview] .bento-tick { opacity: 1; transform: none; }
+.bento-sun { transform: translateY(18px); opacity: 0.4; transition: transform var(--dur-slow) var(--ease-out) 150ms, opacity var(--dur-slow) var(--ease-out) 150ms; }
+[data-inview] .bento-sun { transform: none; opacity: 1; }
+.bento-page { transform: translateY(26px) rotate(-4deg); transition: transform var(--dur-slow) var(--ease-out) 150ms; }
+[data-inview] .bento-page { transform: translateY(0) rotate(-2deg); }
+.bento-lock path.shackle { transform: translateY(-5px); transition: transform var(--dur-slow) var(--ease-out) 300ms; }
+[data-inview] .bento-lock path.shackle { transform: none; }
+
+/* The promise: its words light up one by one as it scrolls past (scrubbed by scroll, not timed). */
+.promise-word { opacity: 0.18; transition: opacity var(--dur-fast) linear; }
+.promise-word[data-lit] { opacity: 1; }
+
+/* Steps: the line between them fills as the section scrolls into view. */
+.steps-line { transform-origin: 0 50%; transform: scaleX(var(--fill, 0)); }
+
+/* Questions: answers open smoothly; the plus turns into a cross. */
+.faq-icon { transition: transform var(--dur-base) var(--ease-out); }
+[aria-expanded="true"] > .faq-icon { transform: rotate(45deg); }
+
+/* The big footer name, faint, like a watermark (clipped by paint containment, not overflow). */
+.footer-wrap { contain: paint; }
+.footer-mark { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.05em; line-height: 0.8; color: var(--line); font-size: clamp(3.5rem, 15vw, 13rem); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker { mask-image: none; }
+  .ticker-track { width: auto; flex-wrap: wrap; row-gap: 0.75rem; }
+  .ticker-track > [aria-hidden] { display: none; }
+  .promise-word { opacity: 1; }
+  .steps-line { transform: none; }
+  .bento-bars > span, .bento-sun, .bento-page, .bento-lock path.shackle, .bento-tick { transform: none; opacity: 1; }
+}
+/* ---------- In-app interactions (owner, 28 Nov 2026: every control answers deliberately). ---------- */
+/* Tab bar: the active tab's icon sits in a pill that grows in from the middle. */
+.tab-pill { animation: pill-in var(--dur-base) var(--ease-out); }
+@keyframes pill-in { from { transform: scaleX(0.4); opacity: 0; } to { transform: none; opacity: 1; } }
+/* Choice chips: the tick pops in when chosen. */
+.pop-in { animation: pop-in var(--dur-fast) var(--ease-out); }
+@keyframes pop-in { from { transform: scale(0.5); opacity: 0; } to { transform: none; opacity: 1; } }
+/* Strength numbers: the picked one settles into place (no bounce: it grows to its size and stops). */
+.pick { animation: pick var(--dur-fast) var(--ease-out); }
+@keyframes pick { from { transform: scale(0.9); } to { transform: none; } }
+/* Week strip: logged days fill in one after another when Today opens or a day is logged. */
+.week-fill { animation: week-fill var(--dur-base) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 40ms); }
+@keyframes week-fill { from { transform: scale(0.6); opacity: 0; } to { transform: none; opacity: 1; } }
+/* Folded sections open and close smoothly where the browser can animate them; elsewhere they snap. */
+:root { interpolate-size: allow-keywords; }
+details::details-content { block-size: 0; overflow-y: clip; transition: block-size var(--dur-base) var(--ease-out), content-visibility var(--dur-base) allow-discrete; }
+details[open]::details-content { block-size: auto; }
+/* Changing the theme in You cross-fades the whole screen (250ms) where the browser supports it. */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: var(--dur-base); animation-timing-function: var(--ease-out); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }

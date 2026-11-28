@@ -5,6 +5,7 @@ import { BackLink } from "./nav";
 import { PublicMenu, type PublicLink } from "./public-menu";
 import { Logo } from "./logo";
 import { Glide } from "./glide";
+import { HeaderScroll } from "./landing/scroll-ui";
 
 const HEADER_LINKS: PublicLink[] = [
   { href: "/how-bloat-works", label: "How it works" },
@@ -23,11 +24,13 @@ export function Wordmark({ className = "" }: { className?: string }) {
   return <Logo className={className} />;
 }
 
-/** The public header: name, the main public pages and Sign in. On phones they move into a menu. */
+/** The public header: name, the main public pages and Sign in. On phones they move into a menu.
+ *  Once the page scrolls it floats as a rounded pill (globals.css, .site-header). */
 export function PublicHeader() {
   return (
-    <header className="sticky top-0 z-20 border-b border-line bg-ground/95 backdrop-blur">
-      <div className="mx-auto flex max-w-[76rem] items-center gap-6 px-5 py-4 md:px-8 lg:px-12">
+    <header id="site-header" className="site-header sticky top-0 z-20 border-b border-line bg-ground/95 backdrop-blur">
+      <HeaderScroll />
+      <div className="site-header-bar mx-auto flex max-w-[76rem] items-center gap-6 px-5 py-4 md:px-8 lg:px-12">
         <Link href="/" className="no-underline" aria-label="Bloat Buddy, home"><Wordmark /></Link>
         <nav aria-label="Site" className="ml-auto hidden items-center gap-7 text-[0.9375rem] md:flex">
           {HEADER_LINKS.map((l) => <Link key={l.href} href={l.href} className="no-underline hover:underline">{l.label}</Link>)}

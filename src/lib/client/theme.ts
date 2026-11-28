@@ -27,13 +27,19 @@ export function currentTheme(): ThemeChoice {
 
 export function applyTheme(choice: ThemeChoice) {
   const root = document.documentElement;
-  if (choice === "system") delete root.dataset.theme;
-  else root.dataset.theme = choice;
+  const set = () => {
+    if (choice === "system") delete root.dataset.theme;
+    else root.dataset.theme = choice;
+    listeners.forEach((l) => l());
+  };
   try {
     if (choice === "system") localStorage.removeItem(THEME_KEY);
     else localStorage.setItem(THEME_KEY, choice);
   } catch {
     // Storage blocked (private window): the choice still applies until the page is closed.
   }
-  listeners.forEach((l) => l());
+  // Cross-fade to the new theme (250ms, globals.css) where the browser can; otherwise switch at once.
+  const doc = document as Document & { startViewTransition?: (update: () => void) => unknown };
+  if (doc.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) doc.startViewTransition(set);
+  else set();
 }

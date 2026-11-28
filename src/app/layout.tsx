@@ -31,7 +31,9 @@ export const viewport: Viewport = {
 
 // Applies a theme picked in You before the first paint, so the page never flashes the other theme.
 // Stored on this device only (no health data). "system" (the default) follows the device setting.
-const THEME_SCRIPT = `try{var t=localStorage.getItem(${JSON.stringify(THEME_KEY)});if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;}catch(e){}`;
+// It also marks that scripts run ("js"), so start-page sections are only hidden for their scroll reveal
+// when the reveal can actually play; without scripts everything is simply shown.
+const THEME_SCRIPT = `document.documentElement.classList.add("js");try{var t=localStorage.getItem(${JSON.stringify(THEME_KEY)});if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

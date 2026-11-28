@@ -63,15 +63,15 @@ function WeekStrip({ state }: { state: State }) {
         <span className="t-caption">Days you log fill in</span>
       </div>
       <ol className="grid grid-cols-7 gap-1 text-center">
-        {week.map((d) => {
+        {week.map((d, i) => {
           const isToday = d.date === today.date;
           const n = Number(d.date.slice(8));
           return (
             <li key={d.date} className="flex flex-col items-center gap-1.5">
               <span aria-hidden className={cx("text-xs", isToday ? "font-bold text-ink" : "text-ink-muted")}>{DAY_LETTER[weekday(d.date)]}</span>
-              <span aria-hidden className={cx(
+              <span aria-hidden style={{ ["--i" as string]: i }} className={cx(
                 "inline-flex h-8 w-8 items-center justify-center rounded-full text-xs tabular",
-                d.logged ? "bg-brand font-semibold text-on-brand" : isToday ? "border-2 border-brand font-semibold text-ink" : d.future ? "border border-dashed border-line text-ink-muted" : "border border-line text-ink-muted",
+                d.logged ? "week-fill bg-brand font-semibold text-on-brand" : isToday ? "border-2 border-brand font-semibold text-ink" : d.future ? "border border-dashed border-line text-ink-muted" : "border border-line text-ink-muted",
                 isToday && d.logged && "outline-2 outline-offset-2 outline-brand",
               )}>{n}</span>
               <span className="sr-only">{formatDate(d.date, profile.date_format)}{isToday ? ", today" : ""}{d.future ? "" : d.logged ? ", logged" : ", nothing logged"}</span>
@@ -87,8 +87,8 @@ function WeekStrip({ state }: { state: State }) {
 function AddTile({ label, name, icon: Icon, hint, onClick }: { label: string; name: string; icon: typeof Utensils; hint?: string; onClick: () => void }) {
   return (
     <button type="button" aria-label={name} onClick={onClick}
-      className="flex min-h-24 flex-col items-center justify-center gap-2 rounded-md border border-line bg-surface px-2 py-3 text-ink transition-colors duration-150 hover:bg-subtle">
-      <span className="inline-flex h-10 w-10 items-center justify-center rounded-sm bg-brand-tint text-brand-text"><Icon size={20} strokeWidth={2} aria-hidden /></span>
+      className="group flex min-h-24 flex-col items-center justify-center gap-2 rounded-md border border-line bg-surface px-2 py-3 text-ink transition-colors duration-150 hover:border-brand hover:bg-subtle">
+      <span className="inline-flex h-10 w-10 items-center justify-center rounded-sm bg-brand-tint text-brand-text transition-transform duration-150 group-hover:-translate-y-0.5"><Icon size={20} strokeWidth={2} aria-hidden /></span>
       <span className="text-[0.9375rem] font-semibold leading-tight">{label}</span>
       {hint && <span className="t-caption -mt-1.5">{hint}</span>}
     </button>
@@ -142,10 +142,10 @@ export function Today() {
       {!!state.consents_due?.length && <Reconfirm due={state.consents_due} onDone={() => { savedToast("Confirmed. Thank you."); reload(); }} />}
 
       {state.pending_review && (
-        <Link href={`/review/${state.pending_review.date}`} data-press className="flex min-h-16 items-center gap-4 rounded-lg border border-brand bg-brand-tint px-5 py-4 text-ink no-underline md:px-6">
+        <Link href={`/review/${state.pending_review.date}`} data-press className="group flex min-h-16 items-center gap-4 rounded-lg border border-brand bg-brand-tint px-5 py-4 text-ink no-underline md:px-6">
           <Sunrise size={24} strokeWidth={2} aria-hidden className="shrink-0 text-brand-text" />
           <span className="flex grow flex-col"><span className="font-bold">Review yesterday</span><span className="t-caption">A few quick questions set your Bloat Score</span></span>
-          <ChevronRight size={20} strokeWidth={2} aria-hidden />
+          <ChevronRight size={20} strokeWidth={2} className="transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden />
         </Link>
       )}
 
@@ -173,12 +173,12 @@ export function Today() {
             <div className="flex flex-col gap-3">
               {ep ? (
                 <>
-                  <button type="button" data-focus-key="today-bloating" onClick={() => setSheet("ongoing")} className="flex min-h-20 items-center gap-4 rounded-md bg-brand px-4 py-3.5 text-left text-on-brand hover:opacity-90">
+                  <button type="button" data-focus-key="today-bloating" onClick={() => setSheet("ongoing")} className="group flex min-h-20 items-center gap-4 rounded-md bg-brand px-4 py-3.5 text-left text-on-brand hover:opacity-90">
                     {ep.current_strength !== null && (
                       <span aria-hidden className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-on-brand font-display text-xl font-extrabold tabular">{ep.current_strength}</span>
                     )}
                     <span className="flex grow flex-col"><span className="text-lg font-bold">Bloating ongoing</span><span className="text-[0.875rem]">Since {formatClock(Date.parse(ep.started_at), profile.time_zone, profile.units)}{ep.current_strength !== null ? ` · strength ${ep.current_strength}` : ""}</span></span>
-                    <ChevronRight size={20} strokeWidth={2} aria-hidden />
+                    <ChevronRight size={20} strokeWidth={2} className="transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden />
                   </button>
                   <Button variant="secondary" onClick={() => setSheet("end")}>It&apos;s gone</Button>
                 </>

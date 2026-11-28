@@ -87,7 +87,7 @@ export function Chip({ selected = false, onClick, children, tone = "brand", disa
         disabled && !selected && "cursor-not-allowed border-line text-ink-muted hover:bg-surface",
       )}
     >
-      {selected && <span aria-hidden>✓</span>}
+      {selected && <Check size={16} strokeWidth={2.8} className="pop-in shrink-0" aria-hidden />}
       {children}
     </button>
   );
@@ -128,15 +128,15 @@ export function StrengthScale({ value, onChange, min = 1, name }: { value: numbe
       <div role="radiogroup" aria-label={name} className="grid grid-cols-5 gap-2">
         {min === 0 && (
           <button type="button" role="radio" aria-checked={value === 0} onClick={() => onChange(0)}
-            className={cx("col-span-5 min-h-12 rounded-sm border font-semibold transition-colors duration-150", value === 0 ? "border-brand bg-brand text-on-brand" : "border-control bg-surface hover:bg-subtle")}>
-            {value === 0 && <span aria-hidden>✓ </span>}0 · No bloating
+            className={cx("col-span-5 inline-flex min-h-12 items-center justify-center gap-1.5 rounded-sm border font-semibold transition-colors duration-150", value === 0 ? "pick border-brand bg-brand text-on-brand" : "border-control bg-surface hover:bg-subtle")}>
+            {value === 0 && <Check size={16} strokeWidth={2.8} className="pop-in" aria-hidden />}0 · No bloating
           </button>
         )}
         {numbers.map((n) => {
           const on = value === n;
           return (
             <button key={n} type="button" role="radio" aria-checked={on} aria-label={`${n}`} onClick={() => onChange(n)}
-              className={cx("min-h-12 rounded-sm border text-lg font-semibold tabular transition-colors duration-150", on ? "border-brand bg-brand text-on-brand" : "border-control bg-surface text-ink hover:bg-subtle")}>
+              className={cx("min-h-12 rounded-sm border text-lg font-semibold tabular transition-colors duration-150", on ? "pick border-brand bg-brand text-on-brand" : "border-control bg-surface text-ink hover:border-ink hover:bg-subtle")}>
               {n}
             </button>
           );

@@ -30,7 +30,10 @@ function TabLink({ id, href, label, icon: Icon, on }: (typeof TABS)[number] & { 
     <Link href={href} data-press aria-current={on ? "page" : undefined}
       className={cx("flex min-h-12 flex-col items-center justify-center gap-1 text-xs no-underline", on ? "font-bold text-brand-text" : "font-medium text-ink-muted")}
       data-tab={id}>
-      <Icon size={22} strokeWidth={on ? 2.2 : 1.75} aria-hidden />
+      {/* The active tab's icon sits in a soft pill that grows in from the middle (250ms). */}
+      <span className={cx("flex h-7 w-14 items-center justify-center rounded-pill", on && "tab-pill bg-brand-tint")}>
+        <Icon size={22} strokeWidth={on ? 2.2 : 1.75} aria-hidden />
+      </span>
       {label}
     </Link>
   );
@@ -45,8 +48,8 @@ export function TabBar() {
       <ul className="mx-auto grid max-w-lg grid-cols-5 items-center px-1.5">
         {left.map((t) => <li key={t.id}><TabLink {...t} on={owner === t.id} /></li>)}
         <li className="flex justify-center">
-          <Link href={LOG_HREF} data-press className="-mt-5 inline-flex h-14 w-14 items-center justify-center rounded-md bg-brand text-on-brand no-underline hover:opacity-90">
-            <Plus size={26} strokeWidth={2.4} aria-hidden />
+          <Link href={LOG_HREF} data-press className="group -mt-5 inline-flex h-14 w-14 items-center justify-center rounded-md bg-brand text-on-brand no-underline hover:opacity-90">
+            <Plus size={26} strokeWidth={2.4} className="transition-transform duration-150 group-active:rotate-90" aria-hidden />
             <span className="sr-only">Log bloating</span>
           </Link>
         </li>
@@ -65,8 +68,8 @@ export function SideNav() {
         <Link href="/today" className="no-underline" aria-label="Bloat Buddy, Today"><Logo size={30} /></Link>
         <span className="t-label">Your bloating diary</span>
       </div>
-      <Link href={LOG_HREF} data-press className="flex min-h-12 items-center gap-3 rounded-sm bg-brand px-3 font-semibold text-on-brand no-underline hover:opacity-90">
-        <Plus size={20} strokeWidth={2.2} aria-hidden />
+      <Link href={LOG_HREF} data-press className="group flex min-h-12 items-center gap-3 rounded-sm bg-brand px-3 font-semibold text-on-brand no-underline hover:opacity-90">
+        <Plus size={20} strokeWidth={2.2} className="transition-transform duration-150 group-hover:rotate-90" aria-hidden />
         Log bloating
       </Link>
       <nav aria-label="Main" className="-mt-4">

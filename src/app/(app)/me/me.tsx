@@ -39,10 +39,10 @@ const REQUIRED = ["terms_privacy", "health_data", "wellness_ack"];
 
 function Row({ href, title, text, locked }: { href: string; title: string; text?: string; locked?: boolean }) {
   return (
-    <Link href={href} className="flex min-h-14 items-center gap-3 border-b border-line py-3 text-ink no-underline last:border-0">
+    <Link href={href} data-press className="group flex min-h-14 items-center gap-3 border-b border-line py-3 text-ink no-underline last:border-0">
       {locked && <Lock size={18} strokeWidth={1.75} className="shrink-0 text-ink-muted" aria-hidden />}
       <span className="flex grow flex-col"><span className="font-semibold">{title}{locked && <ProTag />}</span>{text && <span className="t-caption">{text}</span>}</span>
-      <ChevronRight size={20} strokeWidth={1.75} className="shrink-0 text-ink-muted" aria-hidden />
+      <ChevronRight size={20} strokeWidth={1.75} className="shrink-0 text-ink-muted transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden />
     </Link>
   );
 }
