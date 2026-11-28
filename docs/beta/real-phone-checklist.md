@@ -17,6 +17,7 @@ Do the whole list once on an **iPhone with Safari** and once on an **Android pho
 | # | Do this | Expect | Result |
 |---|---|---|---|
 | 1.1 | Open `https://bloat-preview.vercel.app` | The start page with **Sign in** (no "Get started", no Vercel login page) | |
+| 1.1b | On the start page, watch the sample phone, then scroll slowly to the end; tap **Pause animation**; try **Try it here** | The phone logs bloating by itself; the day story changes from morning to night as you scroll; Pause stops the phone and the moving line of words; the sample says nothing was saved or sent. Nothing jumps, stutters or covers text | |
 | 1.2 | Sign in with the email and temporary password | You land on Today | |
 | 1.3 | Pull down to refresh | Still signed in, still on Today | |
 | 1.4 | Add to home screen, close the browser, open Bloat Buddy from the home screen | It opens on Today, still signed in | |

@@ -33,10 +33,11 @@ Bloat is an installable mobile-web bloating tracker, shown to people as "Bloat B
 
 ## Toolkit
 
-The owner's chosen tools (27 Nov 2026). **Rule: prefer these tools over others when building anything.** Since the motion pass of 27 Nov 2026 (DECISIONS.md choice 34) the app uses Motion, GSAP (start page only), AutoAnimate, Sonner, Vaul, Recharts, React Hook Form + Zod, shadcn Command and Popover, Lucide and india-pincode; Lottie is installed but unused.
+The owner's chosen tools (27 Nov 2026). **Rule: prefer these tools over others when building anything.** Since the motion passes of 27 and 28 Nov 2026 (DECISIONS.md choices 34 and 35) the app uses Motion, GSAP ScrollTrigger (start page only), AutoAnimate, Sonner, Vaul, Recharts, React Hook Form + Zod, shadcn Command and Popover, Lucide and india-pincode; Lottie is installed but unused.
 
 Motion rules (owner's spec, 27 Nov 2026):
-- One source for timing: `--dur-press` 120ms, `--dur-fast` 150ms, `--dur-base` 250ms, `--dur-slow` 400ms and `--ease-out` in `globals.css`, mirrored in `src/lib/motion.ts`. Nothing longer than 400ms (the start page's slow background drift is the only exception), no bounce or spring overshoot, nothing that makes the person wait.
+- One source for timing: `--dur-press` 120ms, `--dur-fast` 150ms, `--dur-base` 250ms, `--dur-slow` 400ms and `--ease-out` in `globals.css`, mirrored in `src/lib/motion.ts`. No timed animation longer than 400ms, no bounce or spring overshoot, nothing that makes the person wait. Scroll-driven effects move only as fast as the person scrolls; ambient loops (the start page's dot drift, ticker and sample phone) never block anything and stop with "Pause animation".
+- The start page is a story you can play with (DECISIONS.md choice 35, the owner's 28 Nov request; countquill.com was the level of life, not a design to copy). Every control in the app gives a deliberate response (tab pill, chip tick, number pick, week fill, arrow nudge, theme cross-fade). Anything new should do the same, within these limits.
 - A tap answers within 150ms (buttons shrink to 0.97 when pressed). A button whose label ends in "…" shows a loader. A finished save shows a toast with a tick (`savedToast()` in `src/lib/client/feedback.tsx`), not an inline notice.
 - Sheets are Vaul drawers (`Sheet` in `ui.tsx`) and keep the unsaved-changes check. Loading shows a page skeleton (`Loading`), never a blank screen or a lone spinner.
 - "Reduce motion" turns every animation off (a global CSS rule plus `useReducedMotion()`/`reducedMotion()` in code).
