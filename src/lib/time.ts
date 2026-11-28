@@ -181,3 +181,15 @@ export function formatClock(ms: number, zone: string, units: "us" | "metric"): s
   const h12 = p.h % 12 === 0 ? 12 : p.h % 12;
   return `${h12}:${pad(p.mi)} ${p.h < 12 ? "am" : "pm"}`;
 }
+
+/**
+ * A clock time that says which one it was when that clock time happened twice (the clocks went back):
+ * "1:50 am (before the clocks went back)", "1:10 am (after the clocks went back)". Otherwise the same
+ * as formatClock. Compares clock offsets, so seconds do not matter.
+ */
+export function formatClockNoted(ms: number, zone: string, units: "us" | "metric"): string {
+  const base = formatClock(ms, zone, units);
+  const twins = zonedToUtc(`${localDate(ms, zone)}T${localTime(ms, zone)}`, zone);
+  if (twins.length !== 2) return base;
+  return `${base} (${offsetMinutes(ms, zone) === offsetMinutes(twins[0]!, zone) ? "before" : "after"} the clocks went back)`;
+}

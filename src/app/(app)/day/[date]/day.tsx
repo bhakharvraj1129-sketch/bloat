@@ -6,7 +6,7 @@ import { TimePick, AmbiguousChoice, timeMissing, type TimeValue } from "@/compon
 import { useLoad, useSave } from "@/lib/client/hooks";
 import { deviceZone } from "@/lib/client/api";
 import { label as optionLabel, question } from "@/lib/registry";
-import { formatClock, formatDate, formatDuration, localParts } from "@/lib/time";
+import { formatClock, formatClockNoted, formatDate, formatDuration, localDate, localParts } from "@/lib/time";
 import { zoneLabel } from "@/lib/regions";
 import { ChartGate } from "@/components/chart-kit";
 import { DayTimeline } from "@/components/day-timeline";
@@ -50,6 +50,12 @@ export function DayDetail({ date }: { date: string }) {
   if (error && !data) return <Screen title="Day" back="/history"><ErrorState error={error} onRetry={reload} /></Screen>;
   if (!data) return null;
   const clock = (iso: string) => formatClock(Date.parse(iso), data.zone, data.units);
+  // A record that started or ends on another day (it runs through this one) also says which day.
+  const stamp = (iso: string) => {
+    const d = localDate(Date.parse(iso), data.zone);
+    const t = formatClockNoted(Date.parse(iso), data.zone, data.units);
+    return d === date ? t : `${formatDate(d, data.date_format)}, ${t}`;
+  };
   const finished = data.date < data.today;
   const empty = !data.episodes.length && !data.meals.length && !data.activities.length && !data.bowel.length && !data.exercise.length;
 
@@ -82,7 +88,7 @@ export function DayDetail({ date }: { date: string }) {
         <ChartGate>
           <section className="flex flex-col gap-2" aria-labelledby="glance">
             <Label id="glance" heading>The day at a glance</Label>
-            <Card><DayTimeline date={date} today={data.today} zone={data.zone} units={data.units} episodes={data.episodes} meals={data.meals} exercise={data.exercise} bowel={data.bowel} /></Card>
+            <Card><DayTimeline date={date} today={data.today} zone={data.zone} units={data.units} dateFormat={data.date_format} episodes={data.episodes} meals={data.meals} exercise={data.exercise} bowel={data.bowel} /></Card>
           </section>
         </ChartGate>
       )}
@@ -97,7 +103,7 @@ export function DayDetail({ date }: { date: string }) {
                 <div className="flex items-center gap-3">
                   <ScoreBadge value={strongest} size="md" />
                   <div className="grow">
-                    <p className="t-body-strong">{e.start_precision === "approximate" ? "About " : ""}{clock(e.started_at)} – {e.state === "OPEN" ? "ongoing" : e.ended_at ? `${e.end_precision === "approximate" ? "about " : ""}${clock(e.ended_at)}` : "end not known"}</p>
+                    <p className="t-body-strong">{e.start_precision === "approximate" ? "About " : ""}{stamp(e.started_at)} – {e.state === "OPEN" ? "ongoing" : e.ended_at ? `${e.end_precision === "approximate" ? "about " : ""}${stamp(e.ended_at)}` : "end not known"}</p>
                     <Caption>{e.samples.length} strength {e.samples.length === 1 ? "reading" : "readings"}: {e.samples.map((s) => s.strength).join(", ")}</Caption>
                   </div>
                 </div>

@@ -3,6 +3,7 @@ import { loadUser } from "@/server/userdata";
 import { daysView, mealsOn } from "@/server/days";
 import { diffDays, isDate, analysisDate } from "@/lib/time";
 import { activity, tagLabel } from "@/lib/registry";
+import { episodeDates } from "@/lib/domain/day";
 
 // Day detail: status, score, the day's timeline and the review answers, for correcting any record.
 export const GET = route({ feature: "history_list" }, async (ctx) => {
@@ -13,7 +14,10 @@ export const GET = route({ feature: "history_list" }, async (ctx) => {
   const view = await daysView(ctx.db, ctx.userId, u, date, date, ctx.now);
   const s = view.summaries[0]!;
   const on = (iso: string) => analysisDate(Date.parse(iso), u.periods) === date;
-  const episodes = view.data.episodes.filter((e) => on(e.started_at) || (e.ended_at && on(e.ended_at)));
+  // The same rule the day's summary uses (episodeDates): a finished record is on every local date it
+  // overlaps, so a Monday-to-Wednesday record is also on Tuesday, and one that ends exactly at
+  // midnight is not on the next day; an open or unknown-end record is on its start date only.
+  const episodes = view.data.episodes.filter((e) => episodeDates(e, u.periods).includes(date));
   const epIds = episodes.map((e) => e.id);
   const [{ data: warnings }, { data: symptoms }, { data: bowel }, { data: exercise }] = await Promise.all([
     epIds.length ? ctx.db.from("warning_signs").select("episode_id,code").eq("user_id", ctx.userId).in("episode_id", epIds) : Promise.resolve({ data: [] }),

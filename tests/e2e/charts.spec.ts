@@ -139,3 +139,82 @@ test.describe("charts", () => {
     await expect(fig).toContainText("not proof that the habit caused anything");
   });
 });
+
+// The day picture is drawn to real time (review of 28 Nov 2026, finding 4): a day can have 23 or 25
+// hours when the clocks change, and a record's marks must sit where its instants fall within the
+// day's real start and end. Times in an hour that happened twice say which one they were.
+type Geom = { track: { x: number; w: number }; bars: Array<{ x: number; w: number }>; dots: number[] };
+const geom = (page: Page) => page.evaluate((): Geom => {
+  const bars = [...document.querySelectorAll<HTMLElement>('[title^="Bloating from"]')];
+  const track = bars[0]!.offsetParent!.getBoundingClientRect();
+  return {
+    track: { x: track.x, w: track.width },
+    bars: bars.map((b) => { const r = b.getBoundingClientRect(); return { x: r.x, w: r.width }; }),
+    dots: [...document.querySelectorAll<HTMLElement>('[title^="Strength"]')].map((d) => { const r = d.getBoundingClientRect(); return r.x + r.width / 2; }),
+  };
+});
+const NYZ = "America/New_York";
+const local = (when: string, offset_min?: number) => ({ mode: "exact", local: when, zone: NYZ, ...(offset_min === undefined ? {} : { offset_min }) });
+
+test.describe("day picture across clock changes", () => {
+  test("autumn: a 20-minute record in the repeated hour (01:50 before, 01:10 after the change) runs forwards, its reading sits inside it, and the times say which hour", async ({ context }) => {
+    const c = await account(context);
+    const s = await c.api("POST", "/v1/episodes", { strength: 5, started: local("2026-11-01T01:50", -240) }, "2026-11-01T05:51:00Z");
+    expect(s.status, JSON.stringify(s.body)).toBe(201);
+    expect(s.body.episode.started_at).toBe("2026-11-01T05:50:00.000Z");
+    expect((await c.api("POST", `/v1/episodes/${s.body.episode.id}/samples`, { strength: 7 }, "2026-11-01T06:05:00Z")).status).toBe(201);
+    const e = await c.api("POST", `/v1/episodes/${s.body.episode.id}/end`, { ended: local("2026-11-01T01:10", -300) }, "2026-11-01T06:15:00Z");
+    expect(e.status, JSON.stringify(e.body)).toBe(200);
+    await c.page.goto("/day/2026-11-01");
+    await expect(c.page.getByRole("img", { name: /^The day from midnight to midnight/ })).toBeVisible({ timeout: 20000 });
+    const g = await geom(c.page);
+    const bar = g.bars[0]!;
+    // Real position: 1 h 50 min after midnight in a 25-hour day.
+    expect((bar.x - g.track.x) / g.track.w).toBeCloseTo(110 / 1500, 2);
+    expect(g.dots.length).toBeGreaterThan(0);
+    for (const d of g.dots) {
+      expect(d, "a reading sits inside its record").toBeGreaterThanOrEqual(bar.x - 1);
+      expect(d, "a reading sits inside its record").toBeLessThanOrEqual(bar.x + bar.w + 1);
+    }
+    await expect(c.page.getByText("The clocks went back this day")).toBeVisible();
+    const glance = c.page.getByRole("region", { name: "The day at a glance" });
+    await glance.getByRole("button", { name: "Show as a table" }).click();
+    const table = glance.getByRole("table");
+    await expect(table).toContainText("1:50 am (before the clocks went back)");
+    await expect(table).toContainText("ended 1:10 am (after the clocks went back)");
+    await expect(table).toContainText("1:05 am (after the clocks went back)");
+  });
+
+  test("spring: a record from 01:30 to 03:30 on the 23-hour day lasted one hour and is drawn one hour long", async ({ context }) => {
+    const c = await account(context);
+    const s = await c.api("POST", "/v1/episodes", { strength: 5, started: local("2026-03-08T01:30") }, "2026-03-08T06:31:00Z");
+    expect(s.status, JSON.stringify(s.body)).toBe(201);
+    expect((await c.api("POST", `/v1/episodes/${s.body.episode.id}/end`, { ended: local("2026-03-08T03:30") }, "2026-03-08T07:31:00Z")).status).toBe(200);
+    await c.page.goto("/day/2026-03-08");
+    await expect(c.page.getByRole("img", { name: /^The day from midnight to midnight/ })).toBeVisible({ timeout: 20000 });
+    const g = await geom(c.page);
+    expect(g.bars[0]!.w / g.track.w).toBeCloseTo(60 / (23 * 60), 2);
+    expect((g.bars[0]!.x - g.track.x) / g.track.w).toBeCloseTo(90 / (23 * 60), 2);
+    await expect(c.page.getByText("The clocks went forward this day")).toBeVisible();
+  });
+
+  test("a record from Monday night to Wednesday morning: Tuesday lists it with both dates and draws it across the whole day; Monday draws it to the end of the day", async ({ context }) => {
+    const c = await account(context);
+    const s = await c.api("POST", "/v1/episodes", { strength: 5, started: local("2026-11-09T22:00") }, "2026-11-10T03:01:00Z");
+    expect(s.status, JSON.stringify(s.body)).toBe(201);
+    expect((await c.api("POST", `/v1/episodes/${s.body.episode.id}/end`, { ended: local("2026-11-11T02:00") }, "2026-11-11T07:01:00Z")).status).toBe(200);
+    await c.page.goto("/day/2026-11-10");
+    await expect(c.page.getByText("Mon Nov 9, 10:00 pm – Wed Nov 11, 2:00 am")).toBeVisible({ timeout: 20000 });
+    await expect(c.page.getByRole("img", { name: /^The day from midnight to midnight: Bloating 1/ })).toBeVisible();
+    let g = await geom(c.page);
+    expect((g.bars[0]!.x - g.track.x) / g.track.w).toBeCloseTo(0, 2);
+    expect(g.bars[0]!.w / g.track.w).toBeCloseTo(1, 2);
+    await expect(c.page.getByText(/clocks went/)).toHaveCount(0);
+    await c.page.goto("/day/2026-11-09");
+    await expect(c.page.getByText("10:00 pm – Wed Nov 11, 2:00 am")).toBeVisible({ timeout: 20000 });
+    await expect(c.page.getByRole("img", { name: /^The day from midnight to midnight: Bloating 1/ })).toBeVisible();
+    g = await geom(c.page);
+    expect((g.bars[0]!.x - g.track.x) / g.track.w).toBeCloseTo(22 / 24, 2);
+    expect((g.bars[0]!.x + g.bars[0]!.w - g.track.x) / g.track.w).toBeCloseTo(1, 2);
+  });
+});
