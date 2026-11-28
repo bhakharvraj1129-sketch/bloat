@@ -1,8 +1,25 @@
 # Test results
 
-Last run: 28 Nov 2026 (the motion and design pass, local results below; run 22 follows). Before that: 27 Nov 2026 (the owner's answers D33 to D35 and the state list, commit `c91169c`, published by run 21 as `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
+Last run: 28 Nov 2026 (the motion and design pass, commit `7953a6a`, published by run 22 as `dpl_FCsJjMaBkxJ87uNHu8tKyK8MUvGK`). Before that: 27 Nov 2026 (the owner's answers D33 to D35 and the state list, commit `c91169c`, published by run 21 as `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
+
+## Motion and design pass (28 Nov 2026): run 22, deployment `dpl_FCsJjMaBkxJ87uNHu8tKyK8MUvGK`
+
+Published revision `7953a6af42e37e87adccc5e065e7cc1a5beb692f` on `https://bloat-preview.vercel.app` and the branch address (00:25 UTC). Preview variables unchanged. The three main addresses still serve `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (`83fe4da`), read back from Vercel after the run.
+
+| Check | Passed | Failed | Notes |
+|---|---|---|---|
+| GitHub run 22 | Typecheck, lint, rule tests, API tests, browser tests (phone screen), the Vercel build, the account-free live checks before and after publishing | 0 | Clean checkout and empty database. The round's checks and the password form are skipped there (they need a server with the round's settings), not passed |
+| Tested = deployed | | | Both preview addresses on `dpl_FCsJjMaBkxJ87uNHu8tKyK8MUvGK`; all 228 repository files Vercel lists are byte-identical to `7953a6a`, 44 of the 56 files changed since run 21 among them; Vercel lists 495 of 698 files |
+| Core hosted suite, 16 checks | 16 | 0 | Disposable accounts marked `synthetic_test_run = 2026-11-27-run22` |
+| `tests/hosted/beta-candidate.spec.ts`, 4 checks | 4 | 0 | Includes the password change through the new form |
+| `tests/hosted/motion.spec.ts` (new), 3 checks | 3 | 0 | On the live build: the PIN lookup answers (380001 gives Gujarat and Ahmadabad, 999999 is 404, 012345 is 422), so its data file is in Vercel's server bundle; in You, 560001 shows "Bengaluru Urban, Karnataka", saves Karnataka, keeps it after a reload, and the PIN code is not in the saved profile; Add meal opens a 250ms bottom sheet with focus inside, and Save ends with "Meal saved.", a tick and the polite live region; the start page's sections end fully visible after scrolling |
+| `tests/hosted/reported-fixes.spec.ts` (account in India, phone in Los Angeles), 1 check | 1 | 0 | Run with a fresh Pro test account: the one the suite had set up was deleted through the app and made again (same marker), as in run 21 |
+| Cleanup: 10 accounts deleted through the app (9 roles, and the first Pro test account earlier) | 10 | 0 | Each answered "deleted"; the same sign-in was refused (401) straight after; the one-off password file destroyed |
+| Read-only check of `bloat-test` after the cleanup | | | 0 accounts by ID or address, 0 with a test-run marker, 0 identities, sessions or refresh tokens, 0 rows in all 48 tables with a user column, 0 stored files; `bloat-tester` unchanged (1 meal, 1 bloating record, 2 readings, 1 report, same sign-in times and password hash); the 5 participant accounts unchanged by the check (same IDs, sign-in and update times before and after); 9 accounts in all, as before |
+
+**Not performed:** real phones and screen readers (browser emulation only); swipe-to-close by touch.
 
 ## Motion and design pass (27 to 28 Nov 2026): local results before run 22
 
