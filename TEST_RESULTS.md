@@ -4,6 +4,33 @@ Last run: 28 Nov 2026 (charts, graphs and pattern diagrams, commit `0bfa329`, pu
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
 
+## Outside review checked and fixed, interface review, stronger gate (28 Nov 2026): local results before run 26
+
+DECISIONS.md choice 37. The outside review of app commit `0bfa329` reported four findings from isolated source-level checks. Each was first reproduced on the real local app (local Supabase, real HTTP, a real browser), with a test that failed on the unchanged code; then fixed. None was disproved or already fixed. Local stack, synthetic accounts only; a normal server (port 3100) and a second server from the same build with the preview's beta settings (port 3200: AI off; Learn, daily cards and experiments off; password sign-in).
+
+| Finding | Reproduced on the old code | After the fix |
+|---|---|---|
+| 1. A record from Monday night to Wednesday morning missing from Tuesday's list | `tests/api/day-span.test.ts`: 3 of 4 failed (Tuesday's list empty while its summary counted 24 hours; 25 hours on the autumn clock-change day; a record ending exactly at midnight listed on the next day with 0 minutes). The open and unknown-end check already passed | 4 of 4, and the day and record API tests 38 of 38. Browser: Tuesday lists it as "Mon Nov 9, 10:00 pm – Wed Nov 11, 2:00 am" and draws it across the whole day |
+| 2. Hide charts carrying over between accounts | `tests/e2e/chart-preference.spec.ts` (account switches signed in through the password form, same tab, no reload): B's day picture hidden after A (who hid charts) signed out; A's late answer switched B's charts on; after a temporary loading failure charts never came back. The failed-save check already passed | 4 of 4 on the password server three times (12 of 12); the settings save checks still pass |
+| 3. PIN code lookup race | `tests/e2e/pin-field.spec.ts`, all 4 failed: the older Gujarat answer replaced the newer Karnataka one; a cleared field still got Gujarat; a state picked by hand (Kerala) was overwritten; after leaving You, Gujarat was saved | 4 of 4 twice; the PIN code is in neither the profile nor the browser's storage; the old address form answers 404 or 405 |
+| 4. Day picture across clock changes | `tests/e2e/charts.spec.ts`: on 1 Nov 2026 (New York) the 1:05 am reading sat before its own record's start (drawn backwards); on 8 Mar 2026 a one-hour record was drawn two hours long | 7 of 7 chart checks twice; times in the repeated hour say "before" or "after the clocks went back" |
+
+Interface review (new `tests/e2e/interface-review.spec.ts`; browser emulation, not a real phone or screen reader): a crawl of every main screen at 320 px and 412 px, light and dark, reduced motion, populated Pro and new account (names, fit, 24 px targets, text contrast, page errors, running animations); every in-app link followed and Back pressed; widths 320 to 1280; chart controls by keyboard; 200% zoom on the chart screens; drawers at 320 px in dark; the password forms. It found, and these were fixed: the tab bar's Log button trapped the phone's Back on Today (regression test in `navigation.spec.ts` failed first); radio groups ignored arrow keys; the selected price option's per-month text at 1.49:1; checkboxes squeezed to 13 px beside long labels at 320 px; sign-in field problems in red without an icon; "Search state or union territorys". Two first failures were the review's own mistakes (a link check that did not wait for its click, an account not dated back), corrected in the test.
+
+Final candidate, the publishing gate's own commands, run locally (14:30 UTC):
+
+| Suite | Passed | Failed | Skipped |
+|---|---|---|---|
+| Type check and lint | passed (lint: 0 errors, the same 5 old warnings) | | |
+| Rule tests | 107 | 0 | 0 |
+| API tests (normal server) | 170 | 0 | 10 (the round's checks, run below) |
+| Browser tests (normal server) | 319 | 0 | 7 (need the beta settings or password sign-in, run below) |
+| API, beta settings (second server) | 10 | 0 | 0 |
+| Browser, beta settings and password sign-in (second server) | 41 | 0 | 0 |
+| Live checks `tests/hosted/charts.spec.ts` against the second server | 3 | 0 | 0 (including the new middle-day check) |
+
+**Not performed:** real phones and screen readers. The checklist (`docs/beta/real-phone-checklist.md`) now includes this round's items (7.5 to 7.8, 8.6 to 8.8).
+
 ## Charts, graphs and pattern diagrams (28 Nov 2026): run 25, deployment `dpl_7aBmbLFDaUjXm6WBcfqWm2XKDKG1`
 
 Published revision `0bfa3291e224ff64bf45bf16f8f0d61d2ed11306` on `https://bloat-preview.vercel.app` and the branch address (10:27 UTC). Preview variables unchanged. The three main addresses still serve `dpl_DoAEN2q7gxKTrfvL9pZw1nGGEekn` (`83fe4da`), read back from Vercel after the run.
