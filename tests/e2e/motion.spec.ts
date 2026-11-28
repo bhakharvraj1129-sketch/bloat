@@ -182,11 +182,17 @@ test.describe("motion spec", () => {
   test("start page: the day story moves with the scroll, and the questions open one at a time", async ({ page }) => {
     await page.goto("/");
     const story = page.locator("section[aria-labelledby=day-title]");
-    const box = (await story.boundingBox())!;
-    const top = (await page.evaluate(() => scrollY)) + box.y;
-    await page.evaluate((y) => scrollTo(0, y + 5), top);
+    // Where the story is now, in page terms. Measured again before each scroll: just after loading,
+    // the story can still be its short, unscripted height (seen 28 Nov: 1397px before 3020px).
+    const where = async () => {
+      const box = (await story.boundingBox())!;
+      const [y, h] = await page.evaluate(() => [scrollY, innerHeight]);
+      return { top: y + box.y, end: y + box.y + box.height - h };
+    };
+    await story.scrollIntoViewIfNeeded();
+    await page.evaluate((y) => scrollTo(0, y + 5), (await where()).top);
     await expect.poll(() => page.getByRole("heading", { name: "Morning review.", exact: true }).evaluate((el) => getComputedStyle(el.parentElement!).opacity)).toBe("1");
-    await page.evaluate((y) => scrollTo(0, y), top + box.height - (await page.evaluate(() => innerHeight)) - 5);
+    await page.evaluate((y) => scrollTo(0, y - 5), (await where()).end);
     await expect.poll(() => page.getByRole("heading", { name: "Day done.", exact: true }).evaluate((el) => getComputedStyle(el.parentElement!).opacity)).toBe("1");
 
     const first = page.getByRole("button", { name: "Who is Bloat Buddy for?" });

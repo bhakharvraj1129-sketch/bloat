@@ -126,13 +126,16 @@ export function ScoreLegend({ unknown = true }: { unknown?: boolean }) {
 }
 
 /** A short key for a line or a mark: a stroke or a swatch of the series colour, then its name in text colour. */
-export function Key({ items }: { items: Array<{ label: string; color: string; kind?: "line" | "box" | "ring" }> }) {
+export function Key({ items }: { items: Array<{ label: string; color: string; kind?: "line" | "box" | "ring" | "dot" | "diamond" | "ramp" }> }) {
   return (
     <ul className="m-0 flex list-none flex-wrap items-center gap-x-4 gap-y-1 p-0 text-xs text-ink-muted" aria-label="Key">
       {items.map((it) => (
         <li key={it.label} className="flex items-center gap-1.5">
           {it.kind === "line" ? <span aria-hidden className="h-0.5 w-4 rounded-pill" style={{ background: it.color }} />
             : it.kind === "ring" ? <span aria-hidden className="h-2.5 w-2.5 rounded-full border-2 bg-surface" style={{ borderColor: it.color }} />
+            : it.kind === "dot" ? <span aria-hidden className="h-2.5 w-2.5 rounded-full" style={{ background: it.color }} />
+            : it.kind === "diamond" ? <span aria-hidden className="h-2 w-2 rotate-45 rounded-[1px]" style={{ background: it.color }} />
+            : it.kind === "ramp" ? <span aria-hidden className="flex gap-px">{[2, 5, 7, 9].map((n) => <span key={n} className="h-3 w-2 rounded-[2px] border" style={{ background: scoreFill(n), borderColor: scoreOutline(n) === "none" ? scoreFill(n) : scoreOutline(n) }} />)}</span>
             : <span aria-hidden className="h-3 w-3 rounded-[3px]" style={{ background: it.color }} />}
           {it.label}
         </li>

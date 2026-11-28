@@ -64,7 +64,7 @@ export function DayTimeline({ date, today, zone, units, episodes, meals, exercis
       name: "Exercise",
       marks: exercise.map((x, i) => {
         const s = mins(x.started_at);
-        return <span key={`x-${i}`} title={`${x.type} for ${x.minutes} minutes at ${clock(x.started_at)}`} className="absolute top-1/2 h-2.5 -translate-y-1/2 rounded-[4px] bg-score-moderate" style={{ left: pct(s), width: `max(6px, calc(${pct(s + x.minutes)} - ${pct(s)}))` }} />;
+        return <span key={`x-${i}`} title={`${x.type} for ${x.minutes} minutes at ${clock(x.started_at)}`} className="absolute top-1/2 h-2.5 -translate-y-1/2 rounded-[4px] bg-ink-muted" style={{ left: pct(s), width: `max(6px, calc(${pct(s + x.minutes)} - ${pct(s)}))` }} />;
       }),
     });
   }
@@ -102,8 +102,10 @@ export function DayTimeline({ date, today, zone, units, episodes, meals, exercis
         </div>
       </div>
       <Key items={[
-        ...(episodes.length ? [{ label: "Bloating, coloured by strongest reading", color: "var(--score-moderate)" }, { label: "A strength reading", color: "var(--ink)" }] : []),
-        ...(meals.length ? [{ label: "Meal", color: "var(--brand)" }] : []),
+        ...(episodes.length ? [{ label: "Bloating, coloured by its strongest reading", color: "", kind: "ramp" as const }, { label: "A strength reading", color: "var(--ink)", kind: "dot" as const }] : []),
+        ...(meals.length ? [{ label: "Meal", color: "var(--brand)", kind: "dot" as const }] : []),
+        ...(exercise.length ? [{ label: "Exercise", color: "var(--ink-muted)" }] : []),
+        ...(bowel.length ? [{ label: "Bowel movement", color: "var(--control)", kind: "diamond" as const }] : []),
         ...(isToday ? [{ label: "Now", color: "var(--ink)", kind: "line" as const }] : []),
       ]} />
       <TableView caption="This day's entries in time order" head={["Time", "Entry", "Detail"]} rows={table.map(([, t, what, detail]) => [t, what, detail])} />

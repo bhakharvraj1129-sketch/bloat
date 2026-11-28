@@ -67,7 +67,7 @@ export function MethodDiagram() {
       </div>
 
       <p className="m-0 flex items-center gap-2 rounded-sm bg-brand-tint px-3 py-2.5 text-sm font-semibold text-brand-text">
-        <Check size={18} strokeWidth={2.6} aria-hidden />In this sample, the habit would be listed under &quot;Worth watching&quot;. It is a difference in records, not proof that the habit caused anything.
+        <Check size={18} strokeWidth={2.6} aria-hidden className="shrink-0" />In this sample, the habit would be listed under &quot;Worth watching&quot;. It is a difference in records, not proof that the habit caused anything.
       </p>
     </figure>
   );

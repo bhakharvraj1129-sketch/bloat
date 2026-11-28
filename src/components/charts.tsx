@@ -368,6 +368,9 @@ export function TrendLine({ points }: { points: Array<{ label: string; value: nu
   if (known.length < 2) return <Caption>A trend line appears once two weeks have scored days.</Caption>;
   const data = points.map((p, i) => ({ i, value: p.value, label: p.label, days: p.days ?? null }));
   const last = [...data].reverse().find((d) => d.value !== null)!;
+  // Evenly spaced week labels, counted back from the latest week so it is always named (at most 4 fit a phone).
+  const step = Math.max(1, Math.ceil(data.length / 4));
+  const ticks = data.filter((d) => (data.length - 1 - d.i) % step === 0).map((d) => d.i);
   return (
     <div className="flex flex-col gap-2">
       <div role="img" aria-label={`Weekly average Bloat Score: ${known.map((p) => `${p.label} ${p.value!.toFixed(1)}`).join(", ")}.`} className="h-[160px] w-full">
@@ -375,7 +378,7 @@ export function TrendLine({ points }: { points: Array<{ label: string; value: nu
           <AreaChart data={data} margin={{ top: 12, right: 28, left: 0, bottom: 0 }} accessibilityLayer={false}>
             <CartesianGrid vertical={false} stroke="var(--line)" />
             <YAxis domain={[0, 10]} ticks={[0, 5, 10]} tickLine={false} axisLine={false} width={26} tick={AXIS_TICK} />
-            <XAxis dataKey="i" tickLine={false} axisLine={{ stroke: "var(--line)" }} interval="preserveStartEnd" minTickGap={24} tick={AXIS_TICK} tickFormatter={(i: number) => data[i]?.label ?? ""} />
+            <XAxis dataKey="i" tickLine={false} axisLine={{ stroke: "var(--line)" }} ticks={ticks} interval={0} tick={AXIS_TICK} tickFormatter={(i: number) => data[i]?.label ?? ""} />
             <Tooltip cursor={{ stroke: "var(--control)", strokeWidth: 1 }} isAnimationActive={false}
               content={({ active, payload }) => { const p = active ? (payload?.[0]?.payload as (typeof data)[number] | undefined) : undefined; return p ? <TipCard title={`Week of ${p.label}`} rows={[{ value: p.value === null ? "–" : p.value.toFixed(1), label: p.value === null ? "no scored days" : `average${p.days ? ` · ${p.days} ${p.days === 1 ? "day" : "days"}` : ""}`, mark: "var(--brand)" }]} /> : null; }} />
             <Area type="linear" dataKey="value" stroke="var(--brand)" strokeWidth={2} fill="var(--brand)" fillOpacity={0.1} connectNulls={false}
