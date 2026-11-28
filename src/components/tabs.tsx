@@ -22,7 +22,8 @@ function useOwner(): Owner | null {
   return ownerOf(path, from);
 }
 
-/** Opens the bloating log from anywhere: Today reads ?log=1 and opens Log bloating, or Bloating now if one is open. */
+/** Opens the bloating log from anywhere: Today reads ?log=1 and opens Log bloating, or Bloating now if one is open.
+ *  On Today itself the link replaces the address instead of adding a step, so Back still leaves Today. */
 export const LOG_HREF = "/today?log=1";
 
 function TabLink({ id, href, label, icon: Icon, on }: (typeof TABS)[number] & { on: boolean }) {
@@ -48,7 +49,7 @@ export function TabBar() {
       <ul className="mx-auto grid max-w-lg grid-cols-5 items-center px-1.5">
         {left.map((t) => <li key={t.id}><TabLink {...t} on={owner === t.id} /></li>)}
         <li className="flex justify-center">
-          <Link href={LOG_HREF} data-press className="group -mt-5 inline-flex h-14 w-14 items-center justify-center rounded-md bg-brand text-on-brand no-underline hover:opacity-90">
+          <Link href={LOG_HREF} replace={owner === "today"} data-press className="group -mt-5 inline-flex h-14 w-14 items-center justify-center rounded-md bg-brand text-on-brand no-underline hover:opacity-90">
             <Plus size={26} strokeWidth={2.4} className="transition-transform duration-150 group-active:rotate-90" aria-hidden />
             <span className="sr-only">Log bloating</span>
           </Link>
@@ -68,7 +69,7 @@ export function SideNav() {
         <Link href="/today" className="no-underline" aria-label="Bloat Buddy, Today"><Logo size={30} /></Link>
         <span className="t-label">Your bloating diary</span>
       </div>
-      <Link href={LOG_HREF} data-press className="group flex min-h-12 items-center gap-3 rounded-sm bg-brand px-3 font-semibold text-on-brand no-underline hover:opacity-90">
+      <Link href={LOG_HREF} replace={owner === "today"} data-press className="group flex min-h-12 items-center gap-3 rounded-sm bg-brand px-3 font-semibold text-on-brand no-underline hover:opacity-90">
         <Plus size={20} strokeWidth={2.2} className="transition-transform duration-150 group-hover:rotate-90" aria-hidden />
         Log bloating
       </Link>

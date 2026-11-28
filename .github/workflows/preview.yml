@@ -96,7 +96,7 @@ jobs:
         env:
           BLOAT_OFF_BASE_URL: http://127.0.0.1:3200
       - name: Browser checks with the beta settings and password sign-in
-        run: pnpm exec playwright test --trace off --reporter=list,json tests/e2e/acceptance-round.spec.ts tests/e2e/chart-preference.spec.ts tests/e2e/motion.spec.ts tests/e2e/charts.spec.ts
+        run: pnpm exec playwright test --trace off --reporter=list,json tests/e2e/acceptance-round.spec.ts tests/e2e/chart-preference.spec.ts tests/e2e/motion.spec.ts tests/e2e/charts.spec.ts tests/e2e/interface-review.spec.ts
         env:
           E2E_PORT: "3200"
           E2E_SIGN_IN: password

@@ -83,7 +83,7 @@ export function SignIn({ testLogin, google: googleOn }: { testLogin: boolean; go
         <Field label="Email"><input ref={emailRef} className={inputClass} type="email" inputMode="email" autoCapitalize="none" spellCheck={false} required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} aria-describedby={message ? "send-code-message" : undefined} /></Field>
         {isNew && (
           <label className="flex min-h-11 items-center gap-3">
-            <input type="checkbox" className="h-6 w-6 accent-(--brand)" checked={adult} onChange={(e) => setAdult(e.target.checked)} />
+            <input type="checkbox" className="h-6 w-6 shrink-0 accent-(--brand)" checked={adult} onChange={(e) => setAdult(e.target.checked)} />
             <span>I am 18 or older</span>
           </label>
         )}

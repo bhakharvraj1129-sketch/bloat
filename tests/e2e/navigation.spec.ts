@@ -73,6 +73,38 @@ test("the phone's Back button closes an open sheet and stays on the screen; focu
   await expect(page).toHaveURL(/\/me$/);
 });
 
+test("the tab bar's Log button: the phone's Back closes Log bloating and then leaves Today, from another screen or from Today itself", async ({ context }) => {
+  // Found in the interface review of 28 Nov 2026: after Log, Back landed on /today?log=1 again and
+  // reopened the sheet, so Back could neither close it nor leave Today.
+  const page = await account(context);
+  const log = () => page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: /^Log/ });
+  const sheet = () => page.getByRole("dialog", { name: "Log bloating" });
+  await page.goto("/me");
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "History" }).click();
+  await expect(page).toHaveURL(/\/history$/);
+  await log().click();
+  await expect(sheet()).toBeVisible();
+  await expect(page).toHaveURL(/\/today$/);
+  await page.goBack();
+  await expect(sheet()).toHaveCount(0);
+  await expect(page).toHaveURL(/\/today$/);
+  await page.waitForTimeout(500);
+  await expect(sheet()).toHaveCount(0); // it does not open again by itself
+  await page.goBack();
+  await expect(page).toHaveURL(/\/history$/);
+
+  // From Today itself: Back closes the sheet, and the next Back leaves Today.
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Today" }).click();
+  await expect(page).toHaveURL(/\/today$/);
+  await log().click();
+  await expect(sheet()).toBeVisible();
+  await page.goBack();
+  await expect(sheet()).toHaveCount(0);
+  await expect(page).toHaveURL(/\/today$/);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/history$/);
+});
+
 test("closing a sheet with something typed asks first, and keeps what was typed", async ({ context }) => {
   const page = await account(context);
   await page.goto("/today");

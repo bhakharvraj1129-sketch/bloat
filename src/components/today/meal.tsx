@@ -223,7 +223,7 @@ export function MealSheet({ open, onOpenChange, state, onSaved }: Props) {
             </div>
           </div>
           <label className="flex min-h-11 items-center gap-3">
-            <input type="checkbox" className="h-6 w-6 accent-(--brand)" checked={asDish} onChange={(e) => setAsDish(e.target.checked)} />
+            <input type="checkbox" className="h-6 w-6 shrink-0 accent-(--brand)" checked={asDish} onChange={(e) => setAsDish(e.target.checked)} />
             <span>{question("ML-12").prompt}</span>
           </label>
           {asDish && <Field label="Place (optional)" hint="For example: Chipotle"><input className={inputClass} maxLength={80} value={place} onChange={(e) => setPlace(e.target.value)} /></Field>}

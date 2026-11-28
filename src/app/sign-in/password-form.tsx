@@ -1,4 +1,5 @@
 "use client";
+import { FieldMessage } from "@/components/field-message";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Button, Caption, inputClass } from "@/components/ui";
@@ -79,7 +80,7 @@ export function PasswordSignIn() {
             aria-invalid={errors.email ? true : undefined} aria-describedby={describe("email")}
             onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors({ ...errors, email: undefined }); }}
           />
-          {errors.email && <p id="email-error" className="t-caption text-alert">{errors.email}</p>}
+          <FieldMessage id="email-error" error={errors.email} />
         </div>
         <div className="flex flex-col gap-2">
           <label htmlFor="password" className="t-body-strong">Password</label>
@@ -89,9 +90,9 @@ export function PasswordSignIn() {
             aria-invalid={errors.password ? true : undefined} aria-describedby={describe("password")}
             onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors({ ...errors, password: undefined }); }}
           />
-          {errors.password && <p id="password-error" className="t-caption text-alert">{errors.password}</p>}
+          <FieldMessage id="password-error" error={errors.password} />
           <label className="flex min-h-11 items-center gap-3">
-            <input type="checkbox" className="h-6 w-6 accent-(--brand)" checked={show} onChange={(e) => setShow(e.target.checked)} />
+            <input type="checkbox" className="h-6 w-6 shrink-0 accent-(--brand)" checked={show} onChange={(e) => setShow(e.target.checked)} />
             <span>Show password</span>
           </label>
         </div>
@@ -99,13 +100,13 @@ export function PasswordSignIn() {
           <div className="flex flex-col gap-1">
             <label className="flex min-h-11 items-center gap-3">
               <input
-                ref={adultRef} type="checkbox" className="h-6 w-6 accent-(--brand)" checked={adult}
+                ref={adultRef} type="checkbox" className="h-6 w-6 shrink-0 accent-(--brand)" checked={adult}
                 aria-invalid={errors.adult ? true : undefined} aria-describedby={describe("adult")}
                 onChange={(e) => { setAdult(e.target.checked); if (errors.adult) setErrors({ ...errors, adult: undefined }); }}
               />
               <span>I am 18 or older</span>
             </label>
-            {errors.adult && <p id="adult-error" className="t-caption text-alert">{errors.adult}</p>}
+            <FieldMessage id="adult-error" error={errors.adult} />
           </div>
         )}
         <Button type="submit" disabled={!ready || busy} aria-busy={busy || undefined}>{busy ? "Signing in…" : "Sign in"}</Button>
@@ -139,10 +140,10 @@ export function AdultConfirm() {
       >
         <div className="flex flex-col gap-1">
           <label className="flex min-h-11 items-center gap-3">
-            <input type="checkbox" className="h-6 w-6 accent-(--brand)" checked={adult} aria-invalid={error ? true : undefined} aria-describedby={error ? "adult-confirm-error" : undefined} onChange={(e) => { setAdult(e.target.checked); setError(""); }} />
+            <input type="checkbox" className="h-6 w-6 shrink-0 accent-(--brand)" checked={adult} aria-invalid={error ? true : undefined} aria-describedby={error ? "adult-confirm-error" : undefined} onChange={(e) => { setAdult(e.target.checked); setError(""); }} />
             <span>I am 18 or older</span>
           </label>
-          {error && <p id="adult-confirm-error" className="t-caption text-alert">{error}</p>}
+          <FieldMessage id="adult-confirm-error" error={error || undefined} />
         </div>
         <Button type="submit">Continue</Button>
       </form>

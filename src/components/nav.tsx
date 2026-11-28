@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import { clearUnsaved, goBack, hasUnsaved, previousScreen, recordVisit } from "@/lib/client/nav";
+import { installRadioKeys } from "@/lib/client/radio-keys";
 
 const ICON = { size: 20, strokeWidth: 1.75 } as const;
 const plainClick = (e: { button: number; metaKey: boolean; ctrlKey: boolean; shiftKey: boolean; altKey: boolean }) =>
@@ -12,6 +13,7 @@ const plainClick = (e: { button: number; metaKey: boolean; ctrlKey: boolean; shi
 
 /** Records each screen visited in this tab, so Back knows where the person came from. */
 export function NavTracker() {
+  useEffect(() => { installRadioKeys(); }, []);
   const path = usePathname();
   const search = useSearchParams().toString();
   const first = useRef(true);

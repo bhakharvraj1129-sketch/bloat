@@ -81,8 +81,8 @@ export function Upgrade({ testMode }: { testMode: boolean }) {
       <section className="flex flex-col gap-2" aria-labelledby="price">
         <Label id="price">Price</Label>
         <div role="radiogroup" aria-label="Plan" className="flex flex-col gap-2">
-          <Chip role="radio" selected={plan === "annual"} onClick={() => setPlan("annual")}>{p.annual} a year <span className="t-caption">· {p.annual_per_month} a month</span></Chip>
-          <Chip role="radio" selected={plan === "three_month"} onClick={() => setPlan("three_month")}>{p.three_month} every 3 months <span className="t-caption">· {p.three_month_per_month} a month</span></Chip>
+          <Chip role="radio" selected={plan === "annual"} onClick={() => setPlan("annual")}>{p.annual} a year <span className="text-[0.8125rem] font-normal">· {p.annual_per_month} a month</span></Chip>
+          <Chip role="radio" selected={plan === "three_month"} onClick={() => setPlan("three_month")}>{p.three_month} every 3 months <span className="text-[0.8125rem] font-normal">· {p.three_month_per_month} a month</span></Chip>
           <Chip role="radio" selected={plan === "monthly"} onClick={() => setPlan("monthly")}>{p.monthly} a month</Chip>
         </div>
         <Caption>

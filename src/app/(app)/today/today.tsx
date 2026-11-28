@@ -110,14 +110,17 @@ export function Today() {
   const wantLog = params.get("log") === "1";
 
   useEffect(() => { if (state && !state.onboarded) router.replace("/setup"); }, [state, router]);
-  // The log button in the tab bar opens /today?log=1: open Log bloating (or Bloating now) once, then tidy the address.
-  const [logOpened, setLogOpened] = useState(false);
-  if (wantLog && state?.onboarded && !logOpened) {
-    setLogOpened(true);
+  // The log button in the tab bar opens /today?log=1. Tidy the address FIRST, then open Log bloating
+  // (or Bloating now): the sheet's own history step then sits on /today, so the phone's Back closes it
+  // and the next Back leaves Today. (Opening first let the tidy-up replace that step, and Back landed
+  // on ?log=1 again and reopened the sheet: interface review of 28 Nov 2026.)
+  const [logPending, setLogPending] = useState(false);
+  if (wantLog && state?.onboarded && !logPending) setLogPending(true);
+  useEffect(() => { if (wantLog && logPending) router.replace("/today", { scroll: false }); }, [wantLog, logPending, router]);
+  if (!wantLog && logPending && state) {
+    setLogPending(false);
     setSheetState(state.open_episode ? "ongoing" : "log");
   }
-  if (!wantLog && logOpened) setLogOpened(false);
-  useEffect(() => { if (wantLog && logOpened) router.replace("/today", { scroll: false }); }, [wantLog, logOpened, router]);
 
   if (loading && !state) return <Screen title="Today" width="wide"><Loading what="Loading today" /></Screen>;
   if (error && !state) return <Screen title="Today" width="wide"><ErrorState error={error} onRetry={reload} /></Screen>;

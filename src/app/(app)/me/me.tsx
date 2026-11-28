@@ -223,14 +223,14 @@ export function Me({ testMode, passwordSignIn = false }: { testMode: boolean; pa
             ) : <Button variant="secondary" onClick={() => setSheet("eye")}>Switch on</Button>}
             <SaveStatus state={mode.state} error={mode.error} onCheck={async () => { if ((await mode.check()).ok) st.reload(); }} />
             {!(s.unavailable ?? []).includes("meal_photos") && <label className="flex min-h-11 items-center gap-3">
-              <input type="checkbox" className="h-6 w-6 accent-(--brand)" checked={shown("keep_meal_photos")} disabled={profile.saving} onChange={(e) => patch({ keep_meal_photos: e.target.checked })} />
+              <input type="checkbox" className="h-6 w-6 shrink-0 accent-(--brand)" checked={shown("keep_meal_photos")} disabled={profile.saving} onChange={(e) => patch({ keep_meal_photos: e.target.checked })} />
               <span>Keep my meal photos <span className="t-caption">(off: a photo is deleted right after its check)</span></span>
             </label>}
             {switchStatus(["keep_meal_photos"])}
           </Card>
         )}
         <label className="flex min-h-11 items-center gap-3 px-1">
-          <input type="checkbox" className="h-6 w-6 accent-(--brand)" checked={shown("hide_charts")} disabled={profile.saving} onChange={(e) => { const v = e.target.checked; setChartsHidden(v); void patch({ hide_charts: v }).then((ok) => { if (ok === null) setChartsHidden(!v); }); }} />
+          <input type="checkbox" className="h-6 w-6 shrink-0 accent-(--brand)" checked={shown("hide_charts")} disabled={profile.saving} onChange={(e) => { const v = e.target.checked; setChartsHidden(v); void patch({ hide_charts: v }).then((ok) => { if (ok === null) setChartsHidden(!v); }); }} />
           <span>Hide charts</span>
         </label>
         {switchStatus(["hide_charts"])}
@@ -548,7 +548,7 @@ function PasswordSheet({ onClose }: { onClose: () => void }) {
             <FieldMessage id="pw-again-msg" error={errors.again?.message} />
           </div>
           <label className="flex min-h-11 items-center gap-3">
-            <input type="checkbox" className="h-6 w-6 accent-(--brand)" checked={show} onChange={(e) => setShow(e.target.checked)} />
+            <input type="checkbox" className="h-6 w-6 shrink-0 accent-(--brand)" checked={show} onChange={(e) => setShow(e.target.checked)} />
             <span>Show passwords</span>
           </label>
           <FieldMessage id="pw-root-msg" error={errors.root?.message} />
