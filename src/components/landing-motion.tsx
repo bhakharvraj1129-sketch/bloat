@@ -51,7 +51,12 @@ export function LandingMotion() {
         onUpdate: (self) => steps.style.setProperty("--fill", self.progress.toFixed(3)),
       }));
     }
-    return () => { io.disconnect(); triggers.forEach((t) => t.kill()); };
+    // Measure again whenever the page changes height (a section switching layout, fonts arriving),
+    // so the scrubbed effects always line up with where their sections really are.
+    let pending = 0;
+    const ro = new ResizeObserver(() => { clearTimeout(pending); pending = window.setTimeout(() => ScrollTrigger.refresh(), 120); });
+    ro.observe(document.body);
+    return () => { io.disconnect(); ro.disconnect(); clearTimeout(pending); triggers.forEach((t) => t.kill()); };
   }, []);
   return null;
 }

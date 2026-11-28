@@ -1,15 +1,13 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { Check, Moon, Sunrise, Utensils, Waves } from "lucide-react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { reducedMotion } from "@/lib/motion";
 import { useBrowserValue } from "@/lib/client/browser-value";
 
 // "A day with Bloat Buddy" (owner, 28 Nov 2026): a scroll story. The screen holds still while you
 // scroll through one day; the light changes from morning to night, a sun (then the moon) crosses the
 // sky and a timeline fills. Every sentence describes something the app really does. Scroll drives
-// it (GSAP ScrollTrigger), so nothing plays by itself; with reduce motion, or before scripts run, the
+// it, so nothing plays by itself; with reduce motion, or before scripts run, the
 // four moments are simply listed one after another.
 
 type Scene = { time: string; title: string; text: string; icon: typeof Sunrise; card: string; tick?: boolean; night?: boolean; bg: string };
@@ -42,23 +40,30 @@ export function DayStory() {
 
   useEffect(() => {
     if (mode !== "scroll" || !section.current) return;
-    gsap.registerPlugin(ScrollTrigger);
-    const st = ScrollTrigger.create({
-      trigger: section.current, start: "top top", end: "bottom bottom",
-      onUpdate: (self) => {
-        const p = self.progress;
-        setScene(Math.min(SCENES.length - 1, Math.floor(p * SCENES.length)));
-        // The sun rises on the left, peaks at midday and sets on the right; the moon takes over at night.
-        if (sun.current) {
-          // It stays in a band above the words (12 to 26% of the screen), so it never covers text.
-          const x = 6 + p * 74;
-          const y = 26 - Math.sin(Math.min(1, p / 0.75) * Math.PI) * 14;
-          sun.current.style.transform = `translate(${x}vw, ${y}vh)`;
-        }
-        if (line.current) line.current.style.transform = `scaleX(${p})`;
-      },
-    });
-    return () => st.kill();
+    const el = section.current;
+    let raf = 0;
+    // Where the story is, worked out from its real position on every scroll, so a change in the
+    // height of anything above it (a label, a button, a font) can never leave it stuck mid-day.
+    const update = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      const span = r.height - innerHeight;
+      const p = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+      setScene(Math.min(SCENES.length - 1, Math.floor(p * SCENES.length)));
+      // The sun rises on the left, peaks at midday and sets on the right; the moon takes over at night.
+      // It stays in a band above the words (12 to 26% of the screen), so it never covers text.
+      if (sun.current) {
+        const x = 6 + p * 74;
+        const y = 26 - Math.sin(Math.min(1, p / 0.75) * Math.PI) * 14;
+        sun.current.style.transform = `translate(${x}vw, ${y}vh)`;
+      }
+      if (line.current) line.current.style.transform = `scaleX(${p})`;
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    addEventListener("scroll", onScroll, { passive: true });
+    addEventListener("resize", onScroll);
+    return () => { removeEventListener("scroll", onScroll); removeEventListener("resize", onScroll); cancelAnimationFrame(raf); };
   }, [mode]);
 
   if (mode === "list") {

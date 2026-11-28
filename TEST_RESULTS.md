@@ -1,8 +1,25 @@
 # Test results
 
-Last run: 28 Nov 2026 (the motion and design pass, commit `7953a6a`, published by run 22 as `dpl_FCsJjMaBkxJ87uNHu8tKyK8MUvGK`). Before that: 27 Nov 2026 (the owner's answers D33 to D35 and the state list, commit `c91169c`, published by run 21 as `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
+Last run: 28 Nov 2026 (the animated start page and in-app responses, local results below; run 23 follows). Before that: the motion and design pass, commit `7953a6a`, published by run 22 as `dpl_FCsJjMaBkxJ87uNHu8tKyK8MUvGK`. Before that: 27 Nov 2026 (the owner's answers D33 to D35 and the state list, commit `c91169c`, published by run 21 as `dpl_9Gxh4m9E7Pf4d3nqvDoRnauck6R9`). Before that: design v2, commit `3120a26`, run 20. Before that: the first invited acceptance round, commit `35c947b`. The newest results are first; older sections follow. Local, CI and hosted results are kept apart below. Synthetic accounts and mock billing everywhere; labelled mock AI in local tests only (the candidate has AI off).
 
 Each result is one of: **passed** (it ran and the outcome was right), **expected failure** (marked to fail until a known defect is fixed; never counted as passed), **skipped** (did not run), **failed**, or **not performed** (nobody has run it).
+
+## Animated start page and in-app responses (28 Nov 2026): local results before run 23
+
+DECISIONS.md choice 35: the start page as a story you can play with (floating header and progress line, word-by-word headline, self-playing sample phone with a pause button, ticker, try-it sample, day scroll story, animated feature cards, promise, steps, questions) and a deliberate response from every control in the app (tab pill, chip tick, number pick, week fill, arrow nudge, theme cross-fade, smooth folded list). Local stack, synthetic accounts only.
+
+| Suite | Result |
+|---|---|
+| Type check and lint | Passed (lint: 0 errors, the same 5 old warnings) |
+| Rule tests | 107 passed (including no banned phrase in any screen text) |
+| API tests | 165 passed, 10 skipped (the round's checks, run below); no server code changed |
+| API, the round's checks (second server) | 10 passed |
+| Browser tests, first full run | 286 passed, 4 skipped, 1 failed: the reduce-motion check still looked for the old headline marker, which the word-by-word headline replaced. The check was updated (it now also checks the ticker, the sample phone's still state, no pause button and the day story as a list) |
+| Browser tests, full run on the final build | **291 passed**, 4 skipped (the round's checks and the password form, run below). New (`tests/e2e/motion.spec.ts`): the sample phone plays and "Pause animation" stops the phone, ticker and dot pattern; the try-it sample uses the real scale, fills in, says nothing was saved or sent, and makes no request; the day story moves with the scroll from "Morning review." to "Day done."; the questions open one at a time and the medical answer links to When to get medical help; in the app the active tab has its pill, a chosen chip shows its tick, a picked number settles, logged days fill in |
+| Browser, second server with the preview's settings (AI off, the round's switches, password sign-in) | First 14 of 15: the day story stopped short of night on the invite-only page. Cause: it measured its position once, and the invite-only label and the pause button changed the height above it afterwards. Fixed: the story works out its position from where it really is on every scroll, and the other scroll effects measure again when the page changes height. Then 30 of 30 (the round's 3 checks and the 12 motion checks, each run twice); on the normal server the motion, accessibility, core and navigation files 46 of 46 |
+| Start page on a phone and a laptop | No sideways scrolling, no errors in the browser console, no request to any other site (the page loads nothing from outside); sun and moon stay above the words; recorded on video |
+
+**Not performed:** real phones and screen readers (browser emulation only); swipe and scroll feel on a real touch screen.
 
 ## Motion and design pass (28 Nov 2026): run 22, deployment `dpl_FCsJjMaBkxJ87uNHu8tKyK8MUvGK`
 
