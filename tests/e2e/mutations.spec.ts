@@ -350,6 +350,9 @@ const ACTIONS: Action[] = [
       expect(ep.status).toBe(201);
       const id = ep.body.episode?.id ?? (await st(c)).open_episode.id;
       expect((await c.api("POST", `/v1/episodes/${id}/end`, { ended: { mode: "exact", local: local(20), zone: "America/New_York" } })).status).toBeLessThan(300);
+      // The record belongs to the day it started on (in the account's zone). Just after midnight that
+      // is yesterday, so the check opens that day instead of assuming today (CI run 23 failed at 00:20).
+      c.today = local(50).slice(0, 10);
     },
     open: async (c) => { await c.page.goto(`/day/${c.today}`); await c.page.getByRole("button", { name: "Edit times" }).click(); await dialog(c, "Edit times").getByRole("radiogroup", { name: "Start" }).getByRole("radio", { name: "Roughly" }).click(); },
     submit: (c) => dialog(c, "Edit times").getByRole("button", { name: "Save changes" }),
