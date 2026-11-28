@@ -9,6 +9,8 @@ import { ScrollProgress } from "@/components/landing/scroll-ui";
 import { TryIt } from "@/components/landing/try-it";
 import { DayStory } from "@/components/landing/day-story";
 import { Faq, type Question } from "@/components/landing/faq";
+import { BeforeAfter } from "@/components/landing/before-after";
+import { FlipSteps } from "@/components/landing/flip-steps";
 import { signInMethod } from "@/server/auth-settings";
 import { featureOff } from "@/server/availability";
 
@@ -198,6 +200,18 @@ export default async function Landing() {
           <div data-reveal><TryIt /></div>
         </section>
 
+        {/* Before and after: drag to compare scattered notes with the same days as a record. */}
+        <section aria-labelledby="compare-title" className="border-t border-line bg-subtle">
+          <div className="mx-auto grid max-w-[76rem] grid-cols-1 items-center gap-8 px-5 py-16 md:px-8 md:py-24 lg:grid-cols-[1fr_1.2fr] lg:px-12">
+            <div data-reveal className="flex flex-col gap-3">
+              <p className="t-label">Before and after</p>
+              <h2 id="compare-title" className="t-headline">From scattered notes to one clear record.</h2>
+              <p className="text-lg leading-8 text-ink-muted">Notes on your phone, a photo here, a guess there. Drag the handle and see the same days as a record you can read at a glance.</p>
+            </div>
+            <div data-reveal><BeforeAfter /></div>
+          </div>
+        </section>
+
         <DayStory />
 
         {/* Feature cards: each plays a short picture of what it does as it comes into view. */}
@@ -236,18 +250,11 @@ export default async function Landing() {
             <div data-reveal className="flex flex-col gap-3">
               <p className="t-label">Getting started</p>
               <h2 id="how-title" className="t-headline">How it works</h2>
+              <p className="max-w-2xl text-lg leading-8 text-ink-muted">Three steps. Tap a card to turn it over.</p>
             </div>
             <div data-steps className="relative">
               <div aria-hidden className="absolute left-5 right-5 top-5 hidden h-0.5 bg-line md:block"><span className="steps-line absolute inset-0 bg-brand" /></div>
-              <ol data-reveal-group className="relative grid list-none grid-cols-1 gap-8 p-0 md:grid-cols-3">
-                {STEPS.map((s) => (
-                  <li key={s.n} className="flex flex-col gap-3">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand font-bold tabular text-on-brand outline-4 outline-solid outline-subtle" aria-hidden>{s.n}</span>
-                    <h3 className="t-title">{s.title}</h3>
-                    <p className="leading-6 text-ink-muted">{s.text}</p>
-                  </li>
-                ))}
-              </ol>
+              <FlipSteps steps={STEPS} />
             </div>
             <Link href="/how-bloat-works" className="group inline-flex items-center gap-1.5 self-start font-semibold">How scores and comparisons are calculated<ArrowRight size={16} className="transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden /></Link>
           </div>

@@ -199,6 +199,25 @@ test.describe("motion spec", () => {
     await expect(page.getByRole("region", { name: "Is it a medical app?" }).getByRole("link", { name: "when to get medical help" })).toHaveAttribute("href", "/help");
   });
 
+  test("start page: the before-and-after slider works by keyboard, and the step cards flip with both sides readable", async ({ page }) => {
+    await page.goto("/");
+    const slider = page.getByRole("slider", { name: /Compare scattered notes with a Bloat Buddy record/ });
+    await slider.scrollIntoViewIfNeeded();
+    await expect(slider).toHaveValue("55");
+    await slider.focus();
+    for (let i = 0; i < 10; i++) await page.keyboard.press("ArrowLeft");
+    await expect(slider).toHaveValue("45");
+    await expect(slider).toHaveAttribute("aria-valuetext", "55% record shown");
+
+    const card = page.getByRole("button", { name: /Log as the day goes/ });
+    await card.scrollIntoViewIfNeeded();
+    await expect(card).toHaveAttribute("aria-expanded", "false");
+    await expect(card).toContainText("Two taps when bloating starts and ends."); // the details are in the page before flipping
+    await card.press("Enter");
+    await expect(card).toHaveAttribute("aria-expanded", "true");
+    await expect.poll(() => card.locator(".flip-inner").evaluate((el) => getComputedStyle(el).transform)).not.toBe("none");
+  });
+
   test("in the app: the active tab has its pill, a chosen chip shows a tick, and logged days fill in", async ({ context }) => {
     const page = await account(context);
     await page.request.post("/v1/meals", { headers: { "idempotency-key": crypto.randomUUID() }, data: { save_key: crypto.randomUUID(), dish_text: "Sample toast", eaten: { mode: "now" } } });
