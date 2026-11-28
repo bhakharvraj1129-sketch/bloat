@@ -61,7 +61,7 @@ Settled questions, including the light-only design, are listed under "Settled" a
 3. Founder tools on the hosted preview (no staff account there, by design).
 4. On the hosted preview: the doctor reminder in History, the experiment answer on Today and "Not useful" on Today (they need several days of records; checked locally and by the workflow).
 5. On the hosted preview, the failure cases that can only be forced on a local database: a storage outage during account deletion and a refused write in the recalled-meals offer. Both pass locally, including a partial photo removal.
-6. The control crawl, the link-by-link navigation run and the five-width check on the final build (last run on 22 Nov, app code `2f22cc4`).
+6. ~~The control crawl, the link-by-link navigation run and the five-width check on the final build.~~ Done on 28 Nov on `96c31de` and now in every workflow run (`tests/e2e/interface-review.spec.ts`; browser emulation only).
 7. Whether Vercel's Ignored Build Step really blocks a Git build (configured and read back by every run; not proven).
 8. A real backup restore on `bloat-test` (re-applying deletions after a restore is checked locally only).
 9. The 19 screens without approved designs have not been compared with designs (only the 20 Slice A screens have them).
@@ -69,7 +69,7 @@ Settled questions, including the light-only design, are listed under "Settled" a
 11. The new deletion message on the live preview (it needs a storage failure, which can only be caused locally).
 12. On the hosted candidate, signed in, only some of the 26 Nov fixes were exercised (27 Nov): the save lines, the empty-time hint, habit deletion, password change, AI, Learn and cards not offered, and share links revoked after a bloating record is deleted or corrected and after a medicine is deleted. The other cases of R2 (tests, health background, lactose details, family history, context answers), X1 and A1 passed locally and in run 17, not signed in on the hosted preview.
 13. The candidate on a real phone, and a tester's own first sign-in from an invitation (nobody is invited). The checklist is `docs/beta/real-phone-checklist.md`.
-14. The round's API and browser checks in the publishing workflow: it runs one normal server, so they are skipped there; they ran locally against a second server, and the deployed candidate was checked by the hosted file.
+14. ~~The round's API and browser checks in the publishing workflow.~~ Done on 28 Nov: the workflow now runs them on a second server with the beta settings and blocks publishing if any is skipped (run 26: 10 and 41, none skipped).
 
 ### Account deletion when storage fails (message fixed, P2)
 
